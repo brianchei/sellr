@@ -1,0 +1,377 @@
+generator client {
+  provider          = "prisma-client-js"
+  previewFeatures   = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [postgis(schema: "public"), uuid_ossp(schema: "public")]
+}
+
+// ─── Users ──────────────────────────────────────────────────────────────────
+
+model User {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phoneE164         String    @unique @map("phone_e164") @db.VarChar(20)
+  displayName       String    @map("display_name") @db.VarChar(100)
+  avatarUrl         String?   @map("avatar_url")
+  verifiedAt        DateTime? @map("verified_at")
+  deviceFingerprint String?   @map("device_fingerprint")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  communityMembers CommunityMember[]
+  listings         Listing[]
+  buyerOffers      Offer[]         @relation("BuyerOffers")
+  sellerOffers     Offer[]         @relation("SellerOffers")
+  ratingsGiven     Rating[]        @relation("RatingsGiven")
+  ratingsReceived  Rating[]        @relation("RatingsReceived")
+  messages         Message[]
+  savedSearches    SavedSearch[]
+  reports          Report[]
+  reputation       UserReputation?
+  flags            UserFlag[]
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+// ─── Communities ─────────────────────────────────────────────────────────────
+
+model Community {
+  id           String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String                @db.VarChar(100)
+  type         CommunityType
+  accessMethod CommunityAccessMethod @map("access_method")
+  emailDomain  String?               @map("email_domain") @db.VarChar(100)
+  rules        Json                  @default("[]")
+  status       String                @default("active")
+  createdAt    DateTime              @default(now()) @map("created_at")
+
+  members       CommunityMember[]
+  listings      Listing[]
+  inviteCodes   InviteCode[]
+  savedSearches SavedSearch[]
+
+  @@map("communities")
+}
+
+enum CommunityType {
+  campus
+  coworking
+  residential
+}
+
+enum CommunityAccessMethod {
+  invite_code
+  email_domain
+}
+
+model CommunityMember {
+  userId      String   @map("user_id") @db.Uuid
+  communityId String   @map("community_id") @db.Uuid
+  role        String   @default("member")
+  status      String   @default("active")
+  joinedAt    DateTime @default(now()) @map("joined_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@id([userId, communityId])
+  @@index([communityId])
+  @@map("community_members")
+}
+
+model InviteCode {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  communityId String    @map("community_id") @db.Uuid
+  code        String    @unique @db.VarChar(20)
+  maxUses     Int?      @map("max_uses")
+  useCount    Int       @default(0) @map("use_count")
+  expiresAt   DateTime? @map("expires_at")
+  createdBy   String    @map("created_by") @db.Uuid
+
+  community Community @relation(fields: [communityId], references: [id])
+
+  @@index([code])
+  @@map("invite_codes")
+}
+
+// ─── Listings ────────────────────────────────────────────────────────────────
+
+model Listing {
+  id                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  communityId          String           @map("community_id") @db.Uuid
+  sellerId             String           @map("seller_id") @db.Uuid
+  title                String           @db.VarChar(60)
+  description          String           @db.Text
+  category             String           @db.VarChar(50)
+  subcategory          String?          @db.VarChar(50)
+  condition            ListingCondition
+  conditionNote        String?          @map("condition_note") @db.VarChar(200)
+  price                Decimal          @db.Decimal(10, 2)
+  negotiable           Boolean          @default(false)
+  status               ListingStatus    @default(draft)
+  locationNeighborhood String           @map("location_neighborhood") @db.VarChar(100)
+  locationRadiusM      Int              @default(1000) @map("location_radius_m")
+  availabilityWindows  Json             @map("availability_windows")
+  photoUrls            Json             @map("photo_urls")
+  aiGenerated          Boolean          @default(false) @map("ai_generated")
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
+
+  community Community @relation(fields: [communityId], references: [id])
+  seller    User      @relation(fields: [sellerId], references: [id])
+  offers    Offer[]
+
+  @@index([communityId])
+  @@index([sellerId])
+  @@index([status])
+  @@index([communityId, status])
+  @@map("listings")
+}
+
+enum ListingStatus {
+  draft
+  pending_review
+  active
+  sold
+  expired
+}
+
+enum ListingCondition {
+  like_new
+  good
+  fair
+  for_parts
+}
+
+// ─── Offers ──────────────────────────────────────────────────────────────────
+
+model Offer {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId     String      @map("listing_id") @db.Uuid
+  buyerId       String      @map("buyer_id") @db.Uuid
+  sellerId      String      @map("seller_id") @db.Uuid
+  offeredPrice  Decimal     @map("offered_price") @db.Decimal(10, 2)
+  requestedTime DateTime    @map("requested_time")
+  status        OfferStatus @default(pending)
+  counterCount  Int         @default(0) @map("counter_count")
+  message       String?     @db.VarChar(300)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  listing      Listing       @relation(fields: [listingId], references: [id])
+  buyer        User          @relation("BuyerOffers", fields: [buyerId], references: [id])
+  seller       User          @relation("SellerOffers", fields: [sellerId], references: [id])
+  meetup       Meetup?
+  conversation Conversation?
+
+  @@index([listingId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+  @@map("offers")
+}
+
+enum OfferStatus {
+  pending
+  countered
+  accepted
+  declined
+  expired
+}
+
+// ─── Meetups ─────────────────────────────────────────────────────────────────
+
+model Meetup {
+  id                 String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  offerId            String       @unique @map("offer_id") @db.Uuid
+  scheduledAt        DateTime     @map("scheduled_at")
+  locationSuggestion Json         @map("location_suggestion")
+  status             MeetupStatus @default(confirmed)
+  completedAt        DateTime?    @map("completed_at")
+
+  offer   Offer    @relation(fields: [offerId], references: [id])
+  ratings Rating[]
+
+  @@map("meetups")
+}
+
+enum MeetupStatus {
+  confirmed
+  completed
+  cancelled
+  unresolved
+}
+
+// ─── Ratings ─────────────────────────────────────────────────────────────────
+
+model Rating {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  meetupId       String   @map("meetup_id") @db.Uuid
+  raterId        String   @map("rater_id") @db.Uuid
+  rateeId        String   @map("ratee_id") @db.Uuid
+  itemAccuracy   Int      @map("item_accuracy")
+  responsiveness Int
+  punctuality    Int
+  note           String?  @db.VarChar(500)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  meetup Meetup @relation(fields: [meetupId], references: [id])
+  rater  User   @relation("RatingsGiven", fields: [raterId], references: [id])
+  ratee  User   @relation("RatingsReceived", fields: [rateeId], references: [id])
+
+  @@unique([meetupId, raterId])
+  @@map("ratings")
+}
+
+model UserReputation {
+  userId             String   @id @map("user_id") @db.Uuid
+  avgItemAccuracy    Decimal  @default(0) @map("avg_item_accuracy") @db.Decimal(3, 2)
+  avgResponsiveness  Decimal  @default(0) @map("avg_responsiveness") @db.Decimal(3, 2)
+  avgPunctuality     Decimal  @default(0) @map("avg_punctuality") @db.Decimal(3, 2)
+  transactionCount   Int      @default(0) @map("transaction_count")
+  noShowCount        Int      @default(0) @map("no_show_count")
+  lateCancelCount    Int      @default(0) @map("late_cancel_count")
+  responseRatePct    Decimal  @default(0) @map("response_rate_pct") @db.Decimal(5, 2)
+  avgResponseTimeMin Decimal  @default(0) @map("avg_response_time_min") @db.Decimal(8, 2)
+  computedAt         DateTime @default(now()) @map("computed_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_reputation")
+}
+
+// ─── Messaging ───────────────────────────────────────────────────────────────
+
+model Conversation {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  offerId        String?          @unique @map("offer_id") @db.Uuid
+  participantIds String[]       @map("participant_ids") @db.Uuid
+  type           ConversationType @default(pre_offer)
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  offer    Offer?    @relation(fields: [offerId], references: [id])
+  messages Message[]
+
+  @@map("conversations")
+}
+
+enum ConversationType {
+  pre_offer
+  post_acceptance
+}
+
+model Message {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversationId String   @map("conversation_id") @db.Uuid
+  senderId       String   @map("sender_id") @db.Uuid
+  content        String   @db.Text
+  aiSuggested    Boolean  @default(false) @map("ai_suggested")
+  safetyFlagged  Boolean  @default(false) @map("safety_flagged")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+// ─── Search ──────────────────────────────────────────────────────────────────
+
+model SavedSearch {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  communityId    String    @map("community_id") @db.Uuid
+  queryParams    Json      @map("query_params")
+  lastNotifiedAt DateTime? @map("last_notified_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id])
+
+  @@map("saved_searches")
+}
+
+// ─── Trust & Safety ──────────────────────────────────────────────────────────
+
+model Report {
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reporterId  String           @map("reporter_id") @db.Uuid
+  targetId    String           @map("target_id") @db.Uuid
+  targetType  ReportTargetType @map("target_type")
+  reason      String           @db.VarChar(500)
+  severity    ReportSeverity
+  status      String           @default("open")
+  moderatorId String?          @map("moderator_id") @db.Uuid
+  resolvedAt  DateTime?        @map("resolved_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  reporter User @relation(fields: [reporterId], references: [id])
+
+  @@index([status, severity])
+  @@map("reports")
+}
+
+enum ReportTargetType {
+  listing
+  user
+  message
+}
+
+enum ReportSeverity {
+  safety
+  quality
+}
+
+model UserFlag {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String       @map("user_id") @db.Uuid
+  flagType       UserFlagType @map("flag_type")
+  count          Int          @default(1)
+  lastOccurredAt DateTime     @default(now()) @map("last_occurred_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, flagType])
+  @@map("user_flags")
+}
+
+enum UserFlagType {
+  late_cancel
+  no_show
+  scam_report
+}
+
+// ─── Notifications ───────────────────────────────────────────────────────────
+
+model Notification {
+  id      String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId  String           @map("user_id") @db.Uuid
+  type    NotificationType
+  payload Json
+  readAt  DateTime?        @map("read_at")
+  sentAt  DateTime         @default(now()) @map("sent_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sentAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  new_offer
+  offer_accepted
+  offer_countered
+  offer_declined
+  meetup_reminder_24h
+  meetup_reminder_2h
+  new_message
+  listing_inquiry
+  rating_request
+  new_match
+}
