@@ -1,7 +1,13 @@
+import { AuthGate } from '@/components/auth-gate';
+
 export default function AppShellLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="min-h-screen bg-zinc-50 text-zinc-900">{children}</div>;
+  return (
+    <div className="min-h-screen bg-zinc-50 text-zinc-900">
+      <AuthGate>{children}</AuthGate>
+    </div>
+  );
 }
