@@ -14,6 +14,7 @@
   "dependencies": {
     "@sellr/api-client": "workspace:^",
     "@sellr/shared": "workspace:^",
+    "@sentry/react-native": "^8.7.0",
     "@tanstack/react-query": "^5.0.0",
     "expo": "~54.0.33",
     "expo-background-task": "^55.0.13",

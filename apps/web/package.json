@@ -12,6 +12,7 @@
   "dependencies": {
     "@sellr/api-client": "workspace:^",
     "@sellr/shared": "workspace:^",
+    "@sentry/nextjs": "^10.47.0",
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-query-devtools": "^5.96.2",
     "next": "16.2.3",

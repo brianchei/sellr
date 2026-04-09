@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Notifications from 'expo-notifications';
+import '../src/lib/sentry';
 import { useAuthStore } from '../src/stores/auth';
 
 const rehydrateAuth = () => useAuthStore.getState().rehydrate();
