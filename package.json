@@ -1,7 +1,7 @@
 {
   "name": "sellr",
   "private": true,
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@10.0.0",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -15,10 +15,18 @@
     "db:migrate": "pnpm --filter @sellr/api prisma migrate dev",
     "db:studio": "pnpm --filter @sellr/api prisma studio"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma"]
+  },
   "devDependencies": {
-    "turbo": "^2.0.0",
-    "typescript": "^5.4.0",
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-prettier": "^5.2.0",
+    "globals": "^16.0.0",
     "prettier": "^3.2.0",
-    "eslint": "^8.57.0"
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.0.0"
   }
 }

@@ -1,0 +1,4 @@
+
+> @sellr/api-client@0.0.1 typecheck /Users/brianchei/repos/sellr/packages/api-client
+> tsc --noEmit
+

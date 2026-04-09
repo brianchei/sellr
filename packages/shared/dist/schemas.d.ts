@@ -2,63 +2,29 @@ import { z } from 'zod';
 import { ListingCondition } from './enums';
 export declare const SendOTPSchema: z.ZodObject<{
     phoneE164: z.ZodString;
-}, "strip", z.ZodTypeAny, {
-    phoneE164: string;
-}, {
-    phoneE164: string;
-}>;
+}, z.core.$strip>;
 export declare const VerifyOTPSchema: z.ZodObject<{
     phoneE164: z.ZodString;
     code: z.ZodString;
     deviceFingerprint: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
-    phoneE164: string;
-    code: string;
-    deviceFingerprint?: string | undefined;
-}, {
-    phoneE164: string;
-    code: string;
-    deviceFingerprint?: string | undefined;
-}>;
-export declare const JoinCommunitySchema: z.ZodEffects<z.ZodObject<{
+}, z.core.$strip>;
+export declare const JoinCommunitySchema: z.ZodObject<{
     inviteCode: z.ZodOptional<z.ZodString>;
-    institutionalEmail: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
-    inviteCode?: string | undefined;
-    institutionalEmail?: string | undefined;
-}, {
-    inviteCode?: string | undefined;
-    institutionalEmail?: string | undefined;
-}>, {
-    inviteCode?: string | undefined;
-    institutionalEmail?: string | undefined;
-}, {
-    inviteCode?: string | undefined;
-    institutionalEmail?: string | undefined;
-}>;
+    institutionalEmail: z.ZodOptional<z.ZodEmail>;
+}, z.core.$strip>;
 export declare const AvailabilityWindowSchema: z.ZodObject<{
     dayOfWeek: z.ZodNumber;
     startHour: z.ZodNumber;
     endHour: z.ZodNumber;
-    specificDate: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
-    dayOfWeek: number;
-    startHour: number;
-    endHour: number;
-    specificDate?: string | undefined;
-}, {
-    dayOfWeek: number;
-    startHour: number;
-    endHour: number;
-    specificDate?: string | undefined;
-}>;
+    specificDate: z.ZodOptional<z.ZodISODateTime>;
+}, z.core.$strip>;
 export declare const CreateListingSchema: z.ZodObject<{
-    communityId: z.ZodString;
+    communityId: z.ZodUUID;
     title: z.ZodString;
     description: z.ZodString;
     category: z.ZodString;
     subcategory: z.ZodOptional<z.ZodString>;
-    condition: z.ZodNativeEnum<typeof ListingCondition>;
+    condition: z.ZodEnum<typeof ListingCondition>;
     conditionNote: z.ZodOptional<z.ZodString>;
     price: z.ZodNumber;
     negotiable: z.ZodDefault<z.ZodBoolean>;
@@ -68,155 +34,45 @@ export declare const CreateListingSchema: z.ZodObject<{
         dayOfWeek: z.ZodNumber;
         startHour: z.ZodNumber;
         endHour: z.ZodNumber;
-        specificDate: z.ZodOptional<z.ZodString>;
-    }, "strip", z.ZodTypeAny, {
-        dayOfWeek: number;
-        startHour: number;
-        endHour: number;
-        specificDate?: string | undefined;
-    }, {
-        dayOfWeek: number;
-        startHour: number;
-        endHour: number;
-        specificDate?: string | undefined;
-    }>, "many">;
-    photoUrls: z.ZodArray<z.ZodString, "many">;
+        specificDate: z.ZodOptional<z.ZodISODateTime>;
+    }, z.core.$strip>>;
+    photoUrls: z.ZodArray<z.ZodURL>;
     aiGenerated: z.ZodDefault<z.ZodBoolean>;
-}, "strip", z.ZodTypeAny, {
-    communityId: string;
-    title: string;
-    description: string;
-    category: string;
-    condition: ListingCondition;
-    price: number;
-    negotiable: boolean;
-    locationRadiusM: number;
-    locationNeighborhood: string;
-    availabilityWindows: {
-        dayOfWeek: number;
-        startHour: number;
-        endHour: number;
-        specificDate?: string | undefined;
-    }[];
-    photoUrls: string[];
-    aiGenerated: boolean;
-    subcategory?: string | undefined;
-    conditionNote?: string | undefined;
-}, {
-    communityId: string;
-    title: string;
-    description: string;
-    category: string;
-    condition: ListingCondition;
-    price: number;
-    locationNeighborhood: string;
-    availabilityWindows: {
-        dayOfWeek: number;
-        startHour: number;
-        endHour: number;
-        specificDate?: string | undefined;
-    }[];
-    photoUrls: string[];
-    subcategory?: string | undefined;
-    conditionNote?: string | undefined;
-    negotiable?: boolean | undefined;
-    locationRadiusM?: number | undefined;
-    aiGenerated?: boolean | undefined;
-}>;
+}, z.core.$strip>;
 export declare const CreateOfferSchema: z.ZodObject<{
-    listingId: z.ZodString;
+    listingId: z.ZodUUID;
     offeredPrice: z.ZodNumber;
-    requestedTime: z.ZodString;
+    requestedTime: z.ZodISODateTime;
     message: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
-    listingId: string;
-    offeredPrice: number;
-    requestedTime: string;
-    message?: string | undefined;
-}, {
-    listingId: string;
-    offeredPrice: number;
-    requestedTime: string;
-    message?: string | undefined;
-}>;
-export declare const RespondToOfferSchema: z.ZodEffects<z.ZodObject<{
-    action: z.ZodEnum<["accept", "decline", "counter"]>;
+}, z.core.$strip>;
+export declare const RespondToOfferSchema: z.ZodObject<{
+    action: z.ZodEnum<{
+        accept: "accept";
+        decline: "decline";
+        counter: "counter";
+    }>;
     counterPrice: z.ZodOptional<z.ZodNumber>;
-    counterTime: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
-    action: "accept" | "decline" | "counter";
-    counterPrice?: number | undefined;
-    counterTime?: string | undefined;
-}, {
-    action: "accept" | "decline" | "counter";
-    counterPrice?: number | undefined;
-    counterTime?: string | undefined;
-}>, {
-    action: "accept" | "decline" | "counter";
-    counterPrice?: number | undefined;
-    counterTime?: string | undefined;
-}, {
-    action: "accept" | "decline" | "counter";
-    counterPrice?: number | undefined;
-    counterTime?: string | undefined;
-}>;
+    counterTime: z.ZodOptional<z.ZodISODateTime>;
+}, z.core.$strip>;
 export declare const CreateRatingSchema: z.ZodObject<{
-    meetupId: z.ZodString;
-    rateeId: z.ZodString;
+    meetupId: z.ZodUUID;
+    rateeId: z.ZodUUID;
     itemAccuracy: z.ZodNumber;
     responsiveness: z.ZodNumber;
     punctuality: z.ZodNumber;
     note: z.ZodOptional<z.ZodString>;
-}, "strip", z.ZodTypeAny, {
-    meetupId: string;
-    rateeId: string;
-    itemAccuracy: number;
-    responsiveness: number;
-    punctuality: number;
-    note?: string | undefined;
-}, {
-    meetupId: string;
-    rateeId: string;
-    itemAccuracy: number;
-    responsiveness: number;
-    punctuality: number;
-    note?: string | undefined;
-}>;
+}, z.core.$strip>;
 export declare const SearchQuerySchema: z.ZodObject<{
     q: z.ZodOptional<z.ZodString>;
     category: z.ZodOptional<z.ZodString>;
     condition: z.ZodOptional<z.ZodString>;
-    minPrice: z.ZodOptional<z.ZodNumber>;
-    maxPrice: z.ZodOptional<z.ZodNumber>;
-    radiusM: z.ZodDefault<z.ZodNumber>;
-    lat: z.ZodOptional<z.ZodNumber>;
-    lng: z.ZodOptional<z.ZodNumber>;
-    availableToday: z.ZodOptional<z.ZodBoolean>;
-    page: z.ZodDefault<z.ZodNumber>;
-    hitsPerPage: z.ZodDefault<z.ZodNumber>;
-}, "strip", z.ZodTypeAny, {
-    radiusM: number;
-    page: number;
-    hitsPerPage: number;
-    category?: string | undefined;
-    condition?: string | undefined;
-    q?: string | undefined;
-    minPrice?: number | undefined;
-    maxPrice?: number | undefined;
-    lat?: number | undefined;
-    lng?: number | undefined;
-    availableToday?: boolean | undefined;
-}, {
-    category?: string | undefined;
-    condition?: string | undefined;
-    q?: string | undefined;
-    minPrice?: number | undefined;
-    maxPrice?: number | undefined;
-    radiusM?: number | undefined;
-    lat?: number | undefined;
-    lng?: number | undefined;
-    availableToday?: boolean | undefined;
-    page?: number | undefined;
-    hitsPerPage?: number | undefined;
-}>;
+    minPrice: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    maxPrice: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    radiusM: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    lat: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    lng: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    availableToday: z.ZodOptional<z.ZodCoercedBoolean<unknown>>;
+    page: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    hitsPerPage: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+}, z.core.$strip>;
 //# sourceMappingURL=schemas.d.ts.map

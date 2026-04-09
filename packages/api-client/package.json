@@ -6,16 +6,17 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
   },
   "dependencies": {
     "@sellr/shared": "workspace:*",
     "@tanstack/react-query": "^5.0.0",
-    "zod": "^3.23.0"
+    "zod": "^4.3.0"
   },
   "devDependencies": {
     "@sellr/tsconfig": "workspace:*",
     "@types/node": "^20.0.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.7.0"
   }
 }

@@ -28,12 +28,14 @@ async function apiFetch(path, options = {}) {
     const res = await fetch(`${API_BASE_URL}/api/v1${path}`, {
         ...options,
         headers,
-        credentials: 'include', // For web httpOnly cookie refresh
+        credentials: 'include',
     });
     if (!res.ok) {
-        const body = await res.json().catch(() => ({ error: 'Unknown error' }));
+        const body = (await res.json().catch(() => ({
+            error: 'Unknown error',
+        })));
         throw new ApiError(res.status, body.error ?? 'Request failed');
     }
-    const json = await res.json();
+    const json = (await res.json());
     return json.data;
 }

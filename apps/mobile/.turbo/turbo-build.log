@@ -1,0 +1,4 @@
+
+> @sellr/mobile@1.0.0 build /Users/brianchei/repos/sellr/apps/mobile
+> tsc --noEmit
+

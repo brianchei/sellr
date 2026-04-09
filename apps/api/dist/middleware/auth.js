@@ -10,9 +10,9 @@ async function verifyJWT(request, reply) {
         reply.code(401).send({ error: 'Unauthorized' });
     }
 }
-async function requireCommunityMembership(request, reply) {
-    const communityId = request.params?.communityId ??
-        request.body?.communityId;
+function requireCommunityMembership(request, reply) {
+    const body = request.body;
+    const communityId = request.params.communityId ?? body.communityId;
     if (!communityId)
         return;
     const isMember = request.user.communityIds.includes(communityId);

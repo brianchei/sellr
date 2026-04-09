@@ -1,0 +1,6 @@
+
+> @sellr/tsconfig@0.0.1 lint /Users/brianchei/repos/sellr/packages/tsconfig
+> prettier -c package.json
+
+Checking formatting...
+All matched files use Prettier code style!

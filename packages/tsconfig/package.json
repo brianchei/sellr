@@ -2,5 +2,12 @@
   "name": "@sellr/tsconfig",
   "version": "0.0.1",
   "private": true,
-  "files": ["base.json", "nextjs.json", "react-native.json"]
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react-native.json"
+  ],
+  "scripts": {
+    "lint": "prettier -c package.json"
+  }
 }

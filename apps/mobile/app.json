@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Sellr",
+    "slug": "sellr",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "sellr",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.sellr.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Sellr uses your location to show nearby listings.",
+        "NSCameraUsageDescription": "Sellr uses your camera to photograph items for listing.",
+        "NSPhotoLibraryUsageDescription": "Sellr accesses your photos to upload listing images."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.sellr.app",
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-notifications",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Sellr uses your location to find nearby listings."
+        }
+      ],
+      "expo-background-task"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

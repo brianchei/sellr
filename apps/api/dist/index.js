@@ -1,11 +1,46 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("./lib/sentry");
 const fastify_1 = __importDefault(require("fastify"));
 const socket_io_1 = require("socket.io");
 const fastify_type_provider_zod_1 = require("fastify-type-provider-zod");
+const Sentry = __importStar(require("@sentry/node"));
 const cors_1 = require("./plugins/cors");
 const jwt_1 = require("./plugins/jwt");
 const rateLimit_1 = require("./plugins/rateLimit");
@@ -27,9 +62,26 @@ const fastify = (0, fastify_1.default)({
 }).withTypeProvider();
 fastify.setValidatorCompiler(fastify_type_provider_zod_1.validatorCompiler);
 fastify.setSerializerCompiler(fastify_type_provider_zod_1.serializerCompiler);
+fastify.setErrorHandler((error, request, reply) => {
+    const statusCode = typeof error.statusCode === 'number' ? error.statusCode : 500;
+    if (statusCode >= 500) {
+        const user = request.user;
+        Sentry.captureException(error, {
+            tags: { route: request.routeOptions.url ?? 'unknown' },
+            user: user?.sub ? { id: user.sub } : undefined,
+        });
+    }
+    fastify.log.error({ err: error, req: request.id }, 'Unhandled error');
+    reply.status(statusCode).send({
+        error: statusCode >= 500 ? 'Internal server error' : error.message,
+        code: typeof error.code === 'string' ? error.code : undefined,
+    });
+});
 const io = new socket_io_1.Server(fastify.server, {
     cors: {
-        origin: process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+        origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [
+            'http://localhost:3000',
+        ],
         credentials: true,
     },
 });
@@ -37,7 +89,7 @@ async function start() {
     await fastify.register(cors_1.corsPlugin);
     await fastify.register(jwt_1.jwtPlugin);
     await fastify.register(rateLimit_1.rateLimitPlugin);
-    fastify.get('/health', async () => ({
+    fastify.get('/health', () => ({
         status: 'ok',
         ts: new Date().toISOString(),
     }));
@@ -53,10 +105,10 @@ async function start() {
         prefix: '/api/v1/notifications',
     });
     (0, socket_1.initSocketIO)(io);
-    await (0, queue_1.initBullMQ)();
+    (0, queue_1.initBullMQ)();
     const port = parseInt(process.env.PORT ?? '3001', 10);
     await fastify.listen({ port, host: '0.0.0.0' });
-    fastify.log.info(`API running on port ${port}`);
+    fastify.log.info(`API running on port ${String(port)}`);
 }
 start().catch((err) => {
     fastify.log.error(err);

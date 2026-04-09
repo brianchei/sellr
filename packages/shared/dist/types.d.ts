@@ -1,4 +1,4 @@
-import { UserRole, CommunityType, CommunityAccessMethod, ListingStatus, ListingCondition, OfferStatus, MeetupStatus, ConversationType, ReportTargetType, ReportSeverity, NotificationType } from './enums';
+import type { UserRole, CommunityType, CommunityAccessMethod, ListingStatus, ListingCondition, OfferStatus, MeetupStatus, ConversationType, ReportTargetType, ReportSeverity, NotificationType } from './enums';
 export interface User {
     id: string;
     phoneE164: string;

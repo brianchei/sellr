@@ -25,13 +25,12 @@ export async function verifyJWT(
   }
 }
 
-export async function requireCommunityMembership(
-  request: FastifyRequest<{ Params?: { communityId?: string } }>,
+export function requireCommunityMembership(
+  request: FastifyRequest<{ Params: { communityId?: string } }>,
   reply: FastifyReply,
-): Promise<void> {
-  const communityId =
-    request.params?.communityId ??
-    (request.body as { communityId?: string })?.communityId;
+): void {
+  const body = request.body as { communityId?: string };
+  const communityId = request.params.communityId ?? body.communityId;
 
   if (!communityId) return;
 

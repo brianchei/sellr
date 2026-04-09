@@ -1,0 +1,13 @@
+# Redis only — Postgres/PostGIS via Supabase CLI (`supabase start` in apps/api). See sellr-technical-implementation-guide-v2.md §5–§9.
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: sellr_redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  redis_data:

@@ -1,10 +1,13 @@
-import Fastify from 'fastify';
+import './lib/sentry';
+
+import Fastify, { type FastifyError } from 'fastify';
 import { Server } from 'socket.io';
 import {
   serializerCompiler,
   validatorCompiler,
-  ZodTypeProvider,
+  type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
+import * as Sentry from '@sentry/node';
 
 import { corsPlugin } from './plugins/cors';
 import { jwtPlugin } from './plugins/jwt';
@@ -21,6 +24,7 @@ import { notificationRoutes } from './modules/notifications/routes';
 import { initSocketIO } from './lib/socket';
 import { initBullMQ } from './lib/queue';
 import { logger } from './lib/logger';
+import type { JWTPayload } from './middleware/auth';
 
 const fastify = Fastify({
   logger,
@@ -30,9 +34,31 @@ const fastify = Fastify({
 fastify.setValidatorCompiler(validatorCompiler);
 fastify.setSerializerCompiler(serializerCompiler);
 
+fastify.setErrorHandler((error: FastifyError, request, reply) => {
+  const statusCode =
+    typeof error.statusCode === 'number' ? error.statusCode : 500;
+
+  if (statusCode >= 500) {
+    const user = request.user as JWTPayload | undefined;
+    Sentry.captureException(error, {
+      tags: { route: request.routeOptions.url ?? 'unknown' },
+      user: user?.sub ? { id: user.sub } : undefined,
+    });
+  }
+
+  fastify.log.error({ err: error, req: request.id }, 'Unhandled error');
+
+  reply.status(statusCode).send({
+    error: statusCode >= 500 ? 'Internal server error' : error.message,
+    code: typeof error.code === 'string' ? error.code : undefined,
+  });
+});
+
 const io = new Server(fastify.server, {
   cors: {
-    origin: process.env.ALLOWED_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+    origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [
+      'http://localhost:3000',
+    ],
     credentials: true,
   },
 });
@@ -42,7 +68,7 @@ async function start() {
   await fastify.register(jwtPlugin);
   await fastify.register(rateLimitPlugin);
 
-  fastify.get('/health', async () => ({
+  fastify.get('/health', () => ({
     status: 'ok',
     ts: new Date().toISOString(),
   }));
@@ -60,14 +86,14 @@ async function start() {
   });
 
   initSocketIO(io);
-  await initBullMQ();
+  initBullMQ();
 
   const port = parseInt(process.env.PORT ?? '3001', 10);
   await fastify.listen({ port, host: '0.0.0.0' });
-  fastify.log.info(`API running on port ${port}`);
+  fastify.log.info(`API running on port ${String(port)}`);
 }
 
-start().catch((err) => {
+start().catch((err: unknown) => {
   fastify.log.error(err);
   process.exit(1);
 });

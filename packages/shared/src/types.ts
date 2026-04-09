@@ -1,4 +1,4 @@
-import {
+import type {
   UserRole,
   CommunityType,
   CommunityAccessMethod,
@@ -9,7 +9,6 @@ import {
   ConversationType,
   ReportTargetType,
   ReportSeverity,
-  UserFlagType,
   NotificationType,
 } from './enums';
 

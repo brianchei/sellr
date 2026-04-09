@@ -6,7 +6,7 @@ import { notificationWorker } from '../jobs/notifications';
 import { savedSearchWorker } from '../jobs/savedSearch';
 import { quickReplyWorker } from '../jobs/quickReply';
 
-export async function initBullMQ(): Promise<void> {
+export function initBullMQ(): void {
   new Worker('ai', imageForensicsWorker, {
     connection: redis,
     concurrency: 3,
