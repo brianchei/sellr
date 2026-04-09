@@ -47,6 +47,13 @@ export function fetchMe() {
   }>('/auth/me');
 }
 
+export function registerPushToken(expoPushToken: string) {
+  return apiFetch<{ registered: boolean }>('/auth/push-token', {
+    method: 'POST',
+    body: JSON.stringify({ expoPushToken }),
+  });
+}
+
 export function joinCommunity(body: {
   inviteCode?: string;
   institutionalEmail?: string;

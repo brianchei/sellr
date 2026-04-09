@@ -16,6 +16,10 @@ export const RefreshTokenSchema = z.object({
   refreshToken: z.string().min(10),
 });
 
+export const RegisterPushTokenSchema = z.object({
+  expoPushToken: z.string().min(1).max(500),
+});
+
 export const JoinCommunitySchema = z
   .object({
     inviteCode: z.string().optional(),

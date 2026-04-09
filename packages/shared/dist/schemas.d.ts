@@ -11,6 +11,9 @@ export declare const VerifyOTPSchema: z.ZodObject<{
 export declare const RefreshTokenSchema: z.ZodObject<{
     refreshToken: z.ZodString;
 }, z.core.$strip>;
+export declare const RegisterPushTokenSchema: z.ZodObject<{
+    expoPushToken: z.ZodString;
+}, z.core.$strip>;
 export declare const JoinCommunitySchema: z.ZodObject<{
     inviteCode: z.ZodOptional<z.ZodString>;
     institutionalEmail: z.ZodOptional<z.ZodEmail>;

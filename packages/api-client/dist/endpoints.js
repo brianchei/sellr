@@ -4,6 +4,7 @@ exports.sendOtp = sendOtp;
 exports.verifyOtp = verifyOtp;
 exports.refreshTokens = refreshTokens;
 exports.fetchMe = fetchMe;
+exports.registerPushToken = registerPushToken;
 exports.joinCommunity = joinCommunity;
 exports.fetchListingsNearby = fetchListingsNearby;
 exports.fetchCommunityListings = fetchCommunityListings;
@@ -43,6 +44,12 @@ function refreshTokens(refreshToken) {
 }
 function fetchMe() {
     return (0, fetch_1.apiFetch)('/auth/me');
+}
+function registerPushToken(expoPushToken) {
+    return (0, fetch_1.apiFetch)('/auth/push-token', {
+        method: 'POST',
+        body: JSON.stringify({ expoPushToken }),
+    });
 }
 function joinCommunity(body) {
     return (0, fetch_1.apiFetch)('/communities/join', {

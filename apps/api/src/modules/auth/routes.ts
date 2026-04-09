@@ -2,6 +2,7 @@ import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import {
   RefreshTokenSchema,
+  RegisterPushTokenSchema,
   SendOTPSchema,
   VerifyOTPSchema,
 } from '@sellr/shared';
@@ -84,6 +85,22 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       } catch {
         return await reply.code(401).send({ error: 'Invalid refresh token' });
       }
+    },
+  );
+
+  fastify.post(
+    '/push-token',
+    {
+      preHandler: verifyJWT,
+      schema: { body: RegisterPushTokenSchema },
+    },
+    async (request, reply) => {
+      const body = RegisterPushTokenSchema.parse(request.body);
+      await prisma.user.update({
+        where: { id: request.user.sub },
+        data: { expoPushToken: body.expoPushToken },
+      });
+      return reply.send(ok({ registered: true }));
     },
   );
 

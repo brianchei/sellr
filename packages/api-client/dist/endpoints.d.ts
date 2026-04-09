@@ -25,6 +25,9 @@ export declare function fetchMe(): Promise<{
     };
     communityIds: string[];
 }>;
+export declare function registerPushToken(expoPushToken: string): Promise<{
+    registered: boolean;
+}>;
 export declare function joinCommunity(body: {
     inviteCode?: string;
     institutionalEmail?: string;
