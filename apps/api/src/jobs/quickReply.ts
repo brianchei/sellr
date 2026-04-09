@@ -4,7 +4,16 @@ import type { QuickReplyJob } from '../lib/jobTypes';
 
 export async function quickReplyWorker(job: Job<QuickReplyJob>): Promise<void> {
   await traceAIJob('quick_reply', async (trace) => {
-    void trace;
+    trace?.update({
+      metadata: {
+        jobId: job.id,
+        messageId: job.data.messageId,
+        conversationId: job.data.conversationId,
+        listingId: job.data.listingId,
+        sellerId: job.data.sellerId,
+        contentLength: job.data.content.length,
+      },
+    });
     void job.data.messageId;
     void job.data.conversationId;
     void job.data.content;

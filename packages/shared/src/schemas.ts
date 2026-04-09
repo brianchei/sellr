@@ -65,6 +65,18 @@ export const CreateMessageSchema = z.object({
   content: z.string().min(1).max(8000),
 });
 
+export const CreateReportSchema = z.object({
+  targetId: z.uuid(),
+  targetType: z.enum(['listing', 'user', 'message']),
+  reason: z.string().min(10).max(500),
+  severity: z.enum(['safety', 'quality']),
+});
+
+export const ListNotificationsQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).optional().default(20),
+  unreadOnly: z.coerce.boolean().optional().default(false),
+});
+
 export const NearbyListingsQuerySchema = z.object({
   communityId: z.uuid(),
   lat: z.coerce.number().gte(-90).lte(90),

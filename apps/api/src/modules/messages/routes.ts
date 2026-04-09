@@ -2,6 +2,7 @@ import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import { CreateConversationSchema, CreateMessageSchema } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
+import { notifyUser } from '../../lib/notifyUser';
 import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
 
@@ -112,6 +113,15 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           content: body.content,
         },
       });
+
+      const peerId = conv.participantIds.find((id) => id !== request.user.sub);
+      if (peerId) {
+        await notifyUser(peerId, 'new_message', {
+          conversationId,
+          messageId: message.id,
+          preview: body.content.slice(0, 120),
+        });
+      }
 
       return reply.code(201).send(ok({ message }));
     },

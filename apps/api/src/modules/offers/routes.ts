@@ -3,6 +3,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import { CreateOfferSchema, RespondToOfferSchema } from '@sellr/shared';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
+import { notifyUser } from '../../lib/notifyUser';
 import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
 
@@ -45,6 +46,12 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           message: body.message,
           status: 'pending',
         },
+      });
+
+      await notifyUser(listing.sellerId, 'new_offer', {
+        offerId: offer.id,
+        listingId: listing.id,
+        buyerId: request.user.sub,
       });
 
       return reply.code(201).send(ok({ offer }));
@@ -107,6 +114,10 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           where: { id: offerId },
           data: { status: 'declined' },
         });
+        await notifyUser(offer.buyerId, 'offer_declined', {
+          offerId: offer.id,
+          listingId: offer.listingId,
+        });
         return reply.send(ok({ offer: updated }));
       }
 
@@ -125,6 +136,10 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
               ? { requestedTime: new Date(body.counterTime) }
               : {}),
           },
+        });
+        await notifyUser(offer.buyerId, 'offer_countered', {
+          offerId: offer.id,
+          listingId: offer.listingId,
         });
         return reply.send(ok({ offer: updated }));
       }
@@ -151,6 +166,12 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           },
         });
         return { offer: updated, meetup };
+      });
+
+      await notifyUser(offer.buyerId, 'offer_accepted', {
+        offerId: result.offer.id,
+        listingId: offer.listingId,
+        meetupId: result.meetup.id,
       });
 
       return reply.send(ok(result));

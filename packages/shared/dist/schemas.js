@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.CreateMessageSchema = exports.CreateConversationSchema = exports.ListListingsQuerySchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.CreateConversationSchema = exports.ListListingsQuerySchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
 // Auth
@@ -57,6 +57,16 @@ exports.CreateConversationSchema = zod_1.z.object({
 });
 exports.CreateMessageSchema = zod_1.z.object({
     content: zod_1.z.string().min(1).max(8000),
+});
+exports.CreateReportSchema = zod_1.z.object({
+    targetId: zod_1.z.uuid(),
+    targetType: zod_1.z.enum(['listing', 'user', 'message']),
+    reason: zod_1.z.string().min(10).max(500),
+    severity: zod_1.z.enum(['safety', 'quality']),
+});
+exports.ListNotificationsQuerySchema = zod_1.z.object({
+    limit: zod_1.z.coerce.number().int().min(1).max(50).optional().default(20),
+    unreadOnly: zod_1.z.coerce.boolean().optional().default(false),
 });
 exports.NearbyListingsQuerySchema = zod_1.z.object({
     communityId: zod_1.z.uuid(),

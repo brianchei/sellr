@@ -96,4 +96,24 @@ export declare function sendMessage(conversationId: string, body: {
 }): Promise<{
     message: unknown;
 }>;
+export declare function fetchNotifications(params?: {
+    limit?: number;
+    unreadOnly?: boolean;
+}): Promise<{
+    notifications: unknown[];
+}>;
+export declare function markNotificationRead(notificationId: string): Promise<{
+    notification: unknown;
+}>;
+export declare function markAllNotificationsRead(): Promise<{
+    updatedCount: number;
+}>;
+export declare function createReport(body: {
+    targetId: string;
+    targetType: 'listing' | 'user' | 'message';
+    reason: string;
+    severity: 'safety' | 'quality';
+}): Promise<{
+    report: unknown;
+}>;
 //# sourceMappingURL=endpoints.d.ts.map

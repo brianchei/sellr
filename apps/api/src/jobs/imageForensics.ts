@@ -6,7 +6,14 @@ export async function imageForensicsWorker(
   job: Job<ImageForensicsJob>,
 ): Promise<void> {
   await traceAIJob('image_forensics', async (trace) => {
-    void trace;
+    trace?.update({
+      metadata: {
+        jobId: job.id,
+        listingId: job.data.listingId,
+        sellerId: job.data.sellerId,
+        photoCount: job.data.photoUrls.length,
+      },
+    });
     void job.data.listingId;
     void job.data.photoUrls;
     void job.data.sellerId;

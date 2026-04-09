@@ -18,6 +18,10 @@ exports.fetchMeetup = fetchMeetup;
 exports.createConversation = createConversation;
 exports.fetchConversationMessages = fetchConversationMessages;
 exports.sendMessage = sendMessage;
+exports.fetchNotifications = fetchNotifications;
+exports.markNotificationRead = markNotificationRead;
+exports.markAllNotificationsRead = markAllNotificationsRead;
+exports.createReport = createReport;
 const fetch_1 = require("./fetch");
 function sendOtp(phoneE164) {
     return (0, fetch_1.apiFetch)('/auth/otp/send', {
@@ -123,6 +127,30 @@ function fetchConversationMessages(conversationId) {
 }
 function sendMessage(conversationId, body) {
     return (0, fetch_1.apiFetch)(`/conversations/${conversationId}/messages`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+    });
+}
+function fetchNotifications(params) {
+    const q = new URLSearchParams();
+    if (params?.limit != null)
+        q.set('limit', String(params.limit));
+    if (params?.unreadOnly != null) {
+        q.set('unreadOnly', String(params.unreadOnly));
+    }
+    const qs = q.toString();
+    return (0, fetch_1.apiFetch)(`/notifications${qs ? `?${qs}` : ''}`);
+}
+function markNotificationRead(notificationId) {
+    return (0, fetch_1.apiFetch)(`/notifications/${notificationId}/read`, { method: 'POST' });
+}
+function markAllNotificationsRead() {
+    return (0, fetch_1.apiFetch)('/notifications/read-all', {
+        method: 'POST',
+    });
+}
+function createReport(body) {
+    return (0, fetch_1.apiFetch)('/reports', {
         method: 'POST',
         body: JSON.stringify(body),
     });

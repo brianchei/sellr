@@ -54,6 +54,23 @@ export declare const CreateConversationSchema: z.ZodObject<{
 export declare const CreateMessageSchema: z.ZodObject<{
     content: z.ZodString;
 }, z.core.$strip>;
+export declare const CreateReportSchema: z.ZodObject<{
+    targetId: z.ZodUUID;
+    targetType: z.ZodEnum<{
+        listing: "listing";
+        user: "user";
+        message: "message";
+    }>;
+    reason: z.ZodString;
+    severity: z.ZodEnum<{
+        safety: "safety";
+        quality: "quality";
+    }>;
+}, z.core.$strip>;
+export declare const ListNotificationsQuerySchema: z.ZodObject<{
+    limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+    unreadOnly: z.ZodDefault<z.ZodOptional<z.ZodCoercedBoolean<unknown>>>;
+}, z.core.$strip>;
 export declare const NearbyListingsQuerySchema: z.ZodObject<{
     communityId: z.ZodUUID;
     lat: z.ZodCoercedNumber<unknown>;

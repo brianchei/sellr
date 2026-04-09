@@ -180,3 +180,43 @@ export function sendMessage(conversationId: string, body: { content: string }) {
     },
   );
 }
+
+export function fetchNotifications(params?: {
+  limit?: number;
+  unreadOnly?: boolean;
+}) {
+  const q = new URLSearchParams();
+  if (params?.limit != null) q.set('limit', String(params.limit));
+  if (params?.unreadOnly != null) {
+    q.set('unreadOnly', String(params.unreadOnly));
+  }
+  const qs = q.toString();
+  return apiFetch<{ notifications: unknown[] }>(
+    `/notifications${qs ? `?${qs}` : ''}`,
+  );
+}
+
+export function markNotificationRead(notificationId: string) {
+  return apiFetch<{ notification: unknown }>(
+    `/notifications/${notificationId}/read`,
+    { method: 'POST' },
+  );
+}
+
+export function markAllNotificationsRead() {
+  return apiFetch<{ updatedCount: number }>('/notifications/read-all', {
+    method: 'POST',
+  });
+}
+
+export function createReport(body: {
+  targetId: string;
+  targetType: 'listing' | 'user' | 'message';
+  reason: string;
+  severity: 'safety' | 'quality';
+}) {
+  return apiFetch<{ report: unknown }>('/reports', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
