@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.CreateMessageSchema = exports.CreateConversationSchema = exports.ListListingsQuerySchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
 // Auth
@@ -11,6 +11,9 @@ exports.VerifyOTPSchema = zod_1.z.object({
     phoneE164: zod_1.z.string().regex(/^\+[1-9]\d{1,14}$/),
     code: zod_1.z.string().length(6),
     deviceFingerprint: zod_1.z.string().optional(),
+});
+exports.RefreshTokenSchema = zod_1.z.object({
+    refreshToken: zod_1.z.string().min(10),
 });
 exports.JoinCommunitySchema = zod_1.z
     .object({
@@ -42,6 +45,18 @@ exports.CreateListingSchema = zod_1.z.object({
     availabilityWindows: zod_1.z.array(exports.AvailabilityWindowSchema).min(1).max(4),
     photoUrls: zod_1.z.array(zod_1.z.url()).min(1).max(8),
     aiGenerated: zod_1.z.boolean().default(false),
+    lat: zod_1.z.number().gte(-90).lte(90).optional(),
+    lng: zod_1.z.number().gte(-180).lte(180).optional(),
+});
+exports.ListListingsQuerySchema = zod_1.z.object({
+    communityId: zod_1.z.uuid(),
+    limit: zod_1.z.coerce.number().int().min(1).max(50).optional().default(20),
+});
+exports.CreateConversationSchema = zod_1.z.object({
+    listingId: zod_1.z.uuid(),
+});
+exports.CreateMessageSchema = zod_1.z.object({
+    content: zod_1.z.string().min(1).max(8000),
 });
 exports.NearbyListingsQuerySchema = zod_1.z.object({
     communityId: zod_1.z.uuid(),

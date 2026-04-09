@@ -3,12 +3,6 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ??
   'http://localhost:3001';
 
-interface ApiResponse<T> {
-  data: T;
-  meta?: Record<string, unknown>;
-  error?: string;
-}
-
 class ApiError extends Error {
   constructor(
     public status: number,
@@ -23,6 +17,10 @@ let accessToken: string | null = null;
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }
 
 export async function apiFetch<T>(
@@ -51,6 +49,9 @@ export async function apiFetch<T>(
     throw new ApiError(res.status, body.error ?? 'Request failed');
   }
 
-  const json = (await res.json()) as ApiResponse<T>;
-  return json.data;
+  const json: unknown = await res.json();
+  if (isRecord(json) && 'data' in json) {
+    return json.data as T;
+  }
+  return json as T;
 }

@@ -4,8 +4,9 @@ export interface JWTPayload {
   sub: string;
   communityIds: string[];
   role: Record<string, string>;
-  iat: number;
-  exp: number;
+  typ?: 'refresh';
+  iat?: number;
+  exp?: number;
 }
 
 declare module '@fastify/jwt' {

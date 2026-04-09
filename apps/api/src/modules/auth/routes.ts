@@ -1,6 +1,115 @@
 import fp from 'fastify-plugin';
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginCallback } from 'fastify';
+import {
+  RefreshTokenSchema,
+  SendOTPSchema,
+  VerifyOTPSchema,
+} from '@sellr/shared';
+import { prisma } from '../../lib/prisma';
+import { ok } from '../../lib/response';
+import { issueTokenPair, refreshAccessToken } from '../../lib/authTokens';
+import {
+  incrementOtpSendCount,
+  sendVerificationSms,
+  verifyOtpCode,
+} from '../../lib/otp';
+import { verifyJWT } from '../../middleware/auth';
 
-const plugin: FastifyPluginAsync = async () => {};
+const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
+  fastify.post(
+    '/otp/send',
+    {
+      schema: { body: SendOTPSchema },
+    },
+    async (request, reply) => {
+      const body = SendOTPSchema.parse(request.body);
+      const n = await incrementOtpSendCount(body.phoneE164);
+      if (n > 5) {
+        return reply.code(429).send({ error: 'Too many OTP requests' });
+      }
+      await sendVerificationSms(body.phoneE164);
+      return reply.send(ok({ sent: true }));
+    },
+  );
+
+  fastify.post(
+    '/otp/verify',
+    {
+      schema: { body: VerifyOTPSchema },
+    },
+    async (request, reply) => {
+      const body = VerifyOTPSchema.parse(request.body);
+      const valid = await verifyOtpCode(body.phoneE164, body.code);
+      if (!valid) {
+        return reply.code(400).send({ error: 'Invalid or expired code' });
+      }
+
+      const user = await prisma.user.upsert({
+        where: { phoneE164: body.phoneE164 },
+        create: {
+          phoneE164: body.phoneE164,
+          displayName: `Member ${body.phoneE164.slice(-4)}`,
+          verifiedAt: new Date(),
+          deviceFingerprint: body.deviceFingerprint,
+        },
+        update: {
+          verifiedAt: new Date(),
+          ...(body.deviceFingerprint
+            ? { deviceFingerprint: body.deviceFingerprint }
+            : {}),
+        },
+      });
+
+      const tokens = await issueTokenPair(fastify, user.id);
+      return reply.send(
+        ok({
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          userId: user.id,
+        }),
+      );
+    },
+  );
+
+  fastify.post(
+    '/refresh',
+    {
+      schema: { body: RefreshTokenSchema },
+    },
+    async (request, reply) => {
+      const body = RefreshTokenSchema.parse(request.body);
+      try {
+        const tokens = await refreshAccessToken(fastify, body.refreshToken);
+        return await reply.send(ok(tokens));
+      } catch {
+        return await reply.code(401).send({ error: 'Invalid refresh token' });
+      }
+    },
+  );
+
+  fastify.get('/me', { preHandler: verifyJWT }, async (request, reply) => {
+    const user = await prisma.user.findUnique({
+      where: { id: request.user.sub },
+      select: {
+        id: true,
+        phoneE164: true,
+        displayName: true,
+        avatarUrl: true,
+        verifiedAt: true,
+      },
+    });
+    if (!user) {
+      return reply.code(404).send({ error: 'User not found' });
+    }
+    return reply.send(
+      ok({
+        user,
+        communityIds: request.user.communityIds,
+      }),
+    );
+  });
+
+  done();
+};
 
 export const authRoutes = fp(plugin);

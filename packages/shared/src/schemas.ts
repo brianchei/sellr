@@ -12,6 +12,10 @@ export const VerifyOTPSchema = z.object({
   deviceFingerprint: z.string().optional(),
 });
 
+export const RefreshTokenSchema = z.object({
+  refreshToken: z.string().min(10),
+});
+
 export const JoinCommunitySchema = z
   .object({
     inviteCode: z.string().optional(),
@@ -44,6 +48,21 @@ export const CreateListingSchema = z.object({
   availabilityWindows: z.array(AvailabilityWindowSchema).min(1).max(4),
   photoUrls: z.array(z.url()).min(1).max(8),
   aiGenerated: z.boolean().default(false),
+  lat: z.number().gte(-90).lte(90).optional(),
+  lng: z.number().gte(-180).lte(180).optional(),
+});
+
+export const ListListingsQuerySchema = z.object({
+  communityId: z.uuid(),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(20),
+});
+
+export const CreateConversationSchema = z.object({
+  listingId: z.uuid(),
+});
+
+export const CreateMessageSchema = z.object({
+  content: z.string().min(1).max(8000),
 });
 
 export const NearbyListingsQuerySchema = z.object({

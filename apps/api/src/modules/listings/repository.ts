@@ -67,3 +67,15 @@ export async function findListingsNearby(params: {
     return mapListingWithDistance(copy);
   });
 }
+
+export async function setListingLocationGeom(
+  listingId: string,
+  lat: number,
+  lng: number,
+): Promise<void> {
+  await prisma.$executeRaw`
+    UPDATE listings
+    SET location_geom = ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)
+    WHERE id = ${listingId}::uuid
+  `;
+}

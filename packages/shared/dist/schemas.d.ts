@@ -8,6 +8,9 @@ export declare const VerifyOTPSchema: z.ZodObject<{
     code: z.ZodString;
     deviceFingerprint: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+export declare const RefreshTokenSchema: z.ZodObject<{
+    refreshToken: z.ZodString;
+}, z.core.$strip>;
 export declare const JoinCommunitySchema: z.ZodObject<{
     inviteCode: z.ZodOptional<z.ZodString>;
     institutionalEmail: z.ZodOptional<z.ZodEmail>;
@@ -38,6 +41,18 @@ export declare const CreateListingSchema: z.ZodObject<{
     }, z.core.$strip>>;
     photoUrls: z.ZodArray<z.ZodURL>;
     aiGenerated: z.ZodDefault<z.ZodBoolean>;
+    lat: z.ZodOptional<z.ZodNumber>;
+    lng: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strip>;
+export declare const ListListingsQuerySchema: z.ZodObject<{
+    communityId: z.ZodUUID;
+    limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+}, z.core.$strip>;
+export declare const CreateConversationSchema: z.ZodObject<{
+    listingId: z.ZodUUID;
+}, z.core.$strip>;
+export declare const CreateMessageSchema: z.ZodObject<{
+    content: z.ZodString;
 }, z.core.$strip>;
 export declare const NearbyListingsQuerySchema: z.ZodObject<{
     communityId: z.ZodUUID;

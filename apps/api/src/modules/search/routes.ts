@@ -2,6 +2,7 @@ import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import { SearchListingsQuerySchema } from '@sellr/shared';
 import { algolia, LISTINGS_INDEX } from '../../lib/algolia';
+import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
 
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
@@ -42,13 +43,15 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         },
       });
 
-      return {
-        hits: res.hits,
-        page: res.page,
-        nbHits: res.nbHits,
-        nbPages: res.nbPages,
-        queryID: res.queryID,
-      };
+      return reply.send(
+        ok({
+          hits: res.hits,
+          page: res.page,
+          nbHits: res.nbHits,
+          nbPages: res.nbPages,
+          queryID: res.queryID,
+        }),
+      );
     },
   );
   done();

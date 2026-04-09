@@ -17,6 +17,9 @@ let accessToken = null;
 function setAccessToken(token) {
     accessToken = token;
 }
+function isRecord(value) {
+    return typeof value === 'object' && value !== null;
+}
 async function apiFetch(path, options = {}) {
     const headers = {
         'Content-Type': 'application/json',
@@ -36,6 +39,9 @@ async function apiFetch(path, options = {}) {
         })));
         throw new ApiError(res.status, body.error ?? 'Request failed');
     }
-    const json = (await res.json());
-    return json.data;
+    const json = await res.json();
+    if (isRecord(json) && 'data' in json) {
+        return json.data;
+    }
+    return json;
 }
