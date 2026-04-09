@@ -1,8 +1,23 @@
+# Runs migrations on production DB after every push to `main`.
+# Application deploy is usually handled by your host (Railway/Vercel/Fly) via their GitHub integration;
+# this workflow only guarantees schema migrations apply before or alongside those deploys.
+#
+# Recommended patterns:
+# - Railway: enable GitHub integration on the API service so pushes deploy the app; keep DATABASE_URL
+#   pointed at the same Postgres this job migrates (often Railway provides DATABASE_URL in secrets).
+# - Add `workflow_dispatch` below to run migrations manually without a code push.
+#
+# Optional: add a deploy step using Railway CLI (requires RAILWAY_TOKEN in repo secrets):
+#   - run: npx @railway/cli@latest up --service <service-id>
+#     env:
+#       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
 name: Deploy
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy-api:
@@ -26,5 +41,3 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-
-      # Railway / hosting: wire your deploy step here (e.g. Railway GitHub integration or CLI).

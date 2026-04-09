@@ -39,6 +39,20 @@ export declare const CreateListingSchema: z.ZodObject<{
     photoUrls: z.ZodArray<z.ZodURL>;
     aiGenerated: z.ZodDefault<z.ZodBoolean>;
 }, z.core.$strip>;
+export declare const NearbyListingsQuerySchema: z.ZodObject<{
+    communityId: z.ZodUUID;
+    lat: z.ZodCoercedNumber<unknown>;
+    lng: z.ZodCoercedNumber<unknown>;
+    radiusM: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+}, z.core.$strip>;
+export declare const SearchListingsQuerySchema: z.ZodObject<{
+    communityId: z.ZodUUID;
+    q: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+    page: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+    hitsPerPage: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+    lat: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    lng: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+}, z.core.$strip>;
 export declare const CreateOfferSchema: z.ZodObject<{
     listingId: z.ZodUUID;
     offeredPrice: z.ZodNumber;

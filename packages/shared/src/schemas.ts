@@ -46,6 +46,22 @@ export const CreateListingSchema = z.object({
   aiGenerated: z.boolean().default(false),
 });
 
+export const NearbyListingsQuerySchema = z.object({
+  communityId: z.uuid(),
+  lat: z.coerce.number().gte(-90).lte(90),
+  lng: z.coerce.number().gte(-180).lte(180),
+  radiusM: z.coerce.number().min(100).max(50_000).optional().default(5000),
+});
+
+export const SearchListingsQuerySchema = z.object({
+  communityId: z.uuid(),
+  q: z.string().max(200).optional().default(''),
+  page: z.coerce.number().int().min(0).optional().default(0),
+  hitsPerPage: z.coerce.number().int().min(1).max(50).optional().default(20),
+  lat: z.coerce.number().gte(-90).lte(90).optional(),
+  lng: z.coerce.number().gte(-180).lte(180).optional(),
+});
+
 // Offers
 export const CreateOfferSchema = z.object({
   listingId: z.uuid(),

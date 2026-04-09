@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
 // Auth
@@ -42,6 +42,20 @@ exports.CreateListingSchema = zod_1.z.object({
     availabilityWindows: zod_1.z.array(exports.AvailabilityWindowSchema).min(1).max(4),
     photoUrls: zod_1.z.array(zod_1.z.url()).min(1).max(8),
     aiGenerated: zod_1.z.boolean().default(false),
+});
+exports.NearbyListingsQuerySchema = zod_1.z.object({
+    communityId: zod_1.z.uuid(),
+    lat: zod_1.z.coerce.number().gte(-90).lte(90),
+    lng: zod_1.z.coerce.number().gte(-180).lte(180),
+    radiusM: zod_1.z.coerce.number().min(100).max(50_000).optional().default(5000),
+});
+exports.SearchListingsQuerySchema = zod_1.z.object({
+    communityId: zod_1.z.uuid(),
+    q: zod_1.z.string().max(200).optional().default(''),
+    page: zod_1.z.coerce.number().int().min(0).optional().default(0),
+    hitsPerPage: zod_1.z.coerce.number().int().min(1).max(50).optional().default(20),
+    lat: zod_1.z.coerce.number().gte(-90).lte(90).optional(),
+    lng: zod_1.z.coerce.number().gte(-180).lte(180).optional(),
 });
 // Offers
 exports.CreateOfferSchema = zod_1.z.object({
