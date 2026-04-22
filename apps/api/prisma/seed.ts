@@ -1,6 +1,17 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { loadDatabaseEnv } from '../src/lib/loadDatabaseEnv';
 
-const prisma = new PrismaClient();
+loadDatabaseEnv();
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL is not set');
+}
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
+});
 
 async function main() {
   const seedUser = await prisma.user.upsert({

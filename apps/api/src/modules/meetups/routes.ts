@@ -1,4 +1,3 @@
-import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import { prisma } from '../../lib/prisma';
 import { ok } from '../../lib/response';
@@ -37,4 +36,4 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   done();
 };
 
-export const meetupRoutes = fp(plugin);
+export const meetupRoutes = plugin;

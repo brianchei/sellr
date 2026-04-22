@@ -1,4 +1,3 @@
-import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import { CreateConversationSchema, CreateMessageSchema } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
@@ -130,4 +129,4 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   done();
 };
 
-export const messageRoutes = fp(plugin);
+export const messageRoutes = plugin;

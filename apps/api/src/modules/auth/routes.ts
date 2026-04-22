@@ -1,4 +1,3 @@
-import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import {
   RefreshTokenSchema,
@@ -157,4 +156,4 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   done();
 };
 
-export const authRoutes = fp(plugin);
+export const authRoutes = plugin;

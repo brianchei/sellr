@@ -1,9 +1,25 @@
 import twilio from 'twilio';
 import { redis } from './redis';
 
+function isPlaceholder(value: string | undefined): boolean {
+  if (!value) return true;
+  const v = value.trim();
+  if (!v) return true;
+  // Common local `.env` placeholders in this repo / guides.
+  return (
+    v.includes('xxxx') ||
+    v.includes('...') ||
+    v.startsWith('change_me') ||
+    v.includes('[PROJECT_REF]') ||
+    v.includes('[PASSWORD]')
+  );
+}
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioClient =
-  process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-    ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+  !isPlaceholder(accountSid) && !isPlaceholder(authToken)
+    ? twilio(accountSid, authToken)
     : null;
 
 export async function incrementOtpSendCount(
@@ -19,8 +35,9 @@ export async function incrementOtpSendCount(
 
 export async function sendVerificationSms(phoneE164: string): Promise<void> {
   const sid = process.env.TWILIO_VERIFY_SERVICE_SID;
-  if (twilioClient && sid) {
-    await twilioClient.verify.v2.services(sid).verifications.create({
+  const serviceSid = !isPlaceholder(sid) ? sid : undefined;
+  if (twilioClient && serviceSid) {
+    await twilioClient.verify.v2.services(serviceSid).verifications.create({
       to: phoneE164,
       channel: 'sms',
     });
@@ -36,9 +53,10 @@ export async function verifyOtpCode(
   code: string,
 ): Promise<boolean> {
   const sid = process.env.TWILIO_VERIFY_SERVICE_SID;
-  if (twilioClient && sid) {
+  const serviceSid = !isPlaceholder(sid) ? sid : undefined;
+  if (twilioClient && serviceSid) {
     const check = await twilioClient.verify.v2
-      .services(sid)
+      .services(serviceSid)
       .verificationChecks.create({ to: phoneE164, code });
     return check.status === 'approved';
   }

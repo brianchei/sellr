@@ -28,7 +28,7 @@ import { logger } from './lib/logger';
 import type { JWTPayload } from './middleware/auth';
 
 const fastify = Fastify({
-  logger,
+  loggerInstance: logger,
   trustProxy: true,
 }).withTypeProvider<ZodTypeProvider>();
 

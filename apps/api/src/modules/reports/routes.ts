@@ -1,4 +1,3 @@
-import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import { CreateReportSchema } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
@@ -33,4 +32,4 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   done();
 };
 
-export const reportRoutes = fp(plugin);
+export const reportRoutes = plugin;

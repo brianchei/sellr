@@ -1,7 +1,6 @@
-import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import { CreateOfferSchema, RespondToOfferSchema } from '@sellr/shared';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../generated/prisma/client';
 import { prisma } from '../../lib/prisma';
 import { notifyUser } from '../../lib/notifyUser';
 import { ok } from '../../lib/response';
@@ -181,4 +180,4 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   done();
 };
 
-export const offerRoutes = fp(plugin);
+export const offerRoutes = plugin;

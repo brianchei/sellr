@@ -1,5 +1,4 @@
-import type { Listing } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import { type Listing, Prisma } from '../../generated/prisma/client';
 import { prisma } from '../../lib/prisma';
 
 export type ListingWithDistance = Listing & { distanceM: number };
@@ -44,17 +43,17 @@ export async function findListingsNearby(params: {
 }): Promise<ListingWithDistance[]> {
   const rows = await prisma.$queryRaw<Record<string, unknown>[]>`
     SELECT l.*,
-           ST_Distance(
-             l.location_geom::geography,
-             ST_SetSRID(ST_MakePoint(${params.lng}, ${params.lat}), 4326)::geography
+           extensions.ST_Distance(
+             l.location_geom::extensions.geography,
+             extensions.ST_SetSRID(extensions.ST_MakePoint(${params.lng}, ${params.lat}), 4326)::extensions.geography
            ) AS distance_m
     FROM listings l
     WHERE l.community_id = ${params.communityId}::uuid
       AND l.status = 'active'
       AND l.location_geom IS NOT NULL
-      AND ST_DWithin(
-        l.location_geom::geography,
-        ST_SetSRID(ST_MakePoint(${params.lng}, ${params.lat}), 4326)::geography,
+      AND extensions.ST_DWithin(
+        l.location_geom::extensions.geography,
+        extensions.ST_SetSRID(extensions.ST_MakePoint(${params.lng}, ${params.lat}), 4326)::extensions.geography,
         ${params.radiusM}
       )
     ORDER BY distance_m ASC
@@ -75,7 +74,10 @@ export async function setListingLocationGeom(
 ): Promise<void> {
   await prisma.$executeRaw`
     UPDATE listings
-    SET location_geom = ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)
+    SET location_geom = extensions.ST_SetSRID(
+      extensions.ST_MakePoint(${lng}, ${lat}),
+      4326
+    )
     WHERE id = ${listingId}::uuid
   `;
 }

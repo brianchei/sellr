@@ -1,4 +1,5 @@
-import type { NotificationType, Prisma } from '@prisma/client';
+import type { Prisma } from '../generated/prisma/client';
+import type { NotificationType } from '../generated/prisma/enums';
 import type { PushNotificationJob } from './jobTypes';
 import { prisma } from './prisma';
 import { notificationQueue } from './queues';

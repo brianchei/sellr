@@ -1,6 +1,5 @@
-import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../generated/prisma/client';
 import {
   CreateListingSchema,
   ListListingsQuerySchema,
@@ -170,4 +169,4 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   done();
 };
 
-export const listingRoutes = fp(plugin);
+export const listingRoutes = plugin;

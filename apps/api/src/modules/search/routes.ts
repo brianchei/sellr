@@ -1,4 +1,3 @@
-import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import { SearchListingsQuerySchema } from '@sellr/shared';
 import { algolia, LISTINGS_INDEX } from '../../lib/algolia';
@@ -57,4 +56,4 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   done();
 };
 
-export const searchRoutes = fp(plugin);
+export const searchRoutes = plugin;

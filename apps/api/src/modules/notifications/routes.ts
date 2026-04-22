@@ -1,4 +1,3 @@
-import fp from 'fastify-plugin';
 import type { FastifyPluginCallback } from 'fastify';
 import { ListNotificationsQuerySchema } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
@@ -68,4 +67,4 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   done();
 };
 
-export const notificationRoutes = fp(plugin);
+export const notificationRoutes = plugin;

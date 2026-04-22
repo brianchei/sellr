@@ -1,6 +1,6 @@
 # Sellr — Technical Implementation Guide
 ### Phase 0: Foundation & Technical Setup
-**Version 2.1 · April 2026 · Internal Use Only**
+**Version 2.2 · April 2026 · Internal Use Only**
 
 > *"The product is not defined by its AI features — it is defined by its close rate."*
 
@@ -8,7 +8,7 @@
 
 ## Table of Contents
 
-- [Current repository vs. target state](#current-repository-vs-target-state)
+- [Current repository baseline](#current-repository-baseline)
 1. [Architecture Overview](#1-architecture-overview)
 2. [Repository & Monorepo Setup](#2-repository--monorepo-setup)
 3. [Shared Packages (`packages/`)](#3-shared-packages-packages)
@@ -27,22 +27,20 @@
 
 ---
 
-## Current repository vs. target state
+## Current repository baseline
 
-This document describes the **intended target stack** (what we are building toward), not a point-in-time snapshot of every `package.json` on every day. The monorepo may **lag** the guide in a few important places. The table below is the **authoritative** “where we are” vs “where the guide points.” Close the rollout tickets (or your tracker’s equivalent) when the **Target** column is true in the repo.
+This document now reflects the **checked-in Phase 0 baseline** for the monorepo. The table below calls out the current implementation for the most important platform decisions, plus a few informational rows where local setup can still vary.
 
-| Area | Current repository (illustrative) | Target (this guide) | Rollout ticket |
-|------|----------------------------------|------------------------|----------------|
-| **Mobile** | `expo` **SDK 54**; `app.json` may still set `newArchEnabled: true` | **Expo SDK 55**; follow SDK 55 app config (e.g. remove `newArchEnabled` as required by the SDK) | `SELLR-UPGRADE-EXPO-55` |
-| **Web** | **Next.js 16**, **Tailwind 4** | Next.js 16, Tailwind 4 (App Router) | (aligned) |
-| **ORM** | **Prisma 6**, `prisma-client-js`, `url` / `directUrl` in `schema.prisma` | **Prisma 7**: `prisma.config.ts`, `prisma-client` generator + output, `@prisma/adapter-pg` at runtime | `SELLR-UPGRADE-PRISMA-7` |
-| **Local DB URL split** | Often **one port (e.g. 54322)** in `.env` when the local **pooler is off** (see [§5](#5-database-supabase--postgis-setup)) | Pooled on **54329** + direct on **54322** when local pooler is **on**; both on **54322** when pooler is **off** | Document in [§5](#5-database-supabase--postgis-setup) / [§13](#13-secrets--environment-management) |
-| **TypeScript (root)** | e.g. **5.7.x** in root `package.json` | **5.9.x** in lockstep with Expo / tooling when you bump (sample snippets use `^5.9.0`) | `SELLR-UPGRADE-TS-59` (optional) |
-| **CI step order** | e.g. **migrate** → typecheck → lint → test (valid for CI DB) | “Ideal local loop”: typecheck → lint → test; **migrate** where needed before tests that need schema | (document only; [§10](#10-cicd-pipeline)) |
+| Area | Current repository baseline | Guide expectation |
+|------|-----------------------------|-------------------|
+| **Mobile** | **Expo SDK 55**; SDK 55-compatible `app.json`; `newArchEnabled` removed | Stay on Expo SDK 55-compatible package versions and config |
+| **Web** | **Next.js 16**, **Tailwind 4** | Next.js 16, Tailwind 4 (App Router) |
+| **ORM** | **Prisma 7** with `prisma.config.ts`, `prisma-client` generator + explicit output, generated client import path, and `@prisma/adapter-pg` at runtime | Keep Prisma 7 as the baseline for all new database work |
+| **Local DB URL split** | Default local setup keeps both URLs on **54322** when the local pooler is **off** (see [§5](#5-database-supabase--postgis-setup)) | Use **54329** for `DATABASE_URL` and **54322** for `DIRECT_URL` only when the local pooler is **on** |
+| **TypeScript (root)** | Root/tooling versions can still move independently from mobile's SDK-pinned TypeScript | Keep sample snippets on **5.9.x** when updating docs or examples |
+| **CI step order** | CI may run **migrate** before other checks when the database schema is needed | Preferred local loop remains typecheck → lint → test, with migrate before schema-dependent checks |
 
-> **Expo SDK 55** and **Prisma 7** are the two **intentional rollout targets** with explicit tickets. Other rows are **informational** (or optional polish) so readers do not assume the repo already matches every checklist line.
-
-Until `SELLR-UPGRADE-EXPO-55` and `SELLR-UPGRADE-PRISMA-7` are done, use **§14** “Interim (repo today)” sub-bullets for Phase 0 sign-off, and the **“Target”** sub-bullets when those upgrades have landed.
+> Prisma 7 and Expo SDK 55 are now part of the repo baseline. The remaining rows above are informational so local setup, CI ordering, and future tooling bumps do not get confused with incomplete platform migrations.
 
 ---
 
@@ -50,7 +48,7 @@ Until `SELLR-UPGRADE-EXPO-55` and `SELLR-UPGRADE-PRISMA-7` are done, use **§14*
 
 ### Full Stack at a Glance
 
-> **Target stack, not a daily snapshot:** The table below states where the **guide** aims (e.g. Expo SDK 55, Prisma 7). The checked-in monorepo may still be on **Expo SDK 54** or **Prisma 6** until the rollout tickets are done. See [Current repository vs. target state](#current-repository-vs-target-state) (`SELLR-UPGRADE-EXPO-55`, `SELLR-UPGRADE-PRISMA-7`).
+> **Phase 0 baseline:** The table below reflects the current implementation baseline in the checked-in monorepo. Prisma 7 and Expo SDK 55 are assumed throughout the guide.
 
 | Layer | Technology | Why |
 |---|---|---|
@@ -1216,7 +1214,7 @@ Prisma still requires **two connection contexts** when used with Supabase:
 
 This is because pgBouncer's transaction-mode pooling is incompatible with Prisma Migrate.
 
-> **Why Prisma 7 needs a guide update:** Prisma 7 no longer treats `prisma-client-js` + `compilerBuild = true` as the recommended setup. The current upgrade path is:
+> **Prisma 7 baseline in this repo:** Sellr now uses the Prisma 7 setup recommended in current docs:
 > - use the `prisma-client` generator
 > - add an explicit `output` path for the generated client
 > - move datasource URL configuration into `prisma.config.ts`
@@ -1239,8 +1237,26 @@ datasource db {
 
 `apps/api/prisma.config.ts`:
 ```typescript
-import 'dotenv/config';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { config as loadEnv } from 'dotenv';
 import { defineConfig, env } from 'prisma/config';
+
+for (const p of [
+  resolve(process.cwd(), '.env.local'),
+  resolve(process.cwd(), '.env'),
+  resolve(process.cwd(), '../../.env.local'),
+  resolve(process.cwd(), '../../.env'),
+]) {
+  if (existsSync(p)) {
+    loadEnv({ path: p });
+  }
+}
+
+// Keep Prisma CLI usable when local development intentionally uses one URL.
+if (process.env.DATABASE_URL && !process.env.DIRECT_URL) {
+  process.env.DIRECT_URL = process.env.DATABASE_URL;
+}
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -1260,14 +1276,18 @@ export default defineConfig({
 > **Note for Next.js (web app):** Next.js uses `.env.local` (not `.env`) for local overrides that are git-ignored. The `.env.example` at the repo root documents all variables; each app reads from its own `.env.local` during local development.
 
 ```bash
-# Pooled connection (runtime API queries) — requires [db.pooler].enabled = true
-DATABASE_URL="postgresql://postgres:postgres@localhost:54329/postgres?pgbouncer=true&connection_limit=1"
-
-# Direct connection (Prisma migrations only)
+# Current repo default: local pooler off
+DATABASE_URL="postgresql://postgres:postgres@localhost:54322/postgres?connection_limit=1"
 DIRECT_URL="postgresql://postgres:postgres@localhost:54322/postgres"
 ```
 
-If you keep the local pooler disabled, point both values at port `54322` locally and reserve pooled/direct separation for staging and production.
+If you enable the local pooler for parity testing, switch to the pooled/direct split below:
+
+```bash
+# Optional local pooler-on setup
+DATABASE_URL="postgresql://postgres:postgres@localhost:54329/postgres?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgresql://postgres:postgres@localhost:54322/postgres"
+```
 
 **Hosted Supabase `.env` values** (from the Supabase dashboard → Settings → Database):
 ```bash
@@ -1745,19 +1765,22 @@ async function findListingsNearby(params: {
 
 ```typescript
 // apps/api/src/lib/prisma.ts
-import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { loadDatabaseEnv } from './loadDatabaseEnv';
+
+loadDatabaseEnv();
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('DATABASE_URL is not set');
+}
+
+const adapter = new PrismaPg({ connectionString });
 
 const globalForPrisma = globalThis as unknown as {
-  prisma?: PrismaClient;
-  prismaAdapter?: PrismaPg;
+  prisma: PrismaClient | undefined;
 };
-
-const adapter =
-  globalForPrisma.prismaAdapter ??
-  new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-  });
 
 export const prisma =
   globalForPrisma.prisma ??
@@ -1770,7 +1793,6 @@ export const prisma =
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
-  globalForPrisma.prismaAdapter = adapter;
 }
 ```
 
@@ -2001,6 +2023,7 @@ npx create-expo-app . --template default@sdk-55
 Install core dependencies for SDK 55:
 ```bash
 pnpm add expo-router@^55 expo-notifications@^55 expo-secure-store@^55 expo-image-picker@^55 expo-image@^55 expo-location@^55 expo-background-task@^55
+pnpm add @sentry/react-native
 pnpm add @tanstack/react-query
 pnpm add zustand
 pnpm add @sellr/shared @sellr/api-client
@@ -2026,7 +2049,7 @@ pnpm add socket.io-client
     "userInterfaceStyle": "light",
     "scheme": "sellr",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -2052,6 +2075,9 @@ pnpm add socket.io-client
         "android.permission.READ_EXTERNAL_STORAGE"
       ]
     },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
     "plugins": [
       "expo-router",
       "expo-notifications",
@@ -2061,7 +2087,10 @@ pnpm add socket.io-client
           "locationAlwaysAndWhenInUsePermission": "Sellr uses your location to find nearby listings."
         }
       ],
-      "expo-background-task"
+      "expo-background-task",
+      "@sentry/react-native",
+      "expo-image",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
@@ -2104,7 +2133,7 @@ apps/mobile/app/
 
 ### Step 4: Root Layout with Auth Guard and QueryClient
 
-Expo Router v5 introduces the `guard` function for protected routes. This replaces the manual `isAuthenticated` conditional rendering in `_layout.tsx` with a declarative protection pattern that integrates with the router's navigation stack.
+The current app keeps a straightforward `useEffect`-based auth redirect in `_layout.tsx`. It is compatible with Expo SDK 55, works well with file-based routing, and keeps Phase 0 auth flow behavior easy to reason about.
 
 `apps/mobile/app/_layout.tsx`:
 ```typescript
@@ -2112,7 +2141,10 @@ import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as Notifications from 'expo-notifications';
+import '../src/lib/sentry';
 import { useAuthStore } from '../src/stores/auth';
+
+const rehydrateAuth = () => useAuthStore.getState().rehydrate();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -2125,41 +2157,34 @@ const queryClient = new QueryClient({
   },
 });
 
-// Notification handler — runs when notification is received while app is foregrounded
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
-// Expo Router v5 guard function — replaces manual conditional rendering.
-// Called before rendering any route; redirect to auth if unauthenticated.
-export const unstable_settings = {
-  initialRouteName: '(tabs)',
-};
-
 export default function RootLayout() {
-  const { isAuthenticated, rehydrate } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const router = useRouter();
   const segments = useSegments();
 
   useEffect(() => {
-    rehydrate();   // Load stored token from SecureStore on app launch
+    void rehydrateAuth();
   }, []);
 
   useEffect(() => {
     const inAuthGroup = segments[0] === '(auth)';
 
     if (!isAuthenticated && !inAuthGroup) {
-      // Not authenticated and not in auth flow — redirect to auth
       router.replace('/(auth)/phone');
     } else if (isAuthenticated && inAuthGroup) {
-      // Authenticated but still in auth flow — redirect to main app
       router.replace('/(tabs)');
     }
-  }, [isAuthenticated, segments]);
+  }, [isAuthenticated, segments, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -2172,7 +2197,7 @@ export default function RootLayout() {
 }
 ```
 
-> **Expo Router v5 Guard Pattern:** The `guard` function (available in Router v5's experimental API) provides a more declarative alternative. For the MVP, the `useEffect`-based redirect above is battle-tested and well-understood. Migrate to the `guard` function when it graduates from experimental in a future minor.
+> **Auth redirect pattern:** The repo currently uses the `useEffect`-based redirect above. If Expo Router's guard APIs become the team standard later, treat that as an implementation refinement rather than a Phase 0 blocker.
 
 ### Step 5: Auth Store (Zustand + SecureStore)
 
@@ -2525,7 +2550,7 @@ jobs:
           REDIS_URL: redis://localhost:6379
 ```
 
-> **Step order:** The workflow runs `prisma migrate deploy` **before** `typecheck` / `lint` / `test` so the CI Postgres has an applied schema. That is **not** the same order as a pure “typecheck → lint → test” local loop, and that is fine — see [Current repository vs. target state](#current-repository-vs-target-state) and the **CI/CD** bullets under [§14 Phase 0 Completion Checklist](#14-phase-0-completion-checklist).
+> **Step order:** The workflow runs `prisma migrate deploy` **before** `typecheck` / `lint` / `test` so the CI Postgres has an applied schema. That is **not** the same order as a pure “typecheck → lint → test” local loop, and that is fine — see [Current repository baseline](#current-repository-baseline) and the **CI/CD** bullets under [§14 Phase 0 Completion Checklist](#14-phase-0-completion-checklist).
 
 `.github/workflows/deploy.yml`:
 ```yaml
@@ -3051,7 +3076,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 Before moving to Phase 1 (MVP Build), every item on this list must be checked off. If any are missing, Phase 1 work will be blocked.
 
-**Rollout tickets:** Treat **Expo SDK 55** (`SELLR-UPGRADE-EXPO-55`) and **Prisma 7** (`SELLR-UPGRADE-PRISMA-7`) as **tracked upgrades**. While those tickets are open, you may sign off **Interim (repo today)** items in **Database** and **Mobile**; after each upgrade merges, complete the matching **Target (guide)** items. See [Current repository vs. target state](#current-repository-vs-target-state).
+This checklist assumes the current checked-in baseline: Prisma 7 on the API and Expo SDK 55 on mobile.
 
 ### Repository
 - [ ] Turborepo monorepo initialized with correct workspace structure
@@ -3072,11 +3097,10 @@ Before moving to Phase 1 (MVP Build), every item on this list must be checked of
 
 ### Database (Supabase)
 
-- [ ] **Interim (repo today, Prisma 6+):** Prisma is installed; `schema.prisma` uses a supported `generator` + `datasource` (e.g. `prisma-client-js` with `url` + `directUrl`); `prisma migrate` / `prisma generate` work against local and hosted Supabase; PostGIS `location_geom` + GiST index migration is present; no checklist item in this section is **blocked** solely because Prisma 7 is not merged yet.
-- [ ] **Target (guide, Prisma 7 — after `SELLR-UPGRADE-PRISMA-7`):** Prisma schema has **no** `previewFeatures = ["postgresqlExtensions"]` and **no** `extensions = [...]` line
-- [ ] **Target (guide, Prisma 7):** Prisma generator uses `provider = "prisma-client"` with an explicit `output` path
-- [ ] **Target (guide, Prisma 7):** `prisma.config.ts` is committed and Prisma CLI reads `DIRECT_URL` from config
-- [ ] **Target (guide, Prisma 7):** Runtime Prisma client imports from the generated client path and uses `@prisma/adapter-pg`
+- [ ] Prisma schema has **no** `previewFeatures = ["postgresqlExtensions"]` and **no** `extensions = [...]` line
+- [ ] Prisma generator uses `provider = "prisma-client"` with an explicit `output` path
+- [ ] `prisma.config.ts` is committed and Prisma CLI reads `DIRECT_URL` from config
+- [ ] Runtime Prisma client imports from the generated client path and uses `@prisma/adapter-pg`
 - [ ] Supabase CLI installed (`pnpm exec supabase --version` returns a version)
 - [ ] `supabase init` run inside `apps/api/` — `supabase/` directory created
 - [ ] `supabase start` runs successfully — Postgres, PostGIS, and Studio all up at `localhost:54323`
@@ -3098,9 +3122,8 @@ Before moving to Phase 1 (MVP Build), every item on this list must be checked of
 - [ ] Semantic cache utility (`getCachedLLMResponse`) wired and tested with a dummy key
 
 ### Mobile
-- [ ] **Interim (repo today, e.g. SDK 54):** `npx expo start` runs on iOS Simulator and Android Emulator; `edgeToEdgeEnabled: true` on Android; `(auth)` / `(tabs)` layouts resolve; useEffect-based auth redirect works; `expo-background-task` installed; `expo-background-fetch` not used; SecureStore + `@sellr/shared` are clean
-- [ ] **Target (guide, Expo SDK 55 — after `SELLR-UPGRADE-EXPO-55`):** Expo SDK **55** project runs on iOS Simulator and Android Emulator via `npx expo start`
-- [ ] **Target (guide, SDK 55):** `newArchEnabled` is absent from `app.json` (per SDK 55; Legacy Architecture support was removed in that release)
+- [ ] Expo SDK **55** project runs on iOS Simulator and Android Emulator via `npx expo start`
+- [ ] `newArchEnabled` is absent from `app.json` (per SDK 55; Legacy Architecture support was removed in that release)
 - [ ] `edgeToEdgeEnabled: true` set for Android; bottom tab bar verified with `useSafeAreaInsets()`
 - [ ] Expo Router v5 file-based routing resolves `(auth)` and `(tabs)` layouts
 - [ ] Auth guard (useEffect-based) correctly redirects unauthenticated users
@@ -3184,4 +3207,4 @@ Auth (OTP + JWT + community gating)
 
 ---
 
-*Document version 2.1 — covers Phase 0: Foundation & Setup only. **Target stack** (where the guide is headed): Node.js 22 LTS, Expo SDK 55, Next.js 16, Prisma 7, TypeScript 5.9 in sample snippets, Zod 4, ESLint 9, Fastify v5, and pnpm 10. The **live monorepo** may still be on **Expo SDK 54** and **Prisma 6** until `SELLR-UPGRADE-EXPO-55` and `SELLR-UPGRADE-PRISMA-7` are completed — see [Current repository vs. target state](#current-repository-vs-target-state). Phase 1 implementation details to follow in a separate guide.*
+*Document version 2.2 — covers Phase 0: Foundation & Setup only. The current baseline in the monorepo is Node.js 22 LTS, Expo SDK 55, Next.js 16, Prisma 7, TypeScript 5.9 in sample snippets, Zod 4, ESLint 9, Fastify v5, and pnpm 10. Phase 1 implementation details to follow in a separate guide.*

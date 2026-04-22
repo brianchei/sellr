@@ -2,14 +2,9 @@
 > @sellr/api@0.0.1 typecheck /Users/brianchei/repos/sellr/apps/api
 > prisma generate && tsc --noEmit
 
-warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please migrate to a Prisma config file (e.g., `prisma.config.ts`).
-For more information, see: https://pris.ly/prisma-config
+Loaded Prisma config from prisma.config.ts.
 
-Prisma schema loaded from prisma/schema.prisma
+Prisma schema loaded from prisma/schema.prisma.
 
-✔ Generated Prisma Client (v6.19.3) to ./../../node_modules/.pnpm/@prisma+client@6.19.3_prisma@6.19.3_magicast@0.3.5_typescript@5.9.3__typescript@5.9.3/node_modules/@prisma/client in 222ms
-
-Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
-
-Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+✔ Generated Prisma Client (7.7.0) to ./src/generated/prisma in 127ms
 

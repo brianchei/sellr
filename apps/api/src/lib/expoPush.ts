@@ -1,4 +1,4 @@
-import type { NotificationType } from '@prisma/client';
+import type { NotificationType } from '../generated/prisma/enums';
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 

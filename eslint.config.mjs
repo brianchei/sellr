@@ -14,6 +14,7 @@ export default tseslint.config(
       '**/.next/**',
       '**/node_modules/**',
       '**/.expo/**',
+      'apps/api/src/generated/**',
       '**/*.js',
       'eslint.config.mjs',
     ],
