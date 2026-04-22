@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { sendOtp, verifyOtp } from '@sellr/api-client';
+import { sendOtp, setAccessToken, verifyOtp } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 
 export default function LoginPage() {
@@ -42,7 +42,12 @@ export default function LoginPage() {
         phoneE164: phoneE164.trim(),
         code: code.trim(),
       });
-      setSession(res.accessToken, res.refreshToken, res.userId);
+      if ('accessToken' in res) {
+        setAccessToken(res.accessToken);
+      } else {
+        setAccessToken(null);
+      }
+      setSession(res.userId);
       router.replace('/dashboard');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid code');

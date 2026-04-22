@@ -1,4 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
+import { SELLR_ACCESS_COOKIE } from '../lib/authCookies';
 
 export interface JWTPayload {
   sub: string;
@@ -15,14 +16,32 @@ declare module '@fastify/jwt' {
   }
 }
 
+function bearerToken(request: FastifyRequest): string | undefined {
+  const h = request.headers.authorization;
+  if (typeof h === 'string' && h.startsWith('Bearer ')) {
+    return h.slice(7);
+  }
+  return undefined;
+}
+
+function accessTokenFromCookie(request: FastifyRequest): string | undefined {
+  const raw = request.cookies[SELLR_ACCESS_COOKIE];
+  return typeof raw === 'string' && raw.length > 0 ? raw : undefined;
+}
+
 export async function verifyJWT(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
+  const token = bearerToken(request) ?? accessTokenFromCookie(request);
+  if (!token) {
+    return reply.code(401).send({ error: 'Unauthorized' });
+  }
   try {
-    await request.jwtVerify();
+    const payload = request.server.jwt.verify<JWTPayload>(token);
+    request.user = payload;
   } catch {
-    reply.code(401).send({ error: 'Unauthorized' });
+    return reply.code(401).send({ error: 'Unauthorized' });
   }
 }
 

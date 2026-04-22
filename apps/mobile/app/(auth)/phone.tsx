@@ -40,6 +40,9 @@ export default function PhoneScreen() {
         phoneE164: phoneE164.trim(),
         code: code.trim(),
       });
+      if (!('accessToken' in res) || !('refreshToken' in res)) {
+        throw new Error('Expected token response from API (mobile client)');
+      }
       await setTokens(res.accessToken, res.refreshToken, res.userId);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid code');

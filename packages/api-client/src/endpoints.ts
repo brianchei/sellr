@@ -6,6 +6,9 @@ export type AuthTokens = {
   userId: string;
 };
 
+/** Web: OTP success via httpOnly cookies only (no tokens in JSON). */
+export type VerifyOtpWebResult = { userId: string };
+
 export function sendOtp(phoneE164: string) {
   return apiFetch<{ sent: boolean }>('/auth/otp/send', {
     method: 'POST',
@@ -18,20 +21,31 @@ export function verifyOtp(body: {
   code: string;
   deviceFingerprint?: string;
 }) {
-  return apiFetch<AuthTokens>('/auth/otp/verify', {
+  return apiFetch<AuthTokens | VerifyOtpWebResult>('/auth/otp/verify', {
     method: 'POST',
     body: JSON.stringify(body),
   });
 }
 
-export function refreshTokens(refreshToken: string) {
-  return apiFetch<{ accessToken: string; refreshToken: string }>(
-    '/auth/refresh',
-    {
-      method: 'POST',
-      body: JSON.stringify({ refreshToken }),
-    },
-  );
+/** Mobile: pass `refreshToken` from secure storage. Web: omit — uses httpOnly cookie. */
+export function refreshTokens(refreshToken?: string) {
+  const body =
+    refreshToken !== undefined
+      ? JSON.stringify({ refreshToken })
+      : JSON.stringify({});
+  return apiFetch<
+    { accessToken: string; refreshToken: string } | { rotated: boolean }
+  >('/auth/refresh', {
+    method: 'POST',
+    body,
+  });
+}
+
+export function logout() {
+  return apiFetch<{ loggedOut: boolean }>('/auth/logout', {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
 }
 
 export function fetchMe() {
@@ -60,8 +74,8 @@ export function joinCommunity(body: {
 }) {
   return apiFetch<{
     communityId: string;
-    accessToken: string;
-    refreshToken: string;
+    accessToken?: string;
+    refreshToken?: string;
   }>('/communities/join', {
     method: 'POST',
     body: JSON.stringify(body),

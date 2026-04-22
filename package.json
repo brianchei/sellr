@@ -13,7 +13,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "db:migrate": "pnpm --filter @sellr/api prisma migrate dev",
-    "db:studio": "pnpm --filter @sellr/api prisma studio"
+    "db:studio": "pnpm --filter @sellr/api prisma studio",
+    "env:web": "node scripts/ensure-web-env.cjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma"]

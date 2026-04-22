@@ -4,6 +4,7 @@ import { JoinCommunitySchema } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
 import { ok } from '../../lib/response';
 import { issueTokenPair } from '../../lib/authTokens';
+import { isWebClient, setAuthCookies } from '../../lib/authCookies';
 import { verifyJWT } from '../../middleware/auth';
 
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
@@ -77,6 +78,10 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       });
 
       const tokens = await issueTokenPair(fastify, request.user.sub);
+      if (isWebClient(request.headers)) {
+        setAuthCookies(reply, tokens);
+        return reply.send(ok({ communityId }));
+      }
       return reply.send(
         ok({
           communityId,

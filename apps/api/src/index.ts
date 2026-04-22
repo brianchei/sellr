@@ -9,6 +9,7 @@ import {
 } from 'fastify-type-provider-zod';
 import * as Sentry from '@sentry/node';
 
+import { cookiesPlugin } from './plugins/cookies';
 import { corsPlugin } from './plugins/cors';
 import { jwtPlugin } from './plugins/jwt';
 import { rateLimitPlugin } from './plugins/rateLimit';
@@ -64,6 +65,7 @@ const io = new Server(fastify.server, {
 });
 
 async function start() {
+  await fastify.register(cookiesPlugin);
   await fastify.register(corsPlugin);
   await fastify.register(jwtPlugin);
   await fastify.register(rateLimitPlugin);

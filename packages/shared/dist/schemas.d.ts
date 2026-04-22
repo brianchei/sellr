@@ -8,8 +8,9 @@ export declare const VerifyOTPSchema: z.ZodObject<{
     code: z.ZodString;
     deviceFingerprint: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+/** Mobile sends `refreshToken` in the body; the web app uses an httpOnly cookie (see API). */
 export declare const RefreshTokenSchema: z.ZodObject<{
-    refreshToken: z.ZodString;
+    refreshToken: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 export declare const RegisterPushTokenSchema: z.ZodObject<{
     expoPushToken: z.ZodString;

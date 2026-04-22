@@ -99,7 +99,7 @@ async function start() {
     await fastify.register(routes_6.searchRoutes, { prefix: '/api/v1/search' });
     await fastify.register(routes_3.offerRoutes, { prefix: '/api/v1/offers' });
     await fastify.register(routes_4.meetupRoutes, { prefix: '/api/v1/meetups' });
-    await fastify.register(routes_5.messageRoutes, { prefix: '/api/v1/messages' });
+    await fastify.register(routes_5.messageRoutes, { prefix: '/api/v1/conversations' });
     await fastify.register(routes_8.reportRoutes, { prefix: '/api/v1/reports' });
     await fastify.register(routes_9.notificationRoutes, {
         prefix: '/api/v1/notifications',

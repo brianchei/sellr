@@ -10,6 +10,12 @@ import { prisma } from '../../lib/prisma';
 import { ok } from '../../lib/response';
 import { issueTokenPair, refreshAccessToken } from '../../lib/authTokens';
 import {
+  clearAuthCookies,
+  isWebClient,
+  SELLR_REFRESH_COOKIE,
+  setAuthCookies,
+} from '../../lib/authCookies';
+import {
   incrementOtpSendCount,
   sendVerificationSms,
   verifyOtpCode,
@@ -62,6 +68,12 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       });
 
       const tokens = await issueTokenPair(fastify, user.id);
+
+      if (isWebClient(request.headers)) {
+        setAuthCookies(reply, tokens);
+        return reply.send(ok({ userId: user.id }));
+      }
+
       return reply.send(
         ok({
           accessToken: tokens.accessToken,
@@ -78,15 +90,31 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       schema: { body: RefreshTokenSchema },
     },
     async (request, reply) => {
-      const body = RefreshTokenSchema.parse(request.body);
+      const body = RefreshTokenSchema.parse(request.body ?? {});
+      const refreshInput =
+        body.refreshToken ?? request.cookies[SELLR_REFRESH_COOKIE];
+      if (!refreshInput) {
+        return reply.code(400).send({ error: 'Missing refresh token' });
+      }
       try {
-        const tokens = await refreshAccessToken(fastify, body.refreshToken);
+        const tokens = await refreshAccessToken(fastify, refreshInput);
+        if (isWebClient(request.headers)) {
+          setAuthCookies(reply, tokens);
+          return await reply.send(ok({ rotated: true }));
+        }
         return await reply.send(ok(tokens));
       } catch {
-        return await reply.code(401).send({ error: 'Invalid refresh token' });
+        return reply.code(401).send({ error: 'Invalid refresh token' });
       }
     },
   );
+
+  fastify.post('/logout', async (request, reply) => {
+    if (isWebClient(request.headers)) {
+      clearAuthCookies(reply);
+    }
+    return reply.send(ok({ loggedOut: true }));
+  });
 
   fastify.post(
     '/push-token',

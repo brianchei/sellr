@@ -1,7 +1,18 @@
-const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  'http://localhost:3001';
+const useSameOriginApi = process.env.NEXT_PUBLIC_USE_SAME_ORIGIN_API === '1';
+
+function getApiBaseUrl(): string {
+  if (typeof window !== 'undefined' && useSameOriginApi) {
+    return '';
+  }
+  if (useSameOriginApi && typeof window === 'undefined') {
+    return process.env.INTERNAL_API_URL ?? 'http://127.0.0.1:3001';
+  }
+  return (
+    process.env.EXPO_PUBLIC_API_URL ??
+    process.env.NEXT_PUBLIC_API_URL ??
+    'http://localhost:3001'
+  );
+}
 
 class ApiError extends Error {
   constructor(
@@ -27,16 +38,21 @@ export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
+  const base = getApiBaseUrl();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
 
+  if (typeof window !== 'undefined' && useSameOriginApi) {
+    headers['X-Sellr-Client'] = 'web';
+  }
+
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`;
   }
 
-  const res = await fetch(`${API_BASE_URL}/api/v1${path}`, {
+  const res = await fetch(`${base}/api/v1${path}`, {
     ...options,
     headers,
     credentials: 'include',
@@ -55,3 +71,5 @@ export async function apiFetch<T>(
   }
   return json as T;
 }
+
+export { ApiError };

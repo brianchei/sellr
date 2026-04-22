@@ -3,6 +3,10 @@ export type AuthTokens = {
     refreshToken: string;
     userId: string;
 };
+/** Web: OTP success via httpOnly cookies only (no tokens in JSON). */
+export type VerifyOtpWebResult = {
+    userId: string;
+};
 export declare function sendOtp(phoneE164: string): Promise<{
     sent: boolean;
 }>;
@@ -10,10 +14,16 @@ export declare function verifyOtp(body: {
     phoneE164: string;
     code: string;
     deviceFingerprint?: string;
-}): Promise<AuthTokens>;
-export declare function refreshTokens(refreshToken: string): Promise<{
+}): Promise<AuthTokens | VerifyOtpWebResult>;
+/** Mobile: pass `refreshToken` from secure storage. Web: omit — uses httpOnly cookie. */
+export declare function refreshTokens(refreshToken?: string): Promise<{
     accessToken: string;
     refreshToken: string;
+} | {
+    rotated: boolean;
+}>;
+export declare function logout(): Promise<{
+    loggedOut: boolean;
 }>;
 export declare function fetchMe(): Promise<{
     user: {
@@ -33,8 +43,8 @@ export declare function joinCommunity(body: {
     institutionalEmail?: string;
 }): Promise<{
     communityId: string;
-    accessToken: string;
-    refreshToken: string;
+    accessToken?: string;
+    refreshToken?: string;
 }>;
 export declare function fetchListingsNearby(params: {
     communityId: string;

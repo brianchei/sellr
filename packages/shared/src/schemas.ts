@@ -12,8 +12,9 @@ export const VerifyOTPSchema = z.object({
   deviceFingerprint: z.string().optional(),
 });
 
+/** Mobile sends `refreshToken` in the body; the web app uses an httpOnly cookie (see API). */
 export const RefreshTokenSchema = z.object({
-  refreshToken: z.string().min(10),
+  refreshToken: z.string().min(10).optional(),
 });
 
 export const RegisterPushTokenSchema = z.object({

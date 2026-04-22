@@ -1,6 +1,6 @@
 # Sellr — Technical Implementation Guide
 ### Phase 0: Foundation & Technical Setup
-**Version 2.0 · April 2026 · Internal Use Only**
+**Version 2.1 · April 2026 · Internal Use Only**
 
 > *"The product is not defined by its AI features — it is defined by its close rate."*
 
@@ -8,6 +8,7 @@
 
 ## Table of Contents
 
+- [Current repository vs. target state](#current-repository-vs-target-state)
 1. [Architecture Overview](#1-architecture-overview)
 2. [Repository & Monorepo Setup](#2-repository--monorepo-setup)
 3. [Shared Packages (`packages/`)](#3-shared-packages-packages)
@@ -26,22 +27,43 @@
 
 ---
 
+## Current repository vs. target state
+
+This document describes the **intended target stack** (what we are building toward), not a point-in-time snapshot of every `package.json` on every day. The monorepo may **lag** the guide in a few important places. The table below is the **authoritative** “where we are” vs “where the guide points.” Close the rollout tickets (or your tracker’s equivalent) when the **Target** column is true in the repo.
+
+| Area | Current repository (illustrative) | Target (this guide) | Rollout ticket |
+|------|----------------------------------|------------------------|----------------|
+| **Mobile** | `expo` **SDK 54**; `app.json` may still set `newArchEnabled: true` | **Expo SDK 55**; follow SDK 55 app config (e.g. remove `newArchEnabled` as required by the SDK) | `SELLR-UPGRADE-EXPO-55` |
+| **Web** | **Next.js 16**, **Tailwind 4** | Next.js 16, Tailwind 4 (App Router) | (aligned) |
+| **ORM** | **Prisma 6**, `prisma-client-js`, `url` / `directUrl` in `schema.prisma` | **Prisma 7**: `prisma.config.ts`, `prisma-client` generator + output, `@prisma/adapter-pg` at runtime | `SELLR-UPGRADE-PRISMA-7` |
+| **Local DB URL split** | Often **one port (e.g. 54322)** in `.env` when the local **pooler is off** (see [§5](#5-database-supabase--postgis-setup)) | Pooled on **54329** + direct on **54322** when local pooler is **on**; both on **54322** when pooler is **off** | Document in [§5](#5-database-supabase--postgis-setup) / [§13](#13-secrets--environment-management) |
+| **TypeScript (root)** | e.g. **5.7.x** in root `package.json` | **5.9.x** in lockstep with Expo / tooling when you bump (sample snippets use `^5.9.0`) | `SELLR-UPGRADE-TS-59` (optional) |
+| **CI step order** | e.g. **migrate** → typecheck → lint → test (valid for CI DB) | “Ideal local loop”: typecheck → lint → test; **migrate** where needed before tests that need schema | (document only; [§10](#10-cicd-pipeline)) |
+
+> **Expo SDK 55** and **Prisma 7** are the two **intentional rollout targets** with explicit tickets. Other rows are **informational** (or optional polish) so readers do not assume the repo already matches every checklist line.
+
+Until `SELLR-UPGRADE-EXPO-55` and `SELLR-UPGRADE-PRISMA-7` are done, use **§14** “Interim (repo today)” sub-bullets for Phase 0 sign-off, and the **“Target”** sub-bullets when those upgrades have landed.
+
+---
+
 ## 1. Architecture Overview
 
 ### Full Stack at a Glance
 
+> **Target stack, not a daily snapshot:** The table below states where the **guide** aims (e.g. Expo SDK 55, Prisma 7). The checked-in monorepo may still be on **Expo SDK 54** or **Prisma 6** until the rollout tickets are done. See [Current repository vs. target state](#current-repository-vs-target-state) (`SELLR-UPGRADE-EXPO-55`, `SELLR-UPGRADE-PRISMA-7`).
+
 | Layer | Technology | Why |
 |---|---|---|
-| Mobile | React Native (Expo SDK 53, managed workflow) | Single codebase for iOS + Android; EAS handles builds and OTA updates; New Architecture enabled by default in SDK 53 |
-| Web | Next.js 15 (App Router) + Tailwind CSS | SSR for SEO on listing pages; seller dashboard and B2B portal; React 19 support; Turbopack stable for dev |
+| Mobile | React Native (Expo SDK 55, managed workflow) | Single codebase for iOS + Android; EAS handles builds and OTA updates; Legacy Architecture support was removed in SDK 55 |
+| Web | Next.js 16 (App Router) + Tailwind CSS 4 | SSR for SEO on listing pages; seller dashboard and B2B portal; React 19.2 support; Turbopack is the default compiler in dev and build |
 | API | Node.js 22 LTS + Fastify v5 + Zod 4 | Fast, typed, schema-validated; manageable for a 2-person team; Node 22 brings native WebSocket client and Permission Model |
-| Database | Supabase (PostgreSQL 16 + PostGIS) | Managed Postgres with PostGIS pre-enabled; connection pooling via pgBouncer; dashboard, backups, and RLS built in |
+| Database | Supabase (PostgreSQL + PostGIS) | Managed Postgres with PostGIS pre-enabled; connection pooling via pgBouncer; set local `db.major_version` to match the hosted project |
 | Cache / Queue | Redis (Upstash) + BullMQ | Job queue for AI pipeline, reminders, search sync; semantic caching for LLM cost reduction |
 | Search | Algolia | Managed; typo tolerance; geosearch; community-scoped proxy |
 | Object Storage | Cloudflare R2 (or AWS S3) | Zero egress cost (R2); presigned uploads; Cloudflare CDN for delivery |
 | Realtime | Socket.IO (self-hosted on Fastify) | WebSocket rooms per conversation; MVP scale acceptable |
-| AI (Vision) | OpenAI GPT-4o Vision (structured output) | Listing assistant |
-| AI (Text) | Anthropic Claude Haiku | Quick-reply classification; fast and cheap |
+| AI (Vision) | OpenAI Responses API + GPT-5.4 / GPT-5.4-mini | Listing assistant, multimodal analysis, structured outputs |
+| AI (Text) | Anthropic Claude Haiku 4.5 | Quick-reply classification; fast and cheap |
 | Push Notifications | Expo Push (wraps FCM + APNs) | Free; works out-of-the-box with managed Expo workflow |
 | Auth | Custom OTP via Twilio Verify + JWT | Phone-number-first, no passwords — Supabase Auth is not used |
 | Hosting | Railway (API) + Supabase (Postgres) + Vercel (web) | Minimal ops; Supabase handles all database infrastructure |
@@ -55,7 +77,7 @@
 sellr/
 ├── apps/
 │   ├── mobile/        ← Expo React Native (iOS + Android)
-│   ├── web/           ← Next.js 15 App Router
+│   ├── web/           ← Next.js 16 App Router
 │   └── api/           ← Fastify REST API (monolith)
 ├── packages/
 │   ├── shared/        ← Domain types, Zod schemas, enums, formatters
@@ -121,7 +143,7 @@ pnpm add -D typescript eslint prettier @eslint/js typescript-eslint globals esli
   },
   "devDependencies": {
     "turbo": "^2.4.0",
-    "typescript": "^5.7.0",
+    "typescript": "^5.9.0",
     "prettier": "^3.2.0",
     "eslint": "^9.0.0"
   }
@@ -287,7 +309,7 @@ mkdir -p packages/shared/src
   },
   "devDependencies": {
     "@sellr/tsconfig": "workspace:*",
-    "typescript": "^5.7.0"
+    "typescript": "^5.9.0"
   }
 }
 ```
@@ -698,7 +720,7 @@ mkdir -p packages/api-client/src
   },
   "devDependencies": {
     "@sellr/tsconfig": "workspace:*",
-    "typescript": "^5.7.0"
+    "typescript": "^5.9.0"
   }
 }
 ```
@@ -767,8 +789,9 @@ The Vercel AI SDK and Instructor patterns require Zod schemas to constrain LLM o
 import { z } from 'zod';
 import { ListingCondition } from './enums';
 
-// AI Listing Assistant — GPT-4o Vision structured output
-// Used by the imageForensics and listingAssist jobs
+// AI Listing Assistant — OpenAI multimodal structured output
+// Pin the exact model in config (for example gpt-5.4 for highest quality or
+// gpt-5.4-mini for lower-latency, cost-sensitive production paths).
 export const AIListingDraftSchema = z.object({
   title: z.string().min(3).max(60),
   description: z.string().min(10).max(1000),
@@ -784,6 +807,7 @@ export const AIListingDraftSchema = z.object({
 export type AIListingDraft = z.infer<typeof AIListingDraftSchema>;
 
 // AI Quick-Reply — Claude Haiku structured output
+// Pin the latest generally available Haiku alias or snapshot at implementation time.
 // Used by the quickReply job to classify and draft buyer messages
 export const AIQuickReplySchema = z.object({
   intent: z.enum(['price_inquiry', 'availability_check', 'condition_question', 'meetup_request', 'other']),
@@ -829,13 +853,13 @@ cd apps/api
 pnpm init
 pnpm add fastify @fastify/cors @fastify/helmet @fastify/rate-limit @fastify/jwt @fastify/cookie @fastify/multipart fastify-plugin
 pnpm add zod @fastify/type-provider-zod
-pnpm add @prisma/client prisma
+pnpm add @prisma/client @prisma/adapter-pg pg
 pnpm add bullmq ioredis
 pnpm add socket.io
 pnpm add pino pino-pretty
 pnpm add twilio
 pnpm add openai @anthropic-ai/sdk
-pnpm add -D typescript tsx @types/node vitest @vitest/coverage-v8
+pnpm add -D prisma dotenv typescript tsx @types/node vitest @vitest/coverage-v8
 ```
 
 > **Why Fastify v5?** Fastify v5 requires Node.js 20+ (we're on 22), delivers ~5-10% throughput improvement, adds Diagnostics Channel API support for better observability hooks, and makes full JSON Schema required for all route inputs — which aligns with our Zod-everywhere approach via `@fastify/type-provider-zod`. Note: `.listen()` now only accepts an options object (no positional `port, host` arguments).
@@ -846,15 +870,17 @@ pnpm add -D typescript tsx @types/node vitest @vitest/coverage-v8
   "name": "@sellr/api",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "prisma generate && tsc --noEmit",
     "test": "vitest run",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:seed": "prisma db seed"
   }
 }
 ```
@@ -1081,7 +1107,7 @@ curl http://localhost:3001/health
 
 ## 5. Database: Supabase + PostGIS Setup
 
-Supabase provides a fully managed PostgreSQL 16 instance with PostGIS pre-installed, a connection pooler (pgBouncer), automatic daily backups, a web dashboard, and Row Level Security. It replaces a self-managed Postgres container in both local development and production.
+Supabase provides a fully managed PostgreSQL instance with PostGIS pre-installed, a connection pooler (pgBouncer), automatic daily backups, a web dashboard, and Row Level Security. It replaces a self-managed Postgres container in both local development and production.
 
 **Why Supabase over plain Postgres on Railway:**
 - PostGIS is enabled by default — no manual extension setup or raw migrations needed for geospatial support
@@ -1098,12 +1124,14 @@ Supabase provides a fully managed PostgreSQL 16 instance with PostGIS pre-instal
 # macOS
 brew install supabase/tap/supabase
 
-# npm (cross-platform)
-npm install -g supabase
+# Or install it in the repo and invoke it locally
+pnpm add -D supabase
 
 # Verify
-supabase --version
+pnpm exec supabase --version
 ```
+
+> **CLI install note:** The current Supabase docs support `npx supabase ...` / `pnpm exec supabase ...`, local dev dependency installs, or Homebrew / Scoop / standalone binaries. Global `npm install -g supabase` is no longer supported.
 
 ### Step 2: Initialize Supabase in the Monorepo
 
@@ -1111,7 +1139,7 @@ Run this from the `apps/api/` directory — Supabase config lives alongside the 
 
 ```bash
 cd apps/api
-supabase init
+pnpm exec supabase init
 ```
 
 This creates `apps/api/supabase/` with:
@@ -1148,9 +1176,9 @@ volumes:
 # Start Redis
 docker compose up -d
 
-# Start the full Supabase local stack (Postgres 16 + PostGIS + Studio)
+# Start the full Supabase local stack (Postgres + PostGIS + Studio)
 cd apps/api
-supabase start
+pnpm exec supabase start
 ```
 
 `supabase start` outputs all local connection details:
@@ -1161,41 +1189,70 @@ Studio: http://localhost:54323        ← Web UI for browsing tables
 Inbucket: http://localhost:54324      ← Local email testing
 ```
 
-Use the `DB URL` as `DATABASE_URL` in your local `.env`.
+Use the `DB URL` as your direct connection string in local development.
+
+> **Postgres version note:** Do not hardcode PostgreSQL 16 in this guide or your local config. Current Supabase CLI docs default `db.major_version` to `15`, and the correct value is whichever major version your hosted Supabase project uses. Set `apps/api/supabase/config.toml` to match the hosted project after creation.
+
+> **Local pooler note:** Current Supabase CLI defaults `db.pooler.enabled = false`. If you want local parity with hosted Supabase's pooled runtime connection, enable it explicitly in `apps/api/supabase/config.toml`:
+>
+> ```toml
+> [db.pooler]
+> enabled = true
+> port = 54329
+> pool_mode = "transaction"
+> ```
 
 **Verify PostGIS is available (it is, by default in Supabase):**
 ```bash
-supabase db execute --local "SELECT PostGIS_Version();"
+pnpm exec supabase db execute --local "SELECT PostGIS_Version();"
 # Returns something like: 3.4.0 ...
 ```
 
 ### Step 4: Prisma Schema — Supabase-Specific Configuration
 
-Prisma requires **two database URLs** when used with Supabase:
-- `DATABASE_URL` → the pgBouncer pooled connection (used at runtime by the API)
-- `DIRECT_URL` → the direct Postgres connection (used only by Prisma for migrations)
+Prisma still requires **two connection contexts** when used with Supabase:
+- `DATABASE_URL` → the pooled runtime connection string used by the API at request time
+- `DIRECT_URL` → the direct Postgres connection string used by Prisma CLI for migrations and Studio
 
 This is because pgBouncer's transaction-mode pooling is incompatible with Prisma Migrate.
 
-> **Why Prisma 7?** Prisma 7 rewrites the query engine in pure TypeScript (no more Rust binary). This dramatically reduces Docker image size, eliminates cold start latency from native module loading, and makes deployments on Railway faster. The `postgresqlExtensions` preview feature is **discontinued in Prisma 7** — PostGIS support is now handled through focused independent efforts. Remove `previewFeatures = ["postgresqlExtensions"]` and the `extensions = [...]` line from the datasource block entirely. PostGIS still works because Supabase enables it by default; Prisma simply doesn't need to manage it.
+> **Why Prisma 7 needs a guide update:** Prisma 7 no longer treats `prisma-client-js` + `compilerBuild = true` as the recommended setup. The current upgrade path is:
+> - use the `prisma-client` generator
+> - add an explicit `output` path for the generated client
+> - move datasource URL configuration into `prisma.config.ts`
+> - load env vars explicitly for Prisma CLI
+> - instantiate Prisma Client with a driver adapter such as `@prisma/adapter-pg`
 
-`apps/api/prisma/schema.prisma` datasource block:
+`apps/api/prisma/schema.prisma` top block:
 ```prisma
 generator client {
-  provider      = "prisma-client-js"
-  // compilerBuild enables Prisma 7's TypeScript-native query engine for faster cold starts
-  compilerBuild = true
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")       // pgBouncer pooled URL (runtime)
-  directUrl  = env("DIRECT_URL")         // Direct URL (migrations only)
-  // Note: postgresqlExtensions preview feature is DISCONTINUED in Prisma 7.
-  // PostGIS is enabled by default in all Supabase projects — no extension config needed here.
-  // If using a non-Supabase Postgres instance, enable PostGIS via a raw SQL migration:
-  //   CREATE EXTENSION IF NOT EXISTS postgis;
+  provider = "postgresql"
+  // Prisma 7 deprecates url/directUrl in schema.prisma.
+  // Configure datasource URLs in prisma.config.ts instead.
 }
+```
+
+`apps/api/prisma.config.ts`:
+```typescript
+import 'dotenv/config';
+import { defineConfig, env } from 'prisma/config';
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  migrations: {
+    path: 'prisma/migrations',
+    seed: 'tsx prisma/seed.ts',
+  },
+  datasource: {
+    // Prisma CLI uses the direct connection for migrations and Studio.
+    url: env('DIRECT_URL'),
+  },
+});
 ```
 
 **Local `.env` values** (from `supabase start` output):
@@ -1203,12 +1260,14 @@ datasource db {
 > **Note for Next.js (web app):** Next.js uses `.env.local` (not `.env`) for local overrides that are git-ignored. The `.env.example` at the repo root documents all variables; each app reads from its own `.env.local` during local development.
 
 ```bash
-# Pooled connection (runtime API queries)
-DATABASE_URL="postgresql://postgres:postgres@localhost:54322/postgres?pgbouncer=true&connection_limit=1"
+# Pooled connection (runtime API queries) — requires [db.pooler].enabled = true
+DATABASE_URL="postgresql://postgres:postgres@localhost:54329/postgres?pgbouncer=true&connection_limit=1"
 
 # Direct connection (Prisma migrations only)
 DIRECT_URL="postgresql://postgres:postgres@localhost:54322/postgres"
 ```
+
+If you keep the local pooler disabled, point both values at port `54322` locally and reserve pooled/direct separation for staging and production.
 
 **Hosted Supabase `.env` values** (from the Supabase dashboard → Settings → Database):
 ```bash
@@ -1221,7 +1280,7 @@ DIRECT_URL="postgresql://postgres.[PROJECT_REF]:[PASSWORD]@db.[PROJECT_REF].supa
 
 ### Step 5: Full Prisma Schema
 
-The Prisma schema entities, enums, indexes, and relations are unchanged from the domain model. The only differences from a plain-Postgres setup are: (1) the datasource block has both `url` and `directUrl`, and (2) the `previewFeatures` and `extensions` lines are removed since Prisma 7 no longer supports the `postgresqlExtensions` preview feature.
+The Prisma schema entities, enums, indexes, and relations are unchanged from the domain model. The Prisma-7-specific differences from a plain-Postgres setup are: (1) the generator uses `provider = "prisma-client"` with an explicit `output`, (2) datasource URLs move to `prisma.config.ts`, and (3) runtime clients use a database driver adapter instead of the old built-in engine configuration.
 
 ```bash
 # Generate Prisma client after schema changes
@@ -1238,14 +1297,13 @@ pnpm --filter @sellr/api prisma studio
 
 ```prisma
 generator client {
-  provider      = "prisma-client-js"
-  compilerBuild = true
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")     // pgBouncer pooled (port 6543 on hosted Supabase)
-  directUrl  = env("DIRECT_URL")       // Direct connection (port 5432) for migrations
+  provider = "postgresql"
+  // URLs are configured in prisma.config.ts in Prisma 7.
   // PostGIS is enabled by default in all Supabase projects.
   // No extensions config needed. For non-Supabase Postgres, enable via raw SQL migration.
 }
@@ -1687,13 +1745,24 @@ async function findListingsNearby(params: {
 
 ```typescript
 // apps/api/src/lib/prisma.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '../generated/prisma/client';
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClient;
+  prismaAdapter?: PrismaPg;
+};
+
+const adapter =
+  globalForPrisma.prismaAdapter ??
+  new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+  });
 
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
+    adapter,
     log: process.env.NODE_ENV === 'development' 
       ? ['query', 'info', 'warn', 'error'] 
       : ['warn', 'error'],
@@ -1701,6 +1770,7 @@ export const prisma =
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
+  globalForPrisma.prismaAdapter = adapter;
 }
 ```
 
@@ -1924,23 +1994,24 @@ await aiQueue.add('test', { listingId: 'test', photoUrls: [], sellerId: 'test' }
 
 ```bash
 cd apps/mobile
-npx create-expo-app . --template blank-typescript
+npx create-expo-app . --template default@sdk-55
 # Clean up template files you don't need
 ```
 
-Install core dependencies for SDK 53:
+Install core dependencies for SDK 55:
 ```bash
-pnpm add expo-router expo-notifications expo-secure-store expo-image-picker expo-image expo-location
-pnpm add expo-background-task   # Replaces expo-background-fetch in SDK 53
+pnpm add expo-router@^55 expo-notifications@^55 expo-secure-store@^55 expo-image-picker@^55 expo-image@^55 expo-location@^55 expo-background-task@^55
 pnpm add @tanstack/react-query
 pnpm add zustand
 pnpm add @sellr/shared @sellr/api-client
 pnpm add socket.io-client
 ```
 
-> **Maps:** `react-native-maps` remains the stable choice for MVP. Expo SDK 53 introduces `expo-maps` (alpha) as a first-party wrapper over Google Maps (Android) and Apple Maps (iOS). Do not use `expo-maps` in production yet — it is alpha and the API may change. Watch for its stable release in SDK 54 or 55.
+> **Expo package versions:** As of SDK 55, Expo packages use the same major version as the SDK. Keep your core Expo packages on `^55.x` so compatibility is obvious and consistent.
 
-> **Background Sync:** `expo-background-task` replaces `expo-background-fetch` in SDK 53. Use `expo-background-task` for any background data sync (token refresh, push token updates). The old `expo-background-fetch` package will stop receiving updates.
+> **Maps:** `react-native-maps` remains the stable MVP choice. Re-evaluate `expo-maps` only against the current Expo docs at implementation time instead of assuming a future stable release date.
+
+> **Background Sync:** `expo-background-task` is the replacement for `expo-background-fetch`. Use it for background data sync (token refresh, push token updates) and remove any legacy `expo-background-fetch` references entirely.
 
 ### Step 2: Expo Configuration `app.json`
 
@@ -1950,7 +2021,6 @@ pnpm add socket.io-client
     "name": "Sellr",
     "slug": "sellr",
     "version": "1.0.0",
-    "sdkVersion": "53.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -1995,15 +2065,14 @@ pnpm add socket.io-client
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "newArchEnabled": true
+    }
   }
 }
 ```
 
-> **Edge-to-Edge Android:** `edgeToEdgeEnabled: true` is the SDK 53 default for new projects. It extends your app's content behind the system bars (status bar, navigation bar) for a modern full-screen look. Verify your bottom tab bar and any fixed-bottom UI have appropriate `paddingBottom` using `useSafeAreaInsets()`.
+> **Edge-to-Edge Android:** `edgeToEdgeEnabled: true` still gives you the modern full-screen layout behind system bars. If you use custom tab bars or fixed-bottom UI, verify padding with `useSafeAreaInsets()`. Expo Router's native-tabs layouts now handle safe areas automatically, but custom layouts still need a visual check.
 
-> **New Architecture:** `newArchEnabled: true` enables the New Architecture (Fabric renderer + TurboModules) by default in SDK 53. All core Expo modules are compatible. If a third-party library causes issues, check its compatibility before disabling — the New Architecture is now the expected default, not an experiment.
+> **New Architecture:** Expo SDK 55 removed Legacy Architecture support entirely, so `newArchEnabled` no longer belongs in `app.json`. Treat New Architecture compatibility as the default assumption when selecting third-party native libraries.
 
 ### Step 3: Expo Router v5 File Structure
 
@@ -2175,11 +2244,13 @@ pnpm add @sellr/shared @sellr/api-client
 pnpm add @tanstack/react-query @tanstack/react-query-devtools
 ```
 
-> **Why Next.js 15?** Next.js 15 ships with React 19 support, Turbopack stable for dev (`next dev --turbopack` is now the recommended dev command), improved self-hosting with automatic Cache-Control headers, Server Actions security hardening, GET Route Handlers no longer cached by default (sane behavior), and the new `after()` API for post-response work. The App Router is unchanged — no migration needed for App Router code.
+> **Why Next.js 16?** Next.js 16 keeps the App Router model intact, ships with React 19.2 support, and makes Turbopack the default compiler for both `next dev` and `next build`. It also formalizes `cacheComponents`, promotes the `turbopack` config key to top-level `next.config.ts`, and renames request interception from `middleware` to `proxy`.
 
-> **React 19 Compatibility:** React 19 ships with improved Server Components, `use()` hook for promises and context, and compiler optimizations. The `@tanstack/react-query` v5 is React 19 compatible. Check all third-party dependencies before upgrading — some older libraries may have peer dependency warnings.
+> **React 19.2 Compatibility:** React 19.2 adds `useEffectEvent`, `<Activity />`, improved SSR primitives, and updated React Hooks linting. `@tanstack/react-query` v5 is compatible, but still verify peer dependencies for older libraries during the upgrade.
 
-> **Turbopack for dev:** Run `next dev --turbopack` instead of `next dev`. Turbopack is now stable and delivers 40-60% faster HMR for large applications. It is not yet used for production builds (Webpack is still used there).
+> **Turbopack default:** Run `next dev` and `next build` with no `--turbopack` flag. Next.js 16 uses Turbopack by default and only needs `--webpack` if you intentionally opt back out.
+
+> **Proxy rename:** If you add request-time auth gates or rewrites later, use `proxy.ts` in new Next.js 16 code. Older `middleware.ts` naming is deprecated.
 
 > **`.env.local` for Next.js:** Next.js reads from `.env.local` for local development overrides (not `.env`). The `.env.local` file is git-ignored by default. Copy `.env.example` to `.env.local` and fill in your values. Never commit `.env.local`.
 
@@ -2265,7 +2336,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 **Verify it works:**
 ```bash
 cd apps/web
-next dev --turbopack
+next dev
 # App should load at http://localhost:3000 with Turbopack compiler active
 ```
 
@@ -2454,6 +2525,8 @@ jobs:
           REDIS_URL: redis://localhost:6379
 ```
 
+> **Step order:** The workflow runs `prisma migrate deploy` **before** `typecheck` / `lint` / `test` so the CI Postgres has an applied schema. That is **not** the same order as a pure “typecheck → lint → test” local loop, and that is fine — see [Current repository vs. target state](#current-repository-vs-target-state) and the **CI/CD** bullets under [§14 Phase 0 Completion Checklist](#14-phase-0-completion-checklist).
+
 `.github/workflows/deploy.yml`:
 ```yaml
 name: Deploy
@@ -2548,9 +2621,9 @@ eas submit --platform all   # Submits to App Store + Google Play
 }
 ```
 
-> **Remote Build Cache (SDK 53):** EAS now supports Remote Build Cache for faster repeat builds — especially valuable when most native code hasn't changed. Enable by setting `cache.key` in `eas.json` as shown above. The cache is stored in EAS's infrastructure and dramatically reduces production build times after the first build.
+> **Remote Build Cache (SDK 55):** EAS supports Remote Build Cache for faster repeat builds — especially valuable when most native code hasn't changed. Enable by setting `cache.key` in `eas.json` as shown above. The cache is stored in EAS's infrastructure and dramatically reduces production build times after the first build.
 
-> **TestFlight Workflow (SDK 53):** Use `eas build --profile production --platform ios && eas submit --platform ios` to automate TestFlight uploads. With SDK 53, the build and submit pipeline is more reliable and supports automatic TestFlight reviewer notes.
+> **TestFlight Workflow (SDK 55):** Use `eas build --profile production --platform ios && eas submit --platform ios` to automate TestFlight uploads. The build and submit pipeline is now stable enough that this can be your default iOS release path from the start.
 
 ---
 
@@ -2978,6 +3051,8 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 Before moving to Phase 1 (MVP Build), every item on this list must be checked off. If any are missing, Phase 1 work will be blocked.
 
+**Rollout tickets:** Treat **Expo SDK 55** (`SELLR-UPGRADE-EXPO-55`) and **Prisma 7** (`SELLR-UPGRADE-PRISMA-7`) as **tracked upgrades**. While those tickets are open, you may sign off **Interim (repo today)** items in **Database** and **Mobile**; after each upgrade merges, complete the matching **Target (guide)** items. See [Current repository vs. target state](#current-repository-vs-target-state).
+
 ### Repository
 - [ ] Turborepo monorepo initialized with correct workspace structure
 - [ ] `packages/shared` compiles with all entity types, Zod 4 schemas, and AI output schemas
@@ -2990,22 +3065,25 @@ Before moving to Phase 1 (MVP Build), every item on this list must be checked of
 - [ ] Fastify v5 app starts and `/health` returns `200`
 - [ ] ZodTypeProvider wired correctly — no TypeBox imports remain
 - [ ] Global error handler registered; test error appears in Sentry
-- [ ] JWT middleware scaffolded (routes are empty but protected correctly)
+- [ ] JWT middleware scaffolded; protected routes behave as intended (route modules may already be scaffolded beyond a blank shell)
 - [ ] Rate limit plugin registered
 - [ ] `@sellr/shared` Zod schemas imported and validated in a sample route
 - [ ] Pino logger outputs structured JSON in production mode
 
 ### Database (Supabase)
-- [ ] Supabase CLI installed (`supabase --version` returns a version)
+
+- [ ] **Interim (repo today, Prisma 6+):** Prisma is installed; `schema.prisma` uses a supported `generator` + `datasource` (e.g. `prisma-client-js` with `url` + `directUrl`); `prisma migrate` / `prisma generate` work against local and hosted Supabase; PostGIS `location_geom` + GiST index migration is present; no checklist item in this section is **blocked** solely because Prisma 7 is not merged yet.
+- [ ] **Target (guide, Prisma 7 — after `SELLR-UPGRADE-PRISMA-7`):** Prisma schema has **no** `previewFeatures = ["postgresqlExtensions"]` and **no** `extensions = [...]` line
+- [ ] **Target (guide, Prisma 7):** Prisma generator uses `provider = "prisma-client"` with an explicit `output` path
+- [ ] **Target (guide, Prisma 7):** `prisma.config.ts` is committed and Prisma CLI reads `DIRECT_URL` from config
+- [ ] **Target (guide, Prisma 7):** Runtime Prisma client imports from the generated client path and uses `@prisma/adapter-pg`
+- [ ] Supabase CLI installed (`pnpm exec supabase --version` returns a version)
 - [ ] `supabase init` run inside `apps/api/` — `supabase/` directory created
 - [ ] `supabase start` runs successfully — Postgres, PostGIS, and Studio all up at `localhost:54323`
 - [ ] `SELECT PostGIS_Version()` returns a version string in Supabase Studio SQL editor
 - [ ] `docker compose up -d` starts Redis without errors (Postgres is now Supabase's job)
-- [ ] Prisma schema has **no** `previewFeatures = ["postgresqlExtensions"]` and **no** `extensions = [...]` line (Prisma 7 change)
-- [ ] Prisma schema `datasource` block has both `url` (pooled) and `directUrl` (direct)
-- [ ] `compilerBuild = true` set in the generator block for Prisma 7 performance
 - [ ] `DIRECT_URL` points to port `54322` locally (direct connection for migrations)
-- [ ] `DATABASE_URL` points to port `54322` with `?pgbouncer=true` locally (pooled)
+- [ ] `DATABASE_URL` points to port `54329` with `?pgbouncer=true` locally **when** the Supabase local pooler is enabled; **or** both point at `54322` when the pooler is off (see [§5](#5-database-supabase--postgis-setup))
 - [ ] `prisma migrate dev --name init` runs successfully against local Supabase
 - [ ] `prisma generate` generates typed client with all 15 entities
 - [ ] PostGIS migration adds `location_geom` POINT column and GIST index to `listings`
@@ -3020,8 +3098,9 @@ Before moving to Phase 1 (MVP Build), every item on this list must be checked of
 - [ ] Semantic cache utility (`getCachedLLMResponse`) wired and tested with a dummy key
 
 ### Mobile
-- [ ] Expo SDK 53 project runs on iOS Simulator and Android Emulator via `npx expo start`
-- [ ] New Architecture enabled (`newArchEnabled: true` in `app.json`)
+- [ ] **Interim (repo today, e.g. SDK 54):** `npx expo start` runs on iOS Simulator and Android Emulator; `edgeToEdgeEnabled: true` on Android; `(auth)` / `(tabs)` layouts resolve; useEffect-based auth redirect works; `expo-background-task` installed; `expo-background-fetch` not used; SecureStore + `@sellr/shared` are clean
+- [ ] **Target (guide, Expo SDK 55 — after `SELLR-UPGRADE-EXPO-55`):** Expo SDK **55** project runs on iOS Simulator and Android Emulator via `npx expo start`
+- [ ] **Target (guide, SDK 55):** `newArchEnabled` is absent from `app.json` (per SDK 55; Legacy Architecture support was removed in that release)
 - [ ] `edgeToEdgeEnabled: true` set for Android; bottom tab bar verified with `useSafeAreaInsets()`
 - [ ] Expo Router v5 file-based routing resolves `(auth)` and `(tabs)` layouts
 - [ ] Auth guard (useEffect-based) correctly redirects unauthenticated users
@@ -3030,8 +3109,8 @@ Before moving to Phase 1 (MVP Build), every item on this list must be checked of
 - [ ] `@sellr/shared` types import cleanly (no TypeScript errors)
 
 ### Web
-- [ ] Next.js 15 app runs at `localhost:3000` without errors
-- [ ] `next dev --turbopack` starts with Turbopack compiler (confirmed in terminal output)
+- [ ] Next.js 16 app runs at `localhost:3000` without errors
+- [ ] `next dev` starts with Turbopack compiler active by default (confirmed in terminal output)
 - [ ] `.env.local` created from `.env.example` (not `.env`)
 - [ ] Tailwind CSS classes render correctly
 - [ ] React Query `QueryClientProvider` is wired in root layout
@@ -3060,7 +3139,7 @@ Before moving to Phase 1 (MVP Build), every item on this list must be checked of
 - [ ] Langfuse project created; test AI trace appears in the dashboard
 
 ### CI/CD
-- [ ] GitHub Actions CI runs on every PR with Node.js 22 and pnpm 10: typecheck → lint → migrate → test
+- [ ] GitHub Actions CI runs on every PR with Node.js 22 and pnpm 10: e.g. **migrate** (for test DB) → **typecheck** → **lint** → **test** (if your pipeline runs `migrate` first, that is OK; the “development loop” may still be typecheck → lint → test locally)
 - [ ] `prisma migrate deploy` runs before Railway deploy in `deploy.yml`
 - [ ] A PR merge to `main` triggers a Railway staging deploy
 - [ ] A PR merge to `main` triggers a Vercel preview deploy
@@ -3074,10 +3153,10 @@ Phase 1 (Weeks 3–17) builds the complete MVP on top of this foundation. The de
 
 ```
 Auth (OTP + JWT + community gating)
-  → User profiles + S3 photo upload
+  → User profiles + R2 / S3 photo upload
     → Community management (admin: create communities, generate invite codes)
-      → Listing creation + AI Listing Assistant (GPT-4o Vision, structured output via Zod)
-        → Photo quality check + Image Forensics job (Google Vision)
+      → Listing creation + AI Listing Assistant (OpenAI Responses API multimodal model, structured output via Zod)
+        → Photo quality check + Image Forensics job (multimodal risk review + heuristics)
           → HITL moderation gate (confidence threshold auto-approve vs. human review)
             → Algolia sync job (listing goes live in search)
               → Listing feed + keyword search + geospatial filters
@@ -3101,8 +3180,8 @@ Auth (OTP + JWT + community gating)
 
 2. **Offer/Meetup Coordination** — this is the close-rate engine. The structured offer flow, meetup card, and reminder jobs are the core product differentiator. Get the state machine right: `pending → countered → accepted → meetup:confirmed → meetup:completed/cancelled/unresolved`.
 
-3. **AI Token Cost Management** — rate limit GPT-4o Vision calls to 10/user/day from day one. Use prompt caching (the system prompt is static and eligible for OpenAI's prompt cache, which charges 50% of the standard input token price for cached tokens). Use Claude Haiku for all text tasks. Track `cost_per_listing` as a PostHog metric from the first listing created. Alert if it exceeds $0.10/listing.
+3. **AI Token Cost Management** — rate limit the listing-assist multimodal model to 10/user/day from day one. Use prompt caching (the system prompt is static and eligible for OpenAI's prompt cache). Default to the cheaper model tier for user-facing production paths and reserve the flagship model for higher-value or moderator-facing flows. Use the latest Claude Haiku alias or pinned snapshot for text tasks. Track `cost_per_listing` as a PostHog metric from the first listing created. Alert if it exceeds $0.10/listing.
 
 ---
 
-*Document version 2.0 — covers Phase 0: Foundation & Setup only. Reflects Node.js 22 LTS, Expo SDK 53, Next.js 15, Prisma 7, Zod 4, ESLint 9, Fastify v5, and pnpm 10. Phase 1 implementation details to follow in a separate guide.*
+*Document version 2.1 — covers Phase 0: Foundation & Setup only. **Target stack** (where the guide is headed): Node.js 22 LTS, Expo SDK 55, Next.js 16, Prisma 7, TypeScript 5.9 in sample snippets, Zod 4, ESLint 9, Fastify v5, and pnpm 10. The **live monorepo** may still be on **Expo SDK 54** and **Prisma 6** until `SELLR-UPGRADE-EXPO-55` and `SELLR-UPGRADE-PRISMA-7` are completed — see [Current repository vs. target state](#current-repository-vs-target-state). Phase 1 implementation details to follow in a separate guide.*

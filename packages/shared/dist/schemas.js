@@ -12,8 +12,9 @@ exports.VerifyOTPSchema = zod_1.z.object({
     code: zod_1.z.string().length(6),
     deviceFingerprint: zod_1.z.string().optional(),
 });
+/** Mobile sends `refreshToken` in the body; the web app uses an httpOnly cookie (see API). */
 exports.RefreshTokenSchema = zod_1.z.object({
-    refreshToken: zod_1.z.string().min(10),
+    refreshToken: zod_1.z.string().min(10).optional(),
 });
 exports.RegisterPushTokenSchema = zod_1.z.object({
     expoPushToken: zod_1.z.string().min(1).max(500),

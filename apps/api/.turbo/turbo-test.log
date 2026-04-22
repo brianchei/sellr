@@ -2,10 +2,14 @@
 > @sellr/api@0.0.1 test /Users/brianchei/repos/sellr/apps/api
 > vitest run --passWithNoTests
 
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
 
  RUN  v2.1.9 /Users/brianchei/repos/sellr/apps/api
 
-include: **/*.{test,spec}.?(c|m)[jt]s?(x)
-exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*
-No test files found, exiting with code 0
+ ✓ src/lib/semanticCache.test.ts (1 test) 1ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  23:27:00
+   Duration  157ms (transform 21ms, setup 0ms, collect 18ms, tests 1ms, environment 0ms, prepare 42ms)
 

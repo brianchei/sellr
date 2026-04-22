@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOtp = sendOtp;
 exports.verifyOtp = verifyOtp;
 exports.refreshTokens = refreshTokens;
+exports.logout = logout;
 exports.fetchMe = fetchMe;
 exports.registerPushToken = registerPushToken;
 exports.joinCommunity = joinCommunity;
@@ -36,10 +37,20 @@ function verifyOtp(body) {
         body: JSON.stringify(body),
     });
 }
+/** Mobile: pass `refreshToken` from secure storage. Web: omit — uses httpOnly cookie. */
 function refreshTokens(refreshToken) {
+    const body = refreshToken !== undefined
+        ? JSON.stringify({ refreshToken })
+        : JSON.stringify({});
     return (0, fetch_1.apiFetch)('/auth/refresh', {
         method: 'POST',
-        body: JSON.stringify({ refreshToken }),
+        body,
+    });
+}
+function logout() {
+    return (0, fetch_1.apiFetch)('/auth/logout', {
+        method: 'POST',
+        body: JSON.stringify({}),
     });
 }
 function fetchMe() {

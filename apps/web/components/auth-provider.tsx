@@ -9,18 +9,18 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { setAccessToken } from '@sellr/api-client';
 import {
-  clearStoredTokens,
-  getStoredTokens,
-  persistTokens,
-} from '@/lib/auth-storage';
+  fetchMe,
+  logout as logoutApi,
+  setAccessToken,
+} from '@sellr/api-client';
 
 type AuthContextValue = {
   hydrated: boolean;
   isAuthenticated: boolean;
   userId: string | null;
-  setSession: (access: string, refresh: string, userId: string) => void;
+  /** After OTP verify: pass `userId` (web uses httpOnly cookies; no tokens in JS). */
+  setSession: (userId: string) => void;
   logout: () => void;
 };
 
@@ -42,39 +42,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(initialAuthState);
 
   useEffect(() => {
-    const t = getStoredTokens();
-    if (t) {
-      setAccessToken(t.access);
-    }
-    // Client-only: read persisted session after mount (localStorage is unavailable on the server).
-    /* eslint-disable react-hooks/set-state-in-effect -- intentional one-shot hydration */
-    setState({
-      hydrated: true,
-      hasToken: Boolean(t),
-      userId: t?.userId ? t.userId : null,
-    });
-    /* eslint-enable react-hooks/set-state-in-effect */
+    void (async () => {
+      try {
+        const me = await fetchMe();
+        setState({
+          hydrated: true,
+          hasToken: true,
+          userId: me.user.id,
+        });
+        setAccessToken(null);
+      } catch {
+        setState({
+          hydrated: true,
+          hasToken: false,
+          userId: null,
+        });
+        setAccessToken(null);
+      }
+    })();
   }, []);
 
-  const setSession = useCallback(
-    (access: string, refresh: string, uid: string) => {
-      persistTokens(access, refresh, uid);
-      setState((prev) => ({
-        ...prev,
-        hasToken: true,
-        userId: uid,
-      }));
-    },
-    [],
-  );
-
-  const logout = useCallback(() => {
-    clearStoredTokens();
+  const setSession = useCallback((userId: string) => {
     setState((prev) => ({
       ...prev,
-      hasToken: false,
-      userId: null,
+      hasToken: true,
+      userId,
     }));
+  }, []);
+
+  const logout = useCallback(() => {
+    void (async () => {
+      try {
+        await logoutApi();
+      } catch {
+        /* still clear local UI */
+      }
+      setAccessToken(null);
+      setState((prev) => ({
+        ...prev,
+        hasToken: false,
+        userId: null,
+      }));
+    })();
   }, []);
 
   const value = useMemo(

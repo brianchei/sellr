@@ -1,1 +1,41 @@
+# Dependencies
 node_modules
+.pnpm-store
+
+# Build / cache
+dist
+.next
+out
+build
+.turbo
+*.tsbuildinfo
+
+# Env (keep .env.example tracked)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
+
+# Logs & debug
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test / coverage
+coverage
+
+# Certificates / secrets
+*.pem
+*.p12
+*.key
+
+# Vercel / deploy artifacts
+.vercel
