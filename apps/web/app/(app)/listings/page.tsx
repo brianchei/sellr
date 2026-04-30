@@ -6,6 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   deleteListing,
   fetchMyListings,
+  markListingSold,
   publishListing,
   unpublishListing,
   type ApiListing,
@@ -22,6 +23,7 @@ const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
   { value: 'active', label: 'Active' },
   { value: 'draft', label: 'Drafts' },
+  { value: 'sold', label: 'Sold' },
   { value: 'expired', label: 'Expired' },
 ] as const;
 
@@ -36,6 +38,7 @@ const STATUS_LABELS: Record<string, string> = {
 type ListingAction =
   | { type: 'publish'; listing: ApiListing }
   | { type: 'unpublish'; listing: ApiListing }
+  | { type: 'mark-sold'; listing: ApiListing }
   | { type: 'delete'; listing: ApiListing };
 
 function statusLabel(status: string): string {
@@ -116,6 +119,9 @@ export default function MyListingsPage() {
       if (action.type === 'unpublish') {
         return unpublishListing(action.listing.id);
       }
+      if (action.type === 'mark-sold') {
+        return markListingSold(action.listing.id);
+      }
       return deleteListing(action.listing.id);
     },
     onSuccess: (_result, action) => {
@@ -125,7 +131,9 @@ export default function MyListingsPage() {
           ? `${title} is now active in the marketplace.`
           : action.type === 'unpublish'
             ? `${title} is now a draft.`
-            : `${title} was deleted.`,
+            : action.type === 'mark-sold'
+              ? `${title} was marked sold and removed from browse.`
+              : `${title} was deleted.`,
       );
       void listingsQuery.refetch();
     },
@@ -138,6 +146,14 @@ export default function MyListingsPage() {
     if (action.type === 'delete') {
       const confirmed = window.confirm(
         `Delete "${action.listing.title}"? This only works for listings without buyer activity.`,
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+    if (action.type === 'mark-sold') {
+      const confirmed = window.confirm(
+        `Mark "${action.listing.title}" as sold? It will be removed from marketplace browse.`,
       );
       if (!confirmed) {
         return;
@@ -333,6 +349,7 @@ export default function MyListingsPage() {
             const canPublish =
               listing.status === 'draft' || listing.status === 'expired';
             const canUnpublish = listing.status === 'active';
+            const canMarkSold = listing.status === 'active';
             const canDelete =
               listing.status === 'draft' || listing.status === 'expired';
 
@@ -428,6 +445,21 @@ export default function MyListingsPage() {
                         {isPending && pendingAction?.type === 'unpublish'
                           ? 'Unpublishing...'
                           : 'Unpublish'}
+                      </button>
+                    ) : null}
+
+                    {canMarkSold ? (
+                      <button
+                        type="button"
+                        disabled={isPending}
+                        onClick={() =>
+                          runAction({ type: 'mark-sold', listing })
+                        }
+                        className="rounded-lg bg-[var(--color-brand-contrast)] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[var(--color-brand-contrast-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {isPending && pendingAction?.type === 'mark-sold'
+                          ? 'Marking sold...'
+                          : 'Mark sold'}
                       </button>
                     ) : null}
 

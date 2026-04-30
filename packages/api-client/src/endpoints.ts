@@ -271,6 +271,12 @@ export function unpublishListing(listingId: string) {
   });
 }
 
+export function markListingSold(listingId: string) {
+  return apiFetch<{ listing: ApiListing }>(`/listings/${listingId}/mark-sold`, {
+    method: 'POST',
+  });
+}
+
 export function deleteListing(listingId: string) {
   return apiFetch<{ deleted: boolean }>(`/listings/${listingId}`, {
     method: 'DELETE',

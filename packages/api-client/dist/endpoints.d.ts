@@ -179,6 +179,9 @@ export declare function publishListing(listingId: string): Promise<{
 export declare function unpublishListing(listingId: string): Promise<{
     listing: ApiListing;
 }>;
+export declare function markListingSold(listingId: string): Promise<{
+    listing: ApiListing;
+}>;
 export declare function deleteListing(listingId: string): Promise<{
     deleted: boolean;
 }>;

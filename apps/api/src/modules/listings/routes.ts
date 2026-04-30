@@ -201,6 +201,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           .code(403)
           .send({ error: 'Not a member of this community' });
       }
+      if (listing.status === 'sold') {
+        return reply.code(400).send({
+          error: 'Sold listings cannot be republished. Create a new listing.',
+        });
+      }
 
       const updated = await prisma.listing.update({
         where: { id: listingId },
@@ -239,6 +244,47 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       const updated = await prisma.listing.update({
         where: { id: listingId },
         data: { status: 'draft' },
+      });
+
+      await searchSyncQueue.add('sync', {
+        listingId: updated.id,
+        action: 'delete',
+      });
+
+      return reply.send(ok({ listing: updated }));
+    },
+  );
+
+  fastify.post(
+    '/:listingId/mark-sold',
+    { preHandler: verifyJWT },
+    async (request, reply) => {
+      const { listingId } = request.params as { listingId: string };
+      const listing = await prisma.listing.findUnique({
+        where: { id: listingId },
+      });
+      if (!listing) {
+        return reply.code(404).send({ error: 'Listing not found' });
+      }
+      if (listing.sellerId !== request.user.sub) {
+        return reply
+          .code(403)
+          .send({ error: 'Only the seller can mark a listing sold' });
+      }
+      if (!request.user.communityIds.includes(listing.communityId)) {
+        return reply
+          .code(403)
+          .send({ error: 'Not a member of this community' });
+      }
+      if (listing.status !== 'active') {
+        return reply
+          .code(400)
+          .send({ error: 'Only active listings can be marked sold' });
+      }
+
+      const updated = await prisma.listing.update({
+        where: { id: listingId },
+        data: { status: 'sold' },
       });
 
       await searchSyncQueue.add('sync', {

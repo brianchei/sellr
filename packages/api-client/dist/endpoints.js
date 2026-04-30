@@ -16,6 +16,7 @@ exports.fetchListing = fetchListing;
 exports.updateListing = updateListing;
 exports.publishListing = publishListing;
 exports.unpublishListing = unpublishListing;
+exports.markListingSold = markListingSold;
 exports.deleteListing = deleteListing;
 exports.searchListings = searchListings;
 exports.createOffer = createOffer;
@@ -131,6 +132,11 @@ function publishListing(listingId) {
 }
 function unpublishListing(listingId) {
     return (0, fetch_1.apiFetch)(`/listings/${listingId}/unpublish`, {
+        method: 'POST',
+    });
+}
+function markListingSold(listingId) {
+    return (0, fetch_1.apiFetch)(`/listings/${listingId}/mark-sold`, {
         method: 'POST',
     });
 }
