@@ -55,6 +55,9 @@ export declare const ListListingsQuerySchema: z.ZodObject<{
 export declare const CreateConversationSchema: z.ZodObject<{
     listingId: z.ZodUUID;
 }, z.core.$strip>;
+export declare const ListConversationsQuerySchema: z.ZodObject<{
+    limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+}, z.core.$strip>;
 export declare const CreateMessageSchema: z.ZodObject<{
     content: z.ZodString;
 }, z.core.$strip>;

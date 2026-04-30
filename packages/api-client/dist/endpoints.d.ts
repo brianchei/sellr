@@ -65,6 +65,26 @@ export type ApiMessage = {
     safetyFlagged: boolean;
     createdAt: string;
 };
+export type ApiConversationSummary = ApiConversation & {
+    listing: {
+        id: string;
+        sellerId: string;
+        title: string;
+        price: number | string;
+        photoUrls: unknown;
+        status: string;
+        locationNeighborhood: string;
+        createdAt: string;
+    } | null;
+    peer: {
+        id: string;
+        displayName: string;
+        avatarUrl: string | null;
+        verifiedAt: string | null;
+    } | null;
+    latestMessage: ApiMessage | null;
+    messageCount: number;
+};
 export type AuthTokens = {
     accessToken: string;
     refreshToken: string;
@@ -167,6 +187,11 @@ export declare function createConversation(body: {
     listingId: string;
 }): Promise<{
     conversation: ApiConversation;
+}>;
+export declare function fetchConversations(params?: {
+    limit?: number;
+}): Promise<{
+    conversations: ApiConversationSummary[];
 }>;
 export declare function fetchConversationMessages(conversationId: string): Promise<{
     messages: ApiMessage[];

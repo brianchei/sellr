@@ -66,6 +66,10 @@ export const CreateConversationSchema = z.object({
   listingId: z.uuid(),
 });
 
+export const ListConversationsQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).optional().default(30),
+});
+
 export const CreateMessageSchema = z.object({
   content: z.string().min(1).max(8000),
 });

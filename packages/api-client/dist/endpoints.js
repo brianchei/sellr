@@ -18,6 +18,7 @@ exports.fetchOffer = fetchOffer;
 exports.respondToOffer = respondToOffer;
 exports.fetchMeetup = fetchMeetup;
 exports.createConversation = createConversation;
+exports.fetchConversations = fetchConversations;
 exports.fetchConversationMessages = fetchConversationMessages;
 exports.sendMessage = sendMessage;
 exports.fetchNotifications = fetchNotifications;
@@ -139,6 +140,14 @@ function createConversation(body) {
         method: 'POST',
         body: JSON.stringify(body),
     });
+}
+function fetchConversations(params) {
+    const q = new URLSearchParams();
+    if (params?.limit != null) {
+        q.set('limit', String(params.limit));
+    }
+    const qs = q.toString();
+    return (0, fetch_1.apiFetch)(`/conversations${qs ? `?${qs}` : ''}`);
 }
 function fetchConversationMessages(conversationId) {
     return (0, fetch_1.apiFetch)(`/conversations/${conversationId}/messages`);

@@ -34,9 +34,12 @@ function isRecord(value) {
 async function apiFetch(path, options = {}) {
     const base = getApiBaseUrl();
     const headers = {
-        'Content-Type': 'application/json',
         ...options.headers,
     };
+    const hasContentType = Object.keys(headers).some((key) => key.toLowerCase() === 'content-type');
+    if (options.body !== undefined && !hasContentType) {
+        headers['Content-Type'] = 'application/json';
+    }
     if (typeof window !== 'undefined' && useSameOriginApi) {
         headers['X-Sellr-Client'] = 'web';
     }

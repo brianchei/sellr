@@ -1,11 +1,152 @@
 import type { FastifyPluginCallback } from 'fastify';
-import { CreateConversationSchema, CreateMessageSchema } from '@sellr/shared';
+import {
+  CreateConversationSchema,
+  CreateMessageSchema,
+  ListConversationsQuerySchema,
+} from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
 import { notifyUser } from '../../lib/notifyUser';
 import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
 
+async function findConversationWithAccessContext(conversationId: string) {
+  return prisma.conversation.findUnique({
+    where: { id: conversationId },
+    include: {
+      listing: {
+        select: {
+          communityId: true,
+        },
+      },
+      offer: {
+        select: {
+          listing: {
+            select: {
+              communityId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+type ConversationAccessContext = NonNullable<
+  Awaited<ReturnType<typeof findConversationWithAccessContext>>
+>;
+
+function getConversationCommunityId(
+  conversation: ConversationAccessContext,
+): string | null {
+  return (
+    conversation.listing?.communityId ??
+    conversation.offer?.listing.communityId ??
+    null
+  );
+}
+
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
+  fastify.get(
+    '/',
+    {
+      preHandler: verifyJWT,
+      schema: { querystring: ListConversationsQuerySchema },
+    },
+    async (request, reply) => {
+      const { limit } = ListConversationsQuerySchema.parse(request.query);
+      if (request.user.communityIds.length === 0) {
+        return reply.send(ok({ conversations: [] }));
+      }
+
+      const conversations = await prisma.conversation.findMany({
+        where: {
+          participantIds: { has: request.user.sub },
+          listing: {
+            is: {
+              communityId: { in: request.user.communityIds },
+            },
+          },
+        },
+        include: {
+          listing: {
+            select: {
+              id: true,
+              sellerId: true,
+              title: true,
+              price: true,
+              photoUrls: true,
+              status: true,
+              locationNeighborhood: true,
+              createdAt: true,
+            },
+          },
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
+          _count: {
+            select: {
+              messages: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+      });
+
+      const peerIds = Array.from(
+        new Set(
+          conversations.flatMap((conversation) =>
+            conversation.participantIds.filter((id) => id !== request.user.sub),
+          ),
+        ),
+      );
+
+      const peers = peerIds.length
+        ? await prisma.user.findMany({
+            where: { id: { in: peerIds } },
+            select: {
+              id: true,
+              displayName: true,
+              avatarUrl: true,
+              verifiedAt: true,
+            },
+          })
+        : [];
+      const peersById = new Map(peers.map((peer) => [peer.id, peer]));
+
+      const summaries = conversations
+        .map((conversation) => {
+          const peerId = conversation.participantIds.find(
+            (id) => id !== request.user.sub,
+          );
+
+          return {
+            id: conversation.id,
+            listingId: conversation.listingId,
+            offerId: conversation.offerId,
+            participantIds: conversation.participantIds,
+            type: conversation.type,
+            createdAt: conversation.createdAt,
+            listing: conversation.listing,
+            peer: peerId ? (peersById.get(peerId) ?? null) : null,
+            latestMessage: conversation.messages.at(0) ?? null,
+            messageCount: conversation._count.messages,
+          };
+        })
+        .sort((left, right) => {
+          const leftDate =
+            left.latestMessage?.createdAt.getTime() ?? left.createdAt.getTime();
+          const rightDate =
+            right.latestMessage?.createdAt.getTime() ??
+            right.createdAt.getTime();
+          return rightDate - leftDate;
+        });
+
+      return reply.send(ok({ conversations: summaries }));
+    },
+  );
+
   fastify.post(
     '/',
     {
@@ -67,13 +208,15 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
     { preHandler: verifyJWT },
     async (request, reply) => {
       const { conversationId } = request.params as { conversationId: string };
-      const conv = await prisma.conversation.findUnique({
-        where: { id: conversationId },
-      });
+      const conv = await findConversationWithAccessContext(conversationId);
       if (!conv) {
         return reply.code(404).send({ error: 'Conversation not found' });
       }
       if (!conv.participantIds.includes(request.user.sub)) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
+      const communityId = getConversationCommunityId(conv);
+      if (!communityId || !request.user.communityIds.includes(communityId)) {
         return reply.code(403).send({ error: 'Forbidden' });
       }
 
@@ -97,13 +240,15 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       const { conversationId } = request.params as { conversationId: string };
       const body = CreateMessageSchema.parse(request.body);
 
-      const conv = await prisma.conversation.findUnique({
-        where: { id: conversationId },
-      });
+      const conv = await findConversationWithAccessContext(conversationId);
       if (!conv) {
         return reply.code(404).send({ error: 'Conversation not found' });
       }
       if (!conv.participantIds.includes(request.user.sub)) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
+      const communityId = getConversationCommunityId(conv);
+      if (!communityId || !request.user.communityIds.includes(communityId)) {
         return reply.code(403).send({ error: 'Forbidden' });
       }
 

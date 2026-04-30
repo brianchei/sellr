@@ -40,9 +40,14 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const base = getApiBaseUrl();
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
+  const hasContentType = Object.keys(headers).some(
+    (key) => key.toLowerCase() === 'content-type',
+  );
+  if (options.body !== undefined && !hasContentType) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (typeof window !== 'undefined' && useSameOriginApi) {
     headers['X-Sellr-Client'] = 'web';

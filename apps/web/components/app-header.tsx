@@ -66,6 +66,7 @@ export function AppHeader() {
           {[
             { label: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
             { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
+            { label: 'Inbox', href: '/inbox', icon: InboxIcon },
             { label: 'Sell', href: '/sell', icon: SellIcon },
           ].map((item) => {
             const active = pathname === item.href;
@@ -161,6 +162,14 @@ export function AppHeader() {
                   >
                     Sell
                   </Link>
+                  <Link
+                    href="/inbox"
+                    className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
+                    style={{ color: 'var(--text-secondary)' }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Inbox
+                  </Link>
                   <div className="my-1 sm:hidden" style={{ borderTop: '1px solid var(--border-default)' }} />
                   <button
                     type="button"
@@ -196,6 +205,16 @@ function BrowseIcon() {
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+function InboxIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+      <path d="M8 9h8" />
+      <path d="M8 13h5" />
     </svg>
   );
 }

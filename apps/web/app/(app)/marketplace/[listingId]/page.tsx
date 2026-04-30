@@ -43,6 +43,9 @@ export default function ListingDetailPage() {
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
   const [messageError, setMessageError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const [sentConversationId, setSentConversationId] = useState<string | null>(
+    null,
+  );
 
   const listingQuery = useQuery({
     queryKey: ['listing', listingId],
@@ -53,10 +56,14 @@ export default function ListingDetailPage() {
   const contactMutation = useMutation({
     mutationFn: async (content: string) => {
       const { conversation } = await createConversation({ listingId });
-      return sendMessage(conversation.id, { content });
+      const { message: sentMessage } = await sendMessage(conversation.id, {
+        content,
+      });
+      return { conversation, message: sentMessage };
     },
-    onSuccess: () => {
+    onSuccess: ({ conversation }) => {
       setSent(true);
+      setSentConversationId(conversation.id);
       setMessage('');
       setMessageError(null);
     },
@@ -330,10 +337,14 @@ export default function ListingDetailPage() {
                   seller will see your message.
                 </p>
                 <Link
-                  href="/marketplace"
+                  href={
+                    sentConversationId
+                      ? `/inbox?conversationId=${sentConversationId}`
+                      : '/inbox'
+                  }
                   className="mt-4 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
                 >
-                  Back to browse
+                  Open inbox
                 </Link>
               </div>
             ) : (

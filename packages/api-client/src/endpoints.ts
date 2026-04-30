@@ -71,6 +71,27 @@ export type ApiMessage = {
   createdAt: string;
 };
 
+export type ApiConversationSummary = ApiConversation & {
+  listing: {
+    id: string;
+    sellerId: string;
+    title: string;
+    price: number | string;
+    photoUrls: unknown;
+    status: string;
+    locationNeighborhood: string;
+    createdAt: string;
+  } | null;
+  peer: {
+    id: string;
+    displayName: string;
+    avatarUrl: string | null;
+    verifiedAt: string | null;
+  } | null;
+  latestMessage: ApiMessage | null;
+  messageCount: number;
+};
+
 export type AuthTokens = {
   accessToken: string;
   refreshToken: string;
@@ -257,6 +278,17 @@ export function createConversation(body: { listingId: string }) {
     method: 'POST',
     body: JSON.stringify(body),
   });
+}
+
+export function fetchConversations(params?: { limit?: number }) {
+  const q = new URLSearchParams();
+  if (params?.limit != null) {
+    q.set('limit', String(params.limit));
+  }
+  const qs = q.toString();
+  return apiFetch<{ conversations: ApiConversationSummary[] }>(
+    `/conversations${qs ? `?${qs}` : ''}`,
+  );
 }
 
 export function fetchConversationMessages(conversationId: string) {
