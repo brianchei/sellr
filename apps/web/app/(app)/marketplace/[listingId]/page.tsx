@@ -10,6 +10,7 @@ import {
   sendMessage,
 } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
+import { ReportDialog } from '@/components/report-dialog';
 import { SellerProfileCard } from '@/components/seller-profile-card';
 import {
   availabilityWindows,
@@ -362,7 +363,17 @@ export default function ListingDetailPage() {
           </section>
 
           <section className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-5">
-            <h2 className="text-sm font-semibold">Safety note</h2>
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-sm font-semibold">Safety note</h2>
+              {!isOwnListing ? (
+                <ReportDialog
+                  targetId={listing.id}
+                  targetType="listing"
+                  subjectLabel="this listing"
+                  triggerLabel="Report listing"
+                />
+              ) : null}
+            </div>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
               Keep the conversation focused on the item, pickup timing, and a
               public local handoff. Do not share payment or sensitive details

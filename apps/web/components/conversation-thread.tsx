@@ -16,14 +16,17 @@ import {
   listingStatusLabel,
 } from '@/lib/conversation-format';
 import { formatPrice } from '@/lib/listing-format';
+import { ReportDialog } from '@/components/report-dialog';
 import { SellerProfileCard } from '@/components/seller-profile-card';
 
 function MessageBubble({
   message,
   isMine,
+  canReport,
 }: {
   message: ApiMessage;
   isMine: boolean;
+  canReport: boolean;
 }) {
   return (
     <li className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
@@ -46,6 +49,17 @@ function MessageBubble({
         >
           {formatMessageTime(message.createdAt)}
         </p>
+        {canReport ? (
+          <div className="mt-2">
+            <ReportDialog
+              targetId={message.id}
+              targetType="message"
+              subjectLabel="this message"
+              triggerLabel="Report message"
+              triggerClassName="text-xs font-medium text-[var(--color-brand-warm-strong)] underline-offset-2 hover:underline"
+            />
+          </div>
+        ) : null}
       </div>
     </li>
   );
@@ -206,6 +220,7 @@ export function ConversationThread({
                 key={message.id}
                 message={message}
                 isMine={message.senderId === userId}
+                canReport={Boolean(userId && message.senderId !== userId)}
               />
             ))}
           </ul>
