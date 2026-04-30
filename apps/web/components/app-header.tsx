@@ -62,7 +62,7 @@ export function AppHeader() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center sm:flex" style={{ gap: '4px' }}>
+        <nav className="hidden items-center md:flex" style={{ gap: '4px' }}>
           {[
             { label: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
             { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
@@ -141,7 +141,7 @@ export function AppHeader() {
                 >
                   <Link
                     href="/dashboard"
-                    className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
+                    className="block w-full px-4 py-2.5 text-left text-sm no-underline md:hidden"
                     style={{ color: 'var(--text-secondary)' }}
                     onClick={() => setMenuOpen(false)}
                   >
@@ -149,7 +149,7 @@ export function AppHeader() {
                   </Link>
                   <Link
                     href="/marketplace"
-                    className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
+                    className="block w-full px-4 py-2.5 text-left text-sm no-underline md:hidden"
                     style={{ color: 'var(--text-secondary)' }}
                     onClick={() => setMenuOpen(false)}
                   >
@@ -157,7 +157,7 @@ export function AppHeader() {
                   </Link>
                   <Link
                     href="/listings"
-                    className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
+                    className="block w-full px-4 py-2.5 text-left text-sm no-underline md:hidden"
                     style={{ color: 'var(--text-secondary)' }}
                     onClick={() => setMenuOpen(false)}
                   >
@@ -165,7 +165,7 @@ export function AppHeader() {
                   </Link>
                   <Link
                     href="/inbox"
-                    className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
+                    className="block w-full px-4 py-2.5 text-left text-sm no-underline md:hidden"
                     style={{ color: 'var(--text-secondary)' }}
                     onClick={() => setMenuOpen(false)}
                   >
@@ -173,13 +173,13 @@ export function AppHeader() {
                   </Link>
                   <Link
                     href="/sell"
-                    className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
+                    className="block w-full px-4 py-2.5 text-left text-sm no-underline md:hidden"
                     style={{ color: 'var(--text-secondary)' }}
                     onClick={() => setMenuOpen(false)}
                   >
                     Sell
                   </Link>
-                  <div className="my-1 sm:hidden" style={{ borderTop: '1px solid var(--border-default)' }} />
+                  <div className="my-1 md:hidden" style={{ borderTop: '1px solid var(--border-default)' }} />
                   <button
                     type="button"
                     onClick={handleLogout}

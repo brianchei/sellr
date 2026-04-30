@@ -359,7 +359,7 @@ export default function MyListingsPage() {
                 className="grid gap-4 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]"
               >
                 <div
-                  className="flex h-24 w-24 items-center justify-center rounded-lg bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-medium text-[var(--text-tertiary)]"
+                  className="flex h-40 w-full items-center justify-center rounded-lg bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-medium text-[var(--text-tertiary)] sm:h-24 sm:w-24"
                   style={
                     primaryPhoto
                       ? { backgroundImage: `url("${primaryPhoto}")` }

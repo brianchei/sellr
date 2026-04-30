@@ -10,7 +10,7 @@ import { useAuth } from '@/components/auth-provider';
 
 function InboxSkeleton() {
   return (
-    <section className="mt-6 grid min-h-[560px] gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
+    <section className="mt-6 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
       <div className="space-y-3 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm">
         {Array.from({ length: 5 }, (_, index) => (
           <div key={index} className="flex gap-3 rounded-lg p-3">
@@ -139,10 +139,10 @@ export default function InboxPage() {
       {!conversationsQuery.isLoading &&
       !conversationsQuery.isError &&
       conversations.length > 0 ? (
-        <section className="mt-6 grid min-h-[560px] gap-4 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <section className="mt-6 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
           <ConversationList conversations={conversations} />
 
-          <article className="flex min-h-[560px] items-center justify-center rounded-lg border border-[var(--border-default)] bg-white p-8 text-center shadow-sm">
+          <article className="flex min-h-[320px] items-center justify-center rounded-lg border border-[var(--border-default)] bg-white p-8 text-center shadow-sm lg:min-h-[560px]">
             <div>
               <h2 className="text-xl font-semibold">Open a conversation</h2>
               <p className="mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">

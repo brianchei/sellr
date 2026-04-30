@@ -126,7 +126,7 @@ export function ConversationThread({
   };
 
   return (
-    <article className="flex min-h-[560px] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm">
+    <article className="flex min-h-[460px] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm lg:min-h-[560px]">
       <div className="border-b border-[var(--border-default)] p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -171,7 +171,7 @@ export function ConversationThread({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-[var(--bg-secondary)] p-4">
+      <div className="max-h-[520px] flex-1 overflow-y-auto bg-[var(--bg-secondary)] p-4 lg:max-h-none">
         {messagesQuery.isLoading ? (
           <div className="space-y-4">
             <div className="h-16 w-2/3 rounded-lg bg-[var(--bg-tertiary)]" />

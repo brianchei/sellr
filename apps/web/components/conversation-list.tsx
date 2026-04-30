@@ -24,7 +24,10 @@ export function ConversationList({
           Conversations
         </h2>
       </div>
-      <nav className="max-h-[640px] overflow-y-auto" aria-label="Conversations">
+      <nav
+        className="max-h-[360px] overflow-y-auto lg:max-h-[640px]"
+        aria-label="Conversations"
+      >
         {conversations.map((conversation) => {
           const selected = conversation.id === selectedConversationId;
           const photos = photoUrls(conversation.listing?.photoUrls);

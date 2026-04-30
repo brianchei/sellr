@@ -165,7 +165,7 @@ export default function DashboardPage() {
             Manage your Sellr profile and community access.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link
             href="/"
             className="rounded-lg border border-[var(--border-strong)] bg-white px-3 py-1.5 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)]"
@@ -226,24 +226,26 @@ export default function DashboardPage() {
             Community access is ready. Browse active listings, create items,
             and keep your seller inventory current.
           </p>
-          <Link
-            href="/marketplace"
-            className="mt-4 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
-          >
-            Browse marketplace
-          </Link>
-          <Link
-            href="/listings"
-            className="ml-2 mt-4 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)]"
-          >
-            Manage listings
-          </Link>
-          <Link
-            href="/sell"
-            className="ml-2 mt-4 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)]"
-          >
-            Create listing
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href="/marketplace"
+              className="inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            >
+              Browse marketplace
+            </Link>
+            <Link
+              href="/listings"
+              className="inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)]"
+            >
+              Manage listings
+            </Link>
+            <Link
+              href="/sell"
+              className="inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)]"
+            >
+              Create listing
+            </Link>
+          </div>
         </section>
       )}
     </main>
