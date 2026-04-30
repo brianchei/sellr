@@ -19,8 +19,14 @@ type AuthContextValue = {
   hydrated: boolean;
   isAuthenticated: boolean;
   userId: string | null;
+  communityIds: string[] | null;
+  primaryCommunityId: string | null;
   /** After OTP verify: pass `userId` (web uses httpOnly cookies; no tokens in JS). */
   setSession: (userId: string) => void;
+  refreshSession: () => Promise<{
+    userId: string;
+    communityIds: string[];
+  } | null>;
   logout: () => void;
 };
 
@@ -30,43 +36,58 @@ type AuthState = {
   hydrated: boolean;
   hasToken: boolean;
   userId: string | null;
+  communityIds: string[] | null;
 };
 
 const initialAuthState: AuthState = {
   hydrated: false,
   hasToken: false,
   userId: null,
+  communityIds: null,
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(initialAuthState);
 
-  useEffect(() => {
-    void (async () => {
-      try {
-        const me = await fetchMe();
-        setState({
-          hydrated: true,
-          hasToken: true,
-          userId: me.user.id,
-        });
-        setAccessToken(null);
-      } catch {
-        setState({
-          hydrated: true,
-          hasToken: false,
-          userId: null,
-        });
-        setAccessToken(null);
-      }
-    })();
+  const refreshSession = useCallback(async () => {
+    try {
+      const me = await fetchMe();
+      setState({
+        hydrated: true,
+        hasToken: true,
+        userId: me.user.id,
+        communityIds: me.communityIds,
+      });
+      setAccessToken(null);
+      return {
+        userId: me.user.id,
+        communityIds: me.communityIds,
+      };
+    } catch {
+      setState({
+        hydrated: true,
+        hasToken: false,
+        userId: null,
+        communityIds: [],
+      });
+      setAccessToken(null);
+      return null;
+    }
   }, []);
+
+  useEffect(() => {
+    // Cookie-backed auth needs one client-side hydration check on app load.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refreshSession();
+  }, [refreshSession]);
 
   const setSession = useCallback((userId: string) => {
     setState((prev) => ({
       ...prev,
+      hydrated: true,
       hasToken: true,
       userId,
+      communityIds: null,
     }));
   }, []);
 
@@ -82,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...prev,
         hasToken: false,
         userId: null,
+        communityIds: [],
       }));
     })();
   }, []);
@@ -92,10 +114,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hydrated: state.hydrated,
         isAuthenticated: state.hasToken,
         userId: state.userId,
+        communityIds: state.communityIds,
+        primaryCommunityId: state.communityIds?.[0] ?? null,
         setSession,
+        refreshSession,
         logout,
       }) satisfies AuthContextValue,
-    [state.hydrated, state.hasToken, state.userId, setSession, logout],
+    [
+      state.hydrated,
+      state.hasToken,
+      state.userId,
+      state.communityIds,
+      setSession,
+      refreshSession,
+      logout,
+    ],
   );
 
   return (

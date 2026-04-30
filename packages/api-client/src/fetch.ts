@@ -59,10 +59,14 @@ export async function apiFetch<T>(
   });
 
   if (!res.ok) {
-    const body = (await res.json().catch(() => ({
-      error: 'Unknown error',
-    }))) as { error?: string };
-    throw new ApiError(res.status, body.error ?? 'Request failed');
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    const fallback =
+      res.status >= 500
+        ? 'Sellr API is unavailable. Make sure the API server is running and try again.'
+        : res.statusText || 'Request failed';
+    throw new ApiError(res.status, body?.error ?? fallback);
   }
 
   const json: unknown = await res.json();

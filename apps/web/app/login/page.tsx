@@ -8,7 +8,13 @@ import { useAuth } from '@/components/auth-provider';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { hydrated, isAuthenticated, setSession } = useAuth();
+  const {
+    communityIds,
+    hydrated,
+    isAuthenticated,
+    refreshSession,
+    setSession,
+  } = useAuth();
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [phoneE164, setPhoneE164] = useState('+1');
   const [code, setCode] = useState('');
@@ -16,10 +22,10 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (hydrated && isAuthenticated) {
-      router.replace('/dashboard');
+    if (hydrated && isAuthenticated && communityIds !== null) {
+      router.replace(communityIds.length > 0 ? '/dashboard' : '/onboarding');
     }
-  }, [hydrated, isAuthenticated, router]);
+  }, [communityIds, hydrated, isAuthenticated, router]);
 
   const onSendOtp = async () => {
     setError(null);
@@ -48,7 +54,12 @@ export default function LoginPage() {
         setAccessToken(null);
       }
       setSession(res.userId);
-      router.replace('/dashboard');
+      const session = await refreshSession();
+      router.replace(
+        session && session.communityIds.length > 0
+          ? '/dashboard'
+          : '/onboarding',
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid code');
     } finally {

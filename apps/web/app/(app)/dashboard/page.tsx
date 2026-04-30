@@ -8,7 +8,7 @@ import { useAuth } from '@/components/auth-provider';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { logout, userId } = useAuth();
+  const { communityIds, logout, userId } = useAuth();
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['me', userId],
     queryFn: fetchMe,
@@ -22,7 +22,7 @@ export default function DashboardPage() {
             Seller dashboard
           </h1>
           <p className="mt-2 text-zinc-600">
-            Signed in with the same phone OTP flow as the mobile app.
+            Manage your Sellr profile and community access.
           </p>
         </div>
         <div className="flex gap-2">
@@ -71,13 +71,42 @@ export default function DashboardPage() {
               <dt className="text-zinc-500">Communities</dt>
               <dd className="text-zinc-900">
                 {data.communityIds.length === 0
-                  ? 'None yet — join a community from the mobile app.'
+                  ? 'None yet. Join a community to unlock marketplace flows.'
                   : `${data.communityIds.length} joined`}
               </dd>
             </div>
           </dl>
         ) : null}
       </section>
+
+      {communityIds?.length === 0 ? (
+        <section className="mt-6 rounded-xl border border-teal-200 bg-teal-50 p-6">
+          <h2 className="text-base font-semibold text-teal-950">
+            Join a community to start
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-teal-900">
+            Sellr keeps browsing and selling scoped to trusted local groups.
+            Add an invite code or community email before creating or viewing
+            listings.
+          </p>
+          <Link
+            href="/onboarding"
+            className="mt-4 inline-flex rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
+          >
+            Join community
+          </Link>
+        </section>
+      ) : (
+        <section className="mt-6 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="text-base font-semibold text-zinc-900">
+            Marketplace setup
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
+            Community access is ready. Next up: browse listings, create a
+            structured listing, and start buyer contact from listing detail.
+          </p>
+        </section>
+      )}
     </main>
   );
 }
