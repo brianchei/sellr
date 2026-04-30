@@ -32,6 +32,72 @@ function getConversationCommunityId(conversation) {
         conversation.offer?.listing.communityId ??
         null);
 }
+function conversationSummaryPayload(conversation, peer) {
+    if (!conversation) {
+        return null;
+    }
+    return {
+        id: conversation.id,
+        listingId: conversation.listingId,
+        offerId: conversation.offerId,
+        participantIds: conversation.participantIds,
+        type: conversation.type,
+        createdAt: conversation.createdAt,
+        listing: conversation.listing
+            ? {
+                id: conversation.listing.id,
+                sellerId: conversation.listing.sellerId,
+                title: conversation.listing.title,
+                price: conversation.listing.price,
+                photoUrls: conversation.listing.photoUrls,
+                status: conversation.listing.status,
+                locationNeighborhood: conversation.listing.locationNeighborhood,
+                createdAt: conversation.listing.createdAt,
+            }
+            : null,
+        peer,
+        latestMessage: conversation.messages.at(0) ?? null,
+        messageCount: conversation._count.messages,
+    };
+}
+async function findConversationSummary(conversationId) {
+    return prisma_1.prisma.conversation.findUnique({
+        where: { id: conversationId },
+        include: {
+            listing: {
+                select: {
+                    id: true,
+                    sellerId: true,
+                    title: true,
+                    price: true,
+                    photoUrls: true,
+                    status: true,
+                    locationNeighborhood: true,
+                    createdAt: true,
+                    communityId: true,
+                },
+            },
+            offer: {
+                select: {
+                    listing: {
+                        select: {
+                            communityId: true,
+                        },
+                    },
+                },
+            },
+            messages: {
+                orderBy: { createdAt: 'desc' },
+                take: 1,
+            },
+            _count: {
+                select: {
+                    messages: true,
+                },
+            },
+        },
+    });
+}
 const plugin = (fastify, _opts, done) => {
     fastify.get('/', {
         preHandler: auth_1.verifyJWT,
@@ -160,6 +226,35 @@ const plugin = (fastify, _opts, done) => {
             },
         });
         return reply.code(201).send((0, response_1.ok)({ conversation }));
+    });
+    fastify.get('/:conversationId', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
+        const { conversationId } = request.params;
+        const conversation = await findConversationSummary(conversationId);
+        if (!conversation) {
+            return reply.code(404).send({ error: 'Conversation not found' });
+        }
+        if (!conversation.participantIds.includes(request.user.sub)) {
+            return reply.code(403).send({ error: 'Forbidden' });
+        }
+        const communityId = conversation.listing?.communityId ??
+            conversation.offer?.listing.communityId ??
+            null;
+        if (!communityId || !request.user.communityIds.includes(communityId)) {
+            return reply.code(403).send({ error: 'Forbidden' });
+        }
+        const peerId = conversation.participantIds.find((id) => id !== request.user.sub);
+        const peer = peerId
+            ? await prisma_1.prisma.user.findUnique({
+                where: { id: peerId },
+                select: {
+                    id: true,
+                    displayName: true,
+                    avatarUrl: true,
+                    verifiedAt: true,
+                },
+            })
+            : null;
+        return reply.send((0, response_1.ok)({ conversation: conversationSummaryPayload(conversation, peer) }));
     });
     fastify.get('/:conversationId/messages', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
         const { conversationId } = request.params;

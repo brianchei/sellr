@@ -330,6 +330,12 @@ export function fetchConversations(params?: { limit?: number }) {
   );
 }
 
+export function fetchConversation(conversationId: string) {
+  return apiFetch<{ conversation: ApiConversationSummary }>(
+    `/conversations/${conversationId}`,
+  );
+}
+
 export function fetchConversationMessages(conversationId: string) {
   return apiFetch<{ messages: ApiMessage[] }>(
     `/conversations/${conversationId}/messages`,

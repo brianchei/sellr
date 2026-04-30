@@ -210,6 +210,9 @@ export declare function fetchConversations(params?: {
 }): Promise<{
     conversations: ApiConversationSummary[];
 }>;
+export declare function fetchConversation(conversationId: string): Promise<{
+    conversation: ApiConversationSummary;
+}>;
 export declare function fetchConversationMessages(conversationId: string): Promise<{
     messages: ApiMessage[];
 }>;

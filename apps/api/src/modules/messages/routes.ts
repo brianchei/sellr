@@ -45,6 +45,83 @@ function getConversationCommunityId(
   );
 }
 
+function conversationSummaryPayload(
+  conversation: Awaited<ReturnType<typeof findConversationSummary>>,
+  peer: {
+    id: string;
+    displayName: string;
+    avatarUrl: string | null;
+    verifiedAt: Date | null;
+  } | null,
+) {
+  if (!conversation) {
+    return null;
+  }
+
+  return {
+    id: conversation.id,
+    listingId: conversation.listingId,
+    offerId: conversation.offerId,
+    participantIds: conversation.participantIds,
+    type: conversation.type,
+    createdAt: conversation.createdAt,
+    listing: conversation.listing
+      ? {
+          id: conversation.listing.id,
+          sellerId: conversation.listing.sellerId,
+          title: conversation.listing.title,
+          price: conversation.listing.price,
+          photoUrls: conversation.listing.photoUrls,
+          status: conversation.listing.status,
+          locationNeighborhood: conversation.listing.locationNeighborhood,
+          createdAt: conversation.listing.createdAt,
+        }
+      : null,
+    peer,
+    latestMessage: conversation.messages.at(0) ?? null,
+    messageCount: conversation._count.messages,
+  };
+}
+
+async function findConversationSummary(conversationId: string) {
+  return prisma.conversation.findUnique({
+    where: { id: conversationId },
+    include: {
+      listing: {
+        select: {
+          id: true,
+          sellerId: true,
+          title: true,
+          price: true,
+          photoUrls: true,
+          status: true,
+          locationNeighborhood: true,
+          createdAt: true,
+          communityId: true,
+        },
+      },
+      offer: {
+        select: {
+          listing: {
+            select: {
+              communityId: true,
+            },
+          },
+        },
+      },
+      messages: {
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+      },
+      _count: {
+        select: {
+          messages: true,
+        },
+      },
+    },
+  });
+}
+
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   fastify.get(
     '/',
@@ -200,6 +277,48 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       });
 
       return reply.code(201).send(ok({ conversation }));
+    },
+  );
+
+  fastify.get(
+    '/:conversationId',
+    { preHandler: verifyJWT },
+    async (request, reply) => {
+      const { conversationId } = request.params as { conversationId: string };
+      const conversation = await findConversationSummary(conversationId);
+      if (!conversation) {
+        return reply.code(404).send({ error: 'Conversation not found' });
+      }
+      if (!conversation.participantIds.includes(request.user.sub)) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
+
+      const communityId =
+        conversation.listing?.communityId ??
+        conversation.offer?.listing.communityId ??
+        null;
+      if (!communityId || !request.user.communityIds.includes(communityId)) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
+
+      const peerId = conversation.participantIds.find(
+        (id) => id !== request.user.sub,
+      );
+      const peer = peerId
+        ? await prisma.user.findUnique({
+            where: { id: peerId },
+            select: {
+              id: true,
+              displayName: true,
+              avatarUrl: true,
+              verifiedAt: true,
+            },
+          })
+        : null;
+
+      return reply.send(
+        ok({ conversation: conversationSummaryPayload(conversation, peer) }),
+      );
     },
   );
 

@@ -23,6 +23,7 @@ exports.respondToOffer = respondToOffer;
 exports.fetchMeetup = fetchMeetup;
 exports.createConversation = createConversation;
 exports.fetchConversations = fetchConversations;
+exports.fetchConversation = fetchConversation;
 exports.fetchConversationMessages = fetchConversationMessages;
 exports.sendMessage = sendMessage;
 exports.fetchNotifications = fetchNotifications;
@@ -178,6 +179,9 @@ function fetchConversations(params) {
     }
     const qs = q.toString();
     return (0, fetch_1.apiFetch)(`/conversations${qs ? `?${qs}` : ''}`);
+}
+function fetchConversation(conversationId) {
+    return (0, fetch_1.apiFetch)(`/conversations/${conversationId}`);
 }
 function fetchConversationMessages(conversationId) {
     return (0, fetch_1.apiFetch)(`/conversations/${conversationId}/messages`);

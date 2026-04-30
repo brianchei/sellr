@@ -339,7 +339,7 @@ export default function ListingDetailPage() {
                 <Link
                   href={
                     sentConversationId
-                      ? `/inbox?conversationId=${sentConversationId}`
+                      ? `/inbox/${sentConversationId}`
                       : '/inbox'
                   }
                   className="mt-4 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
