@@ -6,6 +6,88 @@ const prisma_1 = require("../../lib/prisma");
 const notifyUser_1 = require("../../lib/notifyUser");
 const response_1 = require("../../lib/response");
 const auth_1 = require("../../middleware/auth");
+function userTrustKey({ userId, communityId }) {
+    return `${userId}:${communityId}`;
+}
+async function findUserTrustProfiles(lookups) {
+    const uniqueLookups = Array.from(new Map(lookups.map((lookup) => [userTrustKey(lookup), lookup])).values());
+    if (uniqueLookups.length === 0) {
+        return new Map();
+    }
+    const userIds = Array.from(new Set(uniqueLookups.map((lookup) => lookup.userId)));
+    const communityIds = Array.from(new Set(uniqueLookups.map((lookup) => lookup.communityId)));
+    const [users, memberships, listingCounts] = await Promise.all([
+        prisma_1.prisma.user.findMany({
+            where: { id: { in: userIds } },
+            select: {
+                id: true,
+                displayName: true,
+                avatarUrl: true,
+                verifiedAt: true,
+                createdAt: true,
+            },
+        }),
+        prisma_1.prisma.communityMember.findMany({
+            where: {
+                userId: { in: userIds },
+                communityId: { in: communityIds },
+                status: 'active',
+            },
+            select: {
+                userId: true,
+                communityId: true,
+                joinedAt: true,
+            },
+        }),
+        prisma_1.prisma.listing.groupBy({
+            by: ['sellerId', 'communityId'],
+            where: {
+                sellerId: { in: userIds },
+                communityId: { in: communityIds },
+                status: 'active',
+            },
+            _count: { _all: true },
+        }),
+    ]);
+    const usersById = new Map(users.map((user) => [user.id, user]));
+    const membershipsByKey = new Map(memberships.map((membership) => [
+        userTrustKey({
+            userId: membership.userId,
+            communityId: membership.communityId,
+        }),
+        membership,
+    ]));
+    const listingCountsByKey = new Map(listingCounts.map((count) => [
+        userTrustKey({
+            userId: count.sellerId,
+            communityId: count.communityId,
+        }),
+        count._count._all,
+    ]));
+    return new Map(uniqueLookups.flatMap((lookup) => {
+        const user = usersById.get(lookup.userId);
+        if (!user) {
+            return [];
+        }
+        const key = userTrustKey(lookup);
+        const membership = membershipsByKey.get(key);
+        return [
+            [
+                key,
+                {
+                    ...user,
+                    memberSince: membership?.joinedAt ?? null,
+                    listingCount: listingCountsByKey.get(key) ?? 0,
+                    communityMember: Boolean(membership),
+                },
+            ],
+        ];
+    }));
+}
+async function findUserTrustProfile(lookup) {
+    const profiles = await findUserTrustProfiles([lookup]);
+    return profiles.get(userTrustKey(lookup)) ?? null;
+}
 async function findConversationWithAccessContext(conversationId) {
     return prisma_1.prisma.conversation.findUnique({
         where: { id: conversationId },
@@ -46,6 +128,7 @@ function conversationSummaryPayload(conversation, peer) {
         listing: conversation.listing
             ? {
                 id: conversation.listing.id,
+                communityId: conversation.listing.communityId,
                 sellerId: conversation.listing.sellerId,
                 title: conversation.listing.title,
                 price: conversation.listing.price,
@@ -120,6 +203,7 @@ const plugin = (fastify, _opts, done) => {
                 listing: {
                     select: {
                         id: true,
+                        communityId: true,
                         sellerId: true,
                         title: true,
                         price: true,
@@ -142,19 +226,18 @@ const plugin = (fastify, _opts, done) => {
             orderBy: { createdAt: 'desc' },
             take: limit,
         });
-        const peerIds = Array.from(new Set(conversations.flatMap((conversation) => conversation.participantIds.filter((id) => id !== request.user.sub))));
-        const peers = peerIds.length
-            ? await prisma_1.prisma.user.findMany({
-                where: { id: { in: peerIds } },
-                select: {
-                    id: true,
-                    displayName: true,
-                    avatarUrl: true,
-                    verifiedAt: true,
-                },
-            })
-            : [];
-        const peersById = new Map(peers.map((peer) => [peer.id, peer]));
+        const peerLookups = conversations.flatMap((conversation) => {
+            const peerId = conversation.participantIds.find((id) => id !== request.user.sub);
+            return peerId && conversation.listing
+                ? [
+                    {
+                        userId: peerId,
+                        communityId: conversation.listing.communityId,
+                    },
+                ]
+                : [];
+        });
+        const peersByKey = await findUserTrustProfiles(peerLookups);
         const summaries = conversations
             .map((conversation) => {
             const peerId = conversation.participantIds.find((id) => id !== request.user.sub);
@@ -166,7 +249,12 @@ const plugin = (fastify, _opts, done) => {
                 type: conversation.type,
                 createdAt: conversation.createdAt,
                 listing: conversation.listing,
-                peer: peerId ? (peersById.get(peerId) ?? null) : null,
+                peer: peerId && conversation.listing
+                    ? (peersByKey.get(userTrustKey({
+                        userId: peerId,
+                        communityId: conversation.listing.communityId,
+                    })) ?? null)
+                    : null,
                 latestMessage: conversation.messages.at(0) ?? null,
                 messageCount: conversation._count.messages,
             };
@@ -243,15 +331,10 @@ const plugin = (fastify, _opts, done) => {
             return reply.code(403).send({ error: 'Forbidden' });
         }
         const peerId = conversation.participantIds.find((id) => id !== request.user.sub);
-        const peer = peerId
-            ? await prisma_1.prisma.user.findUnique({
-                where: { id: peerId },
-                select: {
-                    id: true,
-                    displayName: true,
-                    avatarUrl: true,
-                    verifiedAt: true,
-                },
+        const peer = peerId && communityId
+            ? await findUserTrustProfile({
+                userId: peerId,
+                communityId,
             })
             : null;
         return reply.send((0, response_1.ok)({ conversation: conversationSummaryPayload(conversation, peer) }));

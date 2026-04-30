@@ -8,6 +8,50 @@ const authTokens_1 = require("../../lib/authTokens");
 const authCookies_1 = require("../../lib/authCookies");
 const otp_1 = require("../../lib/otp");
 const auth_1 = require("../../middleware/auth");
+async function findMeProfile(userId, communityIds) {
+    const [user, membership, listingCount] = await Promise.all([
+        prisma_1.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                phoneE164: true,
+                displayName: true,
+                avatarUrl: true,
+                verifiedAt: true,
+                createdAt: true,
+            },
+        }),
+        communityIds.length > 0
+            ? prisma_1.prisma.communityMember.findFirst({
+                where: {
+                    userId,
+                    communityId: { in: communityIds },
+                    status: 'active',
+                },
+                orderBy: { joinedAt: 'asc' },
+                select: { joinedAt: true },
+            })
+            : null,
+        communityIds.length > 0
+            ? prisma_1.prisma.listing.count({
+                where: {
+                    sellerId: userId,
+                    communityId: { in: communityIds },
+                    status: 'active',
+                },
+            })
+            : 0,
+    ]);
+    if (!user) {
+        return null;
+    }
+    return {
+        ...user,
+        memberSince: membership?.joinedAt ?? null,
+        listingCount,
+        communityMember: Boolean(membership),
+    };
+}
 const plugin = (fastify, _opts, done) => {
     fastify.post('/otp/send', {
         schema: { body: shared_1.SendOTPSchema },
@@ -92,16 +136,30 @@ const plugin = (fastify, _opts, done) => {
         return reply.send((0, response_1.ok)({ registered: true }));
     });
     fastify.get('/me', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
-        const user = await prisma_1.prisma.user.findUnique({
+        const user = await findMeProfile(request.user.sub, request.user.communityIds);
+        if (!user) {
+            return reply.code(404).send({ error: 'User not found' });
+        }
+        return reply.send((0, response_1.ok)({
+            user,
+            communityIds: request.user.communityIds,
+        }));
+    });
+    fastify.put('/me', {
+        preHandler: auth_1.verifyJWT,
+        schema: { body: shared_1.UpdateProfileSchema },
+    }, async (request, reply) => {
+        const body = shared_1.UpdateProfileSchema.parse(request.body);
+        await prisma_1.prisma.user.update({
             where: { id: request.user.sub },
-            select: {
-                id: true,
-                phoneE164: true,
-                displayName: true,
-                avatarUrl: true,
-                verifiedAt: true,
+            data: {
+                displayName: body.displayName,
+                ...(body.avatarUrl !== undefined
+                    ? { avatarUrl: body.avatarUrl }
+                    : {}),
             },
         });
+        const user = await findMeProfile(request.user.sub, request.user.communityIds);
         if (!user) {
             return reply.code(404).send({ error: 'User not found' });
         }

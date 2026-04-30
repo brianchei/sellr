@@ -5,6 +5,7 @@ exports.verifyOtp = verifyOtp;
 exports.refreshTokens = refreshTokens;
 exports.logout = logout;
 exports.fetchMe = fetchMe;
+exports.updateProfile = updateProfile;
 exports.registerPushToken = registerPushToken;
 exports.joinCommunity = joinCommunity;
 exports.fetchListingsNearby = fetchListingsNearby;
@@ -61,6 +62,12 @@ function logout() {
 }
 function fetchMe() {
     return (0, fetch_1.apiFetch)('/auth/me');
+}
+function updateProfile(body) {
+    return (0, fetch_1.apiFetch)('/auth/me', {
+        method: 'PUT',
+        body: JSON.stringify(body),
+    });
 }
 function registerPushToken(expoPushToken) {
     return (0, fetch_1.apiFetch)('/auth/push-token', {

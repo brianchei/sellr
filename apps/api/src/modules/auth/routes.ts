@@ -3,6 +3,7 @@ import {
   RefreshTokenSchema,
   RegisterPushTokenSchema,
   SendOTPSchema,
+  UpdateProfileSchema,
   VerifyOTPSchema,
 } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
@@ -20,6 +21,53 @@ import {
   verifyOtpCode,
 } from '../../lib/otp';
 import { verifyJWT } from '../../middleware/auth';
+
+async function findMeProfile(userId: string, communityIds: string[]) {
+  const [user, membership, listingCount] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        phoneE164: true,
+        displayName: true,
+        avatarUrl: true,
+        verifiedAt: true,
+        createdAt: true,
+      },
+    }),
+    communityIds.length > 0
+      ? prisma.communityMember.findFirst({
+          where: {
+            userId,
+            communityId: { in: communityIds },
+            status: 'active',
+          },
+          orderBy: { joinedAt: 'asc' },
+          select: { joinedAt: true },
+        })
+      : null,
+    communityIds.length > 0
+      ? prisma.listing.count({
+          where: {
+            sellerId: userId,
+            communityId: { in: communityIds },
+            status: 'active',
+          },
+        })
+      : 0,
+  ]);
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    ...user,
+    memberSince: membership?.joinedAt ?? null,
+    listingCount,
+    communityMember: Boolean(membership),
+  };
+}
 
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   fastify.post(
@@ -132,16 +180,10 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   );
 
   fastify.get('/me', { preHandler: verifyJWT }, async (request, reply) => {
-    const user = await prisma.user.findUnique({
-      where: { id: request.user.sub },
-      select: {
-        id: true,
-        phoneE164: true,
-        displayName: true,
-        avatarUrl: true,
-        verifiedAt: true,
-      },
-    });
+    const user = await findMeProfile(
+      request.user.sub,
+      request.user.communityIds,
+    );
     if (!user) {
       return reply.code(404).send({ error: 'User not found' });
     }
@@ -152,6 +194,41 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       }),
     );
   });
+
+  fastify.put(
+    '/me',
+    {
+      preHandler: verifyJWT,
+      schema: { body: UpdateProfileSchema },
+    },
+    async (request, reply) => {
+      const body = UpdateProfileSchema.parse(request.body);
+      await prisma.user.update({
+        where: { id: request.user.sub },
+        data: {
+          displayName: body.displayName,
+          ...(body.avatarUrl !== undefined
+            ? { avatarUrl: body.avatarUrl }
+            : {}),
+        },
+      });
+
+      const user = await findMeProfile(
+        request.user.sub,
+        request.user.communityIds,
+      );
+      if (!user) {
+        return reply.code(404).send({ error: 'User not found' });
+      }
+
+      return reply.send(
+        ok({
+          user,
+          communityIds: request.user.communityIds,
+        }),
+      );
+    },
+  );
 
   done();
 };

@@ -21,6 +21,11 @@ export const RegisterPushTokenSchema = z.object({
   expoPushToken: z.string().min(1).max(500),
 });
 
+export const UpdateProfileSchema = z.object({
+  displayName: z.string().trim().min(2).max(60),
+  avatarUrl: z.url().max(2048).nullable().optional(),
+});
+
 export const JoinCommunitySchema = z
   .object({
     inviteCode: z.string().optional(),

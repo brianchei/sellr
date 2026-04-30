@@ -10,6 +10,7 @@ import {
   sendMessage,
 } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
+import { SellerProfileCard } from '@/components/seller-profile-card';
 import {
   availabilityWindows,
   formatAvailabilityWindow,
@@ -22,18 +23,6 @@ import {
 
 const DEFAULT_MESSAGE =
   'Hi, is this still available? I can pick up locally.';
-
-function sellerInitials(name: string): string {
-  const parts = name
-    .split(' ')
-    .map((part) => part.trim())
-    .filter(Boolean);
-  return parts
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase() || 'S';
-}
 
 export default function ListingDetailPage() {
   const params = useParams<{ listingId: string }>();
@@ -73,7 +62,6 @@ export default function ListingDetailPage() {
   const photos = photoUrls(listing?.photoUrls);
   const primaryPhoto = photos[selectedPhotoIndex] ?? photos[0];
   const windows = availabilityWindows(listing?.availabilityWindows);
-  const sellerName = listing?.seller?.displayName ?? 'Community seller';
   const isOwnListing = listing ? listing.sellerId === userId : false;
   const isAvailable = listing?.status === 'active';
 
@@ -284,30 +272,12 @@ export default function ListingDetailPage() {
         </article>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
-            <h2 className="text-base font-semibold">Seller</h2>
-            <div className="mt-4 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-brand-primary)] text-sm font-bold text-[var(--text-primary)] shadow-sm">
-                {sellerInitials(sellerName)}
-              </div>
-              <div>
-                <p className="font-medium text-[var(--text-primary)]">
-                  {sellerName}
-                </p>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  This seller is in your community.
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-accent-strong)]">
-                Local member
-              </span>
-              <span className="rounded-full bg-[var(--color-brand-contrast-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-contrast)]">
-                Phone sign-in
-              </span>
-            </div>
-          </section>
+          <SellerProfileCard
+            profile={listing.seller}
+            heading="Seller"
+            contextLabel="This seller is in your community."
+            editableHref={isOwnListing ? '/dashboard' : undefined}
+          />
 
           <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
             <h2 className="text-base font-semibold">Contact seller</h2>

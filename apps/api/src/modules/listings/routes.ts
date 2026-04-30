@@ -13,6 +13,47 @@ import { verifyJWT } from '../../middleware/auth';
 import { findListingsNearby, setListingLocationGeom } from './repository';
 import { searchSyncQueue } from '../../lib/queues';
 
+async function findListingSellerProfile(userId: string, communityId: string) {
+  const [seller, membership, listingCount] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        displayName: true,
+        avatarUrl: true,
+        verifiedAt: true,
+        createdAt: true,
+      },
+    }),
+    prisma.communityMember.findFirst({
+      where: {
+        userId,
+        communityId,
+        status: 'active',
+      },
+      select: { joinedAt: true },
+    }),
+    prisma.listing.count({
+      where: {
+        sellerId: userId,
+        communityId,
+        status: 'active',
+      },
+    }),
+  ]);
+
+  if (!seller) {
+    return null;
+  }
+
+  return {
+    ...seller,
+    memberSince: membership?.joinedAt ?? null,
+    listingCount,
+    communityMember: Boolean(membership),
+  };
+}
+
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   fastify.get(
     '/nearby',
@@ -322,16 +363,6 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       const { listingId } = request.params as { listingId: string };
       const listing = await prisma.listing.findUnique({
         where: { id: listingId },
-        include: {
-          seller: {
-            select: {
-              id: true,
-              displayName: true,
-              avatarUrl: true,
-              verifiedAt: true,
-            },
-          },
-        },
       });
       if (!listing) {
         return reply.code(404).send({ error: 'Listing not found' });
@@ -347,7 +378,13 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       ) {
         return reply.code(404).send({ error: 'Listing not found' });
       }
-      return reply.send(ok({ listing }));
+
+      const seller = await findListingSellerProfile(
+        listing.sellerId,
+        listing.communityId,
+      );
+
+      return reply.send(ok({ listing: { ...listing, seller } }));
     },
   );
 

@@ -14,9 +14,9 @@ import {
   conversationTitle,
   formatMessageTime,
   listingStatusLabel,
-  peerInitials,
 } from '@/lib/conversation-format';
 import { formatPrice } from '@/lib/listing-format';
+import { SellerProfileCard } from '@/components/seller-profile-card';
 
 function MessageBubble({
   message,
@@ -64,6 +64,10 @@ export function ConversationThread({
   const [reply, setReply] = useState('');
   const [replyError, setReplyError] = useState<string | null>(null);
   const role = conversation.listing?.sellerId === userId ? 'Seller' : 'Buyer';
+  const peerRole =
+    conversation.peer?.id && conversation.peer.id === conversation.listing?.sellerId
+      ? 'Seller'
+      : 'Member';
 
   const messagesQuery = useQuery({
     queryKey: ['conversation-messages', conversation.id],
@@ -111,18 +115,13 @@ export function ConversationThread({
     <article className="flex min-h-[560px] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm">
       <div className="border-b border-[var(--border-default)] p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-brand-contrast-soft)] text-sm font-bold text-[var(--color-brand-contrast)]">
-              {peerInitials(conversationPeer(conversation))}
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-[var(--text-primary)]">
-                {conversationPeer(conversation)}
-              </h2>
-              <p className="text-sm text-[var(--text-secondary)]">
-                {conversationTitle(conversation)}
-              </p>
-            </div>
+          <div>
+            <h2 className="text-base font-semibold text-[var(--text-primary)]">
+              {conversationTitle(conversation)}
+            </h2>
+            <p className="text-sm text-[var(--text-secondary)]">
+              Conversation with {conversationPeer(conversation)}
+            </p>
           </div>
           {conversation.listing ? (
             <div className="text-left sm:text-right">
@@ -138,15 +137,15 @@ export function ConversationThread({
             </div>
           ) : null}
         </div>
+
+        <SellerProfileCard
+          profile={conversation.peer}
+          heading={`${peerRole} profile`}
+          contextLabel={`You are the ${role.toLowerCase()} in this conversation.`}
+          className="mt-4 bg-[var(--bg-secondary)] shadow-none"
+        />
+
         <div className="mt-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-accent-strong)]">
-            Community member
-          </span>
-          {conversation.peer?.verifiedAt ? (
-            <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-primary-strong)]">
-              Verified peer
-            </span>
-          ) : null}
           <span className="rounded-full bg-[var(--color-brand-contrast-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-contrast)]">
             You are {role.toLowerCase()}
           </span>

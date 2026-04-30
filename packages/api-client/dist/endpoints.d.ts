@@ -1,13 +1,18 @@
+export type ApiUserTrustProfile = {
+    id: string;
+    displayName: string;
+    avatarUrl: string | null;
+    verifiedAt: string | null;
+    createdAt: string;
+    memberSince: string | null;
+    listingCount: number;
+    communityMember: boolean;
+};
 export type ApiListing = {
     id: string;
     communityId: string;
     sellerId: string;
-    seller?: {
-        id: string;
-        displayName: string;
-        avatarUrl: string | null;
-        verifiedAt: string | null;
-    };
+    seller?: ApiUserTrustProfile | null;
     title: string;
     description: string;
     category: string;
@@ -69,6 +74,7 @@ export type ApiMessage = {
 export type ApiConversationSummary = ApiConversation & {
     listing: {
         id: string;
+        communityId: string;
         sellerId: string;
         title: string;
         price: number | string;
@@ -77,14 +83,13 @@ export type ApiConversationSummary = ApiConversation & {
         locationNeighborhood: string;
         createdAt: string;
     } | null;
-    peer: {
-        id: string;
-        displayName: string;
-        avatarUrl: string | null;
-        verifiedAt: string | null;
-    } | null;
+    peer: ApiUserTrustProfile | null;
     latestMessage: ApiMessage | null;
     messageCount: number;
+};
+export type UpdateProfileInput = {
+    displayName: string;
+    avatarUrl?: string | null;
 };
 export type AuthTokens = {
     accessToken: string;
@@ -114,12 +119,16 @@ export declare function logout(): Promise<{
     loggedOut: boolean;
 }>;
 export declare function fetchMe(): Promise<{
-    user: {
+    user: ApiUserTrustProfile & {
         id: string;
         phoneE164: string;
-        displayName: string;
-        avatarUrl: string | null;
-        verifiedAt: Date | null;
+    };
+    communityIds: string[];
+}>;
+export declare function updateProfile(body: UpdateProfileInput): Promise<{
+    user: ApiUserTrustProfile & {
+        id: string;
+        phoneE164: string;
     };
     communityIds: string[];
 }>;
