@@ -12,11 +12,13 @@ completed transactions.
 
 ## Current Status
 
-This repository is the Phase 0 foundation for Sellr. The backend domain model
-and API surface are in place for auth, communities, listings, search, offers,
-meetups, conversations, reports, and notifications. The web and mobile apps are
-currently scaffolded around the shared auth/client foundation, with product UI
-work expected to build on top of these contracts.
+This repository is moving from the Phase 0 foundation into a web SLC MVP. The
+backend domain model and API surface are in place for auth, communities,
+listings, search, offers, meetups, conversations, reports, and notifications.
+The web app now covers the core community-scoped buyer/seller loop: onboarding,
+browse, structured listing creation, listing management/editing, seller trust
+signals, buyer contact, inbox replies, basic reporting, and sold-listing
+lifecycle.
 
 ## Repository Layout
 
@@ -101,6 +103,12 @@ Run database migrations:
 pnpm db:migrate
 ```
 
+Seed local demo data:
+
+```bash
+pnpm --filter @sellr/api exec prisma db seed
+```
+
 Start the workspace:
 
 ```bash
@@ -110,6 +118,16 @@ pnpm dev
 By default, the API listens on `http://localhost:3001`, the web app listens on
 `http://localhost:3000`, and Expo serves the mobile app through its development
 server.
+
+## Local Demo Flow
+
+The seed creates a `Dev Campus` community, invite code `DEV2026`, demo listings,
+and one buyer/seller conversation. Local OTP accepts `000000`.
+
+- Seller: `+15550000001`
+- Buyer: `+15550000002`
+
+See `docs/slc-smoke-test.md` for the first working web SLC smoke checklist.
 
 ## Useful Commands
 
@@ -122,11 +140,13 @@ pnpm test         # run tests
 pnpm db:migrate   # run Prisma migrations for the API
 pnpm db:studio    # open Prisma Studio for the API
 pnpm env:web      # create/update apps/web/.env.local from root env values
+pnpm --filter @sellr/api exec prisma db seed
 ```
 
 ## Documentation
 
 The detailed implementation baseline lives in
-`sellr-technical-implementation-guide-v2.md`. It documents the current Phase 0
+`sellr-technical-implementation-guide-v2.md`. It documents the Phase 0
 architecture, local setup expectations, infrastructure decisions, and planned
-next phases.
+next phases. The web visual direction is documented in `docs/design-language.md`;
+the SLC smoke checklist is documented in `docs/slc-smoke-test.md`.

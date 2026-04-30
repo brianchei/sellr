@@ -13,6 +13,170 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),
 });
 
+const demoPhotos = {
+  desk: 'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80',
+  bike: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=900&q=80',
+  lamp: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80',
+  chair:
+    'https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=900&q=80',
+};
+
+type DemoListingInput = {
+  sellerId: string;
+  communityId: string;
+  title: string;
+  description: string;
+  category: string;
+  subcategory: string;
+  condition: 'like_new' | 'good' | 'fair' | 'for_parts';
+  conditionNote?: string;
+  price: string;
+  negotiable: boolean;
+  status: 'draft' | 'active' | 'sold' | 'expired';
+  locationNeighborhood: string;
+  locationRadiusM: number;
+  photoUrl: string;
+};
+
+async function upsertDemoUser({
+  phoneE164,
+  displayName,
+}: {
+  phoneE164: string;
+  displayName: string;
+}) {
+  return prisma.user.upsert({
+    where: { phoneE164 },
+    create: {
+      phoneE164,
+      displayName,
+      verifiedAt: new Date(),
+    },
+    update: {
+      displayName,
+      verifiedAt: new Date(),
+    },
+  });
+}
+
+async function ensureMembership(userId: string, communityId: string) {
+  await prisma.communityMember.upsert({
+    where: {
+      userId_communityId: {
+        userId,
+        communityId,
+      },
+    },
+    create: {
+      userId,
+      communityId,
+      role: 'member',
+      status: 'active',
+    },
+    update: {
+      status: 'active',
+    },
+  });
+}
+
+async function upsertDemoListing(input: DemoListingInput) {
+  const existing = await prisma.listing.findFirst({
+    where: {
+      sellerId: input.sellerId,
+      communityId: input.communityId,
+      title: input.title,
+    },
+  });
+
+  const data = {
+    communityId: input.communityId,
+    sellerId: input.sellerId,
+    title: input.title,
+    description: input.description,
+    category: input.category,
+    subcategory: input.subcategory,
+    condition: input.condition,
+    conditionNote: input.conditionNote ?? null,
+    price: input.price,
+    negotiable: input.negotiable,
+    status: input.status,
+    locationNeighborhood: input.locationNeighborhood,
+    locationRadiusM: input.locationRadiusM,
+    availabilityWindows: [{ dayOfWeek: 6, startHour: 10, endHour: 14 }],
+    photoUrls: [input.photoUrl],
+    aiGenerated: false,
+  };
+
+  if (existing) {
+    return prisma.listing.update({
+      where: { id: existing.id },
+      data,
+    });
+  }
+
+  return prisma.listing.create({ data });
+}
+
+async function ensureDemoConversation({
+  buyerId,
+  sellerId,
+  listingId,
+}: {
+  buyerId: string;
+  sellerId: string;
+  listingId: string;
+}) {
+  let conversation = await prisma.conversation.findFirst({
+    where: {
+      listingId,
+      type: 'pre_offer',
+      AND: [
+        { participantIds: { has: buyerId } },
+        { participantIds: { has: sellerId } },
+      ],
+    },
+    include: {
+      _count: {
+        select: { messages: true },
+      },
+    },
+  });
+
+  if (!conversation) {
+    conversation = await prisma.conversation.create({
+      data: {
+        listingId,
+        participantIds: [buyerId, sellerId],
+        type: 'pre_offer',
+      },
+      include: {
+        _count: {
+          select: { messages: true },
+        },
+      },
+    });
+  }
+
+  if (conversation._count.messages === 0) {
+    await prisma.message.createMany({
+      data: [
+        {
+          conversationId: conversation.id,
+          senderId: buyerId,
+          content:
+            'Hi, is the walnut study desk still available? I can pick up locally this weekend.',
+        },
+        {
+          conversationId: conversation.id,
+          senderId: sellerId,
+          content:
+            'Yes, it is still available. Saturday afternoon works well for pickup.',
+        },
+      ],
+    });
+  }
+}
+
 async function main() {
   const seedUser = await prisma.user.upsert({
     where: { phoneE164: '+10000000001' },
@@ -21,6 +185,15 @@ async function main() {
       displayName: 'Seed',
     },
     update: {},
+  });
+
+  const demoSeller = await upsertDemoUser({
+    phoneE164: '+15550000001',
+    displayName: 'Maya Chen',
+  });
+  const demoBuyer = await upsertDemoUser({
+    phoneE164: '+15550000002',
+    displayName: 'Jordan Rivera',
   });
 
   let community = await prisma.community.findFirst({
@@ -46,6 +219,90 @@ async function main() {
       createdBy: seedUser.id,
     },
     update: {},
+  });
+
+  await Promise.all([
+    ensureMembership(seedUser.id, community.id),
+    ensureMembership(demoSeller.id, community.id),
+    ensureMembership(demoBuyer.id, community.id),
+  ]);
+
+  const desk = await upsertDemoListing({
+    sellerId: demoSeller.id,
+    communityId: community.id,
+    title: 'Walnut study desk',
+    description:
+      'Compact desk in good condition with a few light marks on the top. Great for a dorm or apartment workspace.',
+    category: 'Furniture',
+    subcategory: 'Desk',
+    condition: 'good',
+    conditionNote: 'Light marks on desktop',
+    price: '45.00',
+    negotiable: true,
+    status: 'active',
+    locationNeighborhood: 'North Campus',
+    locationRadiusM: 1000,
+    photoUrl: demoPhotos.desk,
+  });
+
+  await Promise.all([
+    upsertDemoListing({
+      sellerId: demoSeller.id,
+      communityId: community.id,
+      title: 'Campus cruiser bike',
+      description:
+        'Single-speed bike with a fresh chain and working brakes. Good for getting around campus.',
+      category: 'Transportation',
+      subcategory: 'Bike',
+      condition: 'good',
+      conditionNote: 'Minor paint scuffs',
+      price: '120.00',
+      negotiable: true,
+      status: 'active',
+      locationNeighborhood: 'East Quad',
+      locationRadiusM: 1500,
+      photoUrl: demoPhotos.bike,
+    }),
+    upsertDemoListing({
+      sellerId: demoSeller.id,
+      communityId: community.id,
+      title: 'Brass desk lamp',
+      description:
+        'Warm brass lamp with a simple shade. Works well for a bedside table or study nook.',
+      category: 'Home',
+      subcategory: 'Lighting',
+      condition: 'like_new',
+      conditionNote: 'Tested and working',
+      price: '28.00',
+      negotiable: false,
+      status: 'draft',
+      locationNeighborhood: 'West Loop',
+      locationRadiusM: 1000,
+      photoUrl: demoPhotos.lamp,
+    }),
+    upsertDemoListing({
+      sellerId: demoSeller.id,
+      communityId: community.id,
+      title: 'Sold reading chair',
+      description:
+        'Comfortable accent chair kept in the demo data to show the sold listing lifecycle.',
+      category: 'Furniture',
+      subcategory: 'Chair',
+      condition: 'fair',
+      conditionNote: 'Already picked up by a local buyer',
+      price: '36.00',
+      negotiable: true,
+      status: 'sold',
+      locationNeighborhood: 'South Hall',
+      locationRadiusM: 1000,
+      photoUrl: demoPhotos.chair,
+    }),
+  ]);
+
+  await ensureDemoConversation({
+    buyerId: demoBuyer.id,
+    sellerId: demoSeller.id,
+    listingId: desk.id,
   });
 }
 
