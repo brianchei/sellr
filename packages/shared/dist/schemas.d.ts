@@ -48,6 +48,27 @@ export declare const CreateListingSchema: z.ZodObject<{
     lat: z.ZodOptional<z.ZodNumber>;
     lng: z.ZodOptional<z.ZodNumber>;
 }, z.core.$strip>;
+export declare const UpdateListingSchema: z.ZodObject<{
+    title: z.ZodString;
+    description: z.ZodString;
+    category: z.ZodString;
+    subcategory: z.ZodOptional<z.ZodString>;
+    condition: z.ZodEnum<typeof ListingCondition>;
+    conditionNote: z.ZodOptional<z.ZodString>;
+    price: z.ZodNumber;
+    negotiable: z.ZodDefault<z.ZodBoolean>;
+    locationRadiusM: z.ZodDefault<z.ZodNumber>;
+    locationNeighborhood: z.ZodString;
+    availabilityWindows: z.ZodArray<z.ZodObject<{
+        dayOfWeek: z.ZodNumber;
+        startHour: z.ZodNumber;
+        endHour: z.ZodNumber;
+        specificDate: z.ZodOptional<z.ZodISODateTime>;
+    }, z.core.$strip>>;
+    photoUrls: z.ZodArray<z.ZodURL>;
+    lat: z.ZodOptional<z.ZodNumber>;
+    lng: z.ZodOptional<z.ZodNumber>;
+}, z.core.$strip>;
 export declare const ListListingsQuerySchema: z.ZodObject<{
     communityId: z.ZodUUID;
     limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;

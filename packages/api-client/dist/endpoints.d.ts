@@ -48,6 +48,7 @@ export type CreateListingInput = {
     lat?: number;
     lng?: number;
 };
+export type UpdateListingInput = Omit<CreateListingInput, 'communityId' | 'aiGenerated'>;
 export type ApiConversation = {
     id: string;
     listingId: string | null;
@@ -158,6 +159,9 @@ export declare function createListing(body: CreateListingInput): Promise<{
     listing: ApiListing;
 }>;
 export declare function fetchListing(listingId: string): Promise<{
+    listing: ApiListing;
+}>;
+export declare function updateListing(listingId: string, body: UpdateListingInput): Promise<{
     listing: ApiListing;
 }>;
 export declare function publishListing(listingId: string): Promise<{

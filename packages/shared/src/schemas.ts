@@ -57,6 +57,11 @@ export const CreateListingSchema = z.object({
   lng: z.number().gte(-180).lte(180).optional(),
 });
 
+export const UpdateListingSchema = CreateListingSchema.omit({
+  communityId: true,
+  aiGenerated: true,
+});
+
 export const ListListingsQuerySchema = z.object({
   communityId: z.uuid(),
   limit: z.coerce.number().int().min(1).max(50).optional().default(20),

@@ -52,6 +52,11 @@ export type CreateListingInput = {
   lng?: number;
 };
 
+export type UpdateListingInput = Omit<
+  CreateListingInput,
+  'communityId' | 'aiGenerated'
+>;
+
 export type ApiConversation = {
   id: string;
   listingId: string | null;
@@ -228,6 +233,13 @@ export function createListing(body: CreateListingInput) {
 
 export function fetchListing(listingId: string) {
   return apiFetch<{ listing: ApiListing }>(`/listings/${listingId}`);
+}
+
+export function updateListing(listingId: string, body: UpdateListingInput) {
+  return apiFetch<{ listing: ApiListing }>(`/listings/${listingId}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
 }
 
 export function publishListing(listingId: string) {

@@ -5,6 +5,7 @@ import {
   ListListingsQuerySchema,
   ListSellerListingsQuerySchema,
   NearbyListingsQuerySchema,
+  UpdateListingSchema,
 } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
 import { ok } from '../../lib/response';
@@ -252,6 +253,63 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       });
 
       return reply.send(ok({ deleted: true }));
+    },
+  );
+
+  fastify.put(
+    '/:listingId',
+    {
+      preHandler: verifyJWT,
+      schema: { body: UpdateListingSchema },
+    },
+    async (request, reply) => {
+      const { listingId } = request.params as { listingId: string };
+      const body = UpdateListingSchema.parse(request.body);
+      const listing = await prisma.listing.findUnique({
+        where: { id: listingId },
+      });
+      if (!listing) {
+        return reply.code(404).send({ error: 'Listing not found' });
+      }
+      if (listing.sellerId !== request.user.sub) {
+        return reply.code(403).send({ error: 'Only the seller can edit' });
+      }
+      if (!request.user.communityIds.includes(listing.communityId)) {
+        return reply
+          .code(403)
+          .send({ error: 'Not a member of this community' });
+      }
+
+      const updated = await prisma.listing.update({
+        where: { id: listingId },
+        data: {
+          title: body.title,
+          description: body.description,
+          category: body.category,
+          subcategory: body.subcategory ?? null,
+          condition: body.condition,
+          conditionNote: body.conditionNote ?? null,
+          price: new Prisma.Decimal(String(body.price)),
+          negotiable: body.negotiable,
+          locationNeighborhood: body.locationNeighborhood,
+          locationRadiusM: body.locationRadiusM,
+          availabilityWindows: body.availabilityWindows,
+          photoUrls: body.photoUrls,
+        },
+      });
+
+      if (body.lat !== undefined && body.lng !== undefined) {
+        await setListingLocationGeom(updated.id, body.lat, body.lng);
+      }
+
+      if (updated.status === 'active') {
+        await searchSyncQueue.add('sync', {
+          listingId: updated.id,
+          action: 'upsert',
+        });
+      }
+
+      return reply.send(ok({ listing: updated }));
     },
   );
 

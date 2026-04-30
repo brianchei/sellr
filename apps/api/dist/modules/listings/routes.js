@@ -192,6 +192,54 @@ const plugin = (fastify, _opts, done) => {
         });
         return reply.send((0, response_1.ok)({ deleted: true }));
     });
+    fastify.put('/:listingId', {
+        preHandler: auth_1.verifyJWT,
+        schema: { body: shared_1.UpdateListingSchema },
+    }, async (request, reply) => {
+        const { listingId } = request.params;
+        const body = shared_1.UpdateListingSchema.parse(request.body);
+        const listing = await prisma_1.prisma.listing.findUnique({
+            where: { id: listingId },
+        });
+        if (!listing) {
+            return reply.code(404).send({ error: 'Listing not found' });
+        }
+        if (listing.sellerId !== request.user.sub) {
+            return reply.code(403).send({ error: 'Only the seller can edit' });
+        }
+        if (!request.user.communityIds.includes(listing.communityId)) {
+            return reply
+                .code(403)
+                .send({ error: 'Not a member of this community' });
+        }
+        const updated = await prisma_1.prisma.listing.update({
+            where: { id: listingId },
+            data: {
+                title: body.title,
+                description: body.description,
+                category: body.category,
+                subcategory: body.subcategory ?? null,
+                condition: body.condition,
+                conditionNote: body.conditionNote ?? null,
+                price: new client_1.Prisma.Decimal(String(body.price)),
+                negotiable: body.negotiable,
+                locationNeighborhood: body.locationNeighborhood,
+                locationRadiusM: body.locationRadiusM,
+                availabilityWindows: body.availabilityWindows,
+                photoUrls: body.photoUrls,
+            },
+        });
+        if (body.lat !== undefined && body.lng !== undefined) {
+            await (0, repository_1.setListingLocationGeom)(updated.id, body.lat, body.lng);
+        }
+        if (updated.status === 'active') {
+            await queues_1.searchSyncQueue.add('sync', {
+                listingId: updated.id,
+                action: 'upsert',
+            });
+        }
+        return reply.send((0, response_1.ok)({ listing: updated }));
+    });
     fastify.get('/:listingId', {
         preHandler: auth_1.verifyJWT,
     }, async (request, reply) => {

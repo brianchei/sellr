@@ -12,6 +12,7 @@ exports.fetchCommunityListings = fetchCommunityListings;
 exports.fetchMyListings = fetchMyListings;
 exports.createListing = createListing;
 exports.fetchListing = fetchListing;
+exports.updateListing = updateListing;
 exports.publishListing = publishListing;
 exports.unpublishListing = unpublishListing;
 exports.deleteListing = deleteListing;
@@ -108,6 +109,12 @@ function createListing(body) {
 }
 function fetchListing(listingId) {
     return (0, fetch_1.apiFetch)(`/listings/${listingId}`);
+}
+function updateListing(listingId, body) {
+    return (0, fetch_1.apiFetch)(`/listings/${listingId}`, {
+        method: 'PUT',
+        body: JSON.stringify(body),
+    });
 }
 function publishListing(listingId) {
     return (0, fetch_1.apiFetch)(`/listings/${listingId}/publish`, {

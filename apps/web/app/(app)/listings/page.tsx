@@ -385,12 +385,20 @@ export default function MyListingsPage() {
                 </div>
 
                 <div className="flex flex-col justify-between gap-3">
-                  <Link
-                    href={`/marketplace/${listing.id}`}
-                    className="inline-flex justify-center rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
-                  >
-                    View details
-                  </Link>
+                  <div className="grid gap-2">
+                    <Link
+                      href={`/listings/${listing.id}/edit`}
+                      className="inline-flex justify-center rounded-lg bg-[var(--color-brand-primary)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+                    >
+                      Edit
+                    </Link>
+                    <Link
+                      href={`/marketplace/${listing.id}`}
+                      className="inline-flex justify-center rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
+                    >
+                      View details
+                    </Link>
+                  </div>
 
                   <div className="grid gap-2">
                     {canPublish ? (
