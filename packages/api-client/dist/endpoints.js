@@ -9,9 +9,12 @@ exports.registerPushToken = registerPushToken;
 exports.joinCommunity = joinCommunity;
 exports.fetchListingsNearby = fetchListingsNearby;
 exports.fetchCommunityListings = fetchCommunityListings;
+exports.fetchMyListings = fetchMyListings;
 exports.createListing = createListing;
 exports.fetchListing = fetchListing;
 exports.publishListing = publishListing;
+exports.unpublishListing = unpublishListing;
+exports.deleteListing = deleteListing;
 exports.searchListings = searchListings;
 exports.createOffer = createOffer;
 exports.fetchOffer = fetchOffer;
@@ -87,6 +90,16 @@ function fetchCommunityListings(params) {
     }
     return (0, fetch_1.apiFetch)(`/listings?${q.toString()}`);
 }
+function fetchMyListings(params) {
+    const q = new URLSearchParams({ communityId: params.communityId });
+    if (params.status) {
+        q.set('status', params.status);
+    }
+    if (params.limit != null) {
+        q.set('limit', String(params.limit));
+    }
+    return (0, fetch_1.apiFetch)(`/listings/mine?${q.toString()}`);
+}
 function createListing(body) {
     return (0, fetch_1.apiFetch)('/listings', {
         method: 'POST',
@@ -99,6 +112,16 @@ function fetchListing(listingId) {
 function publishListing(listingId) {
     return (0, fetch_1.apiFetch)(`/listings/${listingId}/publish`, {
         method: 'POST',
+    });
+}
+function unpublishListing(listingId) {
+    return (0, fetch_1.apiFetch)(`/listings/${listingId}/unpublish`, {
+        method: 'POST',
+    });
+}
+function deleteListing(listingId) {
+    return (0, fetch_1.apiFetch)(`/listings/${listingId}`, {
+        method: 'DELETE',
     });
 }
 function searchListings(params) {

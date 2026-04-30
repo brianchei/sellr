@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ListingCondition } from './enums';
+import { ListingCondition, ListingStatus } from './enums';
 export declare const SendOTPSchema: z.ZodObject<{
     phoneE164: z.ZodString;
 }, z.core.$strip>;
@@ -50,6 +50,11 @@ export declare const CreateListingSchema: z.ZodObject<{
 }, z.core.$strip>;
 export declare const ListListingsQuerySchema: z.ZodObject<{
     communityId: z.ZodUUID;
+    limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+}, z.core.$strip>;
+export declare const ListSellerListingsQuerySchema: z.ZodObject<{
+    communityId: z.ZodUUID;
+    status: z.ZodOptional<z.ZodEnum<typeof ListingStatus>>;
     limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
 }, z.core.$strip>;
 export declare const CreateConversationSchema: z.ZodObject<{

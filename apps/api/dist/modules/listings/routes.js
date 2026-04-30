@@ -46,6 +46,27 @@ const plugin = (fastify, _opts, done) => {
         });
         return reply.send((0, response_1.ok)({ listings }));
     });
+    fastify.get('/mine', {
+        preHandler: auth_1.verifyJWT,
+        schema: { querystring: shared_1.ListSellerListingsQuerySchema },
+    }, async (request, reply) => {
+        const { communityId, limit, status } = shared_1.ListSellerListingsQuerySchema.parse(request.query);
+        if (!request.user.communityIds.includes(communityId)) {
+            return reply
+                .code(403)
+                .send({ error: 'Not a member of this community' });
+        }
+        const listings = await prisma_1.prisma.listing.findMany({
+            where: {
+                communityId,
+                sellerId: request.user.sub,
+                ...(status !== undefined ? { status } : {}),
+            },
+            orderBy: { updatedAt: 'desc' },
+            take: limit,
+        });
+        return reply.send((0, response_1.ok)({ listings }));
+    });
     fastify.post('/', {
         preHandler: auth_1.verifyJWT,
         schema: { body: shared_1.CreateListingSchema },
@@ -106,6 +127,70 @@ const plugin = (fastify, _opts, done) => {
             action: 'upsert',
         });
         return reply.send((0, response_1.ok)({ listing: updated }));
+    });
+    fastify.post('/:listingId/unpublish', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
+        const { listingId } = request.params;
+        const listing = await prisma_1.prisma.listing.findUnique({
+            where: { id: listingId },
+        });
+        if (!listing) {
+            return reply.code(404).send({ error: 'Listing not found' });
+        }
+        if (listing.sellerId !== request.user.sub) {
+            return reply.code(403).send({ error: 'Only the seller can unpublish' });
+        }
+        if (!request.user.communityIds.includes(listing.communityId)) {
+            return reply
+                .code(403)
+                .send({ error: 'Not a member of this community' });
+        }
+        const updated = await prisma_1.prisma.listing.update({
+            where: { id: listingId },
+            data: { status: 'draft' },
+        });
+        await queues_1.searchSyncQueue.add('sync', {
+            listingId: updated.id,
+            action: 'delete',
+        });
+        return reply.send((0, response_1.ok)({ listing: updated }));
+    });
+    fastify.delete('/:listingId', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
+        const { listingId } = request.params;
+        const listing = await prisma_1.prisma.listing.findUnique({
+            where: { id: listingId },
+            include: {
+                _count: {
+                    select: {
+                        conversations: true,
+                        offers: true,
+                    },
+                },
+            },
+        });
+        if (!listing) {
+            return reply.code(404).send({ error: 'Listing not found' });
+        }
+        if (listing.sellerId !== request.user.sub) {
+            return reply.code(403).send({ error: 'Only the seller can delete' });
+        }
+        if (!request.user.communityIds.includes(listing.communityId)) {
+            return reply
+                .code(403)
+                .send({ error: 'Not a member of this community' });
+        }
+        if (listing._count.conversations > 0 || listing._count.offers > 0) {
+            return reply.code(409).send({
+                error: 'Listings with buyer activity cannot be deleted. Unpublish it instead.',
+            });
+        }
+        await prisma_1.prisma.listing.delete({
+            where: { id: listingId },
+        });
+        await queues_1.searchSyncQueue.add('sync', {
+            listingId,
+            action: 'delete',
+        });
+        return reply.send((0, response_1.ok)({ deleted: true }));
     });
     fastify.get('/:listingId', {
         preHandler: auth_1.verifyJWT,

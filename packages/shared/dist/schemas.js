@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.ListListingsQuerySchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
 // Auth
@@ -55,6 +55,11 @@ exports.CreateListingSchema = zod_1.z.object({
 exports.ListListingsQuerySchema = zod_1.z.object({
     communityId: zod_1.z.uuid(),
     limit: zod_1.z.coerce.number().int().min(1).max(50).optional().default(20),
+});
+exports.ListSellerListingsQuerySchema = zod_1.z.object({
+    communityId: zod_1.z.uuid(),
+    status: zod_1.z.enum(enums_1.ListingStatus).optional(),
+    limit: zod_1.z.coerce.number().int().min(1).max(100).optional().default(50),
 });
 exports.CreateConversationSchema = zod_1.z.object({
     listingId: zod_1.z.uuid(),

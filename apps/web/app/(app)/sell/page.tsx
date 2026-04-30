@@ -165,7 +165,7 @@ export default function SellPage() {
     try {
       const created = await createListing(payload);
       await publishListing(created.listing.id);
-      router.push('/marketplace');
+      router.push('/listings');
     } catch (e) {
       setError(
         e instanceof Error
@@ -214,10 +214,10 @@ export default function SellPage() {
           </p>
         </div>
         <Link
-          href="/marketplace"
+          href="/listings"
           className="rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)]"
         >
-          Back to browse
+          My listings
         </Link>
       </div>
 

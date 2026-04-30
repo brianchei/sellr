@@ -147,6 +147,13 @@ export declare function fetchCommunityListings(params: {
 }): Promise<{
     listings: ApiListing[];
 }>;
+export declare function fetchMyListings(params: {
+    communityId: string;
+    status?: string;
+    limit?: number;
+}): Promise<{
+    listings: ApiListing[];
+}>;
 export declare function createListing(body: CreateListingInput): Promise<{
     listing: ApiListing;
 }>;
@@ -155,6 +162,12 @@ export declare function fetchListing(listingId: string): Promise<{
 }>;
 export declare function publishListing(listingId: string): Promise<{
     listing: ApiListing;
+}>;
+export declare function unpublishListing(listingId: string): Promise<{
+    listing: ApiListing;
+}>;
+export declare function deleteListing(listingId: string): Promise<{
+    deleted: boolean;
 }>;
 export declare function searchListings(params: {
     communityId: string;

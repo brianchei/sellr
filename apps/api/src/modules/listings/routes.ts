@@ -3,6 +3,7 @@ import { Prisma } from '../../generated/prisma/client';
 import {
   CreateListingSchema,
   ListListingsQuerySchema,
+  ListSellerListingsQuerySchema,
   NearbyListingsQuerySchema,
 } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
@@ -60,6 +61,35 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       const listings = await prisma.listing.findMany({
         where: { communityId, status: 'active' },
         orderBy: { createdAt: 'desc' },
+        take: limit,
+      });
+
+      return reply.send(ok({ listings }));
+    },
+  );
+
+  fastify.get(
+    '/mine',
+    {
+      preHandler: verifyJWT,
+      schema: { querystring: ListSellerListingsQuerySchema },
+    },
+    async (request, reply) => {
+      const { communityId, limit, status } =
+        ListSellerListingsQuerySchema.parse(request.query);
+      if (!request.user.communityIds.includes(communityId)) {
+        return reply
+          .code(403)
+          .send({ error: 'Not a member of this community' });
+      }
+
+      const listings = await prisma.listing.findMany({
+        where: {
+          communityId,
+          sellerId: request.user.sub,
+          ...(status !== undefined ? { status } : {}),
+        },
+        orderBy: { updatedAt: 'desc' },
         take: limit,
       });
 
@@ -141,6 +171,87 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       });
 
       return reply.send(ok({ listing: updated }));
+    },
+  );
+
+  fastify.post(
+    '/:listingId/unpublish',
+    { preHandler: verifyJWT },
+    async (request, reply) => {
+      const { listingId } = request.params as { listingId: string };
+      const listing = await prisma.listing.findUnique({
+        where: { id: listingId },
+      });
+      if (!listing) {
+        return reply.code(404).send({ error: 'Listing not found' });
+      }
+      if (listing.sellerId !== request.user.sub) {
+        return reply.code(403).send({ error: 'Only the seller can unpublish' });
+      }
+      if (!request.user.communityIds.includes(listing.communityId)) {
+        return reply
+          .code(403)
+          .send({ error: 'Not a member of this community' });
+      }
+
+      const updated = await prisma.listing.update({
+        where: { id: listingId },
+        data: { status: 'draft' },
+      });
+
+      await searchSyncQueue.add('sync', {
+        listingId: updated.id,
+        action: 'delete',
+      });
+
+      return reply.send(ok({ listing: updated }));
+    },
+  );
+
+  fastify.delete(
+    '/:listingId',
+    { preHandler: verifyJWT },
+    async (request, reply) => {
+      const { listingId } = request.params as { listingId: string };
+      const listing = await prisma.listing.findUnique({
+        where: { id: listingId },
+        include: {
+          _count: {
+            select: {
+              conversations: true,
+              offers: true,
+            },
+          },
+        },
+      });
+      if (!listing) {
+        return reply.code(404).send({ error: 'Listing not found' });
+      }
+      if (listing.sellerId !== request.user.sub) {
+        return reply.code(403).send({ error: 'Only the seller can delete' });
+      }
+      if (!request.user.communityIds.includes(listing.communityId)) {
+        return reply
+          .code(403)
+          .send({ error: 'Not a member of this community' });
+      }
+      if (listing._count.conversations > 0 || listing._count.offers > 0) {
+        return reply.code(409).send({
+          error:
+            'Listings with buyer activity cannot be deleted. Unpublish it instead.',
+        });
+      }
+
+      await prisma.listing.delete({
+        where: { id: listingId },
+      });
+
+      await searchSyncQueue.add('sync', {
+        listingId,
+        action: 'delete',
+      });
+
+      return reply.send(ok({ deleted: true }));
     },
   );
 

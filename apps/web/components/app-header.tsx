@@ -66,6 +66,7 @@ export function AppHeader() {
           {[
             { label: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
             { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
+            { label: 'Listings', href: '/listings', icon: ListingsIcon },
             { label: 'Inbox', href: '/inbox', icon: InboxIcon },
             { label: 'Sell', href: '/sell', icon: SellIcon },
           ].map((item) => {
@@ -155,12 +156,12 @@ export function AppHeader() {
                     Browse
                   </Link>
                   <Link
-                    href="/sell"
+                    href="/listings"
                     className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
                     style={{ color: 'var(--text-secondary)' }}
                     onClick={() => setMenuOpen(false)}
                   >
-                    Sell
+                    Listings
                   </Link>
                   <Link
                     href="/inbox"
@@ -169,6 +170,14 @@ export function AppHeader() {
                     onClick={() => setMenuOpen(false)}
                   >
                     Inbox
+                  </Link>
+                  <Link
+                    href="/sell"
+                    className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
+                    style={{ color: 'var(--text-secondary)' }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Sell
                   </Link>
                   <div className="my-1 sm:hidden" style={{ borderTop: '1px solid var(--border-default)' }} />
                   <button
@@ -215,6 +224,19 @@ function InboxIcon() {
       <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
       <path d="M8 9h8" />
       <path d="M8 13h5" />
+    </svg>
+  );
+}
+
+function ListingsIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 6h13" />
+      <path d="M8 12h13" />
+      <path d="M8 18h13" />
+      <path d="M3 6h.01" />
+      <path d="M3 12h.01" />
+      <path d="M3 18h.01" />
     </svg>
   );
 }

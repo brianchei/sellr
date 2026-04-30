@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ListingCondition } from './enums';
+import { ListingCondition, ListingStatus } from './enums';
 
 // Auth
 export const SendOTPSchema = z.object({
@@ -60,6 +60,12 @@ export const CreateListingSchema = z.object({
 export const ListListingsQuerySchema = z.object({
   communityId: z.uuid(),
   limit: z.coerce.number().int().min(1).max(50).optional().default(20),
+});
+
+export const ListSellerListingsQuerySchema = z.object({
+  communityId: z.uuid(),
+  status: z.enum(ListingStatus).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
 });
 
 export const CreateConversationSchema = z.object({

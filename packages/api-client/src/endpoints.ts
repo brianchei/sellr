@@ -204,6 +204,21 @@ export function fetchCommunityListings(params: {
   return apiFetch<{ listings: ApiListing[] }>(`/listings?${q.toString()}`);
 }
 
+export function fetchMyListings(params: {
+  communityId: string;
+  status?: string;
+  limit?: number;
+}) {
+  const q = new URLSearchParams({ communityId: params.communityId });
+  if (params.status) {
+    q.set('status', params.status);
+  }
+  if (params.limit != null) {
+    q.set('limit', String(params.limit));
+  }
+  return apiFetch<{ listings: ApiListing[] }>(`/listings/mine?${q.toString()}`);
+}
+
 export function createListing(body: CreateListingInput) {
   return apiFetch<{ listing: ApiListing }>('/listings', {
     method: 'POST',
@@ -218,6 +233,18 @@ export function fetchListing(listingId: string) {
 export function publishListing(listingId: string) {
   return apiFetch<{ listing: ApiListing }>(`/listings/${listingId}/publish`, {
     method: 'POST',
+  });
+}
+
+export function unpublishListing(listingId: string) {
+  return apiFetch<{ listing: ApiListing }>(`/listings/${listingId}/unpublish`, {
+    method: 'POST',
+  });
+}
+
+export function deleteListing(listingId: string) {
+  return apiFetch<{ deleted: boolean }>(`/listings/${listingId}`, {
+    method: 'DELETE',
   });
 }
 
