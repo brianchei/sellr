@@ -4,6 +4,12 @@ export type ApiListing = {
   id: string;
   communityId: string;
   sellerId: string;
+  seller?: {
+    id: string;
+    displayName: string;
+    avatarUrl: string | null;
+    verifiedAt: string | null;
+  };
   title: string;
   description: string;
   category: string;
@@ -44,6 +50,25 @@ export type CreateListingInput = {
   aiGenerated?: boolean;
   lat?: number;
   lng?: number;
+};
+
+export type ApiConversation = {
+  id: string;
+  listingId: string | null;
+  offerId: string | null;
+  participantIds: string[];
+  type: string;
+  createdAt: string;
+};
+
+export type ApiMessage = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  content: string;
+  aiSuggested: boolean;
+  safetyFlagged: boolean;
+  createdAt: string;
 };
 
 export type AuthTokens = {
@@ -228,20 +253,20 @@ export function fetchMeetup(meetupId: string) {
 }
 
 export function createConversation(body: { listingId: string }) {
-  return apiFetch<{ conversation: unknown }>('/conversations', {
+  return apiFetch<{ conversation: ApiConversation }>('/conversations', {
     method: 'POST',
     body: JSON.stringify(body),
   });
 }
 
 export function fetchConversationMessages(conversationId: string) {
-  return apiFetch<{ messages: unknown[] }>(
+  return apiFetch<{ messages: ApiMessage[] }>(
     `/conversations/${conversationId}/messages`,
   );
 }
 
 export function sendMessage(conversationId: string, body: { content: string }) {
-  return apiFetch<{ message: unknown }>(
+  return apiFetch<{ message: ApiMessage }>(
     `/conversations/${conversationId}/messages`,
     {
       method: 'POST',

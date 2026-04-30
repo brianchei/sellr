@@ -153,6 +153,16 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       const { listingId } = request.params as { listingId: string };
       const listing = await prisma.listing.findUnique({
         where: { id: listingId },
+        include: {
+          seller: {
+            select: {
+              id: true,
+              displayName: true,
+              avatarUrl: true,
+              verifiedAt: true,
+            },
+          },
+        },
       });
       if (!listing) {
         return reply.code(404).send({ error: 'Listing not found' });
@@ -161,6 +171,12 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         return reply
           .code(403)
           .send({ error: 'Not a member of this community' });
+      }
+      if (
+        listing.status !== 'active' &&
+        listing.sellerId !== request.user.sub
+      ) {
+        return reply.code(404).send({ error: 'Listing not found' });
       }
       return reply.send(ok({ listing }));
     },

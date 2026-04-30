@@ -1,14 +1,11 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.communityRoutes = void 0;
-const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
 const shared_1 = require("@sellr/shared");
 const prisma_1 = require("../../lib/prisma");
 const response_1 = require("../../lib/response");
 const authTokens_1 = require("../../lib/authTokens");
+const authCookies_1 = require("../../lib/authCookies");
 const auth_1 = require("../../middleware/auth");
 const plugin = (fastify, _opts, done) => {
     fastify.post('/join', {
@@ -75,6 +72,10 @@ const plugin = (fastify, _opts, done) => {
             update: { status: 'active' },
         });
         const tokens = await (0, authTokens_1.issueTokenPair)(fastify, request.user.sub);
+        if ((0, authCookies_1.isWebClient)(request.headers)) {
+            (0, authCookies_1.setAuthCookies)(reply, tokens);
+            return reply.send((0, response_1.ok)({ communityId }));
+        }
         return reply.send((0, response_1.ok)({
             communityId,
             accessToken: tokens.accessToken,
@@ -83,4 +84,4 @@ const plugin = (fastify, _opts, done) => {
     });
     done();
 };
-exports.communityRoutes = (0, fastify_plugin_1.default)(plugin);
+exports.communityRoutes = plugin;

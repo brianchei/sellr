@@ -1,14 +1,11 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRoutes = void 0;
-const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
 const shared_1 = require("@sellr/shared");
 const prisma_1 = require("../../lib/prisma");
 const response_1 = require("../../lib/response");
 const authTokens_1 = require("../../lib/authTokens");
+const authCookies_1 = require("../../lib/authCookies");
 const otp_1 = require("../../lib/otp");
 const auth_1 = require("../../middleware/auth");
 const plugin = (fastify, _opts, done) => {
@@ -47,6 +44,10 @@ const plugin = (fastify, _opts, done) => {
             },
         });
         const tokens = await (0, authTokens_1.issueTokenPair)(fastify, user.id);
+        if ((0, authCookies_1.isWebClient)(request.headers)) {
+            (0, authCookies_1.setAuthCookies)(reply, tokens);
+            return reply.send((0, response_1.ok)({ userId: user.id }));
+        }
         return reply.send((0, response_1.ok)({
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
@@ -56,14 +57,28 @@ const plugin = (fastify, _opts, done) => {
     fastify.post('/refresh', {
         schema: { body: shared_1.RefreshTokenSchema },
     }, async (request, reply) => {
-        const body = shared_1.RefreshTokenSchema.parse(request.body);
+        const body = shared_1.RefreshTokenSchema.parse(request.body ?? {});
+        const refreshInput = body.refreshToken ?? request.cookies[authCookies_1.SELLR_REFRESH_COOKIE];
+        if (!refreshInput) {
+            return reply.code(400).send({ error: 'Missing refresh token' });
+        }
         try {
-            const tokens = await (0, authTokens_1.refreshAccessToken)(fastify, body.refreshToken);
+            const tokens = await (0, authTokens_1.refreshAccessToken)(fastify, refreshInput);
+            if ((0, authCookies_1.isWebClient)(request.headers)) {
+                (0, authCookies_1.setAuthCookies)(reply, tokens);
+                return await reply.send((0, response_1.ok)({ rotated: true }));
+            }
             return await reply.send((0, response_1.ok)(tokens));
         }
         catch {
-            return await reply.code(401).send({ error: 'Invalid refresh token' });
+            return reply.code(401).send({ error: 'Invalid refresh token' });
         }
+    });
+    fastify.post('/logout', async (request, reply) => {
+        if ((0, authCookies_1.isWebClient)(request.headers)) {
+            (0, authCookies_1.clearAuthCookies)(reply);
+        }
+        return reply.send((0, response_1.ok)({ loggedOut: true }));
     });
     fastify.post('/push-token', {
         preHandler: auth_1.verifyJWT,
@@ -97,4 +112,4 @@ const plugin = (fastify, _opts, done) => {
     });
     done();
 };
-exports.authRoutes = (0, fastify_plugin_1.default)(plugin);
+exports.authRoutes = plugin;

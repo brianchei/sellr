@@ -41,6 +41,7 @@ const fastify_1 = __importDefault(require("fastify"));
 const socket_io_1 = require("socket.io");
 const fastify_type_provider_zod_1 = require("fastify-type-provider-zod");
 const Sentry = __importStar(require("@sentry/node"));
+const cookies_1 = require("./plugins/cookies");
 const cors_1 = require("./plugins/cors");
 const jwt_1 = require("./plugins/jwt");
 const rateLimit_1 = require("./plugins/rateLimit");
@@ -57,7 +58,7 @@ const socket_1 = require("./lib/socket");
 const queue_1 = require("./lib/queue");
 const logger_1 = require("./lib/logger");
 const fastify = (0, fastify_1.default)({
-    logger: logger_1.logger,
+    loggerInstance: logger_1.logger,
     trustProxy: true,
 }).withTypeProvider();
 fastify.setValidatorCompiler(fastify_type_provider_zod_1.validatorCompiler);
@@ -86,6 +87,7 @@ const io = new socket_io_1.Server(fastify.server, {
     },
 });
 async function start() {
+    await fastify.register(cookies_1.cookiesPlugin);
     await fastify.register(cors_1.corsPlugin);
     await fastify.register(jwt_1.jwtPlugin);
     await fastify.register(rateLimit_1.rateLimitPlugin);

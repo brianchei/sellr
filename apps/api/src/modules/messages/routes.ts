@@ -25,13 +25,15 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           .code(403)
           .send({ error: 'Not a member of this community' });
       }
-
       const buyerId = request.user.sub;
       const sellerId = listing.sellerId;
       if (buyerId === sellerId) {
         return reply
           .code(400)
           .send({ error: 'Use seller tools for your own listing' });
+      }
+      if (listing.status !== 'active') {
+        return reply.code(400).send({ error: 'Listing is not available' });
       }
 
       const existing = await prisma.conversation.findFirst({

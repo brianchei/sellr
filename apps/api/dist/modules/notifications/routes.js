@@ -1,10 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.notificationRoutes = void 0;
-const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
 const shared_1 = require("@sellr/shared");
 const prisma_1 = require("../../lib/prisma");
 const response_1 = require("../../lib/response");
@@ -48,4 +44,4 @@ const plugin = (fastify, _opts, done) => {
     });
     done();
 };
-exports.notificationRoutes = (0, fastify_plugin_1.default)(plugin);
+exports.notificationRoutes = plugin;

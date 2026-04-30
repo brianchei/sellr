@@ -8,38 +8,12 @@ import {
   type ApiListing,
 } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
-
-const CONDITION_LABELS: Record<string, string> = {
-  like_new: 'Like new',
-  good: 'Good',
-  fair: 'Fair',
-  for_parts: 'For parts',
-};
-
-function formatCondition(condition: string): string {
-  return CONDITION_LABELS[condition] ?? condition.replaceAll('_', ' ');
-}
-
-function photoUrls(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string')
-    : [];
-}
-
-function formatPrice(price: ApiListing['price']): string {
-  const amount =
-    typeof price === 'number' ? price : Number.parseFloat(String(price));
-
-  if (!Number.isFinite(amount)) {
-    return '$--';
-  }
-
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
-  }).format(amount);
-}
+import {
+  CONDITION_LABELS,
+  formatCondition,
+  formatPrice,
+  photoUrls,
+} from '@/lib/listing-format';
 
 function listingMatchesQuery(listing: ApiListing, query: string): boolean {
   if (!query) {
@@ -289,9 +263,10 @@ export default function MarketplacePage() {
             const primaryPhoto = photos[0];
 
             return (
-              <article
+              <Link
                 key={listing.id}
-                className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm"
+                href={`/marketplace/${listing.id}`}
+                className="group block overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm no-underline transition hover:-translate-y-0.5 hover:border-[var(--color-brand-contrast-muted)] hover:shadow-md"
               >
                 <div
                   className="flex h-44 items-end bg-[var(--bg-tertiary)] bg-cover bg-center"
@@ -343,8 +318,11 @@ export default function MarketplacePage() {
                       Community member
                     </span>
                   </div>
+                  <p className="mt-4 text-sm font-medium text-[var(--color-brand-contrast)]">
+                    View details
+                  </p>
                 </div>
-              </article>
+              </Link>
             );
           })}
         </section>

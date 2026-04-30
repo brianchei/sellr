@@ -1,10 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchRoutes = void 0;
-const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
 const shared_1 = require("@sellr/shared");
 const algolia_1 = require("../../lib/algolia");
 const response_1 = require("../../lib/response");
@@ -48,4 +44,4 @@ const plugin = (fastify, _opts, done) => {
     });
     done();
 };
-exports.searchRoutes = (0, fastify_plugin_1.default)(plugin);
+exports.searchRoutes = plugin;

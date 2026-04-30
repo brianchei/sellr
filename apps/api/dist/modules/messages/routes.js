@@ -1,10 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.messageRoutes = void 0;
-const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
 const shared_1 = require("@sellr/shared");
 const prisma_1 = require("../../lib/prisma");
 const notifyUser_1 = require("../../lib/notifyUser");
@@ -33,6 +29,9 @@ const plugin = (fastify, _opts, done) => {
             return reply
                 .code(400)
                 .send({ error: 'Use seller tools for your own listing' });
+        }
+        if (listing.status !== 'active') {
+            return reply.code(400).send({ error: 'Listing is not available' });
         }
         const existing = await prisma_1.prisma.conversation.findFirst({
             where: {
@@ -108,4 +107,4 @@ const plugin = (fastify, _opts, done) => {
     });
     done();
 };
-exports.messageRoutes = (0, fastify_plugin_1.default)(plugin);
+exports.messageRoutes = plugin;

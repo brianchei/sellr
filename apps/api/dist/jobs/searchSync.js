@@ -29,7 +29,8 @@ async function searchSyncWorker(job) {
     }
     const photoUrls = listing.photoUrls;
     const geomResult = await prisma_1.prisma.$queryRaw `
-    SELECT ST_Y(location_geom::geometry) AS lat, ST_X(location_geom::geometry) AS lng
+    SELECT extensions.ST_Y(location_geom::extensions.geometry) AS lat,
+           extensions.ST_X(location_geom::extensions.geometry) AS lng
     FROM listings WHERE id = ${listingId}::uuid
   `;
     const g = geomResult.at(0);

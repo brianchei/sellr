@@ -1,11 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listingRoutes = void 0;
-const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
-const client_1 = require("@prisma/client");
+const client_1 = require("../../generated/prisma/client");
 const shared_1 = require("@sellr/shared");
 const prisma_1 = require("../../lib/prisma");
 const response_1 = require("../../lib/response");
@@ -117,6 +113,16 @@ const plugin = (fastify, _opts, done) => {
         const { listingId } = request.params;
         const listing = await prisma_1.prisma.listing.findUnique({
             where: { id: listingId },
+            include: {
+                seller: {
+                    select: {
+                        id: true,
+                        displayName: true,
+                        avatarUrl: true,
+                        verifiedAt: true,
+                    },
+                },
+            },
         });
         if (!listing) {
             return reply.code(404).send({ error: 'Listing not found' });
@@ -126,8 +132,12 @@ const plugin = (fastify, _opts, done) => {
                 .code(403)
                 .send({ error: 'Not a member of this community' });
         }
+        if (listing.status !== 'active' &&
+            listing.sellerId !== request.user.sub) {
+            return reply.code(404).send({ error: 'Listing not found' });
+        }
         return reply.send((0, response_1.ok)({ listing }));
     });
     done();
 };
-exports.listingRoutes = (0, fastify_plugin_1.default)(plugin);
+exports.listingRoutes = plugin;
