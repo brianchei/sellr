@@ -1,3 +1,25 @@
+export type ApiListing = {
+    id: string;
+    communityId: string;
+    sellerId: string;
+    title: string;
+    description: string;
+    category: string;
+    subcategory: string | null;
+    condition: string;
+    conditionNote: string | null;
+    price: number | string;
+    negotiable: boolean;
+    status: string;
+    locationNeighborhood: string;
+    locationRadiusM: number;
+    availabilityWindows: unknown;
+    photoUrls: unknown;
+    aiGenerated: boolean;
+    distanceM?: number;
+    createdAt: string;
+    updatedAt: string;
+};
 export type AuthTokens = {
     accessToken: string;
     refreshToken: string;
@@ -52,22 +74,22 @@ export declare function fetchListingsNearby(params: {
     lng: number;
     radiusM?: number;
 }): Promise<{
-    listings: unknown[];
+    listings: ApiListing[];
 }>;
 export declare function fetchCommunityListings(params: {
     communityId: string;
     limit?: number;
 }): Promise<{
-    listings: unknown[];
+    listings: ApiListing[];
 }>;
 export declare function createListing(body: unknown): Promise<{
-    listing: unknown;
+    listing: ApiListing;
 }>;
 export declare function fetchListing(listingId: string): Promise<{
-    listing: unknown;
+    listing: ApiListing;
 }>;
 export declare function publishListing(listingId: string): Promise<{
-    listing: unknown;
+    listing: ApiListing;
 }>;
 export declare function searchListings(params: {
     communityId: string;

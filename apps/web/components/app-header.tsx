@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 
 export function AppHeader() {
   const { logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -63,28 +64,34 @@ export function AppHeader() {
         <nav className="hidden items-center sm:flex" style={{ gap: '4px' }}>
           {[
             { label: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
-            { label: 'Browse', href: '/', icon: BrowseIcon },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="no-underline"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 500,
-                color: 'var(--text-secondary)',
-                borderRadius: 'var(--radius-md)',
-                transition: 'all var(--duration-fast) var(--ease-out)',
-              }}
-            >
-              <item.icon />
-              {item.label}
-            </Link>
-          ))}
+            { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
+          ].map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="no-underline"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 500,
+                  color: active
+                    ? 'var(--color-primary-700)'
+                    : 'var(--text-secondary)',
+                  background: active ? 'var(--color-primary-50)' : 'transparent',
+                  borderRadius: 'var(--radius-md)',
+                  transition: 'all var(--duration-fast) var(--ease-out)',
+                }}
+              >
+                <item.icon />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right side */}
@@ -137,7 +144,7 @@ export function AppHeader() {
                     Dashboard
                   </Link>
                   <Link
-                    href="/"
+                    href="/marketplace"
                     className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
                     style={{ color: 'var(--text-secondary)' }}
                     onClick={() => setMenuOpen(false)}

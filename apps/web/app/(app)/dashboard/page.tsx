@@ -102,9 +102,15 @@ export default function DashboardPage() {
             Marketplace setup
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
-            Community access is ready. Next up: browse listings, create a
-            structured listing, and start buyer contact from listing detail.
+            Community access is ready. Browse active listings from members in
+            your verified local marketplace.
           </p>
+          <Link
+            href="/marketplace"
+            className="mt-4 inline-flex rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
+          >
+            Browse marketplace
+          </Link>
         </section>
       )}
     </main>

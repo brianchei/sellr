@@ -1,5 +1,28 @@
 import { apiFetch } from './fetch';
 
+export type ApiListing = {
+  id: string;
+  communityId: string;
+  sellerId: string;
+  title: string;
+  description: string;
+  category: string;
+  subcategory: string | null;
+  condition: string;
+  conditionNote: string | null;
+  price: number | string;
+  negotiable: boolean;
+  status: string;
+  locationNeighborhood: string;
+  locationRadiusM: number;
+  availabilityWindows: unknown;
+  photoUrls: unknown;
+  aiGenerated: boolean;
+  distanceM?: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AuthTokens = {
   accessToken: string;
   refreshToken: string;
@@ -96,7 +119,9 @@ export function fetchListingsNearby(params: {
   if (params.radiusM != null) {
     q.set('radiusM', String(params.radiusM));
   }
-  return apiFetch<{ listings: unknown[] }>(`/listings/nearby?${q.toString()}`);
+  return apiFetch<{ listings: ApiListing[] }>(
+    `/listings/nearby?${q.toString()}`,
+  );
 }
 
 export function fetchCommunityListings(params: {
@@ -107,22 +132,22 @@ export function fetchCommunityListings(params: {
   if (params.limit != null) {
     q.set('limit', String(params.limit));
   }
-  return apiFetch<{ listings: unknown[] }>(`/listings?${q.toString()}`);
+  return apiFetch<{ listings: ApiListing[] }>(`/listings?${q.toString()}`);
 }
 
 export function createListing(body: unknown) {
-  return apiFetch<{ listing: unknown }>('/listings', {
+  return apiFetch<{ listing: ApiListing }>('/listings', {
     method: 'POST',
     body: JSON.stringify(body),
   });
 }
 
 export function fetchListing(listingId: string) {
-  return apiFetch<{ listing: unknown }>(`/listings/${listingId}`);
+  return apiFetch<{ listing: ApiListing }>(`/listings/${listingId}`);
 }
 
 export function publishListing(listingId: string) {
-  return apiFetch<{ listing: unknown }>(`/listings/${listingId}/publish`, {
+  return apiFetch<{ listing: ApiListing }>(`/listings/${listingId}/publish`, {
     method: 'POST',
   });
 }
