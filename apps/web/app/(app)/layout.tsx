@@ -7,7 +7,7 @@ export default function AppShellLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900">
+    <div className="min-h-screen bg-[var(--bg-secondary)] text-[var(--text-primary)]">
       <AuthGate>
         <AppHeader />
         {children}

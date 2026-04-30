@@ -20,6 +20,28 @@ export type ApiListing = {
     createdAt: string;
     updatedAt: string;
 };
+export type CreateListingInput = {
+    communityId: string;
+    title: string;
+    description: string;
+    category: string;
+    subcategory?: string;
+    condition: string;
+    conditionNote?: string;
+    price: number;
+    negotiable: boolean;
+    locationRadiusM: number;
+    locationNeighborhood: string;
+    availabilityWindows: Array<{
+        dayOfWeek: number;
+        startHour: number;
+        endHour: number;
+    }>;
+    photoUrls: string[];
+    aiGenerated?: boolean;
+    lat?: number;
+    lng?: number;
+};
 export type AuthTokens = {
     accessToken: string;
     refreshToken: string;
@@ -82,7 +104,7 @@ export declare function fetchCommunityListings(params: {
 }): Promise<{
     listings: ApiListing[];
 }>;
-export declare function createListing(body: unknown): Promise<{
+export declare function createListing(body: CreateListingInput): Promise<{
     listing: ApiListing;
 }>;
 export declare function fetchListing(listingId: string): Promise<{

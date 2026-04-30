@@ -31,7 +31,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   if (!hydrated || (isAuthenticated && communityIds === null)) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 text-sm text-zinc-500">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--bg-secondary)] text-sm text-[var(--text-tertiary)]">
         Loading…
       </div>
     );

@@ -9,7 +9,7 @@ function SellrLogo() {
       <div
         className="flex h-9 w-9 items-center justify-center rounded-lg"
         style={{
-          background: 'var(--color-primary-600)',
+          background: 'var(--color-brand-primary)',
           boxShadow: 'var(--shadow-sm)',
         }}
       >
@@ -31,7 +31,7 @@ function SellrLogo() {
         </svg>
       </div>
       <span
-        className="text-xl font-bold tracking-tight"
+        className="text-xl font-bold"
         style={{ color: 'var(--text-primary)' }}
       >
         Sellr
@@ -47,7 +47,7 @@ export function Header() {
     <header
       className="sticky top-0 z-50 w-full"
       style={{
-        background: 'rgba(255, 255, 255, 0.85)',
+        background: 'rgba(250, 250, 247, 0.9)',
         backdropFilter: 'blur(16px) saturate(180%)',
         WebkitBackdropFilter: 'blur(16px) saturate(180%)',
         borderBottom: '1px solid var(--border-default)',

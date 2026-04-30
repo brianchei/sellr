@@ -72,11 +72,11 @@ export default function OnboardingPage() {
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl items-center">
         <div className="grid w-full gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <section className="space-y-5">
-            <div className="inline-flex rounded-full border border-[var(--color-primary-200)] bg-[var(--color-primary-50)] px-3 py-1 text-xs font-medium text-[var(--color-primary-800)]">
+            <div className="inline-flex rounded-full border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-3 py-1 text-xs font-medium text-[var(--color-brand-accent-strong)]">
               Community-first marketplace
             </div>
             <div className="space-y-3">
-              <h1 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h1 className="max-w-xl text-3xl font-semibold sm:text-4xl">
                 Join your local Sellr community.
               </h1>
               <p className="max-w-xl text-base leading-7 text-[var(--text-secondary)]">
@@ -110,7 +110,7 @@ export default function OnboardingPage() {
           <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm sm:p-7">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold tracking-tight">
+                <h2 className="text-xl font-semibold">
                   Verify community access
                 </h2>
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">
@@ -120,7 +120,7 @@ export default function OnboardingPage() {
               <button
                 type="button"
                 onClick={onSignOut}
-                className="rounded-md border border-[var(--border-default)] px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]"
+                className="rounded-md border border-[var(--border-default)] px-3 py-1.5 text-sm font-medium text-[var(--color-brand-contrast)] hover:bg-[var(--bg-secondary)]"
               >
                 Sign out
               </button>
@@ -136,7 +136,7 @@ export default function OnboardingPage() {
                 }}
                 className={`rounded-md px-3 py-2 text-sm font-medium transition ${
                   mode === 'invite'
-                    ? 'bg-white text-[var(--text-primary)] shadow-sm'
+                    ? 'bg-white text-[var(--color-brand-contrast)] shadow-sm'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -151,7 +151,7 @@ export default function OnboardingPage() {
                 }}
                 className={`rounded-md px-3 py-2 text-sm font-medium transition ${
                   mode === 'email'
-                    ? 'bg-white text-[var(--text-primary)] shadow-sm'
+                    ? 'bg-white text-[var(--color-brand-contrast)] shadow-sm'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -170,7 +170,7 @@ export default function OnboardingPage() {
                     }
                     autoComplete="off"
                     placeholder="DEV2026"
-                    className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 font-mono text-sm uppercase tracking-wide text-[var(--text-primary)] outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)]"
+                    className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 font-mono text-sm uppercase text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                   />
                 </label>
               ) : (
@@ -184,7 +184,7 @@ export default function OnboardingPage() {
                     type="email"
                     autoComplete="email"
                     placeholder="you@school.edu"
-                    className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-primary-500)] focus:ring-2 focus:ring-[var(--color-primary-100)]"
+                    className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                   />
                 </label>
               )}
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
               <button
                 type="submit"
                 disabled={loading || !canSubmit}
-                className="mt-5 w-full rounded-lg bg-[var(--color-primary-600)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-700)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-5 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? 'Joining...' : 'Join community'}
               </button>

@@ -23,6 +23,29 @@ export type ApiListing = {
   updatedAt: string;
 };
 
+export type CreateListingInput = {
+  communityId: string;
+  title: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  condition: string;
+  conditionNote?: string;
+  price: number;
+  negotiable: boolean;
+  locationRadiusM: number;
+  locationNeighborhood: string;
+  availabilityWindows: Array<{
+    dayOfWeek: number;
+    startHour: number;
+    endHour: number;
+  }>;
+  photoUrls: string[];
+  aiGenerated?: boolean;
+  lat?: number;
+  lng?: number;
+};
+
 export type AuthTokens = {
   accessToken: string;
   refreshToken: string;
@@ -135,7 +158,7 @@ export function fetchCommunityListings(params: {
   return apiFetch<{ listings: ApiListing[] }>(`/listings?${q.toString()}`);
 }
 
-export function createListing(body: unknown) {
+export function createListing(body: CreateListingInput) {
   return apiFetch<{ listing: ApiListing }>('/listings', {
     method: 'POST',
     body: JSON.stringify(body),

@@ -20,7 +20,7 @@ export function AppHeader() {
     <header
       className="sticky top-0 z-50 w-full"
       style={{
-        background: 'rgba(255, 255, 255, 0.85)',
+        background: 'rgba(250, 250, 247, 0.9)',
         backdropFilter: 'blur(16px) saturate(180%)',
         WebkitBackdropFilter: 'blur(16px) saturate(180%)',
         borderBottom: '1px solid var(--border-default)',
@@ -32,7 +32,8 @@ export function AppHeader() {
           <div
             className="flex h-8 w-8 items-center justify-center rounded-lg"
             style={{
-              background: 'var(--color-primary-600)',
+              background: 'var(--color-brand-primary)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -53,7 +54,7 @@ export function AppHeader() {
             </svg>
           </div>
           <span
-            className="text-lg font-bold tracking-tight"
+            className="text-lg font-bold"
             style={{ color: 'var(--text-primary)' }}
           >
             Sellr
@@ -65,6 +66,7 @@ export function AppHeader() {
           {[
             { label: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
             { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
+            { label: 'Sell', href: '/sell', icon: SellIcon },
           ].map((item) => {
             const active = pathname === item.href;
             return (
@@ -80,9 +82,9 @@ export function AppHeader() {
                   fontSize: 'var(--text-sm)',
                   fontWeight: 500,
                   color: active
-                    ? 'var(--color-primary-700)'
+                    ? 'var(--color-brand-contrast)'
                     : 'var(--text-secondary)',
-                  background: active ? 'var(--color-primary-50)' : 'transparent',
+                  background: active ? 'var(--color-brand-primary-soft)' : 'transparent',
                   borderRadius: 'var(--radius-md)',
                   transition: 'all var(--duration-fast) var(--ease-out)',
                 }}
@@ -105,8 +107,8 @@ export function AppHeader() {
               style={{
                 width: '34px',
                 height: '34px',
-                background: 'var(--color-primary-100)',
-                color: 'var(--color-primary-700)',
+                background: 'var(--color-brand-contrast-soft)',
+                color: 'var(--color-brand-contrast)',
                 transition: 'all var(--duration-fast) var(--ease-out)',
                 cursor: 'pointer',
                 border: 'none',
@@ -151,6 +153,14 @@ export function AppHeader() {
                   >
                     Browse
                   </Link>
+                  <Link
+                    href="/sell"
+                    className="block w-full px-4 py-2.5 text-left text-sm no-underline sm:hidden"
+                    style={{ color: 'var(--text-secondary)' }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Sell
+                  </Link>
                   <div className="my-1 sm:hidden" style={{ borderTop: '1px solid var(--border-default)' }} />
                   <button
                     type="button"
@@ -186,6 +196,15 @@ function BrowseIcon() {
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+function SellIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
     </svg>
   );
 }
