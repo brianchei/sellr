@@ -127,7 +127,8 @@ and one buyer/seller conversation. Local OTP accepts `000000`.
 - Seller: `+15550000001`
 - Buyer: `+15550000002`
 
-See `docs/slc-smoke-test.md` for the first working web SLC smoke checklist.
+See `docs/slc-readiness.md` for the web SLC readiness checklist and
+`docs/slc-smoke-test.md` for the detailed smoke path.
 
 ## Useful Commands
 
@@ -140,6 +141,9 @@ pnpm test         # run tests
 pnpm db:migrate   # run Prisma migrations for the API
 pnpm db:studio    # open Prisma Studio for the API
 pnpm env:web      # create/update apps/web/.env.local from root env values
+pnpm smoke:seller # run seller lifecycle smoke check through the web proxy
+pnpm smoke:buyer  # run buyer contact/inbox smoke check through the web proxy
+pnpm smoke:web    # run authenticated web route smoke check
 pnpm --filter @sellr/api exec prisma db seed
 ```
 
@@ -148,5 +152,7 @@ pnpm --filter @sellr/api exec prisma db seed
 The detailed implementation baseline lives in
 `sellr-technical-implementation-guide-v2.md`. It documents the Phase 0
 architecture, local setup expectations, infrastructure decisions, and planned
-next phases. The web visual direction is documented in `docs/design-language.md`;
-the SLC smoke checklist is documented in `docs/slc-smoke-test.md`.
+next phases. The web visual direction is documented in
+`docs/design-language.md`; SLC readiness is documented in
+`docs/slc-readiness.md`; and the detailed smoke checklist is documented in
+`docs/slc-smoke-test.md`.

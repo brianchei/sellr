@@ -2,6 +2,8 @@
 
 Use this checklist after migrations and `pnpm --filter @sellr/api exec prisma db seed`.
 It verifies the first working web SLC without relying on hand-created data.
+For the higher-level handoff checklist, see
+[`slc-readiness.md`](./slc-readiness.md).
 
 ## Automated SLC Checks
 
