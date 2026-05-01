@@ -1,10 +1,15 @@
 'use client';
 
-import type { FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
+import {
+  ListingBuyerPreview,
+  type ListingImageStatus,
+} from '@/components/listing-buyer-preview';
 import {
   CATEGORIES,
   CONDITIONS,
   DAYS,
+  getListingFormErrors,
   type ListingFormValues,
 } from '@/lib/listing-form';
 
@@ -18,6 +23,32 @@ type ListingFormProps = {
   submittingLabel: string;
 };
 
+type FieldName = keyof ListingFormValues;
+type TouchedFields = Partial<Record<FieldName, true>>;
+
+function fieldClassName(hasError: boolean): string {
+  return `mt-2 w-full rounded-lg border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 ${
+    hasError
+      ? 'border-[var(--color-brand-warm)] focus:border-[var(--color-brand-warm)] focus:ring-[var(--color-brand-warm-soft)]'
+      : 'border-[var(--border-default)] focus:border-[var(--color-brand-contrast)] focus:ring-[var(--color-brand-contrast-muted)]'
+  }`;
+}
+
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <p
+      id={id}
+      className="mt-1.5 text-xs font-medium text-[var(--color-brand-warm-strong)]"
+    >
+      {message}
+    </p>
+  );
+}
+
 export function ListingForm({
   values,
   onChange,
@@ -27,6 +58,56 @@ export function ListingForm({
   submitLabel,
   submittingLabel,
 }: ListingFormProps) {
+  const [touchedFields, setTouchedFields] = useState<TouchedFields>({});
+  const [showAllErrors, setShowAllErrors] = useState(false);
+  const [loadedImageUrl, setLoadedImageUrl] = useState<string | null>(null);
+  const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
+  const fieldErrors = getListingFormErrors(values);
+  const cleanPhotoUrl = values.photoUrl.trim();
+  const canPreviewImage = cleanPhotoUrl.length > 0 && !fieldErrors.photoUrl;
+  const imageStatus: ListingImageStatus = !canPreviewImage
+    ? 'idle'
+    : loadedImageUrl === cleanPhotoUrl
+      ? 'loaded'
+      : failedImageUrl === cleanPhotoUrl
+        ? 'error'
+        : 'loading';
+
+  useEffect(() => {
+    if (!canPreviewImage) {
+      return;
+    }
+
+    let cancelled = false;
+    const preview = new window.Image();
+    preview.onload = () => {
+      if (!cancelled) {
+        setLoadedImageUrl(cleanPhotoUrl);
+        setFailedImageUrl(null);
+      }
+    };
+    preview.onerror = () => {
+      if (!cancelled) {
+        setLoadedImageUrl(null);
+        setFailedImageUrl(cleanPhotoUrl);
+      }
+    };
+    preview.src = cleanPhotoUrl;
+
+    return () => {
+      cancelled = true;
+      preview.onload = null;
+      preview.onerror = null;
+    };
+  }, [canPreviewImage, cleanPhotoUrl]);
+
+  const visibleError = (field: FieldName): string | undefined =>
+    showAllErrors || touchedFields[field] ? fieldErrors[field] : undefined;
+
+  const markTouched = (field: FieldName) => {
+    setTouchedFields((current) => ({ ...current, [field]: true }));
+  };
+
   const setField = <Key extends keyof ListingFormValues>(
     key: Key,
     value: ListingFormValues[Key],
@@ -34,9 +115,20 @@ export function ListingForm({
     onChange({ ...values, [key]: value });
   };
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    setShowAllErrors(true);
+    onSubmit(event);
+  };
+
+  const photoUrlError =
+    visibleError('photoUrl') ??
+    (canPreviewImage && imageStatus === 'error'
+      ? 'This image URL did not load. Use a public image link.'
+      : undefined);
+
   return (
     <form
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]"
     >
       <section className="space-y-5 rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm sm:p-6">
@@ -52,10 +144,25 @@ export function ListingForm({
           <input
             value={values.title}
             onChange={(event) => setField('title', event.target.value)}
+            onBlur={() => markTouched('title')}
             maxLength={60}
             placeholder="IKEA desk, walnut finish"
-            className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            aria-invalid={Boolean(visibleError('title'))}
+            aria-describedby="listing-title-error listing-title-count"
+            className={fieldClassName(Boolean(visibleError('title')))}
           />
+          <div className="mt-1.5 flex items-start justify-between gap-3">
+            <FieldError
+              id="listing-title-error"
+              message={visibleError('title')}
+            />
+            <span
+              id="listing-title-count"
+              className="ml-auto shrink-0 text-xs text-[var(--text-tertiary)]"
+            >
+              {values.title.trim().length}/60
+            </span>
+          </div>
         </label>
 
         <label className="block text-sm font-medium text-[var(--text-primary)]">
@@ -63,11 +170,26 @@ export function ListingForm({
           <textarea
             value={values.description}
             onChange={(event) => setField('description', event.target.value)}
+            onBlur={() => markTouched('description')}
             maxLength={1000}
             rows={5}
             placeholder="Mention dimensions, age, what is included, and any flaws."
-            className="mt-2 w-full resize-y rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm leading-6 outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            aria-invalid={Boolean(visibleError('description'))}
+            aria-describedby="listing-description-error listing-description-count"
+            className={`${fieldClassName(Boolean(visibleError('description')))} resize-y leading-6`}
           />
+          <div className="mt-1.5 flex items-start justify-between gap-3">
+            <FieldError
+              id="listing-description-error"
+              message={visibleError('description')}
+            />
+            <span
+              id="listing-description-count"
+              className="ml-auto shrink-0 text-xs text-[var(--text-tertiary)]"
+            >
+              {values.description.trim().length}/1000
+            </span>
+          </div>
         </label>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -76,7 +198,7 @@ export function ListingForm({
             <select
               value={values.category}
               onChange={(event) => setField('category', event.target.value)}
-              className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className={fieldClassName(false)}
             >
               {CATEGORIES.map((item) => (
                 <option key={item} value={item}>
@@ -91,8 +213,15 @@ export function ListingForm({
             <input
               value={values.subcategory}
               onChange={(event) => setField('subcategory', event.target.value)}
+              onBlur={() => markTouched('subcategory')}
               placeholder="Desk, textbook, bike"
-              className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              aria-invalid={Boolean(visibleError('subcategory'))}
+              aria-describedby="listing-subcategory-error"
+              className={fieldClassName(Boolean(visibleError('subcategory')))}
+            />
+            <FieldError
+              id="listing-subcategory-error"
+              message={visibleError('subcategory')}
             />
           </label>
         </div>
@@ -103,7 +232,7 @@ export function ListingForm({
             <select
               value={values.condition}
               onChange={(event) => setField('condition', event.target.value)}
-              className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className={fieldClassName(false)}
             >
               {CONDITIONS.map((item) => (
                 <option key={item.value} value={item.value}>
@@ -118,9 +247,16 @@ export function ListingForm({
             <input
               value={values.price}
               onChange={(event) => setField('price', event.target.value)}
+              onBlur={() => markTouched('price')}
               inputMode="decimal"
               placeholder="45"
-              className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              aria-invalid={Boolean(visibleError('price'))}
+              aria-describedby="listing-price-error"
+              className={fieldClassName(Boolean(visibleError('price')))}
+            />
+            <FieldError
+              id="listing-price-error"
+              message={visibleError('price')}
             />
           </label>
         </div>
@@ -130,10 +266,25 @@ export function ListingForm({
           <input
             value={values.conditionNote}
             onChange={(event) => setField('conditionNote', event.target.value)}
+            onBlur={() => markTouched('conditionNote')}
             maxLength={200}
             placeholder="Small scratch on left side"
-            className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            aria-invalid={Boolean(visibleError('conditionNote'))}
+            aria-describedby="listing-condition-note-error listing-condition-note-count"
+            className={fieldClassName(Boolean(visibleError('conditionNote')))}
           />
+          <div className="mt-1.5 flex items-start justify-between gap-3">
+            <FieldError
+              id="listing-condition-note-error"
+              message={visibleError('conditionNote')}
+            />
+            <span
+              id="listing-condition-note-count"
+              className="ml-auto shrink-0 text-xs text-[var(--text-tertiary)]"
+            >
+              {values.conditionNote.trim().length}/200
+            </span>
+          </div>
         </label>
 
         <label className="block text-sm font-medium text-[var(--text-primary)]">
@@ -141,9 +292,13 @@ export function ListingForm({
           <input
             value={values.photoUrl}
             onChange={(event) => setField('photoUrl', event.target.value)}
+            onBlur={() => markTouched('photoUrl')}
             placeholder="https://example.com/photo.jpg"
-            className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            aria-invalid={Boolean(photoUrlError)}
+            aria-describedby="listing-photo-url-error"
+            className={fieldClassName(Boolean(photoUrlError))}
           />
+          <FieldError id="listing-photo-url-error" message={photoUrlError} />
         </label>
 
         <label className="flex items-start gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3 text-sm">
@@ -165,6 +320,8 @@ export function ListingForm({
       </section>
 
       <aside className="space-y-5">
+        <ListingBuyerPreview values={values} imageStatus={imageStatus} />
+
         <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
           <h2 className="text-base font-semibold">Pickup context</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
@@ -179,8 +336,17 @@ export function ListingForm({
               onChange={(event) =>
                 setField('locationNeighborhood', event.target.value)
               }
+              onBlur={() => markTouched('locationNeighborhood')}
               placeholder="North Campus"
-              className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              aria-invalid={Boolean(visibleError('locationNeighborhood'))}
+              aria-describedby="listing-neighborhood-error"
+              className={fieldClassName(
+                Boolean(visibleError('locationNeighborhood')),
+              )}
+            />
+            <FieldError
+              id="listing-neighborhood-error"
+              message={visibleError('locationNeighborhood')}
             />
           </label>
 
@@ -191,13 +357,22 @@ export function ListingForm({
               onChange={(event) =>
                 setField('locationRadiusM', event.target.value)
               }
-              className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              onBlur={() => markTouched('locationRadiusM')}
+              aria-invalid={Boolean(visibleError('locationRadiusM'))}
+              aria-describedby="listing-radius-error"
+              className={fieldClassName(
+                Boolean(visibleError('locationRadiusM')),
+              )}
             >
               <option value="500">Within 500 m</option>
               <option value="1000">Within 1 km</option>
               <option value="2500">Within 2.5 km</option>
               <option value="5000">Within 5 km</option>
             </select>
+            <FieldError
+              id="listing-radius-error"
+              message={visibleError('locationRadiusM')}
+            />
           </label>
         </section>
 
@@ -212,7 +387,7 @@ export function ListingForm({
             <select
               value={values.dayOfWeek}
               onChange={(event) => setField('dayOfWeek', event.target.value)}
-              className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className={fieldClassName(false)}
             >
               {DAYS.map((day) => (
                 <option key={day.value} value={day.value}>
@@ -228,7 +403,7 @@ export function ListingForm({
               <select
                 value={values.startHour}
                 onChange={(event) => setField('startHour', event.target.value)}
-                className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className={fieldClassName(false)}
               >
                 {Array.from({ length: 24 }, (_, hour) => (
                   <option key={hour} value={hour}>
@@ -243,7 +418,10 @@ export function ListingForm({
               <select
                 value={values.endHour}
                 onChange={(event) => setField('endHour', event.target.value)}
-                className="mt-2 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                onBlur={() => markTouched('endHour')}
+                aria-invalid={Boolean(visibleError('endHour'))}
+                aria-describedby="listing-end-hour-error"
+                className={fieldClassName(Boolean(visibleError('endHour')))}
               >
                 {Array.from({ length: 24 }, (_, hour) => (
                   <option key={hour} value={hour}>
@@ -253,6 +431,10 @@ export function ListingForm({
               </select>
             </label>
           </div>
+          <FieldError
+            id="listing-end-hour-error"
+            message={visibleError('endHour')}
+          />
         </section>
 
         {error ? (

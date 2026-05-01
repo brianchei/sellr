@@ -1,7 +1,4 @@
-import type {
-  ApiListing,
-  UpdateListingInput,
-} from '@sellr/api-client';
+import type { ApiListing, UpdateListingInput } from '@sellr/api-client';
 import { photoUrls } from '@/lib/listing-format';
 
 export const CATEGORIES = [
@@ -70,7 +67,11 @@ type ListingFormValidationResult =
   | { ok: true; payload: UpdateListingInput }
   | { ok: false; error: string };
 
-function isValidUrl(value: string): boolean {
+export type ListingFormErrors = Partial<
+  Record<keyof ListingFormValues, string>
+>;
+
+export function isValidImageUrl(value: string): boolean {
   try {
     const url = new URL(value);
     return url.protocol === 'http:' || url.protocol === 'https:';
@@ -109,6 +110,20 @@ function firstAvailabilityWindow(
   };
 }
 
+export function conditionLabel(value: string): string {
+  return (
+    CONDITIONS.find((condition) => condition.value === value)?.label ??
+    value.replaceAll('_', ' ')
+  );
+}
+
+export function dayLabel(value: string): string {
+  const parsedDay = Number.parseInt(value, 10);
+  return (
+    DAYS.find((day) => day.value === parsedDay)?.label ?? 'Pickup window'
+  );
+}
+
 export function listingFormValuesFromListing(
   listing: ApiListing,
 ): ListingFormValues {
@@ -139,6 +154,12 @@ export function listingFormValuesFromListing(
 export function validateListingForm(
   values: ListingFormValues,
 ): ListingFormValidationResult {
+  const errors = getListingFormErrors(values);
+  const firstError = Object.values(errors).find(Boolean);
+  if (firstError) {
+    return { ok: false, error: firstError };
+  }
+
   const cleanTitle = values.title.trim();
   const cleanDescription = values.description.trim();
   const cleanPhotoUrl = values.photoUrl.trim();
@@ -151,50 +172,6 @@ export function validateListingForm(
   const parsedStart = Number.parseInt(values.startHour, 10);
   const parsedEnd = Number.parseInt(values.endHour, 10);
 
-  if (cleanTitle.length < 3 || cleanTitle.length > 60) {
-    return { ok: false, error: 'Title must be between 3 and 60 characters.' };
-  }
-
-  if (cleanDescription.length < 10 || cleanDescription.length > 1000) {
-    return {
-      ok: false,
-      error: 'Description must be between 10 and 1000 characters.',
-    };
-  }
-
-  if (parsedPrice === null) {
-    return { ok: false, error: 'Enter a valid price greater than $0.' };
-  }
-
-  if (!isValidUrl(cleanPhotoUrl)) {
-    return {
-      ok: false,
-      error: 'Add a valid image URL starting with http:// or https://.',
-    };
-  }
-
-  if (!cleanNeighborhood) {
-    return { ok: false, error: 'Add a neighborhood or pickup area.' };
-  }
-
-  if (
-    !Number.isInteger(parsedRadius) ||
-    parsedRadius < 100 ||
-    parsedRadius > 5000
-  ) {
-    return {
-      ok: false,
-      error: 'Pickup radius must be between 100 and 5000 meters.',
-    };
-  }
-
-  if (parsedEnd <= parsedStart) {
-    return {
-      ok: false,
-      error: 'Availability end time must be after the start time.',
-    };
-  }
-
   return {
     ok: true,
     payload: {
@@ -204,7 +181,7 @@ export function validateListingForm(
       ...(cleanSubcategory ? { subcategory: cleanSubcategory } : {}),
       condition: values.condition,
       ...(cleanConditionNote ? { conditionNote: cleanConditionNote } : {}),
-      price: parsedPrice,
+      price: parsedPrice ?? 0,
       negotiable: values.negotiable,
       locationRadiusM: parsedRadius,
       locationNeighborhood: cleanNeighborhood,
@@ -218,4 +195,63 @@ export function validateListingForm(
       photoUrls: [cleanPhotoUrl],
     },
   };
+}
+
+export function getListingFormErrors(
+  values: ListingFormValues,
+): ListingFormErrors {
+  const cleanTitle = values.title.trim();
+  const cleanDescription = values.description.trim();
+  const cleanPhotoUrl = values.photoUrl.trim();
+  const cleanNeighborhood = values.locationNeighborhood.trim();
+  const cleanSubcategory = values.subcategory.trim();
+  const cleanConditionNote = values.conditionNote.trim();
+  const parsedPrice = parsePrice(values.price);
+  const parsedRadius = Number.parseInt(values.locationRadiusM, 10);
+  const parsedStart = Number.parseInt(values.startHour, 10);
+  const parsedEnd = Number.parseInt(values.endHour, 10);
+  const errors: ListingFormErrors = {};
+
+  if (cleanTitle.length < 3 || cleanTitle.length > 60) {
+    errors.title = 'Use 3-60 characters so buyers can scan the item quickly.';
+  }
+
+  if (cleanDescription.length < 10 || cleanDescription.length > 1000) {
+    errors.description =
+      'Add 10-1000 characters with size, condition, inclusions, or flaws.';
+  }
+
+  if (cleanSubcategory.length > 50) {
+    errors.subcategory = 'Keep the subcategory under 50 characters.';
+  }
+
+  if (parsedPrice === null) {
+    errors.price = 'Enter a valid price greater than $0.';
+  }
+
+  if (cleanConditionNote.length > 200) {
+    errors.conditionNote = 'Keep the condition note under 200 characters.';
+  }
+
+  if (!isValidImageUrl(cleanPhotoUrl)) {
+    errors.photoUrl = 'Add a valid image URL starting with http:// or https://.';
+  }
+
+  if (!cleanNeighborhood) {
+    errors.locationNeighborhood = 'Add a neighborhood or pickup area.';
+  }
+
+  if (
+    !Number.isInteger(parsedRadius) ||
+    parsedRadius < 100 ||
+    parsedRadius > 5000
+  ) {
+    errors.locationRadiusM = 'Pickup radius must be between 100 and 5000 m.';
+  }
+
+  if (parsedEnd <= parsedStart) {
+    errors.endHour = 'End time must be after the start time.';
+  }
+
+  return errors;
 }
