@@ -15,7 +15,8 @@
     "db:migrate": "pnpm --filter @sellr/api prisma migrate dev",
     "db:studio": "pnpm --filter @sellr/api prisma studio",
     "env:web": "node scripts/ensure-web-env.cjs",
-    "smoke:seller": "node scripts/smoke-seller-lifecycle.cjs"
+    "smoke:seller": "node scripts/smoke-seller-lifecycle.cjs",
+    "smoke:buyer": "node scripts/smoke-buyer-contact.cjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

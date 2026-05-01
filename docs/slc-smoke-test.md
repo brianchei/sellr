@@ -3,17 +3,24 @@
 Use this checklist after migrations and `pnpm --filter @sellr/api exec prisma db seed`.
 It verifies the first working web SLC without relying on hand-created data.
 
-## Automated Seller Lifecycle Check
+## Automated SLC Checks
 
 With Redis, Supabase/Postgres, API, and web running:
 
 ```bash
 pnpm smoke:seller
+pnpm smoke:buyer
 ```
 
-The script signs in through the web `/api/v1` proxy, confirms `/auth/me`,
-creates a temporary listing, publishes it, verifies it appears in seller
-inventory, updates it, unpublishes it, and deletes it. Override the target with
+The seller script signs in through the web `/api/v1` proxy, confirms
+`/auth/me`, creates a temporary listing, publishes it, verifies it appears in
+seller inventory, updates it, unpublishes it, and deletes it.
+
+The buyer script signs in as the seeded seller and buyer, opens or reuses a
+pre-offer conversation for an active seller listing, sends a buyer message, and
+confirms both inboxes and message threads can see it.
+
+Override the target with
 `SELLR_SMOKE_API_BASE_URL=http://127.0.0.1:3001/api/v1` when you want to test
 the API directly instead of the web proxy.
 
