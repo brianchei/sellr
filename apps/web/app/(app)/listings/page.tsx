@@ -255,7 +255,7 @@ function MyListingsContent() {
         </div>
         <Link
           href="/sell"
-          className="rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+          className="inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
         >
           Create listing
         </Link>
@@ -439,7 +439,7 @@ function MyListingsContent() {
                       </span>
                     ) : null}
                   </div>
-                  <h2 className="mt-2 truncate text-lg font-semibold text-[var(--text-primary)]">
+                  <h2 className="mt-2 break-words text-lg font-semibold text-[var(--text-primary)] sm:truncate">
                     {listing.title}
                   </h2>
                   <p className="mt-1 line-clamp-2 text-sm leading-6 text-[var(--text-secondary)]">

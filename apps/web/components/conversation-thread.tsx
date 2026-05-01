@@ -37,7 +37,7 @@ function MessageBubble({
             : 'border border-[var(--border-default)] bg-white text-[var(--text-primary)]'
         }`}
       >
-        <p className="whitespace-pre-wrap text-sm leading-6">
+        <p className="whitespace-pre-wrap break-words text-sm leading-6">
           {message.content}
         </p>
         <p
@@ -273,7 +273,7 @@ export function ConversationThread({
           <button
             type="submit"
             disabled={replyMutation.isPending}
-            className="rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {replyMutation.isPending ? 'Sending...' : 'Send reply'}
           </button>

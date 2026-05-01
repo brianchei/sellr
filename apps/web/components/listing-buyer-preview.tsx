@@ -70,10 +70,10 @@ export function ListingBuyerPreview({
         <p className="text-xl font-semibold text-[var(--text-primary)]">
           {formatPreviewPrice(values.price)}
         </p>
-        <h3 className="mt-1 line-clamp-2 text-base font-semibold text-[var(--text-primary)]">
+        <h3 className="mt-1 line-clamp-2 break-words text-base font-semibold text-[var(--text-primary)]">
           {title}
         </h3>
-        <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--text-secondary)]">
+        <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-[var(--text-secondary)]">
           {description}
         </p>
       </div>

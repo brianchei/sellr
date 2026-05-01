@@ -76,14 +76,14 @@ export function ReportDialog({
 
       {open ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 px-4 py-6 sm:items-center"
           role="presentation"
         >
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby={`report-${targetType}-${targetId}-title`}
-            className="w-full max-w-md rounded-xl border border-[var(--border-default)] bg-white p-5 shadow-xl"
+            className="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-y-auto rounded-xl border border-[var(--border-default)] bg-white p-5 shadow-xl"
           >
             {reportMutation.isSuccess ? (
               <div>
@@ -185,7 +185,7 @@ export function ReportDialog({
                   </p>
                 ) : null}
 
-                <div className="mt-5 flex flex-wrap justify-end gap-3">
+                <div className="mt-5 grid gap-3 sm:flex sm:flex-wrap sm:justify-end">
                   <button
                     type="button"
                     onClick={close}

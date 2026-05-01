@@ -119,13 +119,13 @@ export default function ListingDetailPage() {
             <button
               type="button"
               onClick={() => void listingQuery.refetch()}
-              className="rounded-lg bg-[var(--color-brand-warm)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-warm-strong)]"
+              className="w-full rounded-lg bg-[var(--color-brand-warm)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-warm-strong)] sm:w-auto"
             >
               Retry
             </button>
             <Link
               href="/marketplace"
-              className="rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
+              className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
             >
               Back to browse
             </Link>
@@ -229,7 +229,7 @@ export default function ListingDetailPage() {
 
             <div className="mt-6 border-t border-[var(--border-default)] pt-6">
               <h2 className="text-base font-semibold">Description</h2>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[var(--text-secondary)]">
+              <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[var(--text-secondary)]">
                 {listing.description}
               </p>
             </div>
@@ -330,7 +330,7 @@ export default function ListingDetailPage() {
                       ? `/inbox/${sentConversationId}`
                       : '/inbox'
                   }
-                  className="mt-4 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
+                  className="mt-4 inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
                 >
                   Open inbox
                 </Link>
