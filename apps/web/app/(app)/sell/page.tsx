@@ -37,15 +37,24 @@ export default function SellPage() {
     }
 
     setLoading(true);
+    let createdListingId: string | null = null;
     try {
       const created = await createListing({
         communityId: primaryCommunityId,
         ...validation.payload,
         aiGenerated: false,
       });
+      createdListingId = created.listing.id;
       await publishListing(created.listing.id);
-      router.push('/listings');
+      router.push(`/listings?created=${encodeURIComponent(created.listing.id)}`);
     } catch (e) {
+      if (createdListingId) {
+        router.push(
+          `/listings?publishError=${encodeURIComponent(createdListingId)}`,
+        );
+        return;
+      }
+
       setError(
         e instanceof Error
           ? e.message

@@ -277,7 +277,10 @@ export default function ListingDetailPage() {
             profile={listing.seller}
             heading="Seller"
             contextLabel="This seller is in your community."
-            editableHref={isOwnListing ? '/dashboard' : undefined}
+            editableHref={
+              isOwnListing ? `/listings/${listing.id}/edit` : undefined
+            }
+            editableLabel="Edit listing"
           />
 
           <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
@@ -291,6 +294,20 @@ export default function ListingDetailPage() {
                   Buyers can contact you from this page once the listing is
                   active in the marketplace.
                 </p>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <Link
+                    href={`/listings/${listing.id}/edit`}
+                    className="inline-flex justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+                  >
+                    Edit listing
+                  </Link>
+                  <Link
+                    href="/listings"
+                    className="inline-flex justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
+                  >
+                    My listings
+                  </Link>
+                </div>
               </div>
             ) : !isAvailable ? (
               <div className="mt-3 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4">

@@ -6,6 +6,7 @@ type SellerProfileCardProps = {
   heading?: string;
   contextLabel?: string;
   editableHref?: string;
+  editableLabel?: string;
   className?: string;
 };
 
@@ -50,6 +51,7 @@ export function SellerProfileCard({
   heading = 'Seller',
   contextLabel = 'This member is in your community.',
   editableHref,
+  editableLabel = 'Edit profile',
   className = '',
 }: SellerProfileCardProps) {
   const displayName = profile?.displayName ?? 'Community member';
@@ -66,7 +68,7 @@ export function SellerProfileCard({
             href={editableHref}
             className="text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
           >
-            Edit profile
+            {editableLabel}
           </Link>
         ) : null}
       </div>

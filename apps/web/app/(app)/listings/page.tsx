@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   deleteListing,
@@ -69,11 +70,62 @@ function sortListings(listings: ApiListing[]): ApiListing[] {
   });
 }
 
-export default function MyListingsPage() {
+type NoticeSearchParams = {
+  has: (name: string) => boolean;
+};
+
+function noticeFromSearchParams(searchParams: NoticeSearchParams): string | null {
+  if (searchParams.has('created')) {
+    return 'Listing published. It is now active in your community marketplace.';
+  }
+
+  if (searchParams.has('publishError')) {
+    return 'Your listing was saved. Publish it from here when Sellr is available.';
+  }
+
+  return null;
+}
+
+function MyListingsFallback() {
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-8">
+      <div className="h-5 w-28 rounded bg-[var(--bg-tertiary)]" />
+      <div className="mt-3 h-9 w-56 rounded bg-[var(--bg-tertiary)]" />
+      <section className="mt-6 space-y-3">
+        {Array.from({ length: 3 }, (_, index) => (
+          <div
+            key={index}
+            className="grid gap-4 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm sm:grid-cols-[96px_minmax(0,1fr)_220px]"
+          >
+            <div className="h-24 rounded-lg bg-[var(--bg-tertiary)]" />
+            <div className="space-y-3">
+              <div className="h-5 w-2/3 rounded bg-[var(--bg-tertiary)]" />
+              <div className="h-4 w-1/2 rounded bg-[var(--bg-tertiary)]" />
+              <div className="h-4 w-full rounded bg-[var(--bg-tertiary)]" />
+            </div>
+            <div className="h-10 rounded bg-[var(--bg-tertiary)]" />
+          </div>
+        ))}
+      </section>
+    </main>
+  );
+}
+
+function MyListingsContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { primaryCommunityId } = useAuth();
   const [statusFilter, setStatusFilter] =
     useState<(typeof STATUS_FILTERS)[number]['value']>('all');
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(() =>
+    noticeFromSearchParams(searchParams),
+  );
+
+  useEffect(() => {
+    if (searchParams.has('created') || searchParams.has('publishError')) {
+      router.replace('/listings', { scroll: false });
+    }
+  }, [router, searchParams]);
 
   const listingsQuery = useQuery({
     queryKey: ['my-listings', primaryCommunityId],
@@ -483,5 +535,13 @@ export default function MyListingsPage() {
         </section>
       ) : null}
     </main>
+  );
+}
+
+export default function MyListingsPage() {
+  return (
+    <Suspense fallback={<MyListingsFallback />}>
+      <MyListingsContent />
+    </Suspense>
   );
 }
