@@ -1,7 +1,28 @@
 import { type Listing, Prisma } from '../../generated/prisma/client';
 import { prisma } from '../../lib/prisma';
 
-export type ListingWithDistance = Listing & { distanceM: number };
+export type ListingWithDistance = Listing & { distanceM?: number };
+
+let locationGeomColumnExists: boolean | null = null;
+
+export async function hasLocationGeomColumn(): Promise<boolean> {
+  if (locationGeomColumnExists !== null) {
+    return locationGeomColumnExists;
+  }
+
+  const result = await prisma.$queryRaw<{ exists: boolean }[]>`
+    SELECT EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'listings'
+        AND column_name = 'location_geom'
+    ) AS exists
+  `;
+
+  locationGeomColumnExists = Boolean(result.at(0)?.exists);
+  return locationGeomColumnExists;
+}
 
 function mapListingWithDistance(
   row: Record<string, unknown>,
@@ -31,16 +52,20 @@ function mapListingWithDistance(
   };
 }
 
-/**
- * Nearby active listings using PostGIS (`location_geom`).
- * Raw rows use DB column names; mapped to Prisma `Listing` + `distanceM` (meters).
- */
 export async function findListingsNearby(params: {
   communityId: string;
   lat: number;
   lng: number;
   radiusM: number;
 }): Promise<ListingWithDistance[]> {
+  if (!(await hasLocationGeomColumn())) {
+    return prisma.listing.findMany({
+      where: { communityId: params.communityId, status: 'active' },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
   const rows = await prisma.$queryRaw<Record<string, unknown>[]>`
     SELECT l.*,
            extensions.ST_Distance(
@@ -72,6 +97,10 @@ export async function setListingLocationGeom(
   lat: number,
   lng: number,
 ): Promise<void> {
+  if (!(await hasLocationGeomColumn())) {
+    return;
+  }
+
   await prisma.$executeRaw`
     UPDATE listings
     SET location_geom = extensions.ST_SetSRID(

@@ -31,4 +31,4 @@ Local OTP accepts `000000`.
 
 - The Sentry auth-token warning during local web builds is expected.
 - If the API was already running before route edits, restart it before endpoint smoke tests.
-- Search-sync jobs can log local `location_geom` noise in older databases; it should not block the web SLC flow.
+- Databases without the optional `location_geom` column fall back to community-scoped listing results without distance ranking.

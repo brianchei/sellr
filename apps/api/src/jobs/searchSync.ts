@@ -3,6 +3,45 @@ import { algolia, LISTINGS_INDEX } from '../lib/algolia';
 import { prisma } from '../lib/prisma';
 import type { AlgoliaSyncJob } from '../lib/jobTypes';
 
+let locationGeomColumnExists: boolean | null = null;
+
+async function hasLocationGeomColumn(): Promise<boolean> {
+  if (locationGeomColumnExists !== null) {
+    return locationGeomColumnExists;
+  }
+
+  const result = await prisma.$queryRaw<{ exists: boolean }[]>`
+    SELECT EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'listings'
+        AND column_name = 'location_geom'
+    ) AS exists
+  `;
+
+  locationGeomColumnExists = Boolean(result.at(0)?.exists);
+  return locationGeomColumnExists;
+}
+
+async function findListingGeoloc(
+  listingId: string,
+): Promise<{ lat: number; lng: number } | null> {
+  if (!(await hasLocationGeomColumn())) {
+    return null;
+  }
+
+  const result = await prisma.$queryRaw<{ lat: number; lng: number }[]>`
+    SELECT extensions.ST_Y(location_geom::extensions.geometry) AS lat,
+           extensions.ST_X(location_geom::extensions.geometry) AS lng
+    FROM listings
+    WHERE id = ${listingId}::uuid
+      AND location_geom IS NOT NULL
+  `;
+
+  return result.at(0) ?? null;
+}
+
 export async function searchSyncWorker(
   job: Job<AlgoliaSyncJob>,
 ): Promise<void> {
@@ -36,14 +75,7 @@ export async function searchSyncWorker(
 
   const photoUrls = listing.photoUrls as string[];
 
-  const geomResult = await prisma.$queryRaw<{ lat: number; lng: number }[]>`
-    SELECT extensions.ST_Y(location_geom::extensions.geometry) AS lat,
-           extensions.ST_X(location_geom::extensions.geometry) AS lng
-    FROM listings WHERE id = ${listingId}::uuid
-  `;
-
-  const g = geomResult.at(0);
-  const geoloc = g !== undefined ? { _geoloc: { lat: g.lat, lng: g.lng } } : {};
+  const geoloc = await findListingGeoloc(listingId);
 
   const rep = listing.seller.reputation;
 
@@ -67,7 +99,7 @@ export async function searchSyncWorker(
       sellerTransactionCount: rep?.transactionCount ?? 0,
       availabilityWindows: listing.availabilityWindows,
       createdAtTimestamp: Math.floor(listing.createdAt.getTime() / 1000),
-      ...geoloc,
+      ...(geoloc ? { _geoloc: geoloc } : {}),
     },
   });
 }
