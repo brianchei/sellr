@@ -10,6 +10,7 @@ With Redis, Supabase/Postgres, API, and web running:
 ```bash
 pnpm smoke:seller
 pnpm smoke:buyer
+pnpm smoke:web
 ```
 
 The seller script signs in through the web `/api/v1` proxy, confirms
@@ -20,9 +21,30 @@ The buyer script signs in as the seeded seller and buyer, opens or reuses a
 pre-offer conversation for an active seller listing, sends a buyer message, and
 confirms both inboxes and message threads can see it.
 
+The web script signs in through the same web proxy, opens or reuses the seeded
+buyer/seller conversation, and verifies the authenticated HTML routes for
+marketplace, listing detail, inbox, thread, sell, listings, and listing edit.
+
 Override the target with
 `SELLR_SMOKE_API_BASE_URL=http://127.0.0.1:3001/api/v1` when you want to test
 the API directly instead of the web proxy.
+
+Override the web route target with
+`SELLR_SMOKE_WEB_BASE_URL=http://localhost:3000` if the web app is served from a
+different local origin.
+
+## Browser Visual Pass
+
+After the automated checks pass, review these routes at desktop and mobile
+widths:
+
+- `/marketplace`: filters, listing cards, loading/empty/error states.
+- `/marketplace/[listingId]`: seller trust card, contact CTA, report action.
+- `/inbox` and `/inbox/[conversationId]`: conversation list, thread layout,
+  message composer, report message action.
+- `/sell`: inline validation, image preview, buyer preview panel.
+- `/listings` and `/listings/[listingId]/edit`: status filters, notices,
+  listing actions, edit form layout.
 
 ## Demo Accounts
 

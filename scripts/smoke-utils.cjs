@@ -96,9 +96,28 @@ function createSmokeApiClient(baseUrl = process.env.SELLR_SMOKE_API_BASE_URL) {
     return body?.data ?? body;
   }
 
+  async function fetchWithCookies(url, options = {}) {
+    const headers = {
+      ...(options.headers ?? {}),
+    };
+
+    const cookies = cookieHeader();
+    if (cookies) {
+      headers.Cookie = cookies;
+    }
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+    rememberCookies(response.headers);
+    return response;
+  }
+
   return {
     api,
     apiBaseUrl,
+    fetchWithCookies,
   };
 }
 
