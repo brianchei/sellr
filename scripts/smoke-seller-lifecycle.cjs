@@ -6,16 +6,52 @@ const {
   signInWithLocalOtp,
 } = require('./smoke-utils.cjs');
 
-const DEFAULT_PHONE = '+10000000001';
+const DEFAULT_PHONE = '+15550000001';
 const DEFAULT_CODE = '000000';
-const DEFAULT_PHOTO_URL =
-  'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80';
+const ONE_PIXEL_PNG_BASE64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 
 const phoneE164 = process.env.SELLR_SMOKE_PHONE ?? DEFAULT_PHONE;
 const otpCode = process.env.SELLR_SMOKE_OTP ?? DEFAULT_CODE;
 const client = createSmokeApiClient();
 let createdListingId = null;
 let cleanedUp = false;
+
+function webBaseUrl() {
+  return client.apiBaseUrl.endsWith('/api/v1')
+    ? client.apiBaseUrl.slice(0, -'/api/v1'.length)
+    : client.apiBaseUrl;
+}
+
+async function uploadSmokeListingImage() {
+  const formData = new FormData();
+  const image = new Blob([Buffer.from(ONE_PIXEL_PNG_BASE64, 'base64')], {
+    type: 'image/png',
+  });
+  formData.append('file', image, 'sellr-smoke-listing.png');
+
+  const uploaded = await client.api('/uploads/listing-images', {
+    method: 'POST',
+    body: formData,
+  });
+  assert(
+    typeof uploaded.url === 'string' && uploaded.url.includes('/uploads/'),
+    'Image upload did not return a listing image URL.',
+  );
+
+  const imageResponse = await client.fetchWithCookies(
+    `${webBaseUrl()}${uploaded.url}`,
+  );
+  assert(imageResponse.ok, 'Uploaded listing image could not be fetched.');
+  assert(
+    imageResponse.headers.get('content-type')?.includes('image/png'),
+    'Uploaded listing image did not return image/png.',
+  );
+  await imageResponse.arrayBuffer();
+  console.log('[ok] uploaded and fetched listing image');
+
+  return uploaded.url;
+}
 
 async function cleanupListing() {
   if (!createdListingId || cleanedUp) {
@@ -44,6 +80,7 @@ async function main() {
     code: otpCode,
     deviceFingerprint: 'sellr-smoke-seller-lifecycle',
   });
+  const photoUrl = await uploadSmokeListingImage();
 
   const created = await client.api('/listings', {
     method: 'POST',
@@ -61,7 +98,7 @@ async function main() {
       locationRadiusM: 1000,
       locationNeighborhood: 'North Campus',
       availabilityWindows: [{ dayOfWeek: 6, startHour: 10, endHour: 14 }],
-      photoUrls: [DEFAULT_PHOTO_URL],
+      photoUrls: [photoUrl],
       aiGenerated: false,
     },
   });
@@ -102,7 +139,7 @@ async function main() {
       locationRadiusM: 500,
       locationNeighborhood: 'East Quad',
       availabilityWindows: [{ dayOfWeek: 5, startHour: 12, endHour: 16 }],
-      photoUrls: [DEFAULT_PHOTO_URL],
+      photoUrls: [photoUrl],
     },
   });
   assert(

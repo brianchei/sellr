@@ -18,8 +18,9 @@ pnpm smoke:web
 ```
 
 The seller script signs in through the web `/api/v1` proxy, confirms
-`/auth/me`, creates a temporary listing, publishes it, verifies it appears in
-seller inventory, updates it, unpublishes it, and deletes it.
+`/auth/me`, uploads a temporary listing image, creates a temporary listing,
+publishes it, verifies it appears in seller inventory, updates it, unpublishes
+it, and deletes it.
 
 The buyer script signs in as the seeded seller and buyer, opens or reuses a
 pre-offer conversation for an active seller listing, sends a buyer message, and

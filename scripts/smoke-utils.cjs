@@ -63,8 +63,10 @@ function createSmokeApiClient(baseUrl = process.env.SELLR_SMOKE_API_BASE_URL) {
       'X-Sellr-Client': 'web',
       ...(options.headers ?? {}),
     };
+    const isFormData =
+      typeof FormData !== 'undefined' && options.body instanceof FormData;
 
-    if (options.body !== undefined && !headers['Content-Type']) {
+    if (options.body !== undefined && !headers['Content-Type'] && !isFormData) {
       headers['Content-Type'] = 'application/json';
     }
 
@@ -77,7 +79,9 @@ function createSmokeApiClient(baseUrl = process.env.SELLR_SMOKE_API_BASE_URL) {
       ...options,
       headers,
       body:
-        options.body !== undefined && typeof options.body !== 'string'
+        options.body !== undefined &&
+        typeof options.body !== 'string' &&
+        !isFormData
           ? JSON.stringify(options.body)
           : options.body,
     });
