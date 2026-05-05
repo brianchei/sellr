@@ -17,6 +17,13 @@ pnpm smoke:buyer
 pnpm smoke:web
 ```
 
+For a full handoff gate that also resets seed data and runs focused lint,
+typecheck, test, and build checks, run:
+
+```bash
+pnpm slc:ready
+```
+
 The seller script signs in through the web `/api/v1` proxy, confirms
   `/auth/me`, uploads a temporary listing image, creates a temporary listing,
   publishes it, verifies it appears in seller inventory, updates it, unpublishes

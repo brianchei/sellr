@@ -45,20 +45,32 @@ Default local URLs:
 
 ## Automated Readiness Checks
 
-Run these before any SLC handoff:
+Run the release readiness command before any SLC handoff:
 
 ```bash
+pnpm slc:ready
+```
+
+This resets seeded demo data, runs the seller/buyer/web smoke checks, then runs
+the focused contract, API, and web lint/typecheck/test/build checks. Use dry run
+mode to inspect the exact command plan without executing it:
+
+```bash
+pnpm slc:ready -- --dry-run
+```
+
+If you need to run the same checks manually, use:
+
+```bash
+pnpm --filter @sellr/api exec prisma db seed
 pnpm smoke:seller
 pnpm smoke:buyer
 pnpm smoke:web
+pnpm --filter @sellr/shared typecheck
+pnpm --filter @sellr/api-client typecheck
 pnpm --filter @sellr/web lint
 pnpm --filter @sellr/web typecheck
 pnpm --filter @sellr/web build
-```
-
-For API-affecting changes, also run:
-
-```bash
 pnpm --filter @sellr/api lint
 pnpm --filter @sellr/api typecheck
 pnpm --filter @sellr/api test

@@ -147,6 +147,7 @@ pnpm env:web      # create/update apps/web/.env.local from root env values
 pnpm smoke:seller # run seller lifecycle smoke check through the web proxy
 pnpm smoke:buyer  # run buyer contact/inbox smoke check through the web proxy
 pnpm smoke:web    # run authenticated web route smoke check
+pnpm slc:ready    # run the full web SLC release readiness gate
 pnpm --filter @sellr/api exec prisma db seed
 ```
 

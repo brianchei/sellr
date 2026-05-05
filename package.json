@@ -17,7 +17,8 @@
     "env:web": "node scripts/ensure-web-env.cjs",
     "smoke:seller": "node scripts/smoke-seller-lifecycle.cjs",
     "smoke:buyer": "node scripts/smoke-buyer-contact.cjs",
-    "smoke:web": "node scripts/smoke-web-routes.cjs"
+    "smoke:web": "node scripts/smoke-web-routes.cjs",
+    "slc:ready": "node scripts/slc-readiness.cjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
