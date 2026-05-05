@@ -59,7 +59,11 @@ async function upsertDemoUser({
   });
 }
 
-async function ensureMembership(userId: string, communityId: string) {
+async function ensureMembership(
+  userId: string,
+  communityId: string,
+  role: 'member' | 'admin' = 'member',
+) {
   await prisma.communityMember.upsert({
     where: {
       userId_communityId: {
@@ -70,10 +74,11 @@ async function ensureMembership(userId: string, communityId: string) {
     create: {
       userId,
       communityId,
-      role: 'member',
+      role,
       status: 'active',
     },
     update: {
+      role,
       status: 'active',
     },
   });
@@ -272,6 +277,10 @@ async function main() {
     phoneE164: '+15550000002',
     displayName: 'Jordan Rivera',
   });
+  const demoAdmin = await upsertDemoUser({
+    phoneE164: '+15550000003',
+    displayName: 'Priya Shah',
+  });
 
   let community = await prisma.community.findFirst({
     where: { name: 'Dev Campus' },
@@ -302,11 +311,12 @@ async function main() {
     ensureMembership(seedUser.id, community.id),
     ensureMembership(demoSeller.id, community.id),
     ensureMembership(demoBuyer.id, community.id),
+    ensureMembership(demoAdmin.id, community.id, 'admin'),
   ]);
 
   await resetDemoCommunityData({
     communityId: community.id,
-    userIds: [seedUser.id, demoSeller.id, demoBuyer.id],
+    userIds: [seedUser.id, demoSeller.id, demoBuyer.id, demoAdmin.id],
   });
 
   const desk = await upsertDemoListing({
@@ -385,6 +395,18 @@ async function main() {
     buyerId: demoBuyer.id,
     sellerId: demoSeller.id,
     listingId: desk.id,
+  });
+
+  await prisma.report.create({
+    data: {
+      reporterId: demoBuyer.id,
+      targetId: desk.id,
+      targetType: 'listing',
+      reason:
+        'Demo report: please confirm the pickup details follow community safety guidelines.',
+      severity: 'quality',
+      status: 'open',
+    },
   });
 }
 

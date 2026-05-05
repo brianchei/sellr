@@ -85,6 +85,32 @@ export type ApiMessage = {
 
 export type ApiNotification = SharedNotification;
 
+export type ApiReportStatus = 'open' | 'in_review' | 'resolved' | 'dismissed';
+
+export type ApiReport = {
+  id: string;
+  reporterId: string;
+  targetId: string;
+  targetType: 'listing' | 'user' | 'message';
+  reason: string;
+  severity: 'safety' | 'quality';
+  status: ApiReportStatus;
+  moderatorId: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  reporter: {
+    id: string;
+    displayName: string;
+    phoneE164: string;
+  };
+  target: {
+    label: string;
+    detail: string;
+    href: string | null;
+    communityId: string | null;
+  } | null;
+};
+
 export type ApiConversationSummary = ApiConversation & {
   listing: {
     id: string;
@@ -415,5 +441,29 @@ export function createReport(body: {
   return apiFetch<{ report: unknown }>('/reports', {
     method: 'POST',
     body: JSON.stringify(body),
+  });
+}
+
+export function fetchReports(params?: {
+  status?: ApiReportStatus | 'all';
+  severity?: 'safety' | 'quality' | 'all';
+  targetType?: 'listing' | 'user' | 'message' | 'all';
+  limit?: number;
+}) {
+  const q = new URLSearchParams();
+  if (params?.status) q.set('status', params.status);
+  if (params?.severity) q.set('severity', params.severity);
+  if (params?.targetType) q.set('targetType', params.targetType);
+  if (params?.limit != null) q.set('limit', String(params.limit));
+  const qs = q.toString();
+  return apiFetch<{ reports: ApiReport[]; adminCommunityIds: string[] }>(
+    `/reports${qs ? `?${qs}` : ''}`,
+  );
+}
+
+export function updateReportStatus(reportId: string, status: ApiReportStatus) {
+  return apiFetch<{ report: ApiReport }>(`/reports/${reportId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
   });
 }

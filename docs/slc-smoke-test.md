@@ -28,7 +28,8 @@ confirms both inboxes and message threads can see it.
 The web script signs in through the same web proxy, opens or reuses the seeded
 buyer/seller conversation, and verifies the authenticated HTML routes for
 marketplace, listing detail, inbox, thread, notifications, sell, listings, and
-listing edit.
+listing edit. It also signs in as the seeded admin account and verifies the
+admin reports API and `/admin/reports` route.
 
 Override the target with
 `SELLR_SMOKE_API_BASE_URL=http://127.0.0.1:3001/api/v1` when you want to test
@@ -49,6 +50,8 @@ widths:
   message composer, report message action.
 - `/notifications`: unread badge behavior, message/listing tabs, mark-read
   actions, and links back to inbox or listing detail.
+- `/admin/reports`: report filters, status actions, target links, and
+  non-admin restricted-access state.
 - `/sell`: inline validation, image preview, buyer preview panel.
 - `/listings` and `/listings/[listingId]/edit`: status filters, notices,
   listing actions, edit form layout.
@@ -59,6 +62,7 @@ Local OTP accepts `000000`.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera
+- Admin: `+15550000003` / Priya Shah
 - Community invite: `DEV2026`
 
 ## Happy Path

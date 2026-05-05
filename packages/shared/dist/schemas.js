@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
 // Auth
@@ -83,6 +83,21 @@ exports.CreateReportSchema = zod_1.z.object({
     targetType: zod_1.z.enum(['listing', 'user', 'message']),
     reason: zod_1.z.string().min(10).max(500),
     severity: zod_1.z.enum(['safety', 'quality']),
+});
+exports.ListReportsQuerySchema = zod_1.z.object({
+    status: zod_1.z
+        .enum(['open', 'in_review', 'resolved', 'dismissed', 'all'])
+        .optional()
+        .default('open'),
+    severity: zod_1.z.enum(['safety', 'quality', 'all']).optional().default('all'),
+    targetType: zod_1.z
+        .enum(['listing', 'user', 'message', 'all'])
+        .optional()
+        .default('all'),
+    limit: zod_1.z.coerce.number().int().min(1).max(100).optional().default(50),
+});
+exports.UpdateReportStatusSchema = zod_1.z.object({
+    status: zod_1.z.enum(['open', 'in_review', 'resolved', 'dismissed']),
 });
 exports.ListNotificationsQuerySchema = zod_1.z.object({
     limit: zod_1.z.coerce.number().int().min(1).max(50).optional().default(20),

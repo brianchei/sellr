@@ -104,6 +104,35 @@ export declare const CreateReportSchema: z.ZodObject<{
         quality: "quality";
     }>;
 }, z.core.$strip>;
+export declare const ListReportsQuerySchema: z.ZodObject<{
+    status: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        open: "open";
+        in_review: "in_review";
+        resolved: "resolved";
+        dismissed: "dismissed";
+        all: "all";
+    }>>>;
+    severity: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        safety: "safety";
+        quality: "quality";
+        all: "all";
+    }>>>;
+    targetType: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        listing: "listing";
+        user: "user";
+        message: "message";
+        all: "all";
+    }>>>;
+    limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+}, z.core.$strip>;
+export declare const UpdateReportStatusSchema: z.ZodObject<{
+    status: z.ZodEnum<{
+        open: "open";
+        in_review: "in_review";
+        resolved: "resolved";
+        dismissed: "dismissed";
+    }>;
+}, z.core.$strip>;
 export declare const ListNotificationsQuerySchema: z.ZodObject<{
     limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
     unreadOnly: z.ZodDefault<z.ZodOptional<z.ZodCoercedBoolean<unknown>>>;

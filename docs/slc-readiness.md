@@ -18,6 +18,8 @@ community:
 - See notification badges and a notification center for messages, marketplace
   posts, listing status changes, and pickup-sensitive listing updates.
 - Submit basic listing/message reports.
+- Review seeded and user-submitted reports from the admin-only
+  `/admin/reports` dashboard.
 - Exercise the flow with seeded demo users and repeatable smoke scripts.
 
 ## Required Local Stack
@@ -76,6 +78,8 @@ widths:
   composer, long message wrapping, report message action.
 - `/notifications`: unread badge, category tabs, mark-read actions, links to
   inbox/listing detail, empty/error states.
+- `/admin/reports`: admin-only report list, filters, target links, status
+  actions, restricted-access state for non-admin users.
 - `/sell`: inline validation, image URL feedback, buyer preview, submit state.
 - `/listings`: status filters, create/publish notices, listing actions, sold
   lifecycle.
@@ -89,6 +93,7 @@ Local OTP accepts `000000`.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera
+- Admin: `+15550000003` / Priya Shah
 
 The buyer smoke test appends a `[smoke]` message to the seeded conversation.
 Rerun the seed when you want to reset demo content; it clears local `Dev Campus`

@@ -18,7 +18,8 @@ listings, search, offers, meetups, conversations, reports, and notifications.
 The web app now covers the core community-scoped buyer/seller loop: onboarding,
 browse, structured listing creation, listing management/editing, seller trust
 signals, buyer contact, inbox replies, basic reporting, and sold-listing
-lifecycle.
+lifecycle, with a restricted admin reports dashboard for reviewing trust and
+safety reports.
 
 ## Repository Layout
 
@@ -67,6 +68,7 @@ sellr/
   searches
 - Trust and safety primitives for reports, reputation, no-shows, late cancels,
   and safety flags
+- Admin-only reports review at `/admin/reports` for community moderators
 
 ## Getting Started
 
@@ -126,6 +128,7 @@ and one buyer/seller conversation. Local OTP accepts `000000`.
 
 - Seller: `+15550000001`
 - Buyer: `+15550000002`
+- Admin: `+15550000003`
 
 See `docs/slc-readiness.md` for the web SLC readiness checklist and
 `docs/slc-smoke-test.md` for the detailed smoke path.

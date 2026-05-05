@@ -8,12 +8,15 @@ const {
 
 const DEFAULT_BUYER_PHONE = '+15550000002';
 const DEFAULT_SELLER_PHONE = '+15550000001';
+const DEFAULT_ADMIN_PHONE = '+15550000003';
 const DEFAULT_CODE = '000000';
 
 const buyerPhoneE164 =
   process.env.SELLR_SMOKE_BUYER_PHONE ?? DEFAULT_BUYER_PHONE;
 const sellerPhoneE164 =
   process.env.SELLR_SMOKE_SELLER_PHONE ?? DEFAULT_SELLER_PHONE;
+const adminPhoneE164 =
+  process.env.SELLR_SMOKE_ADMIN_PHONE ?? DEFAULT_ADMIN_PHONE;
 const otpCode = process.env.SELLR_SMOKE_OTP ?? DEFAULT_CODE;
 const explicitWebBaseUrl = process.env.SELLR_SMOKE_WEB_BASE_URL;
 
@@ -84,6 +87,7 @@ function findEditableListing(listings) {
 async function main() {
   const sellerClient = createSmokeApiClient();
   const buyerClient = createSmokeApiClient();
+  const adminClient = createSmokeApiClient();
   const webBaseUrl = inferWebBaseUrl(buyerClient.apiBaseUrl);
 
   console.log('Sellr authenticated web route smoke test');
@@ -153,6 +157,25 @@ async function main() {
     webBaseUrl,
     `/listings/${editableListing.id}/edit`,
   );
+
+  const { communityId: adminCommunityId } = await signInWithLocalOtp(
+    adminClient,
+    {
+      phoneE164: adminPhoneE164,
+      code: otpCode,
+      deviceFingerprint: 'sellr-smoke-web-routes-admin',
+    },
+  );
+  assert(
+    adminCommunityId === activeListing.communityId,
+    'Admin smoke account is not in the listing community.',
+  );
+  const reports = await adminClient.api('/reports?status=all&limit=10');
+  assert(
+    Array.isArray(reports.reports),
+    'Admin reports endpoint did not return a report list.',
+  );
+  await assertHtmlRoute(adminClient, webBaseUrl, '/admin/reports');
 
   console.log('Smoke test passed.');
 }

@@ -32,6 +32,8 @@ exports.fetchNotifications = fetchNotifications;
 exports.markNotificationRead = markNotificationRead;
 exports.markAllNotificationsRead = markAllNotificationsRead;
 exports.createReport = createReport;
+exports.fetchReports = fetchReports;
+exports.updateReportStatus = updateReportStatus;
 const fetch_1 = require("./fetch");
 function sendOtp(phoneE164) {
     return (0, fetch_1.apiFetch)('/auth/otp/send', {
@@ -227,5 +229,24 @@ function createReport(body) {
     return (0, fetch_1.apiFetch)('/reports', {
         method: 'POST',
         body: JSON.stringify(body),
+    });
+}
+function fetchReports(params) {
+    const q = new URLSearchParams();
+    if (params?.status)
+        q.set('status', params.status);
+    if (params?.severity)
+        q.set('severity', params.severity);
+    if (params?.targetType)
+        q.set('targetType', params.targetType);
+    if (params?.limit != null)
+        q.set('limit', String(params.limit));
+    const qs = q.toString();
+    return (0, fetch_1.apiFetch)(`/reports${qs ? `?${qs}` : ''}`);
+}
+function updateReportStatus(reportId, status) {
+    return (0, fetch_1.apiFetch)(`/reports/${reportId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
     });
 }

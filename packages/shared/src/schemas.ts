@@ -97,6 +97,23 @@ export const CreateReportSchema = z.object({
   severity: z.enum(['safety', 'quality']),
 });
 
+export const ListReportsQuerySchema = z.object({
+  status: z
+    .enum(['open', 'in_review', 'resolved', 'dismissed', 'all'])
+    .optional()
+    .default('open'),
+  severity: z.enum(['safety', 'quality', 'all']).optional().default('all'),
+  targetType: z
+    .enum(['listing', 'user', 'message', 'all'])
+    .optional()
+    .default('all'),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+});
+
+export const UpdateReportStatusSchema = z.object({
+  status: z.enum(['open', 'in_review', 'resolved', 'dismissed']),
+});
+
 export const ListNotificationsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional().default(20),
   unreadOnly: z.coerce.boolean().optional().default(false),
