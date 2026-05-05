@@ -35,9 +35,9 @@ confirms both inboxes and message threads can see it.
 
 The web script signs in through the same web proxy, opens or reuses the seeded
 buyer/seller conversation, and verifies the authenticated HTML routes for
-marketplace, listing detail, seller storefront, inbox, thread, notifications,
-sell, listings, and listing edit. It also signs in as the seeded admin account
-and verifies the admin reports API and `/admin/reports` route.
+dashboard, marketplace, listing detail, seller storefront, inbox, thread,
+notifications, sell, listings, and listing edit. It also signs in as the seeded
+admin account and verifies the admin reports API and `/admin/reports` route.
 
 Override the target with
 `SELLR_SMOKE_API_BASE_URL=http://127.0.0.1:3001/api/v1` when you want to test

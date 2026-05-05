@@ -140,6 +140,7 @@ async function main() {
   const conversationId = conversation.conversation.id;
   assert(conversationId, 'Conversation route smoke did not return an id.');
 
+  await assertHtmlRoute(buyerClient, webBaseUrl, '/dashboard');
   await assertHtmlRoute(buyerClient, webBaseUrl, '/marketplace');
   await assertHtmlRoute(
     buyerClient,

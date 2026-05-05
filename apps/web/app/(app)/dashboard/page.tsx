@@ -2,16 +2,251 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchMe, updateProfile } from '@sellr/api-client';
+import {
+  fetchConversations,
+  fetchMe,
+  fetchMyListings,
+  fetchNotifications,
+  updateProfile,
+  type ApiListing,
+} from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 import {
   SellerProfileCard,
   profileInitials,
 } from '@/components/seller-profile-card';
+import { ACTIVITY_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
+import { photoUrls } from '@/lib/listing-format';
 
 type MeData = Awaited<ReturnType<typeof fetchMe>>;
+
+function listingHasPhoto(listing: ApiListing): boolean {
+  return photoUrls(listing.photoUrls).length > 0;
+}
+
+function SellerReadinessPanel({
+  primaryCommunityId,
+  userId,
+}: {
+  primaryCommunityId: string;
+  userId: string | null;
+}) {
+  const listingsQuery = useQuery({
+    queryKey: ['dashboard-readiness-listings', primaryCommunityId],
+    queryFn: () =>
+      fetchMyListings({
+        communityId: primaryCommunityId,
+        limit: 100,
+      }),
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
+  });
+  const conversationsQuery = useQuery({
+    queryKey: ['dashboard-readiness-conversations'],
+    queryFn: () => fetchConversations({ limit: 50 }),
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
+  });
+  const unreadNotificationsQuery = useQuery({
+    queryKey: ['dashboard-readiness-unread-notifications'],
+    queryFn: () => fetchNotifications({ unreadOnly: true, limit: 50 }),
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
+  });
+
+  const listings = useMemo(
+    () => listingsQuery.data?.listings ?? [],
+    [listingsQuery.data?.listings],
+  );
+  const conversations = conversationsQuery.data?.conversations ?? [];
+  const unreadNotifications =
+    unreadNotificationsQuery.data?.notifications ?? [];
+  const activeListings = listings.filter(
+    (listing) => listing.status === 'active',
+  );
+  const draftListings = listings.filter((listing) => listing.status === 'draft');
+  const listingsMissingPhotos = listings.filter(
+    (listing) => !listingHasPhoto(listing),
+  );
+  const buyerConversationCount = conversations.filter((conversation) => {
+    return (
+      conversation.listing?.sellerId === userId &&
+      conversation.latestMessage !== null
+    );
+  }).length;
+  const unreadCount = unreadNotifications.length;
+  const hasError =
+    listingsQuery.isError ||
+    conversationsQuery.isError ||
+    unreadNotificationsQuery.isError;
+  const isLoading =
+    listingsQuery.isLoading ||
+    conversationsQuery.isLoading ||
+    unreadNotificationsQuery.isLoading;
+
+  const checks = [
+    {
+      label: 'Community access',
+      detail: 'Ready to browse, list, and message inside your local group.',
+      complete: true,
+    },
+    {
+      label: 'Active seller presence',
+      detail:
+        activeListings.length > 0
+          ? `${activeListings.length} active ${activeListings.length === 1 ? 'listing' : 'listings'} live.`
+          : draftListings.length > 0
+            ? 'Draft saved. Publish it when it is ready.'
+            : 'Create your first listing to appear in marketplace browse.',
+      complete: activeListings.length > 0,
+    },
+    {
+      label: 'Photo quality',
+      detail:
+        listings.length === 0
+          ? 'Add photos when you create your first listing.'
+          : listingsMissingPhotos.length === 0
+            ? 'Every listing has at least one photo.'
+            : `${listingsMissingPhotos.length} listing ${listingsMissingPhotos.length === 1 ? 'needs' : 'need'} a photo.`,
+      complete: listings.length > 0 && listingsMissingPhotos.length === 0,
+    },
+    {
+      label: 'Buyer activity',
+      detail:
+        unreadCount > 0
+          ? `${unreadCount} unread ${unreadCount === 1 ? 'notification' : 'notifications'} need attention.`
+          : buyerConversationCount > 0
+            ? `${buyerConversationCount} buyer ${buyerConversationCount === 1 ? 'conversation' : 'conversations'} ready in inbox.`
+            : 'No buyer messages waiting right now.',
+      complete: unreadCount === 0,
+    },
+  ];
+  const completedCount = checks.filter((check) => check.complete).length;
+  const nextAction =
+    activeListings.length === 0
+      ? draftListings.length > 0
+        ? {
+            label: 'Publish a draft',
+            href: '/listings',
+            copy: 'You have inventory started. Publish one listing to become visible to buyers.',
+          }
+        : {
+            label: 'Create listing',
+            href: '/sell',
+            copy: 'Add one polished listing with photos to complete your seller setup.',
+          }
+      : listingsMissingPhotos.length > 0
+        ? {
+            label: 'Improve listings',
+            href: '/listings',
+            copy: 'Add photos to make your listings easier to trust and scan.',
+          }
+        : unreadCount > 0
+          ? {
+              label: 'Review activity',
+              href: '/notifications',
+              copy: 'Clear unread buyer or marketplace activity before the next demo pass.',
+            }
+          : {
+              label: 'View storefront',
+              href: userId ? `/sellers/${userId}` : '/marketplace',
+              copy: 'Your core seller setup is ready. Review how buyers see your profile.',
+            };
+
+  return (
+    <section className="mt-8 rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
+            Seller readiness
+          </p>
+          <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">
+            Keep your local seller flow demo-ready
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+            A quick health check for listing presence, photo quality, buyer
+            activity, and the next best seller action.
+          </p>
+        </div>
+        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] px-4 py-3 text-sm shadow-sm">
+          <span className="text-2xl font-semibold text-[var(--text-primary)]">
+            {completedCount}/{checks.length}
+          </span>{' '}
+          <span className="text-[var(--text-secondary)]">ready</span>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div
+              key={index}
+              className="h-24 animate-pulse rounded-lg bg-[var(--bg-tertiary)]"
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {hasError ? (
+        <div
+          className="mt-5 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-sm text-[var(--color-brand-warm-strong)]"
+          role="alert"
+        >
+          Could not load every readiness signal. Refresh the dashboard or check
+          the local API server.
+        </div>
+      ) : null}
+
+      {!isLoading && !hasError ? (
+        <>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {checks.map((check) => (
+              <div
+                key={check.label}
+                className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-4"
+              >
+                <div className="flex items-start gap-3">
+                  <span
+                    className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                      check.complete
+                        ? 'bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]'
+                        : 'bg-[var(--color-brand-primary-soft)] text-[var(--color-brand-primary-strong)]'
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {check.complete ? 'OK' : '!'}
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                      {check.label}
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+                      {check.detail}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 rounded-lg border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+            <p className="text-sm font-semibold text-[var(--text-primary)]">
+              Next best action
+            </p>
+            <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+              {nextAction.copy}
+            </p>
+            <Link
+              href={nextAction.href}
+              className="mt-3 inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
+            >
+              {nextAction.label}
+            </Link>
+          </div>
+        </>
+      ) : null}
+    </section>
+  );
+}
 
 function ProfileEditor({
   data,
@@ -146,7 +381,7 @@ function ProfileEditor({
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { communityIds, logout, userId } = useAuth();
+  const { communityIds, logout, primaryCommunityId, userId } = useAuth();
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['me', userId],
     queryFn: fetchMe,
@@ -185,6 +420,13 @@ export default function DashboardPage() {
           </button>
         </div>
       </div>
+
+      {primaryCommunityId ? (
+        <SellerReadinessPanel
+          primaryCommunityId={primaryCommunityId}
+          userId={userId}
+        />
+      ) : null}
 
       <section className="mt-8 rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
         <h2 className="text-sm font-medium text-[var(--text-tertiary)]">Account</h2>
