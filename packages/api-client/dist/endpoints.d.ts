@@ -1,3 +1,4 @@
+import type { Notification as SharedNotification } from '@sellr/shared';
 export type ApiUserTrustProfile = {
     id: string;
     displayName: string;
@@ -71,6 +72,7 @@ export type ApiMessage = {
     safetyFlagged: boolean;
     createdAt: string;
 };
+export type ApiNotification = SharedNotification;
 export type ApiConversationSummary = ApiConversation & {
     listing: {
         id: string;
@@ -237,10 +239,10 @@ export declare function fetchNotifications(params?: {
     limit?: number;
     unreadOnly?: boolean;
 }): Promise<{
-    notifications: unknown[];
+    notifications: ApiNotification[];
 }>;
 export declare function markNotificationRead(notificationId: string): Promise<{
-    notification: unknown;
+    notification: ApiNotification;
 }>;
 export declare function markAllNotificationsRead(): Promise<{
     updatedCount: number;

@@ -111,6 +111,9 @@ export const NotificationType = {
   meetup_reminder_2h: 'meetup_reminder_2h',
   new_message: 'new_message',
   listing_inquiry: 'listing_inquiry',
+  listing_published: 'listing_published',
+  listing_updated: 'listing_updated',
+  listing_status_changed: 'listing_status_changed',
   rating_request: 'rating_request',
   new_match: 'new_match'
 } as const

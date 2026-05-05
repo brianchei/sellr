@@ -1,4 +1,5 @@
 import { apiFetch } from './fetch';
+import type { Notification as SharedNotification } from '@sellr/shared';
 
 export type ApiUserTrustProfile = {
   id: string;
@@ -81,6 +82,8 @@ export type ApiMessage = {
   safetyFlagged: boolean;
   createdAt: string;
 };
+
+export type ApiNotification = SharedNotification;
 
 export type ApiConversationSummary = ApiConversation & {
   listing: {
@@ -385,13 +388,13 @@ export function fetchNotifications(params?: {
     q.set('unreadOnly', String(params.unreadOnly));
   }
   const qs = q.toString();
-  return apiFetch<{ notifications: unknown[] }>(
+  return apiFetch<{ notifications: ApiNotification[] }>(
     `/notifications${qs ? `?${qs}` : ''}`,
   );
 }
 
 export function markNotificationRead(notificationId: string) {
-  return apiFetch<{ notification: unknown }>(
+  return apiFetch<{ notification: ApiNotification }>(
     `/notifications/${notificationId}/read`,
     { method: 'POST' },
   );

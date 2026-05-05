@@ -75,6 +75,9 @@ export enum NotificationType {
   MeetupReminder2h = 'meetup_reminder_2h',
   NewMessage = 'new_message',
   ListingInquiry = 'listing_inquiry',
+  ListingPublished = 'listing_published',
+  ListingUpdated = 'listing_updated',
+  ListingStatusChanged = 'listing_status_changed',
   RatingRequest = 'rating_request',
   NewMatch = 'new_match',
 }

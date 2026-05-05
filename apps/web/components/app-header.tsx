@@ -3,13 +3,24 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchNotifications } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 
 export function AppHeader() {
-  const { logout } = useAuth();
+  const { logout, primaryCommunityId } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const unreadNotificationsQuery = useQuery({
+    queryKey: ['notifications-unread'],
+    queryFn: () => fetchNotifications({ unreadOnly: true, limit: 50 }),
+    enabled: Boolean(primaryCommunityId),
+    refetchInterval: 30_000,
+  });
+  const unreadCount =
+    unreadNotificationsQuery.data?.notifications.length ?? 0;
+  const unreadLabel = unreadCount > 9 ? '9+' : String(unreadCount);
 
   const handleLogout = () => {
     logout();
@@ -68,14 +79,21 @@ export function AppHeader() {
             { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
             { label: 'Listings', href: '/listings', icon: ListingsIcon },
             { label: 'Inbox', href: '/inbox', icon: InboxIcon },
+            {
+              label: 'Notifications',
+              href: '/notifications',
+              icon: NotificationIcon,
+            },
             { label: 'Sell', href: '/sell', icon: SellIcon },
           ].map((item) => {
             const active = pathname === item.href;
+            const showBadge =
+              item.href === '/notifications' && unreadCount > 0;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="no-underline"
+                className="relative no-underline"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -93,6 +111,11 @@ export function AppHeader() {
               >
                 <item.icon />
                 {item.label}
+                {showBadge ? (
+                  <span className="ml-0.5 rounded-full bg-[var(--color-brand-warm)] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                    {unreadLabel}
+                  </span>
+                ) : null}
               </Link>
             );
           })}
@@ -172,6 +195,19 @@ export function AppHeader() {
                     Inbox
                   </Link>
                   <Link
+                    href="/notifications"
+                    className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm no-underline md:hidden"
+                    style={{ color: 'var(--text-secondary)' }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span>Notifications</span>
+                    {unreadCount > 0 ? (
+                      <span className="rounded-full bg-[var(--color-brand-warm)] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                        {unreadLabel}
+                      </span>
+                    ) : null}
+                  </Link>
+                  <Link
                     href="/sell"
                     className="block w-full px-4 py-2.5 text-left text-sm no-underline md:hidden"
                     style={{ color: 'var(--text-secondary)' }}
@@ -237,6 +273,15 @@ function ListingsIcon() {
       <path d="M3 6h.01" />
       <path d="M3 12h.01" />
       <path d="M3 18h.01" />
+    </svg>
+  );
+}
+
+function NotificationIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
     </svg>
   );
 }

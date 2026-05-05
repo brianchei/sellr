@@ -15,6 +15,8 @@ community:
   since, and active listing count.
 - Create, edit, publish, unpublish, delete, and mark listings sold.
 - Contact a seller from listing detail and continue the conversation in inbox.
+- See notification badges and a notification center for messages, marketplace
+  posts, listing status changes, and pickup-sensitive listing updates.
 - Submit basic listing/message reports.
 - Exercise the flow with seeded demo users and repeatable smoke scripts.
 
@@ -72,6 +74,8 @@ widths:
   report action, owner action state.
 - `/inbox` and `/inbox/[conversationId]`: conversation list, message thread,
   composer, long message wrapping, report message action.
+- `/notifications`: unread badge, category tabs, mark-read actions, links to
+  inbox/listing detail, empty/error states.
 - `/sell`: inline validation, image URL feedback, buyer preview, submit state.
 - `/listings`: status filters, create/publish notices, listing actions, sold
   lifecycle.
@@ -88,7 +92,8 @@ Local OTP accepts `000000`.
 
 The buyer smoke test appends a `[smoke]` message to the seeded conversation.
 Rerun the seed when you want to reset demo content; it clears local `Dev Campus`
-demo listings, conversations, and reports before recreating the fixtures.
+demo listings, conversations, reports, and notifications before recreating the
+fixtures.
 
 ## Expected Local Caveats
 

@@ -121,6 +121,10 @@ async function resetDemoCommunityData({
   });
   const meetupIds = meetups.map((meetup) => meetup.id);
 
+  await prisma.notification.deleteMany({
+    where: { userId: { in: userIds } },
+  });
+
   await prisma.report.deleteMany({
     where: {
       OR: [

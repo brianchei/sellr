@@ -143,6 +143,20 @@ async function main() {
   );
   console.log('[ok] seller can fetch buyer message');
 
+  const sellerNotifications = await sellerClient.api(
+    '/notifications?limit=20&unreadOnly=true',
+  );
+  assert(
+    sellerNotifications.notifications.some((notification) => {
+      return (
+        notification.type === 'new_message' &&
+        notification.payload?.conversationId === conversationId
+      );
+    }),
+    'Seller unread notifications are missing the buyer message.',
+  );
+  console.log('[ok] seller notification badge has buyer message');
+
   console.log('Smoke test passed.');
 }
 

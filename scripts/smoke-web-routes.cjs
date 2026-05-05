@@ -144,6 +144,7 @@ async function main() {
   );
   await assertHtmlRoute(buyerClient, webBaseUrl, '/inbox');
   await assertHtmlRoute(buyerClient, webBaseUrl, `/inbox/${conversationId}`);
+  await assertHtmlRoute(buyerClient, webBaseUrl, '/notifications');
 
   await assertHtmlRoute(sellerClient, webBaseUrl, '/sell');
   await assertHtmlRoute(sellerClient, webBaseUrl, '/listings');

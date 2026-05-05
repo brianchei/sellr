@@ -3,7 +3,7 @@
 Use this checklist after migrations and `pnpm --filter @sellr/api exec prisma db seed`.
 It verifies the first working web SLC without relying on hand-created data.
 The seed resets the local `Dev Campus` demo listings, conversations, and
-reports before recreating the canonical fixtures.
+reports, and notifications before recreating the canonical fixtures.
 For the higher-level handoff checklist, see
 [`slc-readiness.md`](./slc-readiness.md).
 
@@ -27,7 +27,8 @@ confirms both inboxes and message threads can see it.
 
 The web script signs in through the same web proxy, opens or reuses the seeded
 buyer/seller conversation, and verifies the authenticated HTML routes for
-marketplace, listing detail, inbox, thread, sell, listings, and listing edit.
+marketplace, listing detail, inbox, thread, notifications, sell, listings, and
+listing edit.
 
 Override the target with
 `SELLR_SMOKE_API_BASE_URL=http://127.0.0.1:3001/api/v1` when you want to test
@@ -46,6 +47,8 @@ widths:
 - `/marketplace/[listingId]`: seller trust card, contact CTA, report action.
 - `/inbox` and `/inbox/[conversationId]`: conversation list, thread layout,
   message composer, report message action.
+- `/notifications`: unread badge behavior, message/listing tabs, mark-read
+  actions, and links back to inbox or listing detail.
 - `/sell`: inline validation, image preview, buyer preview panel.
 - `/listings` and `/listings/[listingId]/edit`: status filters, notices,
   listing actions, edit form layout.

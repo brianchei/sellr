@@ -12,6 +12,7 @@ import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
 import { findListingsNearby, setListingLocationGeom } from './repository';
 import { searchSyncQueue } from '../../lib/queues';
+import { notifyUser } from '../../lib/notifyUser';
 
 async function findListingSellerProfile(userId: string, communityId: string) {
   const [seller, membership, listingCount] = await Promise.all([
@@ -52,6 +53,92 @@ async function findListingSellerProfile(userId: string, communityId: string) {
     listingCount,
     communityMember: Boolean(membership),
   };
+}
+
+function jsonStableValue(value: unknown): string {
+  return JSON.stringify(value);
+}
+
+function listingPreview(title: string, message: string): string {
+  return `${title}: ${message}`.slice(0, 140);
+}
+
+async function notifyCommunityAboutNewListing(listing: {
+  id: string;
+  communityId: string;
+  sellerId: string;
+  title: string;
+  price: Prisma.Decimal;
+  locationNeighborhood: string;
+}) {
+  const members = await prisma.communityMember.findMany({
+    where: {
+      communityId: listing.communityId,
+      status: 'active',
+      userId: { not: listing.sellerId },
+    },
+    select: { userId: true },
+  });
+
+  await Promise.all(
+    members.map((member) =>
+      notifyUser(member.userId, 'listing_published', {
+        listingId: listing.id,
+        listingTitle: listing.title,
+        communityId: listing.communityId,
+        price: listing.price.toString(),
+        locationNeighborhood: listing.locationNeighborhood,
+        preview: listingPreview(
+          listing.title,
+          'new in your community marketplace.',
+        ),
+      }),
+    ),
+  );
+}
+
+async function notifyListingParticipants(
+  listing: {
+    id: string;
+    title: string;
+    sellerId: string;
+    status: string;
+  },
+  payload: {
+    type: 'listing_updated' | 'listing_status_changed';
+    changeKind: 'details' | 'pickup' | 'price' | 'availability';
+    preview: string;
+  },
+) {
+  const conversations = await prisma.conversation.findMany({
+    where: { listingId: listing.id },
+    select: {
+      id: true,
+      participantIds: true,
+    },
+  });
+
+  const targets = new Map<string, string>();
+  for (const conversation of conversations) {
+    for (const participantId of conversation.participantIds) {
+      if (participantId !== listing.sellerId && !targets.has(participantId)) {
+        targets.set(participantId, conversation.id);
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from(targets.entries()).map(([userId, conversationId]) =>
+      notifyUser(userId, payload.type, {
+        listingId: listing.id,
+        listingTitle: listing.title,
+        conversationId,
+        status: listing.status,
+        changeKind: payload.changeKind,
+        preview: payload.preview,
+      }),
+    ),
+  );
 }
 
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
@@ -207,6 +294,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         });
       }
 
+      const shouldNotifyMarketplace = listing.status !== 'active';
       const updated = await prisma.listing.update({
         where: { id: listingId },
         data: { status: 'active' },
@@ -216,6 +304,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         listingId: updated.id,
         action: 'upsert',
       });
+      if (shouldNotifyMarketplace) {
+        await notifyCommunityAboutNewListing(updated);
+      }
 
       return reply.send(ok({ listing: updated }));
     },
@@ -249,6 +340,14 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       await searchSyncQueue.add('sync', {
         listingId: updated.id,
         action: 'delete',
+      });
+      await notifyListingParticipants(updated, {
+        type: 'listing_status_changed',
+        changeKind: 'availability',
+        preview: listingPreview(
+          updated.title,
+          'the seller moved this listing back to draft.',
+        ),
       });
 
       return reply.send(ok({ listing: updated }));
@@ -290,6 +389,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       await searchSyncQueue.add('sync', {
         listingId: updated.id,
         action: 'delete',
+      });
+      await notifyListingParticipants(updated, {
+        type: 'listing_status_changed',
+        changeKind: 'availability',
+        preview: listingPreview(updated.title, 'this item was marked sold.'),
       });
 
       return reply.send(ok({ listing: updated }));
@@ -333,6 +437,14 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       await prisma.listing.delete({
         where: { id: listingId },
       });
+      await prisma.notification.deleteMany({
+        where: {
+          payload: {
+            path: ['listingId'],
+            equals: listingId,
+          },
+        },
+      });
 
       await searchSyncQueue.add('sync', {
         listingId,
@@ -367,6 +479,24 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           .send({ error: 'Not a member of this community' });
       }
 
+      const nextPrice = new Prisma.Decimal(String(body.price));
+      const nextCondition = body.condition as typeof listing.condition;
+      const pickupChanged =
+        listing.locationNeighborhood !== body.locationNeighborhood ||
+        listing.locationRadiusM !== body.locationRadiusM ||
+        jsonStableValue(listing.availabilityWindows) !==
+          jsonStableValue(body.availabilityWindows);
+      const priceChanged = !listing.price.equals(nextPrice);
+      const detailsChanged =
+        listing.title !== body.title ||
+        listing.description !== body.description ||
+        listing.category !== body.category ||
+        listing.subcategory !== (body.subcategory ?? null) ||
+        listing.condition !== nextCondition ||
+        listing.conditionNote !== (body.conditionNote ?? null) ||
+        listing.negotiable !== body.negotiable ||
+        jsonStableValue(listing.photoUrls) !== jsonStableValue(body.photoUrls);
+
       const updated = await prisma.listing.update({
         where: { id: listingId },
         data: {
@@ -374,9 +504,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           description: body.description,
           category: body.category,
           subcategory: body.subcategory ?? null,
-          condition: body.condition,
+          condition: nextCondition,
           conditionNote: body.conditionNote ?? null,
-          price: new Prisma.Decimal(String(body.price)),
+          price: nextPrice,
           negotiable: body.negotiable,
           locationNeighborhood: body.locationNeighborhood,
           locationRadiusM: body.locationRadiusM,
@@ -393,6 +523,28 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         await searchSyncQueue.add('sync', {
           listingId: updated.id,
           action: 'upsert',
+        });
+      }
+      if (
+        listing.status === 'active' &&
+        (pickupChanged || priceChanged || detailsChanged)
+      ) {
+        const changeKind = pickupChanged
+          ? 'pickup'
+          : priceChanged
+            ? 'price'
+            : 'details';
+        const changeLabel =
+          changeKind === 'pickup'
+            ? 'pickup timing or area changed.'
+            : changeKind === 'price'
+              ? 'the price changed.'
+              : 'the listing details changed.';
+
+        await notifyListingParticipants(updated, {
+          type: 'listing_updated',
+          changeKind,
+          preview: listingPreview(updated.title, changeLabel),
         });
       }
 

@@ -71,6 +71,21 @@ export function notificationPushCopy(
         title: 'Listing inquiry',
         body: 'Someone inquired about your listing.',
       };
+    case 'listing_published':
+      return {
+        title: 'New marketplace listing',
+        body: preview ?? 'A new item was posted in your community.',
+      };
+    case 'listing_updated':
+      return {
+        title: 'Listing updated',
+        body: preview ?? 'A listing you asked about was updated.',
+      };
+    case 'listing_status_changed':
+      return {
+        title: 'Listing status changed',
+        body: preview ?? 'A listing you asked about changed availability.',
+      };
     case 'rating_request':
       return {
         title: 'Rate your experience',
