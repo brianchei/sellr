@@ -22,6 +22,19 @@ const twilioClient =
     ? twilio(accountSid, authToken)
     : null;
 
+function twilioVerifyServiceSid(): string | undefined {
+  const sid = process.env.TWILIO_VERIFY_SERVICE_SID;
+  return !isPlaceholder(sid) ? sid : undefined;
+}
+
+function hasTwilioVerifyConfig(): boolean {
+  return Boolean(twilioClient && twilioVerifyServiceSid());
+}
+
+export function isLocalOtpMode(): boolean {
+  return !hasTwilioVerifyConfig() && process.env.NODE_ENV !== 'production';
+}
+
 export async function incrementOtpSendCount(
   phoneE164: string,
 ): Promise<number> {
@@ -34,8 +47,7 @@ export async function incrementOtpSendCount(
 }
 
 export async function sendVerificationSms(phoneE164: string): Promise<void> {
-  const sid = process.env.TWILIO_VERIFY_SERVICE_SID;
-  const serviceSid = !isPlaceholder(sid) ? sid : undefined;
+  const serviceSid = twilioVerifyServiceSid();
   if (twilioClient && serviceSid) {
     await twilioClient.verify.v2.services(serviceSid).verifications.create({
       to: phoneE164,
@@ -52,8 +64,7 @@ export async function verifyOtpCode(
   phoneE164: string,
   code: string,
 ): Promise<boolean> {
-  const sid = process.env.TWILIO_VERIFY_SERVICE_SID;
-  const serviceSid = !isPlaceholder(sid) ? sid : undefined;
+  const serviceSid = twilioVerifyServiceSid();
   if (twilioClient && serviceSid) {
     const check = await twilioClient.verify.v2
       .services(serviceSid)

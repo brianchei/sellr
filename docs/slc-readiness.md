@@ -90,6 +90,10 @@ widths:
 
 The seed creates the `Dev Campus` community and invite code `DEV2026`.
 Local OTP accepts `000000`.
+When Twilio Verify is not configured locally, OTP send requests skip the
+per-phone hourly SMS limiter so repeated demo sign-ins do not get stuck before
+the verification-code step. Real SMS sends still use the production-style
+per-phone limiter.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera

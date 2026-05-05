@@ -59,6 +59,8 @@ widths:
 ## Demo Accounts
 
 Local OTP accepts `000000`.
+When Twilio Verify is not configured in local development, repeated OTP sends
+for these accounts are not blocked by the per-phone SMS limiter.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera

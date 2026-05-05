@@ -17,6 +17,7 @@ import {
 } from '../../lib/authCookies';
 import {
   incrementOtpSendCount,
+  isLocalOtpMode,
   sendVerificationSms,
   verifyOtpCode,
 } from '../../lib/otp';
@@ -77,9 +78,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
     },
     async (request, reply) => {
       const body = SendOTPSchema.parse(request.body);
-      const n = await incrementOtpSendCount(body.phoneE164);
-      if (n > 5) {
-        return reply.code(429).send({ error: 'Too many OTP requests' });
+      if (!isLocalOtpMode()) {
+        const n = await incrementOtpSendCount(body.phoneE164);
+        if (n > 5) {
+          return reply.code(429).send({ error: 'Too many OTP requests' });
+        }
       }
       await sendVerificationSms(body.phoneE164);
       return reply.send(ok({ sent: true }));

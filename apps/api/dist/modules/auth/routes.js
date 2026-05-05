@@ -57,9 +57,11 @@ const plugin = (fastify, _opts, done) => {
         schema: { body: shared_1.SendOTPSchema },
     }, async (request, reply) => {
         const body = shared_1.SendOTPSchema.parse(request.body);
-        const n = await (0, otp_1.incrementOtpSendCount)(body.phoneE164);
-        if (n > 5) {
-            return reply.code(429).send({ error: 'Too many OTP requests' });
+        if (!(0, otp_1.isLocalOtpMode)()) {
+            const n = await (0, otp_1.incrementOtpSendCount)(body.phoneE164);
+            if (n > 5) {
+                return reply.code(429).send({ error: 'Too many OTP requests' });
+            }
         }
         await (0, otp_1.sendVerificationSms)(body.phoneE164);
         return reply.send((0, response_1.ok)({ sent: true }));
