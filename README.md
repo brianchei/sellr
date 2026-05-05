@@ -152,6 +152,7 @@ pnpm lint         # lint all packages/apps
 pnpm typecheck    # run TypeScript checks
 pnpm test         # run tests
 pnpm db:migrate   # run Prisma migrations for the API
+pnpm db:deploy    # deploy committed Prisma migrations
 pnpm db:studio    # open Prisma Studio for the API
 pnpm env:web      # create/update apps/web/.env.local from root env values
 pnpm smoke:seller # run seller lifecycle smoke check through the web proxy

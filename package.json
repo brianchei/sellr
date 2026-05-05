@@ -13,6 +13,7 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "db:migrate": "pnpm --filter @sellr/api db:migrate",
+    "db:deploy": "pnpm --filter @sellr/api db:deploy",
     "db:studio": "pnpm --filter @sellr/api db:studio",
     "env:web": "node scripts/ensure-web-env.cjs",
     "smoke:seller": "node scripts/smoke-seller-lifecycle.cjs",

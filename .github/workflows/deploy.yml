@@ -22,6 +22,9 @@ on:
 jobs:
   deploy-api:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -36,8 +39,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Skip production migrations without DATABASE_URL
+        if: ${{ env.DATABASE_URL == '' }}
+        run: |
+          echo "DATABASE_URL secret is not configured; skipping production migration."
+
       - name: Run Prisma migrations against production
-        run: pnpm --filter @sellr/api prisma migrate deploy
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        if: ${{ env.DATABASE_URL != '' }}
+        run: pnpm db:deploy

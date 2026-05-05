@@ -44,7 +44,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Run DB migrations against test DB
-        run: pnpm --filter @sellr/api prisma migrate deploy
+        run: pnpm db:deploy
         env:
           DATABASE_URL: postgresql://sellr:test_password@localhost:5432/sellr_test
           DIRECT_URL: postgresql://sellr:test_password@localhost:5432/sellr_test
