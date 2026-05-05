@@ -88,6 +88,13 @@ export declare const ListSellerListingsQuerySchema: z.ZodObject<{
     status: z.ZodOptional<z.ZodEnum<typeof ListingStatus>>;
     limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
 }, z.core.$strip>;
+export declare const SellerStorefrontParamsSchema: z.ZodObject<{
+    sellerId: z.ZodUUID;
+}, z.core.$strip>;
+export declare const SellerStorefrontQuerySchema: z.ZodObject<{
+    communityId: z.ZodUUID;
+    limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+}, z.core.$strip>;
 export declare const CreateConversationSchema: z.ZodObject<{
     listingId: z.ZodUUID;
 }, z.core.$strip>;

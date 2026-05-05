@@ -155,6 +155,35 @@ const plugin = (fastify, _opts, done) => {
         });
         return reply.send((0, response_1.ok)({ listings }));
     });
+    fastify.get('/sellers/:sellerId', {
+        preHandler: auth_1.verifyJWT,
+        schema: {
+            params: shared_1.SellerStorefrontParamsSchema,
+            querystring: shared_1.SellerStorefrontQuerySchema,
+        },
+    }, async (request, reply) => {
+        const { sellerId } = shared_1.SellerStorefrontParamsSchema.parse(request.params);
+        const { communityId, limit } = shared_1.SellerStorefrontQuerySchema.parse(request.query);
+        if (!request.user.communityIds.includes(communityId)) {
+            return reply
+                .code(403)
+                .send({ error: 'Not a member of this community' });
+        }
+        const seller = await findListingSellerProfile(sellerId, communityId);
+        if (!seller?.communityMember) {
+            return reply.code(404).send({ error: 'Seller not found' });
+        }
+        const listings = await prisma_1.prisma.listing.findMany({
+            where: {
+                communityId,
+                sellerId,
+                status: 'active',
+            },
+            orderBy: { updatedAt: 'desc' },
+            take: limit,
+        });
+        return reply.send((0, response_1.ok)({ seller, listings }));
+    });
     fastify.post('/', {
         preHandler: auth_1.verifyJWT,
         schema: { body: shared_1.CreateListingSchema },

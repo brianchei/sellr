@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.LISTING_IMAGE_MIME_TYPES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.LISTING_IMAGE_MIME_TYPES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
 exports.isListingPhotoUrl = isListingPhotoUrl;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
@@ -98,6 +98,13 @@ exports.ListSellerListingsQuerySchema = zod_1.z.object({
     communityId: zod_1.z.uuid(),
     status: zod_1.z.enum(enums_1.ListingStatus).optional(),
     limit: zod_1.z.coerce.number().int().min(1).max(100).optional().default(50),
+});
+exports.SellerStorefrontParamsSchema = zod_1.z.object({
+    sellerId: zod_1.z.uuid(),
+});
+exports.SellerStorefrontQuerySchema = zod_1.z.object({
+    communityId: zod_1.z.uuid(),
+    limit: zod_1.z.coerce.number().int().min(1).max(50).optional().default(20),
 });
 exports.CreateConversationSchema = zod_1.z.object({
     listingId: zod_1.z.uuid(),

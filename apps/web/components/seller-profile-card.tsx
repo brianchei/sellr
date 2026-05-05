@@ -5,6 +5,8 @@ type SellerProfileCardProps = {
   profile?: ApiUserTrustProfile | null;
   heading?: string;
   contextLabel?: string;
+  profileHref?: string;
+  profileLabel?: string;
   editableHref?: string;
   editableLabel?: string;
   className?: string;
@@ -50,6 +52,8 @@ export function SellerProfileCard({
   profile,
   heading = 'Seller',
   contextLabel = 'This member is in your community.',
+  profileHref,
+  profileLabel = 'View profile',
   editableHref,
   editableLabel = 'Edit profile',
   className = '',
@@ -63,14 +67,24 @@ export function SellerProfileCard({
     >
       <div className="flex items-start justify-between gap-3">
         <h2 className="text-base font-semibold">{heading}</h2>
-        {editableHref ? (
-          <Link
-            href={editableHref}
-            className="text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
-          >
-            {editableLabel}
-          </Link>
-        ) : null}
+        <div className="flex flex-wrap justify-end gap-3">
+          {profileHref ? (
+            <Link
+              href={profileHref}
+              className="text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
+            >
+              {profileLabel}
+            </Link>
+          ) : null}
+          {editableHref ? (
+            <Link
+              href={editableHref}
+              className="text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
+            >
+              {editableLabel}
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-4 flex items-center gap-3">

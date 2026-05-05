@@ -190,6 +190,13 @@ export declare function fetchMyListings(params: {
 }): Promise<{
     listings: ApiListing[];
 }>;
+export declare function fetchSellerStorefront(sellerId: string, params: {
+    communityId: string;
+    limit?: number;
+}): Promise<{
+    seller: ApiUserTrustProfile;
+    listings: ApiListing[];
+}>;
 export declare function createListing(body: CreateListingInput): Promise<{
     listing: ApiListing;
 }>;

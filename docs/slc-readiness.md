@@ -13,6 +13,8 @@ community:
 - Browse active community listings and inspect listing detail.
 - See seller trust signals: display name, verified/community status, member
   since, and active listing count.
+- Open a community-scoped seller storefront with trust signals, active listings,
+  report seller action, and contact-through-listing guidance.
 - Create, edit, publish, unpublish, delete, and mark listings sold.
 - Contact a seller from listing detail and continue the conversation in inbox.
 - See notification badges and a notification center for messages, marketplace
@@ -74,6 +76,8 @@ widths:
 - `/marketplace`: filters, listing cards, empty/error states, tap targets.
 - `/marketplace/[listingId]`: photo area, seller trust card, contact form,
   report action, owner action state.
+- `/sellers/[sellerId]`: seller trust signals, active listing cards,
+  contact-through-listing copy, report seller action.
 - `/inbox` and `/inbox/[conversationId]`: conversation list, message thread,
   composer, long message wrapping, report message action.
 - `/notifications`: unread badge, category tabs, mark-read actions, links to

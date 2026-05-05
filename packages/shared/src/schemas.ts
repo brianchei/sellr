@@ -114,6 +114,15 @@ export const ListSellerListingsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(50),
 });
 
+export const SellerStorefrontParamsSchema = z.object({
+  sellerId: z.uuid(),
+});
+
+export const SellerStorefrontQuerySchema = z.object({
+  communityId: z.uuid(),
+  limit: z.coerce.number().int().min(1).max(50).optional().default(20),
+});
+
 export const CreateConversationSchema = z.object({
   listingId: z.uuid(),
 });

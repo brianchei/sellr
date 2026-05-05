@@ -11,6 +11,7 @@ exports.joinCommunity = joinCommunity;
 exports.fetchListingsNearby = fetchListingsNearby;
 exports.fetchCommunityListings = fetchCommunityListings;
 exports.fetchMyListings = fetchMyListings;
+exports.fetchSellerStorefront = fetchSellerStorefront;
 exports.createListing = createListing;
 exports.fetchListing = fetchListing;
 exports.updateListing = updateListing;
@@ -112,6 +113,13 @@ function fetchMyListings(params) {
         q.set('limit', String(params.limit));
     }
     return (0, fetch_1.apiFetch)(`/listings/mine?${q.toString()}`);
+}
+function fetchSellerStorefront(sellerId, params) {
+    const q = new URLSearchParams({ communityId: params.communityId });
+    if (params.limit != null) {
+        q.set('limit', String(params.limit));
+    }
+    return (0, fetch_1.apiFetch)(`/listings/sellers/${sellerId}?${q.toString()}`);
 }
 function createListing(body) {
     return (0, fetch_1.apiFetch)('/listings', {

@@ -153,6 +153,12 @@ export function ConversationThread({
           profile={conversation.peer}
           heading={`${peerRole} profile`}
           contextLabel={`You are the ${role.toLowerCase()} in this conversation.`}
+          profileHref={
+            conversation.peer?.id &&
+            conversation.peer.id === conversation.listing?.sellerId
+              ? `/sellers/${conversation.peer.id}`
+              : undefined
+          }
           className="mt-4 bg-[var(--bg-secondary)] shadow-none"
         />
 

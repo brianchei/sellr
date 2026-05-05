@@ -146,6 +146,11 @@ async function main() {
     webBaseUrl,
     `/marketplace/${activeListing.id}`,
   );
+  await assertHtmlRoute(
+    buyerClient,
+    webBaseUrl,
+    `/sellers/${activeListing.sellerId}`,
+  );
   await assertHtmlRoute(buyerClient, webBaseUrl, '/inbox');
   await assertHtmlRoute(buyerClient, webBaseUrl, `/inbox/${conversationId}`);
   await assertHtmlRoute(buyerClient, webBaseUrl, '/notifications');

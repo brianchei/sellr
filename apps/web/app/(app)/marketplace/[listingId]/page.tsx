@@ -284,6 +284,9 @@ export default function ListingDetailPage() {
             profile={listing.seller}
             heading="Seller"
             contextLabel="This seller is in your community."
+            profileHref={
+              listing.seller ? `/sellers/${listing.seller.id}` : undefined
+            }
             editableHref={
               isOwnListing ? `/listings/${listing.id}/edit` : undefined
             }

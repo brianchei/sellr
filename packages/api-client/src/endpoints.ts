@@ -270,6 +270,23 @@ export function fetchMyListings(params: {
   return apiFetch<{ listings: ApiListing[] }>(`/listings/mine?${q.toString()}`);
 }
 
+export function fetchSellerStorefront(
+  sellerId: string,
+  params: {
+    communityId: string;
+    limit?: number;
+  },
+) {
+  const q = new URLSearchParams({ communityId: params.communityId });
+  if (params.limit != null) {
+    q.set('limit', String(params.limit));
+  }
+  return apiFetch<{
+    seller: ApiUserTrustProfile;
+    listings: ApiListing[];
+  }>(`/listings/sellers/${sellerId}?${q.toString()}`);
+}
+
 export function createListing(body: CreateListingInput) {
   return apiFetch<{ listing: ApiListing }>('/listings', {
     method: 'POST',
