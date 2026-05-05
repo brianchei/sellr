@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sellr Web
 
-## Getting Started
+`apps/web` is the Next.js 16 App Router web SLC for Sellr. It uses React 19,
+Tailwind CSS 4, httpOnly cookie auth through same-origin `/api/v1` rewrites,
+React Query, and typed helpers from `@sellr/api-client`.
 
-First, run the development server:
+## Current SLC Routes
+
+- `/login`: phone OTP sign-in for web cookie sessions.
+- `/onboarding`: join a verified community with an invite code or email.
+- `/dashboard`: profile editor, trust preview, seller readiness panel, and next
+  best action.
+- `/marketplace`: community-scoped browse, search, filters, and listing cards.
+- `/marketplace/[listingId]`: listing detail, seller trust card, contact seller,
+  and report listing.
+- `/sellers/[sellerId]`: seller storefront-lite with trust signals, active
+  listings, report seller action, and contact-through-listing guidance.
+- `/sell`: structured listing creation with local file image upload and buyer
+  preview.
+- `/listings`: seller inventory management, status filters, publish/unpublish,
+  delete, and mark sold.
+- `/listings/[listingId]/edit`: owner-only listing edit flow.
+- `/inbox` and `/inbox/[conversationId]`: buyer/seller conversation list,
+  message thread, reply composer, and report message.
+- `/notifications`: activity center with unread/listing/message filters and
+  mark-read actions.
+- `/admin/reports`: admin-only report review and status updates.
+
+## Local Development
+
+From the repository root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm env:web
+pnpm --filter @sellr/web dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app expects the API to be available through the local rewrite at
+`http://localhost:3000/api/v1`. In the normal local stack, run the API dev server
+on `http://localhost:3001`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Verification
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Useful focused checks:
 
-## Learn More
+```bash
+pnpm --filter @sellr/web lint
+pnpm --filter @sellr/web typecheck
+pnpm --filter @sellr/web build
+```
 
-To learn more about Next.js, take a look at the following resources:
+For a full SLC handoff gate from the repository root:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm slc:ready
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `../../docs/slc-readiness.md` and `../../docs/slc-smoke-test.md` for the
+full readiness and smoke-test workflow.

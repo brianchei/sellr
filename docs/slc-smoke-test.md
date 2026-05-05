@@ -56,6 +56,8 @@ widths:
 - `/marketplace/[listingId]`: seller trust card, contact CTA, report action.
 - `/sellers/[sellerId]`: seller trust signals, active listing cards, report
   seller action, contact-through-listing copy.
+- `/dashboard`: seller readiness panel, profile preview, next best seller
+  action, and community setup links.
 - `/inbox` and `/inbox/[conversationId]`: conversation list, thread layout,
   message composer, report message action.
 - `/notifications`: unread badge behavior, message/listing tabs, mark-read
@@ -85,17 +87,21 @@ for these accounts are not blocked by the per-phone SMS limiter.
 3. Sign in as the buyer with OTP `000000`.
 4. Join `DEV2026` if prompted.
 5. Browse `/marketplace` and open `Walnut study desk`.
-6. Confirm the listing detail shows seller trust signals, pickup area, availability, and report listing.
-7. Send a message to the seller and open the conversation thread.
-8. Confirm the inbox shows the seeded conversation and allows replies.
-9. Sign out and sign in as the seller.
-10. Open `/listings`.
-11. Confirm active, draft, and sold demo listings are visible under their filters.
-12. Create a new listing from `/sell`, edit it, publish it, then mark it sold.
-13. Confirm the sold listing leaves marketplace browse and appears in the Sold filter.
+6. Confirm the listing detail shows seller trust signals, pickup area, availability, report listing, and a seller profile link.
+7. Open the seller storefront and confirm active listings plus report seller/contact-through-listing guidance.
+8. Send a message to the seller and open the conversation thread.
+9. Confirm the inbox shows the seeded conversation and allows replies.
+10. Sign out and sign in as the seller.
+11. Open `/dashboard` and confirm seller readiness reflects listings, photos, buyer activity, and next action.
+12. Open `/listings`.
+13. Confirm active, draft, and sold demo listings are visible under their filters.
+14. Create a new listing from `/sell` using a local image file, edit it, publish it, then mark it sold.
+15. Confirm the sold listing leaves marketplace browse and appears in the Sold filter.
+16. Sign in as the admin and open `/admin/reports` to review the seeded report.
 
 ## Expected Local Notes
 
 - The Sentry auth-token warning during local web builds is expected.
 - If the API was already running before route edits, restart it before endpoint smoke tests.
 - Databases without the optional `location_geom` column fall back to community-scoped listing results without distance ranking.
+- Uploaded listing images are stored in local API storage for the SLC; production media storage is deferred.

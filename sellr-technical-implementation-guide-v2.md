@@ -35,6 +35,7 @@ This document now reflects the **checked-in Phase 0 baseline** for the monorepo.
 |------|-----------------------------|-------------------|
 | **Mobile** | **Expo SDK 55**; SDK 55-compatible `app.json`; `newArchEnabled` removed | Stay on Expo SDK 55-compatible package versions and config |
 | **Web** | **Next.js 16**, **Tailwind 4** | Next.js 16, Tailwind 4 (App Router) |
+| **Web SLC** | Buyer/seller loop is implemented for local demo: community onboarding, browse/filter, listing detail, file photo uploads, seller inventory, seller storefront-lite, buyer contact/inbox, notifications, reports, admin reports, seller readiness, and `pnpm slc:ready` | Treat this as the current web product baseline before expanding scope |
 | **ORM** | **Prisma 7** with `prisma.config.ts`, `prisma-client` generator + explicit output, generated client import path, and `@prisma/adapter-pg` at runtime | Keep Prisma 7 as the baseline for all new database work |
 | **Local DB URL split** | Default local setup keeps both URLs on **54322** when the local pooler is **off** (see [§5](#5-database-supabase--postgis-setup)) | Use **54329** for `DATABASE_URL` and **54322** for `DIRECT_URL` only when the local pooler is **on** |
 | **TypeScript (root)** | Root/tooling versions can still move independently from mobile's SDK-pinned TypeScript | Keep sample snippets on **5.9.x** when updating docs or examples |

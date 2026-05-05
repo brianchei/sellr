@@ -16,12 +16,15 @@ community:
 - Open a community-scoped seller storefront with trust signals, active listings,
   report seller action, and contact-through-listing guidance.
 - Create, edit, publish, unpublish, delete, and mark listings sold.
+- Upload listing photos from local files with inline validation and previews.
 - Contact a seller from listing detail and continue the conversation in inbox.
 - See notification badges and a notification center for messages, marketplace
   posts, listing status changes, and pickup-sensitive listing updates.
 - Submit basic listing/message reports.
 - Review seeded and user-submitted reports from the admin-only
   `/admin/reports` dashboard.
+- Use the dashboard seller readiness panel to see listing presence, photo
+  quality, buyer activity, and the next best seller action.
 - Exercise the flow with seeded demo users and repeatable smoke scripts.
 
 ## Required Local Stack
@@ -101,7 +104,8 @@ widths:
 - `/listings`: status filters, create/publish notices, listing actions, sold
   lifecycle.
 - `/listings/[listingId]/edit`: edit form layout, save notice, owner-only guard.
-- `/dashboard`: profile preview/edit state and community access copy.
+- `/dashboard`: profile preview/edit state, seller readiness panel, next best
+  action, and community access copy.
 
 ## Demo Data
 
@@ -116,7 +120,9 @@ per-phone limiter.
 - Buyer: `+15550000002` / Jordan Rivera
 - Admin: `+15550000003` / Priya Shah
 
-The buyer smoke test appends a `[smoke]` message to the seeded conversation.
+The seller smoke test uploads a temporary listing image and deletes its
+temporary listing at the end. The buyer smoke test appends a `[smoke]` message
+to the seeded conversation.
 Rerun the seed when you want to reset demo content; it clears local `Dev Campus`
 demo listings, conversations, reports, and notifications before recreating the
 fixtures.
@@ -136,7 +142,7 @@ fixtures.
 
 These are intentionally deferred until the core web loop is stable:
 
-- Production-grade image uploads and media management.
+- Production-grade media storage, CDN delivery, and cleanup policies.
 - Ratings, KYC, full reputation, or advanced moderation workflows.
 - Payments, offers, meetup scheduling, and delivery/logistics.
 - Push/realtime notification polish beyond existing API foundations.

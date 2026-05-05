@@ -30,8 +30,17 @@ Prefer work that improves:
 - Basic trust/safety signals
 - Responsive web usability
 
+## Current Web SLC Surface
+The current web SLC includes OTP login, community onboarding, marketplace
+browse/search/filter, listing detail, file-based listing photo upload, seller
+inventory management, sold lifecycle, seller trust cards, seller storefront-lite
+pages, buyer contact and inbox replies, notifications, basic reporting, an
+admin-only reports dashboard, and a seller readiness panel on `/dashboard`.
+Before adding breadth, keep these flows polished and covered by the readiness
+gate.
+
 ## Repository Map
-- `apps/web`: Next.js 16 App Router web app and seller dashboard scaffold.
+- `apps/web`: Next.js 16 App Router web SLC and seller/admin surfaces.
 - `apps/api`: Fastify API, Prisma 7 schema/client, BullMQ workers, Socket.IO.
 - `apps/mobile`: Expo React Native app. Keep compatible with Expo SDK 55.
 - `packages/shared`: Domain enums, types, and Zod schemas shared by apps/API.
@@ -95,6 +104,7 @@ Prefer work that improves:
   - `pnpm lint`
   - `pnpm test`
   - `pnpm build`
+  - `pnpm slc:ready`
 - Useful focused commands:
   - `pnpm --filter @sellr/web typecheck`
   - `pnpm --filter @sellr/web lint`

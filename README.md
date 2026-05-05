@@ -12,14 +12,13 @@ completed transactions.
 
 ## Current Status
 
-This repository is moving from the Phase 0 foundation into a web SLC MVP. The
-backend domain model and API surface are in place for auth, communities,
-listings, search, offers, meetups, conversations, reports, and notifications.
-The web app now covers the core community-scoped buyer/seller loop: onboarding,
-browse, structured listing creation, listing management/editing, seller trust
-signals, buyer contact, inbox replies, basic reporting, and sold-listing
-lifecycle, with a restricted admin reports dashboard for reviewing trust and
-safety reports.
+This repository now has a working web SLC MVP for the core
+community-scoped buyer/seller loop. The app covers onboarding, browse/search,
+listing detail, file-based listing photo uploads, structured listing creation,
+listing management/editing, sold-listing lifecycle, seller trust signals,
+seller storefronts, buyer contact, inbox replies, notifications, basic
+reporting, a restricted admin reports dashboard, and a seller readiness panel on
+the dashboard.
 
 ## Repository Layout
 
@@ -59,16 +58,20 @@ sellr/
   domains
 - Community-scoped listings with status, condition, pricing, photos,
   availability windows, and approximate neighborhood/radius location
+- Local web SLC listing photo uploads with JPG/PNG/WebP validation and preview
 - Nearby listing lookup using PostGIS and full-text/product search through
   Algolia
-- Offer, counter, accept, decline, meetup, and post-acceptance conversation
-  flows
+- Seller storefront-lite pages with trust signals, active listings, and
+  contact-through-listing guidance
+- Buyer contact and pre-offer conversation flows for listing-specific messages
 - Realtime-ready messaging through Socket.IO-backed API infrastructure
-- Notifications for offers, messages, meetups, ratings, matches, and saved
-  searches
+- Notifications for messages, listing lifecycle changes, marketplace activity,
+  and pickup-sensitive updates
 - Trust and safety primitives for reports, reputation, no-shows, late cancels,
   and safety flags
 - Admin-only reports review at `/admin/reports` for community moderators
+- Seller dashboard readiness panel for listing presence, photo quality, buyer
+  activity, and next best actions
 
 ## Getting Started
 
@@ -124,14 +127,21 @@ server.
 ## Local Demo Flow
 
 The seed creates a `Dev Campus` community, invite code `DEV2026`, demo listings,
-and one buyer/seller conversation. Local OTP accepts `000000`.
+a buyer/seller conversation, and a demo report. Local OTP accepts `000000`.
 
-- Seller: `+15550000001`
-- Buyer: `+15550000002`
-- Admin: `+15550000003`
+- Seller: `+15550000001` / Maya Chen
+- Buyer: `+15550000002` / Jordan Rivera
+- Admin: `+15550000003` / Priya Shah
 
 See `docs/slc-readiness.md` for the web SLC readiness checklist and
 `docs/slc-smoke-test.md` for the detailed smoke path.
+
+Key local routes:
+
+- Buyer/seller app: `http://localhost:3000`
+- Marketplace browse: `http://localhost:3000/marketplace`
+- Seller storefront: `http://localhost:3000/sellers/<sellerId>`
+- Admin reports: `http://localhost:3000/admin/reports`
 
 ## Useful Commands
 

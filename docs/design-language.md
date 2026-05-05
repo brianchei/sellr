@@ -26,6 +26,17 @@ The visual language should support confidence: clean hierarchy, obvious actions,
 
 The Sellr logo uses mustard and white. Mustard is the primary brand color for the app, while dusty grape provides contrast, structure, and accessible action states where mustard would be too light.
 
+## Brand Assets
+
+Current checked-in brand assets live in `apps/web/public/brand`:
+
+- `sellr-app-icon.png`: app icon and metadata icon source.
+- `sellr-logo-mark.png`: compact logo mark used in headers and compact app UI.
+- `sellr-logo-wordmark.png`: wordmark source for Open Graph/social previews.
+
+The Expo app mirrors the icon assets in `apps/mobile/assets`. Prefer these files
+over recreating the mark in CSS or inline SVG.
+
 ### Core Palette
 
 | Token | Hex | Role |
