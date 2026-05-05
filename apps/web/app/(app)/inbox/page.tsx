@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchConversations } from '@sellr/api-client';
 import { ConversationList } from '@/components/conversation-list';
 import { useAuth } from '@/components/auth-provider';
+import { MESSAGE_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 
 function InboxSkeleton() {
   return (
@@ -50,6 +51,7 @@ export default function InboxPage() {
     queryKey: ['conversations', primaryCommunityId],
     queryFn: () => fetchConversations({ limit: 50 }),
     enabled: Boolean(primaryCommunityId),
+    refetchInterval: MESSAGE_REFETCH_INTERVAL_MS,
   });
 
   const conversations = conversationsQuery.data?.conversations ?? [];

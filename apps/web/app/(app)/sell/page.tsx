@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { createListing, publishListing } from '@sellr/api-client';
 import { ListingForm } from '@/components/listing-form';
 import { useAuth } from '@/components/auth-provider';
@@ -11,9 +12,14 @@ import {
   validateListingForm,
   type ListingFormValues,
 } from '@/lib/listing-form';
+import {
+  invalidateListingActivity,
+  writeListingToCaches,
+} from '@/lib/query-refresh';
 
 export default function SellPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { primaryCommunityId } = useAuth();
   const [values, setValues] = useState<ListingFormValues>(
     DEFAULT_LISTING_FORM_VALUES,
@@ -45,10 +51,13 @@ export default function SellPage() {
         aiGenerated: false,
       });
       createdListingId = created.listing.id;
-      await publishListing(created.listing.id);
+      const published = await publishListing(created.listing.id);
+      writeListingToCaches(queryClient, published.listing);
+      await invalidateListingActivity(queryClient, published.listing.id);
       router.push(`/listings?created=${encodeURIComponent(created.listing.id)}`);
     } catch (e) {
       if (createdListingId) {
+        await invalidateListingActivity(queryClient, createdListingId);
         router.push(
           `/listings?publishError=${encodeURIComponent(createdListingId)}`,
         );

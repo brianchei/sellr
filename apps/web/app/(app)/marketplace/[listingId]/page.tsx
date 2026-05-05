@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createConversation,
   fetchListing,
@@ -21,12 +21,17 @@ import {
   formatRadius,
   photoUrls,
 } from '@/lib/listing-format';
+import {
+  ACTIVITY_REFETCH_INTERVAL_MS,
+  invalidateConversationActivity,
+} from '@/lib/query-refresh';
 
 const DEFAULT_MESSAGE =
   'Hi, is this still available? I can pick up locally.';
 
 export default function ListingDetailPage() {
   const params = useParams<{ listingId: string }>();
+  const queryClient = useQueryClient();
   const { userId } = useAuth();
   const listingId = params.listingId;
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
@@ -41,6 +46,7 @@ export default function ListingDetailPage() {
     queryKey: ['listing', listingId],
     queryFn: () => fetchListing(listingId),
     enabled: Boolean(listingId),
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
   });
 
   const contactMutation = useMutation({
@@ -51,11 +57,12 @@ export default function ListingDetailPage() {
       });
       return { conversation, message: sentMessage };
     },
-    onSuccess: ({ conversation }) => {
+    onSuccess: async ({ conversation }) => {
       setSent(true);
       setSentConversationId(conversation.id);
       setMessage('');
       setMessageError(null);
+      await invalidateConversationActivity(queryClient, conversation.id);
     },
   });
 

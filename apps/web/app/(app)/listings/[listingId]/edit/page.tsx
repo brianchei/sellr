@@ -17,6 +17,11 @@ import {
   type ListingFormValues,
 } from '@/lib/listing-form';
 import { formatPostedDate, formatPrice } from '@/lib/listing-format';
+import {
+  ACTIVITY_REFETCH_INTERVAL_MS,
+  invalidateListingActivity,
+  writeListingToCaches,
+} from '@/lib/query-refresh';
 
 const STATUS_LABELS: Record<string, string> = {
   active: 'Active',
@@ -45,14 +50,11 @@ function EditListingForm({ listing }: { listing: ApiListing }) {
       }
       return updateListing(listing.id, payload.payload);
     },
-    onSuccess: async () => {
+    onSuccess: async (updated) => {
       setError(null);
       setNotice('Listing changes saved.');
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['listing', listing.id] }),
-        queryClient.invalidateQueries({ queryKey: ['my-listings'] }),
-        queryClient.invalidateQueries({ queryKey: ['community-listings'] }),
-      ]);
+      writeListingToCaches(queryClient, updated.listing);
+      await invalidateListingActivity(queryClient, updated.listing.id);
     },
   });
 
@@ -110,6 +112,7 @@ export default function EditListingPage() {
     queryKey: ['listing', listingId],
     queryFn: () => fetchListing(listingId),
     enabled: Boolean(primaryCommunityId && listingId),
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
   });
 
   if (!primaryCommunityId) {

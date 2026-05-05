@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   deleteListing,
   fetchMyListings,
@@ -19,6 +19,12 @@ import {
   formatPrice,
   photoUrls,
 } from '@/lib/listing-format';
+import {
+  ACTIVITY_REFETCH_INTERVAL_MS,
+  invalidateListingActivity,
+  removeListingFromCaches,
+  writeListingToCaches,
+} from '@/lib/query-refresh';
 
 const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
@@ -113,6 +119,7 @@ function MyListingsFallback() {
 
 function MyListingsContent() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const { primaryCommunityId } = useAuth();
   const [statusFilter, setStatusFilter] =
@@ -139,6 +146,7 @@ function MyListingsContent() {
       });
     },
     enabled: Boolean(primaryCommunityId),
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
   });
 
   const listings = useMemo(
@@ -176,7 +184,7 @@ function MyListingsContent() {
       }
       return deleteListing(action.listing.id);
     },
-    onSuccess: (_result, action) => {
+    onSuccess: async (result, action) => {
       const title = action.listing.title;
       setNotice(
         action.type === 'publish'
@@ -187,7 +195,14 @@ function MyListingsContent() {
               ? `${title} was marked sold and removed from browse.`
               : `${title} was deleted.`,
       );
-      void listingsQuery.refetch();
+
+      if ('listing' in result) {
+        writeListingToCaches(queryClient, result.listing);
+      } else {
+        removeListingFromCaches(queryClient, action.listing.id);
+      }
+
+      await invalidateListingActivity(queryClient, action.listing.id);
     },
   });
 

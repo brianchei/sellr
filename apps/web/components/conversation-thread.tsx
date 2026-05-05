@@ -18,6 +18,10 @@ import {
 import { formatPrice } from '@/lib/listing-format';
 import { ReportDialog } from '@/components/report-dialog';
 import { SellerProfileCard } from '@/components/seller-profile-card';
+import {
+  invalidateConversationActivity,
+  MESSAGE_REFETCH_INTERVAL_MS,
+} from '@/lib/query-refresh';
 
 function MessageBubble({
   message,
@@ -86,6 +90,7 @@ export function ConversationThread({
   const messagesQuery = useQuery({
     queryKey: ['conversation-messages', conversation.id],
     queryFn: () => fetchConversationMessages(conversation.id),
+    refetchInterval: MESSAGE_REFETCH_INTERVAL_MS,
   });
 
   const replyMutation = useMutation({
@@ -96,15 +101,7 @@ export function ConversationThread({
     onSuccess: async () => {
       setReply('');
       setReplyError(null);
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ['conversation', conversation.id],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ['conversation-messages', conversation.id],
-        }),
-        queryClient.invalidateQueries({ queryKey: ['conversations'] }),
-      ]);
+      await invalidateConversationActivity(queryClient, conversation.id);
     },
   });
 

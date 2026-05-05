@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { joinCommunity } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 
@@ -9,6 +10,7 @@ type JoinMode = 'invite' | 'email';
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { logout, refreshSession } = useAuth();
   const [mode, setMode] = useState<JoinMode>('invite');
   const [inviteCode, setInviteCode] = useState('');
@@ -50,6 +52,7 @@ export default function OnboardingPage() {
         return;
       }
 
+      await queryClient.invalidateQueries({ queryKey: ['me'] });
       router.replace('/dashboard');
     } catch (e) {
       setError(

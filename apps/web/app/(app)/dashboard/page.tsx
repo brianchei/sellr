@@ -29,6 +29,7 @@ function ProfileEditor({
     onSuccess: async (updated) => {
       setDisplayName(updated.user.displayName);
       setFormError(null);
+      queryClient.setQueryData(['me', userId], updated);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['me', userId] }),
         queryClient.invalidateQueries({ queryKey: ['conversations'] }),

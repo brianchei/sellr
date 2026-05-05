@@ -7,6 +7,7 @@ import { fetchConversation, fetchConversations } from '@sellr/api-client';
 import { ConversationList } from '@/components/conversation-list';
 import { ConversationThread } from '@/components/conversation-thread';
 import { useAuth } from '@/components/auth-provider';
+import { MESSAGE_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 
 function ThreadSkeleton() {
   return (
@@ -43,12 +44,14 @@ export default function ConversationPage() {
     queryKey: ['conversation', conversationId],
     queryFn: () => fetchConversation(conversationId),
     enabled: Boolean(primaryCommunityId && conversationId),
+    refetchInterval: MESSAGE_REFETCH_INTERVAL_MS,
   });
 
   const conversationsQuery = useQuery({
     queryKey: ['conversations', primaryCommunityId],
     queryFn: () => fetchConversations({ limit: 50 }),
     enabled: Boolean(primaryCommunityId),
+    refetchInterval: MESSAGE_REFETCH_INTERVAL_MS,
   });
 
   if (!primaryCommunityId) {

@@ -14,6 +14,12 @@ import {
   type NotificationCategory,
   type NotificationViewModel,
 } from '@/lib/notification-format';
+import {
+  ACTIVITY_REFETCH_INTERVAL_MS,
+  invalidateNotificationActivity,
+  markAllNotificationsReadInCaches,
+  markNotificationReadInCaches,
+} from '@/lib/query-refresh';
 
 const FILTERS: Array<{
   value: NotificationCategory | 'all' | 'unread';
@@ -147,7 +153,7 @@ export default function NotificationsPage() {
   const notificationsQuery = useQuery({
     queryKey: ['notifications'],
     queryFn: () => fetchNotifications({ limit: 50 }),
-    refetchInterval: 30_000,
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
   });
 
   const notifications = useMemo(
@@ -184,19 +190,20 @@ export default function NotificationsPage() {
     );
   }, [notifications]);
 
-  const invalidateNotifications = () => {
-    void queryClient.invalidateQueries({ queryKey: ['notifications'] });
-    void queryClient.invalidateQueries({ queryKey: ['notifications-unread'] });
-  };
-
   const markReadMutation = useMutation({
     mutationFn: markNotificationRead,
-    onSuccess: invalidateNotifications,
+    onSuccess: async (_result, notificationId) => {
+      markNotificationReadInCaches(queryClient, notificationId);
+      await invalidateNotificationActivity(queryClient);
+    },
   });
 
   const markAllMutation = useMutation({
     mutationFn: markAllNotificationsRead,
-    onSuccess: invalidateNotifications,
+    onSuccess: async () => {
+      markAllNotificationsReadInCaches(queryClient);
+      await invalidateNotificationActivity(queryClient);
+    },
   });
 
   return (

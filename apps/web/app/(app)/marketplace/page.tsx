@@ -14,6 +14,7 @@ import {
   formatPrice,
   photoUrls,
 } from '@/lib/listing-format';
+import { ACTIVITY_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 
 function listingMatchesQuery(listing: ApiListing, query: string): boolean {
   if (!query) {
@@ -52,6 +53,7 @@ export default function MarketplacePage() {
       });
     },
     enabled: Boolean(primaryCommunityId),
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
   });
 
   const rawListings = listingsQuery.data?.listings;

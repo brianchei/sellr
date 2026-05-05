@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchNotifications } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
+import { ACTIVITY_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 
 export function AppHeader() {
   const { logout, primaryCommunityId } = useAuth();
@@ -16,7 +17,7 @@ export function AppHeader() {
     queryKey: ['notifications-unread'],
     queryFn: () => fetchNotifications({ unreadOnly: true, limit: 50 }),
     enabled: Boolean(primaryCommunityId),
-    refetchInterval: 30_000,
+    refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
   });
   const unreadCount =
     unreadNotificationsQuery.data?.notifications.length ?? 0;
