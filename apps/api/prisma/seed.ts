@@ -79,6 +79,79 @@ async function ensureMembership(userId: string, communityId: string) {
   });
 }
 
+async function resetDemoCommunityData({
+  communityId,
+  userIds,
+}: {
+  communityId: string;
+  userIds: string[];
+}) {
+  const listings = await prisma.listing.findMany({
+    where: { communityId },
+    select: { id: true },
+  });
+  const listingIds = listings.map((listing) => listing.id);
+
+  const offers = await prisma.offer.findMany({
+    where: { listingId: { in: listingIds } },
+    select: { id: true },
+  });
+  const offerIds = offers.map((offer) => offer.id);
+
+  const conversations = await prisma.conversation.findMany({
+    where: {
+      OR: [
+        { listingId: { in: listingIds } },
+        { offerId: { in: offerIds } },
+      ],
+    },
+    select: { id: true },
+  });
+  const conversationIds = conversations.map((conversation) => conversation.id);
+
+  const messages = await prisma.message.findMany({
+    where: { conversationId: { in: conversationIds } },
+    select: { id: true },
+  });
+  const messageIds = messages.map((message) => message.id);
+
+  const meetups = await prisma.meetup.findMany({
+    where: { offerId: { in: offerIds } },
+    select: { id: true },
+  });
+  const meetupIds = meetups.map((meetup) => meetup.id);
+
+  await prisma.report.deleteMany({
+    where: {
+      OR: [
+        { reporterId: { in: userIds } },
+        { targetType: 'user', targetId: { in: userIds } },
+        { targetType: 'listing', targetId: { in: listingIds } },
+        { targetType: 'message', targetId: { in: messageIds } },
+      ],
+    },
+  });
+
+  await prisma.rating.deleteMany({
+    where: { meetupId: { in: meetupIds } },
+  });
+  await prisma.message.deleteMany({
+    where: { conversationId: { in: conversationIds } },
+  });
+  await prisma.conversation.deleteMany({
+    where: { id: { in: conversationIds } },
+  });
+  await prisma.meetup.deleteMany({
+    where: { id: { in: meetupIds } },
+  });
+  await prisma.offer.deleteMany({
+    where: { id: { in: offerIds } },
+  });
+  await prisma.listing.deleteMany({
+    where: { id: { in: listingIds } },
+  });
+}
+
 async function upsertDemoListing(input: DemoListingInput) {
   const existing = await prisma.listing.findFirst({
     where: {
@@ -226,6 +299,11 @@ async function main() {
     ensureMembership(demoSeller.id, community.id),
     ensureMembership(demoBuyer.id, community.id),
   ]);
+
+  await resetDemoCommunityData({
+    communityId: community.id,
+    userIds: [seedUser.id, demoSeller.id, demoBuyer.id],
+  });
 
   const desk = await upsertDemoListing({
     sellerId: demoSeller.id,

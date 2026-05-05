@@ -87,7 +87,8 @@ Local OTP accepts `000000`.
 - Buyer: `+15550000002` / Jordan Rivera
 
 The buyer smoke test appends a `[smoke]` message to the seeded conversation.
-Rerun the seed when you want to reset demo content.
+Rerun the seed when you want to reset demo content; it clears local `Dev Campus`
+demo listings, conversations, and reports before recreating the fixtures.
 
 ## Expected Local Caveats
 

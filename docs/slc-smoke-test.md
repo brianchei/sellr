@@ -2,6 +2,8 @@
 
 Use this checklist after migrations and `pnpm --filter @sellr/api exec prisma db seed`.
 It verifies the first working web SLC without relying on hand-created data.
+The seed resets the local `Dev Campus` demo listings, conversations, and
+reports before recreating the canonical fixtures.
 For the higher-level handoff checklist, see
 [`slc-readiness.md`](./slc-readiness.md).
 
