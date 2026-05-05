@@ -1,4 +1,8 @@
 import type { ApiListing, UpdateListingInput } from '@sellr/api-client';
+import {
+  LISTING_IMAGE_MAX_COUNT,
+  isListingPhotoUrl,
+} from '@sellr/shared';
 import { photoUrls } from '@/lib/listing-format';
 
 export const CATEGORIES = [
@@ -38,7 +42,7 @@ export type ListingFormValues = {
   conditionNote: string;
   price: string;
   negotiable: boolean;
-  photoUrl: string;
+  photoUrls: string[];
   locationNeighborhood: string;
   locationRadiusM: string;
   dayOfWeek: string;
@@ -55,7 +59,7 @@ export const DEFAULT_LISTING_FORM_VALUES: ListingFormValues = {
   conditionNote: '',
   price: '',
   negotiable: true,
-  photoUrl: '',
+  photoUrls: [],
   locationNeighborhood: '',
   locationRadiusM: '1000',
   dayOfWeek: '6',
@@ -72,12 +76,7 @@ export type ListingFormErrors = Partial<
 >;
 
 export function isValidImageUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch {
-    return false;
-  }
+  return isListingPhotoUrl(value);
 }
 
 function parsePrice(value: string): number | null {
@@ -142,7 +141,7 @@ export function listingFormValuesFromListing(
     conditionNote: listing.conditionNote ?? '',
     price: Number.isFinite(price) ? String(price) : '',
     negotiable: listing.negotiable,
-    photoUrl: photoUrls(listing.photoUrls)[0] ?? '',
+    photoUrls: photoUrls(listing.photoUrls),
     locationNeighborhood: listing.locationNeighborhood,
     locationRadiusM: String(listing.locationRadiusM),
     dayOfWeek: String(window.dayOfWeek),
@@ -162,7 +161,7 @@ export function validateListingForm(
 
   const cleanTitle = values.title.trim();
   const cleanDescription = values.description.trim();
-  const cleanPhotoUrl = values.photoUrl.trim();
+  const cleanPhotoUrls = values.photoUrls.map((url) => url.trim());
   const cleanNeighborhood = values.locationNeighborhood.trim();
   const cleanSubcategory = values.subcategory.trim();
   const cleanConditionNote = values.conditionNote.trim();
@@ -192,7 +191,7 @@ export function validateListingForm(
           endHour: parsedEnd,
         },
       ],
-      photoUrls: [cleanPhotoUrl],
+      photoUrls: cleanPhotoUrls,
     },
   };
 }
@@ -202,7 +201,7 @@ export function getListingFormErrors(
 ): ListingFormErrors {
   const cleanTitle = values.title.trim();
   const cleanDescription = values.description.trim();
-  const cleanPhotoUrl = values.photoUrl.trim();
+  const cleanPhotoUrls = values.photoUrls.map((url) => url.trim());
   const cleanNeighborhood = values.locationNeighborhood.trim();
   const cleanSubcategory = values.subcategory.trim();
   const cleanConditionNote = values.conditionNote.trim();
@@ -233,8 +232,12 @@ export function getListingFormErrors(
     errors.conditionNote = 'Keep the condition note under 200 characters.';
   }
 
-  if (!isValidImageUrl(cleanPhotoUrl)) {
-    errors.photoUrl = 'Add a valid image URL starting with http:// or https://.';
+  if (cleanPhotoUrls.length === 0) {
+    errors.photoUrls = 'Add at least one item photo.';
+  } else if (cleanPhotoUrls.length > LISTING_IMAGE_MAX_COUNT) {
+    errors.photoUrls = `Add ${LISTING_IMAGE_MAX_COUNT} photos or fewer.`;
+  } else if (!cleanPhotoUrls.every(isValidImageUrl)) {
+    errors.photoUrls = 'Remove any image that did not upload correctly.';
   }
 
   if (!cleanNeighborhood) {

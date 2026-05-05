@@ -38,6 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("./lib/sentry");
 const fastify_1 = __importDefault(require("fastify"));
+const multipart_1 = __importDefault(require("@fastify/multipart"));
 const socket_io_1 = require("socket.io");
 const fastify_type_provider_zod_1 = require("fastify-type-provider-zod");
 const Sentry = __importStar(require("@sentry/node"));
@@ -54,6 +55,7 @@ const routes_6 = require("./modules/search/routes");
 const routes_7 = require("./modules/communities/routes");
 const routes_8 = require("./modules/reports/routes");
 const routes_9 = require("./modules/notifications/routes");
+const routes_10 = require("./modules/uploads/routes");
 const socket_1 = require("./lib/socket");
 const queue_1 = require("./lib/queue");
 const logger_1 = require("./lib/logger");
@@ -91,6 +93,7 @@ async function start() {
     await fastify.register(cors_1.corsPlugin);
     await fastify.register(jwt_1.jwtPlugin);
     await fastify.register(rateLimit_1.rateLimitPlugin);
+    await fastify.register(multipart_1.default);
     fastify.get('/health', () => ({
         status: 'ok',
         ts: new Date().toISOString(),
@@ -106,6 +109,7 @@ async function start() {
     await fastify.register(routes_9.notificationRoutes, {
         prefix: '/api/v1/notifications',
     });
+    await fastify.register(routes_10.uploadRoutes, { prefix: '/api/v1/uploads' });
     (0, socket_1.initSocketIO)(io);
     (0, queue_1.initBullMQ)();
     const port = parseInt(process.env.PORT ?? '3001', 10);

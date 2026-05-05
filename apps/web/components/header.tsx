@@ -1,35 +1,20 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 
 function SellrLogo() {
   return (
     <Link href="/" className="flex items-center gap-2.5 no-underline">
-      <div
-        className="flex h-9 w-9 items-center justify-center rounded-lg"
-        style={{
-          background: 'var(--color-brand-primary)',
-          boxShadow: 'var(--shadow-sm)',
-        }}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M3 9.5L12 4L21 9.5V20C21 20.55 20.55 21 20 21H4C3.45 21 3 20.55 3 20V9.5Z"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M9 21V13H15V21"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
+      <Image
+        src="/brand/sellr-logo-mark.png"
+        alt=""
+        width={36}
+        height={36}
+        className="h-9 w-9 object-contain"
+        priority
+      />
       <span
         className="text-xl font-bold"
         style={{ color: 'var(--text-primary)' }}

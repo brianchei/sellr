@@ -211,6 +211,9 @@ export declare function markListingSold(listingId: string): Promise<{
 export declare function deleteListing(listingId: string): Promise<{
     deleted: boolean;
 }>;
+export declare function uploadListingImage(file: File): Promise<{
+    url: string;
+}>;
 export declare function searchListings(params: {
     communityId: string;
     q?: string;

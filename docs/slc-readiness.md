@@ -80,7 +80,8 @@ widths:
   inbox/listing detail, empty/error states.
 - `/admin/reports`: admin-only report list, filters, target links, status
   actions, restricted-access state for non-admin users.
-- `/sell`: inline validation, image URL feedback, buyer preview, submit state.
+- `/sell`: inline validation, file image upload feedback, buyer preview,
+  submit state.
 - `/listings`: status filters, create/publish notices, listing actions, sold
   lifecycle.
 - `/listings/[listingId]/edit`: edit form layout, save notice, owner-only guard.
@@ -110,8 +111,8 @@ fixtures.
   tests return stale endpoint behavior.
 - Databases without the optional `location_geom` column fall back to
   community-scoped listings without distance ranking.
-- Image support is URL-based for the SLC; upload/storage integration is out of
-  scope.
+- Listing photos upload to local API storage for the web SLC. Production media
+  storage and cleanup policies are still outside the first SLC.
 - Browser route smoke validates authenticated HTML responses, not pixel-level
   visual layout. Use the manual visual pass for layout sign-off.
 

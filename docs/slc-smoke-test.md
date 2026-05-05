@@ -52,7 +52,8 @@ widths:
   actions, and links back to inbox or listing detail.
 - `/admin/reports`: report filters, status actions, target links, and
   non-admin restricted-access state.
-- `/sell`: inline validation, image preview, buyer preview panel.
+- `/sell`: inline validation, file image upload, image preview, buyer preview
+  panel.
 - `/listings` and `/listings/[listingId]/edit`: status filters, notices,
   listing actions, edit form layout.
 

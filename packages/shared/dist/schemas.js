@@ -1,8 +1,29 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.LISTING_IMAGE_MIME_TYPES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
+exports.isListingPhotoUrl = isListingPhotoUrl;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
+exports.LISTING_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
+exports.LISTING_IMAGE_MAX_COUNT = 8;
+exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = '/api/v1/uploads/listing-images/';
+exports.LISTING_IMAGE_MIME_TYPES = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+];
+function isListingPhotoUrl(value) {
+    if (value.startsWith(exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX)) {
+        return new RegExp(`^${exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX}[a-f0-9-]+\\.(jpg|png|webp)$`, 'i').test(value);
+    }
+    try {
+        const url = new URL(value);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    }
+    catch {
+        return false;
+    }
+}
 // Auth
 exports.SendOTPSchema = zod_1.z.object({
     phoneE164: zod_1.z.string().regex(/^\+[1-9]\d{1,14}$/, 'Must be E.164 format'),
@@ -38,6 +59,12 @@ exports.AvailabilityWindowSchema = zod_1.z.object({
     endHour: zod_1.z.number().min(0).max(23),
     specificDate: zod_1.z.iso.datetime().optional(),
 });
+exports.ListingPhotoUrlSchema = zod_1.z
+    .string()
+    .max(2048)
+    .refine(isListingPhotoUrl, {
+    error: 'Photo must be an uploaded listing image or an http(s) image URL',
+});
 exports.CreateListingSchema = zod_1.z.object({
     communityId: zod_1.z.uuid(),
     title: zod_1.z.string().min(3).max(60),
@@ -51,7 +78,10 @@ exports.CreateListingSchema = zod_1.z.object({
     locationRadiusM: zod_1.z.number().min(100).max(5000).default(1000),
     locationNeighborhood: zod_1.z.string().max(100),
     availabilityWindows: zod_1.z.array(exports.AvailabilityWindowSchema).min(1).max(4),
-    photoUrls: zod_1.z.array(zod_1.z.url()).min(1).max(8),
+    photoUrls: zod_1.z
+        .array(exports.ListingPhotoUrlSchema)
+        .min(1)
+        .max(exports.LISTING_IMAGE_MAX_COUNT),
     aiGenerated: zod_1.z.boolean().default(false),
     lat: zod_1.z.number().gte(-90).lte(90).optional(),
     lng: zod_1.z.number().gte(-180).lte(180).optional(),

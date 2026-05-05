@@ -1,5 +1,10 @@
 import { z } from 'zod';
 import { ListingCondition, ListingStatus } from './enums';
+export declare const LISTING_IMAGE_MAX_BYTES: number;
+export declare const LISTING_IMAGE_MAX_COUNT = 8;
+export declare const LISTING_IMAGE_UPLOAD_PATH_PREFIX = "/api/v1/uploads/listing-images/";
+export declare const LISTING_IMAGE_MIME_TYPES: readonly ["image/jpeg", "image/png", "image/webp"];
+export declare function isListingPhotoUrl(value: string): boolean;
 export declare const SendOTPSchema: z.ZodObject<{
     phoneE164: z.ZodString;
 }, z.core.$strip>;
@@ -29,6 +34,7 @@ export declare const AvailabilityWindowSchema: z.ZodObject<{
     endHour: z.ZodNumber;
     specificDate: z.ZodOptional<z.ZodISODateTime>;
 }, z.core.$strip>;
+export declare const ListingPhotoUrlSchema: z.ZodString;
 export declare const CreateListingSchema: z.ZodObject<{
     communityId: z.ZodUUID;
     title: z.ZodString;
@@ -47,7 +53,7 @@ export declare const CreateListingSchema: z.ZodObject<{
         endHour: z.ZodNumber;
         specificDate: z.ZodOptional<z.ZodISODateTime>;
     }, z.core.$strip>>;
-    photoUrls: z.ZodArray<z.ZodURL>;
+    photoUrls: z.ZodArray<z.ZodString>;
     aiGenerated: z.ZodDefault<z.ZodBoolean>;
     lat: z.ZodOptional<z.ZodNumber>;
     lng: z.ZodOptional<z.ZodNumber>;
@@ -69,7 +75,7 @@ export declare const UpdateListingSchema: z.ZodObject<{
         endHour: z.ZodNumber;
         specificDate: z.ZodOptional<z.ZodISODateTime>;
     }, z.core.$strip>>;
-    photoUrls: z.ZodArray<z.ZodURL>;
+    photoUrls: z.ZodArray<z.ZodString>;
     lat: z.ZodOptional<z.ZodNumber>;
     lng: z.ZodOptional<z.ZodNumber>;
 }, z.core.$strip>;

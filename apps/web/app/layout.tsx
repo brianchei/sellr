@@ -9,9 +9,19 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Sellr — The Marketplace That Actually Closes',
   description: 'A trust-native local marketplace for verified communities.',
+  icons: {
+    icon: [{ url: '/brand/sellr-app-icon.png', type: 'image/png' }],
+    apple: [{ url: '/brand/sellr-app-icon.png', type: 'image/png' }],
+  },
   openGraph: {
     type: 'website',
     siteName: 'Sellr',
+    images: [
+      {
+        url: '/brand/sellr-logo-wordmark.png',
+        alt: 'Sellr logo',
+      },
+    ],
   },
 };
 

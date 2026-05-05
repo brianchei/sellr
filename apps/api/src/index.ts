@@ -1,6 +1,7 @@
 import './lib/sentry';
 
 import Fastify, { type FastifyError } from 'fastify';
+import multipart from '@fastify/multipart';
 import { Server } from 'socket.io';
 import {
   serializerCompiler,
@@ -22,6 +23,7 @@ import { searchRoutes } from './modules/search/routes';
 import { communityRoutes } from './modules/communities/routes';
 import { reportRoutes } from './modules/reports/routes';
 import { notificationRoutes } from './modules/notifications/routes';
+import { uploadRoutes } from './modules/uploads/routes';
 import { initSocketIO } from './lib/socket';
 import { initBullMQ } from './lib/queue';
 import { logger } from './lib/logger';
@@ -69,6 +71,7 @@ async function start() {
   await fastify.register(corsPlugin);
   await fastify.register(jwtPlugin);
   await fastify.register(rateLimitPlugin);
+  await fastify.register(multipart);
 
   fastify.get('/health', () => ({
     status: 'ok',
@@ -86,6 +89,7 @@ async function start() {
   await fastify.register(notificationRoutes, {
     prefix: '/api/v1/notifications',
   });
+  await fastify.register(uploadRoutes, { prefix: '/api/v1/uploads' });
 
   initSocketIO(io);
   initBullMQ();

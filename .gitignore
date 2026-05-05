@@ -28,6 +28,15 @@ npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+/uploads/
+/apps/api/uploads/
+!/apps/api/dist/
+/apps/api/dist/*
+!/apps/api/dist/modules/
+/apps/api/dist/modules/*
+!/apps/api/dist/modules/uploads/
+/apps/api/dist/modules/uploads/*
+!/apps/api/dist/modules/uploads/routes.js
 
 # Test / coverage
 coverage

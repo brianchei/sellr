@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { sendOtp, setAccessToken, verifyOtp } from '@sellr/api-client';
@@ -83,24 +84,14 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-[var(--bg-secondary)] px-6 py-16">
       <section className="w-full max-w-md rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm sm:p-7">
         <Link href="/" className="mb-8 flex items-center gap-2 no-underline">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--color-brand-primary)] shadow-sm">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M3 9.5L12 4L21 9.5V20C21 20.55 20.55 21 20 21H4C3.45 21 3 20.55 3 20V9.5Z"
-                stroke="white"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.25"
-              />
-              <path
-                d="M9 21V13H15V21"
-                stroke="white"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.25"
-              />
-            </svg>
-          </span>
+          <Image
+            src="/brand/sellr-logo-mark.png"
+            alt=""
+            width={36}
+            height={36}
+            className="h-9 w-9 object-contain"
+            priority
+          />
           <span className="text-lg font-bold text-[var(--text-primary)]">
             Sellr
           </span>

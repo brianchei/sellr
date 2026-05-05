@@ -312,6 +312,15 @@ export function deleteListing(listingId: string) {
   });
 }
 
+export function uploadListingImage(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return apiFetch<{ url: string }>('/uploads/listing-images', {
+    method: 'POST',
+    body: formData,
+  });
+}
+
 export function searchListings(params: {
   communityId: string;
   q?: string;

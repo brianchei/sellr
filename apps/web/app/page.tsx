@@ -1,27 +1,18 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center bg-[var(--bg-secondary)] px-6 py-16 text-[var(--text-primary)]">
       <div className="mb-6 flex items-center gap-2">
-        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-primary)] shadow-sm">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M3 9.5L12 4L21 9.5V20C21 20.55 20.55 21 20 21H4C3.45 21 3 20.55 3 20V9.5Z"
-              stroke="white"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2.25"
-            />
-            <path
-              d="M9 21V13H15V21"
-              stroke="white"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2.25"
-            />
-          </svg>
-        </span>
+        <Image
+          src="/brand/sellr-logo-mark.png"
+          alt=""
+          width={40}
+          height={40}
+          className="h-10 w-10 object-contain"
+          priority
+        />
         <span className="text-xl font-bold">Sellr</span>
       </div>
       <p className="text-sm font-medium text-[var(--color-brand-contrast)]">

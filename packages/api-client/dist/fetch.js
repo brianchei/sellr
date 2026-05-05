@@ -37,7 +37,8 @@ async function apiFetch(path, options = {}) {
         ...options.headers,
     };
     const hasContentType = Object.keys(headers).some((key) => key.toLowerCase() === 'content-type');
-    if (options.body !== undefined && !hasContentType) {
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+    if (options.body !== undefined && !hasContentType && !isFormData) {
         headers['Content-Type'] = 'application/json';
     }
     if (typeof window !== 'undefined' && useSameOriginApi) {

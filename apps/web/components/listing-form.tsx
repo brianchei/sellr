@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { uploadListingImage } from '@sellr/api-client';
+import {
+  LISTING_IMAGE_MAX_BYTES,
+  LISTING_IMAGE_MAX_COUNT,
+  LISTING_IMAGE_MIME_TYPES,
+} from '@sellr/shared';
 import {
   ListingBuyerPreview,
   type ListingImageStatus,
@@ -62,16 +68,25 @@ export function ListingForm({
   const [showAllErrors, setShowAllErrors] = useState(false);
   const [loadedImageUrl, setLoadedImageUrl] = useState<string | null>(null);
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const latestValuesRef = useRef(values);
   const fieldErrors = getListingFormErrors(values);
-  const cleanPhotoUrl = values.photoUrl.trim();
-  const canPreviewImage = cleanPhotoUrl.length > 0 && !fieldErrors.photoUrl;
+  const cleanPhotoUrl = values.photoUrls[0]?.trim() ?? '';
+  const canPreviewImage = cleanPhotoUrl.length > 0 && !fieldErrors.photoUrls;
   const imageStatus: ListingImageStatus = !canPreviewImage
     ? 'idle'
-    : loadedImageUrl === cleanPhotoUrl
+    : isUploadingImage
+      ? 'loading'
+      : loadedImageUrl === cleanPhotoUrl
       ? 'loaded'
       : failedImageUrl === cleanPhotoUrl
         ? 'error'
         : 'loading';
+
+  useEffect(() => {
+    latestValuesRef.current = values;
+  }, [values]);
 
   useEffect(() => {
     if (!canPreviewImage) {
@@ -121,10 +136,84 @@ export function ListingForm({
   };
 
   const photoUrlError =
-    visibleError('photoUrl') ??
+    visibleError('photoUrls') ??
+    imageUploadError ??
     (canPreviewImage && imageStatus === 'error'
-      ? 'This image URL did not load. Use a public image link.'
+      ? 'This image could not load. Try another file.'
       : undefined);
+
+  const updatePhotoUrls = (photoUrls: string[]) => {
+    const nextValues = { ...latestValuesRef.current, photoUrls };
+    latestValuesRef.current = nextValues;
+    onChange(nextValues);
+  };
+
+  const removePhotoUrl = (photoUrl: string) => {
+    setImageUploadError(null);
+    markTouched('photoUrls');
+    updatePhotoUrls(values.photoUrls.filter((url) => url !== photoUrl));
+  };
+
+  const handleImageFiles = async (files: FileList | null) => {
+    markTouched('photoUrls');
+    setImageUploadError(null);
+
+    const selectedFiles = Array.from(files ?? []);
+    if (selectedFiles.length === 0) {
+      return;
+    }
+
+    const remainingSlots = LISTING_IMAGE_MAX_COUNT - values.photoUrls.length;
+    if (remainingSlots <= 0) {
+      setImageUploadError(`Remove a photo before adding another one.`);
+      return;
+    }
+
+    const filesToUpload = selectedFiles.slice(0, remainingSlots);
+    const unsupportedFile = filesToUpload.find(
+      (file) =>
+        !LISTING_IMAGE_MIME_TYPES.includes(
+          file.type as (typeof LISTING_IMAGE_MIME_TYPES)[number],
+        ),
+    );
+    if (unsupportedFile) {
+      setImageUploadError('Upload JPG, PNG, or WebP images.');
+      return;
+    }
+
+    const oversizedFile = filesToUpload.find(
+      (file) => file.size > LISTING_IMAGE_MAX_BYTES,
+    );
+    if (oversizedFile) {
+      setImageUploadError('Keep each image under 3 MB.');
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      const uploaded = await Promise.all(
+        filesToUpload.map((file) => uploadListingImage(file)),
+      );
+      const currentPhotoUrls = latestValuesRef.current.photoUrls;
+      updatePhotoUrls([
+        ...currentPhotoUrls,
+        ...uploaded.map((result) => result.url),
+      ]);
+      if (selectedFiles.length > filesToUpload.length) {
+        setImageUploadError(
+          `Uploaded ${filesToUpload.length} photos. Remove a photo before adding more.`,
+        );
+      }
+    } catch (uploadError) {
+      setImageUploadError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : 'Could not upload this image. Try another file.',
+      );
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   return (
     <form
@@ -287,19 +376,61 @@ export function ListingForm({
           </div>
         </label>
 
-        <label className="block text-sm font-medium text-[var(--text-primary)]">
-          Image URL
-          <input
-            value={values.photoUrl}
-            onChange={(event) => setField('photoUrl', event.target.value)}
-            onBlur={() => markTouched('photoUrl')}
-            placeholder="https://example.com/photo.jpg"
-            aria-invalid={Boolean(photoUrlError)}
-            aria-describedby="listing-photo-url-error"
-            className={fieldClassName(Boolean(photoUrlError))}
-          />
+        <div>
+          <label className="block text-sm font-medium text-[var(--text-primary)]">
+            Photos
+            <input
+              type="file"
+              accept={LISTING_IMAGE_MIME_TYPES.join(',')}
+              multiple
+              disabled={isUploadingImage}
+              onChange={(event) => {
+                void handleImageFiles(event.target.files);
+                event.target.value = '';
+              }}
+              onBlur={() => markTouched('photoUrls')}
+              aria-invalid={Boolean(photoUrlError)}
+              aria-describedby="listing-photo-url-error listing-photo-help"
+              className={fieldClassName(Boolean(photoUrlError))}
+            />
+          </label>
+          <p
+            id="listing-photo-help"
+            className="mt-1.5 text-xs text-[var(--text-tertiary)]"
+          >
+            JPG, PNG, or WebP. Up to {LISTING_IMAGE_MAX_COUNT} photos.
+          </p>
           <FieldError id="listing-photo-url-error" message={photoUrlError} />
-        </label>
+
+          {values.photoUrls.length > 0 ? (
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {values.photoUrls.map((photoUrl, index) => (
+                <div
+                  key={photoUrl}
+                  className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white"
+                >
+                  <div
+                    className="flex aspect-square items-end bg-[var(--bg-tertiary)] bg-cover bg-center"
+                    style={{ backgroundImage: `url("${photoUrl}")` }}
+                  >
+                    {index === 0 ? (
+                      <span className="m-2 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-[var(--color-brand-contrast)] shadow-sm">
+                        Primary
+                      </span>
+                    ) : null}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removePhotoUrl(photoUrl)}
+                    className="w-full border-0 bg-white px-2 py-2 text-xs font-medium text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
 
         <label className="flex items-start gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3 text-sm">
           <input
@@ -448,10 +579,14 @@ export function ListingForm({
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isUploadingImage}
           className="w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-3 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? submittingLabel : submitLabel}
+          {isSubmitting
+            ? submittingLabel
+            : isUploadingImage
+              ? 'Uploading photos...'
+              : submitLabel}
         </button>
       </aside>
     </form>

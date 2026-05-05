@@ -32,7 +32,7 @@ export function ListingBuyerPreview({
   values,
   imageStatus,
 }: ListingBuyerPreviewProps) {
-  const cleanPhotoUrl = values.photoUrl.trim();
+  const cleanPhotoUrl = values.photoUrls[0]?.trim() ?? '';
   const hasLoadedImage =
     cleanPhotoUrl.length > 0 &&
     isValidImageUrl(cleanPhotoUrl) &&

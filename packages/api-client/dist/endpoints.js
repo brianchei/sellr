@@ -18,6 +18,7 @@ exports.publishListing = publishListing;
 exports.unpublishListing = unpublishListing;
 exports.markListingSold = markListingSold;
 exports.deleteListing = deleteListing;
+exports.uploadListingImage = uploadListingImage;
 exports.searchListings = searchListings;
 exports.createOffer = createOffer;
 exports.fetchOffer = fetchOffer;
@@ -145,6 +146,14 @@ function markListingSold(listingId) {
 function deleteListing(listingId) {
     return (0, fetch_1.apiFetch)(`/listings/${listingId}`, {
         method: 'DELETE',
+    });
+}
+function uploadListingImage(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return (0, fetch_1.apiFetch)('/uploads/listing-images', {
+        method: 'POST',
+        body: formData,
     });
 }
 function searchListings(params) {

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -39,32 +40,15 @@ export function AppHeader() {
       }}
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        {/* Logo */}
         <Link href="/dashboard" className="flex items-center gap-2 no-underline">
-          <div
-            className="flex h-8 w-8 items-center justify-center rounded-lg"
-            style={{
-              background: 'var(--color-brand-primary)',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M3 9.5L12 4L21 9.5V20C21 20.55 20.55 21 20 21H4C3.45 21 3 20.55 3 20V9.5Z"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M9 21V13H15V21"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
+          <Image
+            src="/brand/sellr-logo-mark.png"
+            alt=""
+            width={32}
+            height={32}
+            className="h-8 w-8 object-contain"
+            priority
+          />
           <span
             className="text-lg font-bold"
             style={{ color: 'var(--text-primary)' }}

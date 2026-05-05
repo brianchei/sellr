@@ -1,6 +1,32 @@
 import { z } from 'zod';
 import { ListingCondition, ListingStatus } from './enums';
 
+export const LISTING_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
+export const LISTING_IMAGE_MAX_COUNT = 8;
+export const LISTING_IMAGE_UPLOAD_PATH_PREFIX =
+  '/api/v1/uploads/listing-images/';
+export const LISTING_IMAGE_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+] as const;
+
+export function isListingPhotoUrl(value: string): boolean {
+  if (value.startsWith(LISTING_IMAGE_UPLOAD_PATH_PREFIX)) {
+    return new RegExp(
+      `^${LISTING_IMAGE_UPLOAD_PATH_PREFIX}[a-f0-9-]+\\.(jpg|png|webp)$`,
+      'i',
+    ).test(value);
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 // Auth
 export const SendOTPSchema = z.object({
   phoneE164: z.string().regex(/^\+[1-9]\d{1,14}$/, 'Must be E.164 format'),
@@ -43,6 +69,13 @@ export const AvailabilityWindowSchema = z.object({
   specificDate: z.iso.datetime().optional(),
 });
 
+export const ListingPhotoUrlSchema = z
+  .string()
+  .max(2048)
+  .refine(isListingPhotoUrl, {
+    error: 'Photo must be an uploaded listing image or an http(s) image URL',
+  });
+
 export const CreateListingSchema = z.object({
   communityId: z.uuid(),
   title: z.string().min(3).max(60),
@@ -56,7 +89,10 @@ export const CreateListingSchema = z.object({
   locationRadiusM: z.number().min(100).max(5000).default(1000),
   locationNeighborhood: z.string().max(100),
   availabilityWindows: z.array(AvailabilityWindowSchema).min(1).max(4),
-  photoUrls: z.array(z.url()).min(1).max(8),
+  photoUrls: z
+    .array(ListingPhotoUrlSchema)
+    .min(1)
+    .max(LISTING_IMAGE_MAX_COUNT),
   aiGenerated: z.boolean().default(false),
   lat: z.number().gte(-90).lte(90).optional(),
   lng: z.number().gte(-180).lte(180).optional(),
