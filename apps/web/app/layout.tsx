@@ -1,10 +1,22 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/components/auth-provider';
 import { Providers } from './providers';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-instrument-serif',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Sellr — The Marketplace That Actually Closes',
@@ -31,8 +43,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
-      <body className={inter.className}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${instrumentSerif.variable}`}
+    >
+      <body>
         <Providers>
           <AuthProvider>{children}</AuthProvider>
         </Providers>

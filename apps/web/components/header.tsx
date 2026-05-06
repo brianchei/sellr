@@ -2,23 +2,31 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-function SellrLogo() {
+const NAV_LINKS = [
+  { label: 'Why Sellr', href: '/#why' },
+  { label: 'How it works', href: '/#how-it-works' },
+  { label: 'Trust & safety', href: '/#trust' },
+  { label: 'For sellers', href: '/#sellers' },
+] as const;
+
+function SellrWordmark({ className = '' }: { className?: string }) {
   return (
-    <Link href="/" className="flex items-center gap-2.5 no-underline">
+    <Link
+      href="/"
+      aria-label="Sellr home"
+      className={`group inline-flex items-center no-underline ${className}`}
+    >
       <Image
         src="/brand/sellr-logo-mark.png"
         alt=""
-        width={36}
-        height={36}
-        className="h-9 w-9 object-contain"
+        width={32}
+        height={32}
         priority
+        className="h-8 w-8 rounded-md object-contain"
       />
-      <span
-        className="text-xl font-bold"
-        style={{ color: 'var(--text-primary)' }}
-      >
+      <span className="ml-2 text-lg font-bold tracking-tight text-[var(--text-primary)]">
         Sellr
       </span>
     </Link>
@@ -27,138 +35,154 @@ function SellrLogo() {
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [mobileOpen]);
 
   return (
     <header
-      className="sticky top-0 z-50 w-full"
-      style={{
-        background: 'rgba(250, 250, 247, 0.9)',
-        backdropFilter: 'blur(16px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-        borderBottom: '1px solid var(--border-default)',
-      }}
+      className={`sticky top-0 z-50 w-full transition-colors duration-200 ${
+        scrolled
+          ? 'border-b border-[var(--border-default)] bg-[rgba(250,250,247,0.92)] backdrop-blur-md backdrop-saturate-150'
+          : 'border-b border-transparent bg-transparent'
+      }`}
     >
-      <div
-        className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4"
-        style={{ gap: '32px' }}
-      >
-        <SellrLogo />
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
+        <SellrWordmark />
 
-        {/* Desktop Navigation */}
         <nav
-          className="hidden items-center md:flex"
-          style={{ gap: '8px' }}
-          aria-label="Main navigation"
+          className="hidden items-center gap-1 md:flex"
+          aria-label="Marketing navigation"
         >
-          {[
-            { label: 'Browse', href: '/#categories' },
-            { label: 'How it Works', href: '/#how-it-works' },
-            { label: 'Trust & Safety', href: '/#trust' },
-          ].map((item) => (
+          {NAV_LINKS.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="btn-ghost btn-sm no-underline"
-              style={{
-                color: 'var(--text-secondary)',
-                borderRadius: 'var(--radius-md)',
-                padding: '7px 14px',
-                fontSize: 'var(--text-sm)',
-                fontWeight: 500,
-                transition: 'all var(--duration-fast) var(--ease-out)',
-              }}
+              className="rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline transition hover:bg-[var(--color-brand-contrast-soft)] hover:text-[var(--text-primary)]"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        {/* Desktop Auth CTAs */}
-        <div className="hidden items-center md:flex" style={{ gap: '10px' }}>
-          <Link href="/login" className="btn btn-ghost btn-sm no-underline">
+        <div className="hidden items-center gap-2 md:flex">
+          <Link
+            href="/login"
+            className="rounded-md px-3 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline transition hover:bg-[var(--color-brand-contrast-soft)]"
+          >
             Sign in
           </Link>
-          <Link href="/login" className="btn btn-primary btn-sm no-underline">
-            Get Started
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm transition hover:-translate-y-px hover:bg-[var(--color-brand-primary-hover)] hover:shadow-md active:translate-y-0"
+          >
+            Join your community
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
           </Link>
         </div>
 
-        {/* Mobile Menu Button */}
         <button
           type="button"
-          className="btn-ghost flex items-center justify-center md:hidden"
-          style={{
-            width: '40px',
-            height: '40px',
-            padding: 0,
-            borderRadius: 'var(--radius-md)',
-          }}
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          onClick={() => setMobileOpen((open) => !open)}
           aria-expanded={mobileOpen}
+          aria-controls="sellr-mobile-menu"
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-[var(--text-secondary)] transition hover:bg-[var(--color-brand-contrast-soft)] hover:text-[var(--text-primary)] md:hidden"
         >
           {mobileOpen ? (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M18 6L6 18M6 6l12 12" />
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           ) : (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M3 12h18M3 6h18M3 18h18" />
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M3 6h18M3 12h18M3 18h18" />
             </svg>
           )}
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileOpen && (
+      {mobileOpen ? (
         <div
-          className="animate-fade-in border-t md:hidden"
-          style={{
-            background: 'var(--bg-primary)',
-            borderColor: 'var(--border-default)',
-            padding: '16px',
-          }}
+          id="sellr-mobile-menu"
+          className="animate-fade-in border-t border-[var(--border-default)] bg-[var(--bg-elevated)] md:hidden"
         >
-          <nav className="flex flex-col" style={{ gap: '4px' }}>
-            {[
-              { label: 'Browse', href: '/#categories' },
-              { label: 'How it Works', href: '/#how-it-works' },
-              { label: 'Trust & Safety', href: '/#trust' },
-            ].map((item) => (
+          <nav className="flex flex-col gap-1 px-4 py-4" aria-label="Mobile">
+            {NAV_LINKS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="no-underline"
-                style={{
-                  display: 'block',
-                  padding: '10px 14px',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 500,
-                  color: 'var(--text-secondary)',
-                  borderRadius: 'var(--radius-md)',
-                  transition: 'all var(--duration-fast) var(--ease-out)',
-                }}
                 onClick={() => setMobileOpen(false)}
+                className="rounded-md px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] no-underline transition hover:bg-[var(--color-brand-contrast-soft)] hover:text-[var(--text-primary)]"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
-          <div
-            className="mt-3 flex flex-col border-t pt-3"
-            style={{ gap: '8px', borderColor: 'var(--border-default)' }}
-          >
-            <Link href="/login" className="btn btn-secondary w-full no-underline">
+          <div className="flex flex-col gap-2 border-t border-[var(--border-default)] px-4 py-4">
+            <Link
+              href="/login"
+              onClick={() => setMobileOpen(false)}
+              className="inline-flex items-center justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+            >
               Sign in
             </Link>
-            <Link href="/login" className="btn btn-primary w-full no-underline">
-              Get Started
+            <Link
+              href="/login"
+              onClick={() => setMobileOpen(false)}
+              className="inline-flex items-center justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            >
+              Join your community
             </Link>
           </div>
         </div>
-      )}
+      ) : null}
     </header>
   );
 }
 
-export { SellrLogo };
+export { SellrWordmark };
