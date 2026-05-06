@@ -1,5 +1,6 @@
 import { AuthGate } from '@/components/auth-gate';
 import { AppHeader } from '@/components/app-header';
+import { AppFooter } from '@/components/app-footer';
 
 export default function AppShellLayout({
   children,
@@ -7,10 +8,11 @@ export default function AppShellLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[var(--bg-secondary)] text-[var(--text-primary)]">
+    <div className="flex min-h-screen flex-col bg-[var(--bg-secondary)] text-[var(--text-primary)]">
       <AuthGate>
         <AppHeader />
-        {children}
+        <div className="flex-1">{children}</div>
+        <AppFooter />
       </AuthGate>
     </div>
   );
