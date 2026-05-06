@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { MouseEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -21,10 +22,9 @@ import {
   markNotificationReadInCaches,
 } from '@/lib/query-refresh';
 
-const FILTERS: Array<{
-  value: NotificationCategory | 'all' | 'unread';
-  label: string;
-}> = [
+type FilterValue = NotificationCategory | 'all' | 'unread';
+
+const FILTERS: Array<{ value: FilterValue; label: string }> = [
   { value: 'all', label: 'All' },
   { value: 'unread', label: 'Unread' },
   { value: 'messages', label: 'Messages' },
@@ -34,9 +34,7 @@ const FILTERS: Array<{
 ];
 
 function categoryLabel(category: NotificationCategory): string {
-  if (category === 'time-sensitive') {
-    return 'Pickup';
-  }
+  if (category === 'time-sensitive') return 'Pickup';
   return category[0].toUpperCase() + category.slice(1);
 }
 
@@ -58,7 +56,7 @@ function categoryClass(category: NotificationCategory): string {
 
 function NotificationSkeleton() {
   return (
-    <section className="mt-6 space-y-3">
+    <section className="mt-4 space-y-3">
       {Array.from({ length: 4 }, (_, index) => (
         <div
           key={index}
@@ -80,75 +78,130 @@ function NotificationCard({
   notification: NotificationViewModel;
   onMarkRead: (notificationId: string) => void;
 }) {
+  const isPickup = notification.category === 'time-sensitive';
+  const isUnread = !notification.read;
+  const accentColor = isPickup
+    ? 'var(--color-brand-warm)'
+    : isUnread
+      ? 'var(--color-brand-contrast)'
+      : 'transparent';
+
+  const handleMarkReadClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onMarkRead(notification.id);
+  };
+
+  const handleOpenClick = () => {
+    if (isUnread) {
+      onMarkRead(notification.id);
+    }
+  };
+
   return (
     <article
-      className="rounded-lg border bg-white p-4 shadow-sm transition hover:border-[var(--color-brand-contrast-muted)]"
+      className="group relative rounded-lg border border-[var(--border-default)] bg-white shadow-sm transition hover:border-[var(--color-brand-contrast-muted)] hover:shadow-md"
       style={{
-        borderColor: notification.read
-          ? 'var(--border-default)'
-          : 'var(--color-brand-primary-muted)',
-        background: notification.read
-          ? 'var(--bg-elevated)'
-          : 'var(--color-brand-primary-soft)',
+        borderLeftColor: accentColor,
+        borderLeftWidth: accentColor === 'transparent' ? '1px' : '4px',
       }}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <Link
+        href={notification.href}
+        onClick={handleOpenClick}
+        className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 p-4 no-underline"
+      >
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            {!notification.read ? (
-              <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-brand-primary)]" />
-            ) : null}
             <span
-              className={`rounded-full px-2.5 py-1 text-xs font-medium ${categoryClass(
+              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${categoryClass(
                 notification.category,
               )}`}
             >
               {categoryLabel(notification.category)}
             </span>
+            {isPickup ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-warm-soft)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-warm-strong)]">
+                <span
+                  aria-hidden="true"
+                  className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-brand-warm)]"
+                />
+                Time-sensitive
+              </span>
+            ) : null}
             <time className="text-xs text-[var(--text-tertiary)]">
               {formatNotificationTime(notification.sentAt)}
             </time>
           </div>
-          <h2 className="mt-3 text-base font-semibold text-[var(--text-primary)]">
-            {notification.title}
-          </h2>
-          <p className="mt-1 break-words text-sm leading-6 text-[var(--text-secondary)]">
+          <div className="mt-2 flex items-start gap-2">
+            {isUnread ? (
+              <span
+                aria-label="Unread"
+                className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-contrast)]"
+              />
+            ) : null}
+            <h2
+              className={`min-w-0 break-words text-base text-[var(--text-primary)] ${
+                isUnread ? 'font-bold' : 'font-semibold'
+              }`}
+            >
+              {notification.title}
+            </h2>
+          </div>
+          <p
+            className={`mt-1 line-clamp-2 break-words text-sm leading-6 ${
+              isUnread
+                ? 'text-[var(--text-primary)]'
+                : 'text-[var(--text-secondary)]'
+            }`}
+          >
             {notification.body}
           </p>
+          {isUnread ? (
+            <button
+              type="button"
+              onClick={handleMarkReadClick}
+              className="mt-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold text-[var(--color-brand-contrast)] hover:bg-[var(--bg-secondary)] hover:underline"
+            >
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m5 12 5 5L20 7" />
+              </svg>
+              Mark read
+            </button>
+          ) : null}
         </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Link
-          href={notification.href}
-          onClick={() => {
-            if (!notification.read) {
-              onMarkRead(notification.id);
-            }
-          }}
-          className="inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="mt-1 shrink-0 text-[var(--text-tertiary)] transition group-hover:translate-x-0.5 group-hover:text-[var(--color-brand-contrast)]"
+          aria-hidden="true"
         >
-          Open
-        </Link>
-        {!notification.read ? (
-          <button
-            type="button"
-            onClick={() => onMarkRead(notification.id)}
-            className="w-full rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
-          >
-            Mark read
-          </button>
-        ) : null}
-      </div>
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      </Link>
     </article>
   );
 }
 
 export default function NotificationsPage() {
   const queryClient = useQueryClient();
-  const [filter, setFilter] = useState<
-    NotificationCategory | 'all' | 'unread'
-  >('all');
+  const [filter, setFilter] = useState<FilterValue>('all');
 
   const notificationsQuery = useQuery({
     queryKey: ['notifications'],
@@ -164,21 +217,19 @@ export default function NotificationsPage() {
     [notificationsQuery.data?.notifications],
   );
 
-  const unreadCount = notifications.filter((notification) => {
-    return !notification.read;
-  }).length;
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.read).length,
+    [notifications],
+  );
 
-  const filteredNotifications = notifications.filter((notification) => {
-    if (filter === 'all') {
-      return true;
-    }
-    if (filter === 'unread') {
-      return !notification.read;
-    }
-    return notification.category === filter;
-  });
+  const filteredNotifications = useMemo(() => {
+    if (filter === 'all') return notifications;
+    if (filter === 'unread') return notifications.filter((n) => !n.read);
+    return notifications.filter((n) => n.category === filter);
+  }, [notifications, filter]);
 
   const filterCounts = useMemo(() => {
+    const initial: Record<string, number> = { all: 0, unread: 0 };
     return notifications.reduce<Record<string, number>>(
       (counts, notification) => ({
         ...counts,
@@ -186,9 +237,16 @@ export default function NotificationsPage() {
         unread: counts.unread + (notification.read ? 0 : 1),
         all: counts.all + 1,
       }),
-      { all: 0, unread: 0 },
+      initial,
     );
   }, [notifications]);
+
+  const summaryLine =
+    notifications.length === 0
+      ? 'No notifications yet'
+      : unreadCount > 0
+        ? `${unreadCount} unread of ${notifications.length}`
+        : `All caught up · ${notifications.length} ${notifications.length === 1 ? 'notification' : 'notifications'}`;
 
   const markReadMutation = useMutation({
     mutationFn: markNotificationRead,
@@ -207,60 +265,102 @@ export default function NotificationsPage() {
   });
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
             Activity
           </p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">
+          <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
             Notifications
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Track buyer messages, marketplace activity, listing status changes,
-            and pickup-sensitive updates.
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            {summaryLine}
           </p>
         </div>
         <button
           type="button"
           disabled={unreadCount === 0 || markAllMutation.isPending}
           onClick={() => markAllMutation.mutate()}
-          className="w-full rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
+          {markAllMutation.isPending ? null : (
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m4 12 4 4 12-12" />
+              <path d="m12 12 4 4" />
+            </svg>
+          )}
           {markAllMutation.isPending ? 'Marking...' : 'Mark all read'}
         </button>
-      </div>
+      </header>
 
-      <section className="mt-6 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap gap-2">
+      {notifications.length > 0 ? (
+        <div
+          className="mt-4 flex flex-wrap items-center gap-2"
+          role="group"
+          aria-label="Filter notifications"
+        >
           {FILTERS.map((item) => {
             const active = filter === item.value;
             const count = filterCounts[item.value] ?? 0;
+            const isUnread = item.value === 'unread';
             return (
               <button
                 key={item.value}
                 type="button"
                 onClick={() => setFilter(item.value)}
                 aria-pressed={active}
-                className="rounded-lg border px-3 py-2 text-sm font-medium transition"
-                style={{
-                  borderColor: active
-                    ? 'var(--color-brand-primary)'
-                    : 'var(--border-default)',
-                  background: active
-                    ? 'var(--color-brand-primary-soft)'
-                    : 'var(--bg-elevated)',
-                  color: active
-                    ? 'var(--text-primary)'
-                    : 'var(--text-secondary)',
-                }}
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+                style={
+                  active
+                    ? {
+                        background: isUnread
+                          ? 'var(--color-brand-contrast)'
+                          : 'var(--color-brand-primary)',
+                        color: isUnread ? 'white' : 'var(--text-primary)',
+                        borderColor: isUnread
+                          ? 'var(--color-brand-contrast)'
+                          : 'var(--color-brand-primary)',
+                      }
+                    : {
+                        background: 'white',
+                        color: 'var(--text-secondary)',
+                        borderColor: 'var(--border-default)',
+                      }
+                }
               >
-                {item.label} ({count})
+                <span>{item.label}</span>
+                <span
+                  className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
+                  style={
+                    active
+                      ? {
+                          background: 'rgba(255,255,255,0.25)',
+                          color: isUnread ? 'white' : 'var(--text-primary)',
+                        }
+                      : {
+                          background: 'var(--bg-tertiary)',
+                          color: 'var(--text-tertiary)',
+                        }
+                  }
+                >
+                  {count}
+                </span>
               </button>
             );
           })}
         </div>
-      </section>
+      ) : null}
 
       {notificationsQuery.isLoading ? <NotificationSkeleton /> : null}
 
@@ -298,7 +398,7 @@ export default function NotificationsPage() {
           </p>
           <Link
             href="/marketplace"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
           >
             Browse marketplace
           </Link>
@@ -309,16 +409,27 @@ export default function NotificationsPage() {
       !notificationsQuery.isError &&
       notifications.length > 0 &&
       filteredNotifications.length === 0 ? (
-        <section className="mt-6 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
-          <h2 className="text-xl font-semibold">Nothing in this tab</h2>
+        <section className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+          <h2 className="text-base font-semibold text-[var(--text-primary)]">
+            {filter === 'unread' ? 'You are caught up' : 'Nothing in this tab'}
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Try another notification tab or wait for a new marketplace update.
+            {filter === 'unread'
+              ? 'No unread notifications right now.'
+              : 'Try another tab or wait for a new marketplace update.'}
           </p>
+          <button
+            type="button"
+            onClick={() => setFilter('all')}
+            className="mt-4 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)]"
+          >
+            View all
+          </button>
         </section>
       ) : null}
 
       {filteredNotifications.length > 0 ? (
-        <section className="mt-6 space-y-3">
+        <section className="mt-4 space-y-2">
           {filteredNotifications.map((notification) => (
             <NotificationCard
               key={notification.id}
