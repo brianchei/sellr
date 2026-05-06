@@ -99,3 +99,42 @@ export function formatPostedDate(value: string): string {
     year: 'numeric',
   }).format(date);
 }
+
+export type ListedFreshness = {
+  label: string;
+  tone: 'fresh' | 'recent' | 'older';
+};
+
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+export function formatRelativeListedDate(
+  value: string,
+  now: Date = new Date(),
+): ListedFreshness {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return { label: 'Recently listed', tone: 'recent' };
+  }
+
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / MS_PER_DAY);
+
+  if (diffDays <= 0) {
+    return { label: 'Listed today', tone: 'fresh' };
+  }
+  if (diffDays === 1) {
+    return { label: 'Listed yesterday', tone: 'fresh' };
+  }
+  if (diffDays < 7) {
+    return { label: `Listed ${diffDays} days ago`, tone: 'fresh' };
+  }
+  if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    return {
+      label: `Listed ${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`,
+      tone: 'recent',
+    };
+  }
+
+  return { label: `Listed ${formatPostedDate(value)}`, tone: 'older' };
+}
