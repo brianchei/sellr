@@ -36,7 +36,7 @@ function statusLabel(status: ApiReportStatus) {
 }
 
 function formatDate(value: string | null) {
-  if (!value) return 'Not resolved';
+  if (!value) return '—';
   return new Intl.DateTimeFormat(undefined, {
     month: 'short',
     day: 'numeric',
@@ -45,33 +45,61 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
-function statusClass(status: ApiReportStatus) {
+function statusToneStyle(status: ApiReportStatus): {
+  background: string;
+  color: string;
+} {
   if (status === 'open') {
-    return 'border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] text-[var(--color-brand-warm-strong)]';
+    return {
+      background: 'var(--color-brand-warm-soft)',
+      color: 'var(--color-brand-warm-strong)',
+    };
   }
   if (status === 'in_review') {
-    return 'border-[var(--color-brand-accent)] bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-contrast)]';
+    return {
+      background: 'var(--color-brand-contrast-soft)',
+      color: 'var(--color-brand-contrast)',
+    };
   }
-  return 'border-[var(--border-default)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)]';
+  if (status === 'resolved') {
+    return {
+      background: 'var(--color-brand-accent-soft)',
+      color: 'var(--color-brand-accent-strong)',
+    };
+  }
+  return {
+    background: 'var(--bg-tertiary)',
+    color: 'var(--text-secondary)',
+  };
 }
 
-function severityClass(severity: ApiReport['severity']) {
-  return severity === 'safety'
-    ? 'border-red-200 bg-red-50 text-red-700'
-    : 'border-[var(--border-default)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)]';
+function severityToneStyle(severity: ApiReport['severity']): {
+  background: string;
+  color: string;
+} {
+  if (severity === 'safety') {
+    return {
+      background: 'var(--color-brand-warm-soft)',
+      color: 'var(--color-brand-warm-strong)',
+    };
+  }
+  return {
+    background: 'var(--bg-tertiary)',
+    color: 'var(--text-secondary)',
+  };
 }
 
 function AdminRestricted({ message }: { message: string }) {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <section
-        className="rounded-xl border border-[var(--border-default)] bg-white p-8 shadow-sm"
+        className="rounded-lg border border-[var(--border-default)] bg-white p-8 shadow-sm"
         role="alert"
       >
-        <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
           Admin
         </p>
-        <h1 className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">
           Reports dashboard is restricted
         </h1>
         <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
@@ -79,7 +107,7 @@ function AdminRestricted({ message }: { message: string }) {
         </p>
         <Link
           href="/dashboard"
-          className="mt-6 inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
+          className="mt-6 inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
         >
           Back to dashboard
         </Link>
@@ -90,11 +118,11 @@ function AdminRestricted({ message }: { message: string }) {
 
 function ReportSkeleton() {
   return (
-    <section className="mt-6 space-y-3" aria-label="Loading reports">
+    <section className="mt-4 space-y-3" aria-label="Loading reports">
       {[0, 1, 2].map((item) => (
         <div
           key={item}
-          className="animate-pulse rounded-xl border border-[var(--border-default)] bg-white p-5 shadow-sm"
+          className="animate-pulse rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm"
         >
           <div className="h-4 w-40 rounded bg-[var(--bg-tertiary)]" />
           <div className="mt-4 h-5 w-3/4 rounded bg-[var(--bg-tertiary)]" />
@@ -105,105 +133,162 @@ function ReportSkeleton() {
   );
 }
 
+type StatusAction = { status: ApiReportStatus; label: string };
+
+function actionsForStatus(status: ApiReportStatus): {
+  primary: StatusAction | null;
+  secondary: StatusAction[];
+} {
+  if (status === 'open') {
+    return {
+      primary: { status: 'in_review', label: 'Move to review' },
+      secondary: [
+        { status: 'resolved', label: 'Resolve' },
+        { status: 'dismissed', label: 'Dismiss' },
+      ],
+    };
+  }
+  if (status === 'in_review') {
+    return {
+      primary: { status: 'resolved', label: 'Resolve' },
+      secondary: [
+        { status: 'dismissed', label: 'Dismiss' },
+        { status: 'open', label: 'Reopen' },
+      ],
+    };
+  }
+  return {
+    primary: null,
+    secondary: [{ status: 'open', label: 'Reopen' }],
+  };
+}
+
 function ReportCard({
   report,
   onStatusChange,
   isUpdating,
+  pendingStatus,
 }: {
   report: ApiReport;
   onStatusChange: (status: ApiReportStatus) => void;
   isUpdating: boolean;
+  pendingStatus: ApiReportStatus | null;
 }) {
-  const actions: Array<{ status: ApiReportStatus; label: string }> = (
-    [
-    { status: 'in_review', label: 'Review' },
-    { status: 'resolved', label: 'Resolve' },
-    { status: 'dismissed', label: 'Dismiss' },
-    { status: 'open', label: 'Reopen' },
-    ] satisfies Array<{ status: ApiReportStatus; label: string }>
-  ).filter((action) => action.status !== report.status);
+  const { primary, secondary } = actionsForStatus(report.status);
+  const statusStyle = statusToneStyle(report.status);
+  const severityStyle = severityToneStyle(report.severity);
 
   return (
-    <article className="rounded-xl border border-[var(--border-default)] bg-white p-5 shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap gap-2">
-            <span
-              className={`rounded-full border px-2.5 py-1 text-xs font-semibold capitalize ${statusClass(report.status)}`}
-            >
-              {statusLabel(report.status)}
-            </span>
-            <span
-              className={`rounded-full border px-2.5 py-1 text-xs font-semibold capitalize ${severityClass(report.severity)}`}
-            >
-              {report.severity}
-            </span>
-            <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2.5 py-1 text-xs font-semibold capitalize text-[var(--text-secondary)]">
-              {report.targetType}
-            </span>
-          </div>
-          <h2 className="mt-3 break-words text-lg font-semibold text-[var(--text-primary)]">
-            {report.target?.label ?? 'Reported item unavailable'}
-          </h2>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            {report.target?.detail ?? 'The target may have been removed.'}
-          </p>
+    <article className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className="inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
+            style={statusStyle}
+          >
+            {statusLabel(report.status)}
+          </span>
+          <span
+            className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
+            style={severityStyle}
+          >
+            {report.severity === 'safety' ? (
+              <span
+                aria-hidden="true"
+                className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-brand-warm)]"
+              />
+            ) : null}
+            {report.severity}
+          </span>
+          <span className="inline-flex items-center rounded-full bg-[var(--bg-secondary)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+            {report.targetType}
+          </span>
         </div>
-        <p className="text-sm text-[var(--text-tertiary)]">
+        <p className="text-xs text-[var(--text-tertiary)]">
           {formatDate(report.createdAt)}
         </p>
-      </div>
+      </header>
 
-      <div className="mt-4 rounded-lg bg-[var(--bg-secondary)] p-4">
-        <p className="text-sm font-medium text-[var(--text-primary)]">
+      <h2 className="mt-3 break-words text-base font-semibold text-[var(--text-primary)] sm:text-lg">
+        {report.target?.label ?? 'Reported item unavailable'}
+      </h2>
+      <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+        {report.target?.detail ?? 'The target may have been removed.'}
+      </p>
+
+      <div className="mt-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
           Report reason
         </p>
-        <p className="mt-2 break-words text-sm leading-6 text-[var(--text-secondary)]">
+        <p className="mt-1.5 break-words text-sm leading-6 text-[var(--text-primary)]">
           {report.reason}
         </p>
       </div>
 
-      <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-        <div>
-          <dt className="text-[var(--text-tertiary)]">Reporter</dt>
-          <dd className="mt-1 font-medium text-[var(--text-primary)]">
+      <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--text-tertiary)]">
+        <span>
+          Reported by{' '}
+          <span className="font-medium text-[var(--text-primary)]">
             {report.reporter.displayName}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[var(--text-tertiary)]">Reporter phone</dt>
-          <dd className="mt-1 font-medium text-[var(--text-primary)]">
-            {report.reporter.phoneE164}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[var(--text-tertiary)]">Resolved</dt>
-          <dd className="mt-1 font-medium text-[var(--text-primary)]">
-            {formatDate(report.resolvedAt)}
-          </dd>
-        </div>
-      </dl>
+          </span>
+        </span>
+        <span>
+          ·{' '}
+          <span className="font-mono">{report.reporter.phoneE164}</span>
+        </span>
+        <span>· Resolved {formatDate(report.resolvedAt)}</span>
+      </p>
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        {report.target?.href ? (
-          <Link
-            href={report.target.href}
-            className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-sm font-medium text-[var(--color-brand-contrast)] hover:bg-[var(--bg-tertiary)] sm:w-auto"
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {primary ? (
+          <button
+            type="button"
+            disabled={isUpdating}
+            onClick={() => onStatusChange(primary.status)}
+            className="rounded-lg bg-[var(--color-brand-primary)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            View target
-          </Link>
+            {isUpdating && pendingStatus === primary.status
+              ? 'Saving...'
+              : primary.label}
+          </button>
         ) : null}
-        {actions.map((action) => (
+        {secondary.map((action) => (
           <button
             key={action.status}
             type="button"
             disabled={isUpdating}
             onClick={() => onStatusChange(action.status)}
-            className="w-full rounded-lg bg-[var(--color-brand-primary)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-2 text-sm font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isUpdating ? 'Saving...' : action.label}
+            {isUpdating && pendingStatus === action.status
+              ? 'Saving...'
+              : action.label}
           </button>
         ))}
+        {report.target?.href ? (
+          <Link
+            href={report.target.href}
+            target="_blank"
+            rel="noreferrer"
+            className="ml-auto inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:bg-[var(--bg-secondary)] hover:underline"
+          >
+            View target
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M7 7h10v10" />
+              <path d="M7 17 17 7" />
+            </svg>
+          </Link>
+        ) : null}
       </div>
     </article>
   );
@@ -237,6 +322,41 @@ export default function AdminReportsPage() {
     () => reportsQuery.data?.reports ?? [],
     [reportsQuery.data?.reports],
   );
+
+  const statusCounts = useMemo(() => {
+    return reports.reduce<Record<string, number>>(
+      (counts, report) => ({
+        ...counts,
+        [report.status]: (counts[report.status] ?? 0) + 1,
+        all: (counts.all ?? 0) + 1,
+      }),
+      {},
+    );
+  }, [reports]);
+
+  const summaryLine = useMemo(() => {
+    if (reports.length === 0) return 'No reports in this view.';
+    const open = statusCounts['open'] ?? 0;
+    const inReview = statusCounts['in_review'] ?? 0;
+    const resolved = statusCounts['resolved'] ?? 0;
+    const dismissed = statusCounts['dismissed'] ?? 0;
+    const parts: string[] = [];
+    if (open > 0) parts.push(`${open} open`);
+    if (inReview > 0) parts.push(`${inReview} in review`);
+    if (resolved > 0) parts.push(`${resolved} resolved`);
+    if (dismissed > 0) parts.push(`${dismissed} dismissed`);
+    return parts.length > 0
+      ? parts.join(' · ')
+      : `${reports.length} ${reports.length === 1 ? 'report' : 'reports'}`;
+  }, [reports.length, statusCounts]);
+
+  const pendingStatusForId = (reportId: string): ApiReportStatus | null => {
+    if (!updateMutation.isPending) return null;
+    const variables = updateMutation.variables;
+    if (!variables) return null;
+    return variables.reportId === reportId ? variables.nextStatus : null;
+  };
+
   if (
     reportsQuery.isError &&
     reportsQuery.error instanceof ApiError &&
@@ -248,93 +368,141 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
             Admin
           </p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">
+          <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
             Reports dashboard
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Review community reports, inspect the reported listing or message,
-            and move each report through a lightweight moderation status.
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            {summaryLine}
           </p>
         </div>
         <button
           type="button"
           onClick={() => void reportsQuery.refetch()}
-          className="w-full rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
+          disabled={reportsQuery.isFetching}
+          className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
-          Refresh
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className={reportsQuery.isFetching ? 'animate-spin' : ''}
+          >
+            <path d="M21 12a9 9 0 0 0-15.5-6.4L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M3 12a9 9 0 0 0 15.5 6.4L21 16" />
+            <path d="M21 21v-5h-5" />
+          </svg>
+          {reportsQuery.isFetching ? 'Refreshing' : 'Refresh'}
         </button>
-      </div>
+      </header>
 
-      <section className="mt-6 rounded-xl border border-[var(--border-default)] bg-white p-4 shadow-sm">
-        <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
-          <div className="flex flex-wrap gap-2">
-            {STATUS_FILTERS.map((item) => {
-              const active = status === item.value;
-              return (
-                <button
-                  key={item.value}
-                  type="button"
-                  onClick={() => setStatus(item.value)}
-                  aria-pressed={active}
-                  className="rounded-lg border px-3 py-2 text-sm font-medium transition"
-                  style={{
-                    borderColor: active
-                      ? 'var(--color-brand-primary)'
-                      : 'var(--border-default)',
-                    background: active
-                      ? 'var(--color-brand-primary-soft)'
-                      : 'var(--bg-elevated)',
-                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  }}
+      <div className="mt-4 space-y-2">
+        <div
+          className="flex flex-wrap items-center gap-2"
+          role="group"
+          aria-label="Filter reports by status"
+        >
+          {STATUS_FILTERS.map((item) => {
+            const active = status === item.value;
+            const count =
+              item.value === 'all'
+                ? statusCounts['all'] ?? 0
+                : statusCounts[item.value] ?? 0;
+            const isOpen = item.value === 'open';
+            const isReview = item.value === 'in_review';
+            return (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() => setStatus(item.value)}
+                aria-pressed={active}
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+                style={
+                  active
+                    ? isOpen
+                      ? {
+                          background: 'var(--color-brand-warm)',
+                          color: 'white',
+                          borderColor: 'var(--color-brand-warm)',
+                        }
+                      : isReview
+                        ? {
+                            background: 'var(--color-brand-contrast)',
+                            color: 'white',
+                            borderColor: 'var(--color-brand-contrast)',
+                          }
+                        : {
+                            background: 'var(--color-brand-primary)',
+                            color: 'var(--text-primary)',
+                            borderColor: 'var(--color-brand-primary)',
+                          }
+                    : {
+                        background: 'white',
+                        color: 'var(--text-secondary)',
+                        borderColor: 'var(--border-default)',
+                      }
+                }
+              >
+                <span>{item.label}</span>
+                <span
+                  className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
+                  style={
+                    active
+                      ? {
+                          background: 'rgba(255,255,255,0.25)',
+                          color: isOpen || isReview ? 'white' : 'var(--text-primary)',
+                        }
+                      : {
+                          background: 'var(--bg-tertiary)',
+                          color: 'var(--text-tertiary)',
+                        }
+                  }
                 >
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <select
-            value={severity}
-            onChange={(event) =>
-              setSeverity(event.currentTarget.value as SeverityFilter)
-            }
-            className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-2 text-sm text-[var(--text-primary)]"
-          >
-            {SEVERITY_FILTERS.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={targetType}
-            onChange={(event) =>
-              setTargetType(event.currentTarget.value as TargetTypeFilter)
-            }
-            className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-2 text-sm text-[var(--text-primary)]"
-          >
-            {TARGET_FILTERS.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
-      </section>
+
+        <div
+          className="flex flex-wrap items-center gap-2"
+          role="group"
+          aria-label="Filter by severity and target"
+        >
+          <FilterPill
+            label="Severity"
+            options={SEVERITY_FILTERS}
+            value={severity}
+            onChange={(next) => setSeverity(next)}
+          />
+          <FilterPill
+            label="Target"
+            options={TARGET_FILTERS}
+            value={targetType}
+            onChange={(next) => setTargetType(next)}
+          />
+        </div>
+      </div>
 
       {reportsQuery.isLoading ? <ReportSkeleton /> : null}
 
       {reportsQuery.isError &&
       !(reportsQuery.error instanceof ApiError && reportsQuery.error.status === 403) ? (
         <section
-          className="mt-6 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h2 className="text-base font-semibold">Could not load reports</h2>
@@ -349,22 +517,26 @@ export default function AdminReportsPage() {
       {!reportsQuery.isLoading &&
       !reportsQuery.isError &&
       reports.length === 0 ? (
-        <section className="mt-6 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
-          <h2 className="text-xl font-semibold">No reports found</h2>
+        <section className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+          <h2 className="text-xl font-semibold">No reports in this view</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            New listing, message, and member reports for your admin communities
-            will appear here.
+            New listing, message, and member reports for your admin
+            communities will appear here.
           </p>
         </section>
       ) : null}
 
       {reports.length > 0 ? (
-        <section className="mt-6 space-y-3">
+        <section className="mt-4 space-y-3">
           {reports.map((report) => (
             <ReportCard
               key={report.id}
               report={report}
-              isUpdating={updateMutation.isPending}
+              isUpdating={
+                updateMutation.isPending &&
+                updateMutation.variables?.reportId === report.id
+              }
+              pendingStatus={pendingStatusForId(report.id)}
               onStatusChange={(nextStatus) =>
                 updateMutation.mutate({ reportId: report.id, nextStatus })
               }
@@ -373,5 +545,54 @@ export default function AdminReportsPage() {
         </section>
       ) : null}
     </main>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Filter pill (segmented chip group used for severity + target type)          */
+/* -------------------------------------------------------------------------- */
+
+function FilterPill<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: ReadonlyArray<{ value: T; label: string }>;
+  value: T;
+  onChange: (next: T) => void;
+}) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-white p-0.5">
+      <span className="px-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+        {label}
+      </span>
+      {options.map((option) => {
+        const active = value === option.value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange(option.value)}
+            aria-pressed={active}
+            className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium transition"
+            style={
+              active
+                ? {
+                    background: 'var(--color-brand-primary-soft)',
+                    color: 'var(--color-brand-primary-strong)',
+                  }
+                : {
+                    background: 'transparent',
+                    color: 'var(--text-secondary)',
+                  }
+            }
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
