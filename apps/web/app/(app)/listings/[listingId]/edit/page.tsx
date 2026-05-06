@@ -217,54 +217,66 @@ export default function EditListingPage() {
     );
   }
 
-  return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
-            Seller tools
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">
-            Edit listing
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Update the structured details buyers use to decide whether to reach
-            out.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href="/listings"
-            className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] sm:w-auto"
-          >
-            My listings
-          </Link>
-          <Link
-            href={`/marketplace/${listing.id}`}
-            className="inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
-          >
-            View listing
-          </Link>
-        </div>
-      </div>
+  const statusToneClass =
+    listing.status === 'active'
+      ? 'bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]'
+      : listing.status === 'draft'
+        ? 'bg-[var(--color-brand-primary-soft)] text-[var(--color-brand-primary-strong)]'
+        : listing.status === 'sold'
+          ? 'bg-[var(--color-brand-contrast-soft)] text-[var(--color-brand-contrast)]'
+          : 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]';
 
-      <section className="mt-6 rounded-lg border border-[var(--border-default)] bg-white p-4 text-sm shadow-sm">
-        <div className="flex flex-wrap gap-x-5 gap-y-2 text-[var(--text-secondary)]">
-          <span>
-            Status:{' '}
-            <strong className="font-semibold text-[var(--text-primary)]">
+  return (
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+      <Link
+        href="/listings"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        Back to my listings
+      </Link>
+
+      <header className="mt-3 flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
+            Edit listing
+          </p>
+          <h1 className="mt-1 break-words text-2xl font-semibold text-[var(--text-primary)]">
+            {listing.title}
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-1 font-medium ${statusToneClass}`}
+            >
               {statusLabel(listing.status)}
-            </strong>
-          </span>
-          <span>
-            Price:{' '}
-            <strong className="font-semibold text-[var(--text-primary)]">
+            </span>
+            <span className="font-semibold text-[var(--text-primary)]">
               {formatPrice(listing.price)}
-            </strong>
-          </span>
-          <span>Updated {formatPostedDate(listing.updatedAt)}</span>
+            </span>
+            <span className="text-[var(--text-tertiary)]">
+              · Updated {formatPostedDate(listing.updatedAt)}
+            </span>
+          </div>
         </div>
-      </section>
+        <Link
+          href={`/marketplace/${listing.id}`}
+          className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] sm:w-auto"
+        >
+          View as buyers see it
+        </Link>
+      </header>
 
       <EditListingForm key={listing.id} listing={listing} />
     </main>

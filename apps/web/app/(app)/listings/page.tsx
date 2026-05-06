@@ -94,9 +94,9 @@ function noticeFromSearchParams(searchParams: NoticeSearchParams): string | null
 
 function MyListingsFallback() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="h-5 w-28 rounded bg-[var(--bg-tertiary)]" />
-      <div className="mt-3 h-9 w-56 rounded bg-[var(--bg-tertiary)]" />
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+      <div className="h-4 w-20 rounded bg-[var(--bg-tertiary)]" />
+      <div className="mt-2 h-7 w-56 rounded bg-[var(--bg-tertiary)]" />
       <section className="mt-6 space-y-3">
         {Array.from({ length: 3 }, (_, index) => (
           <div
@@ -170,6 +170,20 @@ function MyListingsContent() {
       {},
     );
   }, [listings]);
+
+  const summaryLine = useMemo(() => {
+    if (listings.length === 0) {
+      return 'No listings yet.';
+    }
+    const active = statusCounts['active'] ?? 0;
+    const drafts = statusCounts['draft'] ?? 0;
+    const sold = statusCounts['sold'] ?? 0;
+    const parts: string[] = [];
+    parts.push(`${active} active`);
+    if (drafts > 0) parts.push(`${drafts} ${drafts === 1 ? 'draft' : 'drafts'}`);
+    if (sold > 0) parts.push(`${sold} sold`);
+    return parts.join(' · ');
+  }, [listings.length, statusCounts]);
 
   const actionMutation = useMutation({
     mutationFn: async (action: ListingAction) => {
@@ -254,61 +268,80 @@ function MyListingsContent() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
             Seller tools
           </p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">
+          <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
             My listings
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Review drafts and active items, keep stale listings out of browse,
-            and open listing details when buyers ask questions.
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            {summaryLine}
           </p>
         </div>
         <Link
           href="/sell"
-          className="inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
+          className="inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
         >
           Create listing
         </Link>
-      </div>
+      </header>
 
-      <section className="mt-6 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap gap-2">
-          {STATUS_FILTERS.map((filter) => {
-            const count =
-              filter.value === 'all'
-                ? listings.length
-                : statusCounts[filter.value] ?? 0;
-            const active = statusFilter === filter.value;
-            return (
-              <button
-                key={filter.value}
-                type="button"
-                onClick={() => setStatusFilter(filter.value)}
-                aria-pressed={active}
-                className="rounded-lg border px-3 py-2 text-sm font-medium transition"
-                style={{
-                  borderColor: active
-                    ? 'var(--color-brand-primary)'
-                    : 'var(--border-default)',
-                  background: active
-                    ? 'var(--color-brand-primary-soft)'
-                    : 'var(--bg-elevated)',
-                  color: active
-                    ? 'var(--text-primary)'
-                    : 'var(--text-secondary)',
-                }}
+      <div
+        className="mt-4 flex flex-wrap items-center gap-2"
+        role="group"
+        aria-label="Filter listings by status"
+      >
+        {STATUS_FILTERS.map((filter) => {
+          const count =
+            filter.value === 'all'
+              ? listings.length
+              : statusCounts[filter.value] ?? 0;
+          const active = statusFilter === filter.value;
+          return (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => setStatusFilter(filter.value)}
+              aria-pressed={active}
+              className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+              style={
+                active
+                  ? {
+                      background: 'var(--color-brand-primary)',
+                      color: 'var(--text-primary)',
+                      borderColor: 'var(--color-brand-primary)',
+                    }
+                  : {
+                      background: 'white',
+                      color: 'var(--text-secondary)',
+                      borderColor: 'var(--border-default)',
+                    }
+              }
+            >
+              <span>{filter.label}</span>
+              <span
+                className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
+                style={
+                  active
+                    ? {
+                        background: 'rgba(255,255,255,0.25)',
+                        color: 'var(--text-primary)',
+                      }
+                    : {
+                        background: 'var(--bg-tertiary)',
+                        color: 'var(--text-tertiary)',
+                      }
+                }
               >
-                {filter.label} ({count})
-              </button>
-            );
-          })}
-        </div>
-      </section>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       {notice ? (
         <p
@@ -409,147 +442,194 @@ function MyListingsContent() {
 
       {filteredListings.length > 0 ? (
         <section className="mt-6 space-y-3">
-          {filteredListings.map((listing) => {
-            const photos = photoUrls(listing.photoUrls);
-            const primaryPhoto = photos[0];
-            const isPending = pendingAction?.listing.id === listing.id;
-            const canPublish =
-              listing.status === 'draft' || listing.status === 'expired';
-            const canUnpublish = listing.status === 'active';
-            const canMarkSold = listing.status === 'active';
-            const canDelete =
-              listing.status === 'draft' || listing.status === 'expired';
-
-            return (
-              <article
-                key={listing.id}
-                className="grid gap-4 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]"
-              >
-                <div
-                  className="flex h-40 w-full items-center justify-center rounded-lg bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-medium text-[var(--text-tertiary)] sm:h-24 sm:w-24"
-                  style={
-                    primaryPhoto
-                      ? { backgroundImage: `url("${primaryPhoto}")` }
-                      : undefined
-                  }
-                >
-                  {!primaryPhoto ? 'No photo' : null}
-                </div>
-
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(
-                        listing.status,
-                      )}`}
-                    >
-                      {statusLabel(listing.status)}
-                    </span>
-                    <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-medium text-[var(--text-secondary)]">
-                      {formatCondition(listing.condition)}
-                    </span>
-                    {listing.negotiable ? (
-                      <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-primary-strong)]">
-                        Negotiable
-                      </span>
-                    ) : null}
-                  </div>
-                  <h2 className="mt-2 break-words text-lg font-semibold text-[var(--text-primary)] sm:truncate">
-                    {listing.title}
-                  </h2>
-                  <p className="mt-1 line-clamp-2 text-sm leading-6 text-[var(--text-secondary)]">
-                    {listing.description}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--text-tertiary)]">
-                    <span>{formatPrice(listing.price)}</span>
-                    <span>{listing.category}</span>
-                    <span>{listing.locationNeighborhood}</span>
-                    <span>Updated {formatPostedDate(listing.updatedAt)}</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col justify-between gap-3">
-                  <div className="grid gap-2">
-                    <Link
-                      href={`/listings/${listing.id}/edit`}
-                      className="inline-flex justify-center rounded-lg bg-[var(--color-brand-primary)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
-                    >
-                      Edit
-                    </Link>
-                    <Link
-                      href={`/marketplace/${listing.id}`}
-                      className="inline-flex justify-center rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
-                    >
-                      View details
-                    </Link>
-                  </div>
-
-                  <div className="grid gap-2">
-                    {canPublish ? (
-                      <button
-                        type="button"
-                        disabled={isPending}
-                        onClick={() =>
-                          runAction({ type: 'publish', listing })
-                        }
-                        className="rounded-lg bg-[var(--color-brand-primary)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {isPending && pendingAction?.type === 'publish'
-                          ? 'Publishing...'
-                          : 'Publish'}
-                      </button>
-                    ) : null}
-
-                    {canUnpublish ? (
-                      <button
-                        type="button"
-                        disabled={isPending}
-                        onClick={() =>
-                          runAction({ type: 'unpublish', listing })
-                        }
-                        className="rounded-lg border border-[var(--border-strong)] bg-white px-3 py-2 text-sm font-medium text-[var(--text-primary)] shadow-sm hover:bg-[var(--bg-tertiary)] disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {isPending && pendingAction?.type === 'unpublish'
-                          ? 'Unpublishing...'
-                          : 'Unpublish'}
-                      </button>
-                    ) : null}
-
-                    {canMarkSold ? (
-                      <button
-                        type="button"
-                        disabled={isPending}
-                        onClick={() =>
-                          runAction({ type: 'mark-sold', listing })
-                        }
-                        className="rounded-lg bg-[var(--color-brand-contrast)] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[var(--color-brand-contrast-hover)] disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {isPending && pendingAction?.type === 'mark-sold'
-                          ? 'Marking sold...'
-                          : 'Mark sold'}
-                      </button>
-                    ) : null}
-
-                    {canDelete ? (
-                      <button
-                        type="button"
-                        disabled={isPending}
-                        onClick={() => runAction({ type: 'delete', listing })}
-                        className="rounded-lg border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-sm font-medium text-[var(--color-brand-warm-strong)] shadow-sm hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {isPending && pendingAction?.type === 'delete'
-                          ? 'Deleting...'
-                          : 'Delete'}
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              </article>
-            );
-          })}
+          {filteredListings.map((listing) => (
+            <ListingRow
+              key={listing.id}
+              listing={listing}
+              isPending={pendingAction?.listing.id === listing.id}
+              pendingType={
+                pendingAction?.listing.id === listing.id
+                  ? pendingAction.type
+                  : null
+              }
+              runAction={runAction}
+            />
+          ))}
         </section>
       ) : null}
     </main>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Row                                                                         */
+/* -------------------------------------------------------------------------- */
+
+function ListingRow({
+  listing,
+  isPending,
+  pendingType,
+  runAction,
+}: {
+  listing: ApiListing;
+  isPending: boolean;
+  pendingType: ListingAction['type'] | null;
+  runAction: (action: ListingAction) => void;
+}) {
+  const photos = photoUrls(listing.photoUrls);
+  const primaryPhoto = photos[0];
+  const status = listing.status;
+  const canPublish = status === 'draft' || status === 'expired';
+  const canUnpublish = status === 'active';
+  const canMarkSold = status === 'active';
+  const canDelete = status === 'draft' || status === 'expired';
+
+  const primaryAction: {
+    type: ListingAction['type'];
+    label: string;
+    pendingLabel: string;
+    tone: 'primary' | 'contrast';
+  } | null = canPublish
+    ? {
+        type: 'publish',
+        label: status === 'expired' ? 'Republish' : 'Publish',
+        pendingLabel: 'Publishing...',
+        tone: 'primary',
+      }
+    : canMarkSold
+      ? {
+          type: 'mark-sold',
+          label: 'Mark sold',
+          pendingLabel: 'Marking sold...',
+          tone: 'contrast',
+        }
+      : null;
+
+  return (
+    <article className="grid gap-4 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
+      <Link
+        href={`/marketplace/${listing.id}`}
+        aria-label={`Open ${listing.title} detail page`}
+        className="flex h-40 w-full items-center justify-center rounded-lg bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-medium text-[var(--text-tertiary)] no-underline transition hover:opacity-90 sm:h-24 sm:w-24"
+        style={
+          primaryPhoto
+            ? { backgroundImage: `url("${primaryPhoto}")` }
+            : undefined
+        }
+      >
+        {!primaryPhoto ? 'No photo' : null}
+      </Link>
+
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(
+              status,
+            )}`}
+          >
+            {statusLabel(status)}
+          </span>
+          <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-medium text-[var(--text-secondary)]">
+            {formatCondition(listing.condition)}
+          </span>
+          {listing.negotiable ? (
+            <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-primary-strong)]">
+              Open to offers
+            </span>
+          ) : null}
+        </div>
+        <h2 className="mt-2 break-words text-base font-semibold text-[var(--text-primary)] sm:truncate sm:text-lg">
+          {listing.title}
+        </h2>
+        <p className="mt-1 line-clamp-2 text-sm leading-6 text-[var(--text-secondary)]">
+          {listing.description}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--text-tertiary)]">
+          <span className="font-semibold text-[var(--text-primary)]">
+            {formatPrice(listing.price)}
+          </span>
+          <span>· {listing.category}</span>
+          {listing.locationNeighborhood ? (
+            <span>· {listing.locationNeighborhood}</span>
+          ) : null}
+          <span>· Updated {formatPostedDate(listing.updatedAt)}</span>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {primaryAction ? (
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() =>
+              runAction({ type: primaryAction.type, listing } as ListingAction)
+            }
+            className="rounded-lg px-3 py-2 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50"
+            style={
+              primaryAction.tone === 'contrast'
+                ? {
+                    background: 'var(--color-brand-contrast)',
+                    color: 'white',
+                  }
+                : {
+                    background: 'var(--color-brand-primary)',
+                    color: 'var(--text-primary)',
+                  }
+            }
+          >
+            {isPending && pendingType === primaryAction.type
+              ? primaryAction.pendingLabel
+              : primaryAction.label}
+          </button>
+        ) : null}
+
+        <div className="grid grid-cols-2 gap-2">
+          <Link
+            href={`/listings/${listing.id}/edit`}
+            className="inline-flex justify-center rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+          >
+            Edit
+          </Link>
+          <Link
+            href={`/marketplace/${listing.id}`}
+            className="inline-flex justify-center rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+          >
+            View
+          </Link>
+        </div>
+
+        {canUnpublish || canDelete ? (
+          <div className="grid grid-cols-2 gap-2">
+            {canUnpublish ? (
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => runAction({ type: 'unpublish', listing })}
+                className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isPending && pendingType === 'unpublish'
+                  ? 'Unpublishing...'
+                  : 'Unpublish'}
+              </button>
+            ) : (
+              <span aria-hidden="true" />
+            )}
+            {canDelete ? (
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => runAction({ type: 'delete', listing })}
+                className="rounded-lg border border-[var(--color-brand-warm)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-brand-warm-strong)] shadow-sm hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isPending && pendingType === 'delete'
+                  ? 'Deleting...'
+                  : 'Delete'}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    </article>
   );
 }
 

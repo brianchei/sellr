@@ -96,16 +96,18 @@ export default function SellPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
-            Structured listing
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
+            Sell
           </p>
-          <h1 className="mt-1 text-3xl font-semibold">Sell an item</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Create a clear listing with the details buyers need before they
-            reach out. Your listing publishes to your community marketplace.
+          <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
+            List an item for your community
+          </h1>
+          <p className="mt-1 max-w-2xl text-sm text-[var(--text-secondary)]">
+            Photos, neighborhood, and an availability window help your listing
+            get replies. Publishes to your community marketplace.
           </p>
         </div>
         <Link
