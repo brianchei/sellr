@@ -11,7 +11,7 @@ import { MESSAGE_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 
 function ThreadSkeleton() {
   return (
-    <section className="mt-6 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
+    <section className="mt-4 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
       <div className="space-y-3 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm">
         {Array.from({ length: 5 }, (_, index) => (
           <div key={index} className="flex gap-3 rounded-lg p-3">
@@ -74,33 +74,32 @@ export default function ConversationPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
-            Buyer and seller messages
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">
-            Conversation
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Review the listing context and continue pickup coordination in one
-            place.
-          </p>
-        </div>
-        <Link
-          href="/inbox"
-          className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+      <Link
+        href="/inbox"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
         >
-          Back to inbox
-        </Link>
-      </div>
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        Back to inbox
+      </Link>
 
       {conversationQuery.isLoading ? <ThreadSkeleton /> : null}
 
       {conversationQuery.isError ? (
         <section
-          className="mt-6 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h2 className="text-base font-semibold">
@@ -132,7 +131,7 @@ export default function ConversationPage() {
       {!conversationQuery.isLoading &&
       !conversationQuery.isError &&
       conversationQuery.data?.conversation ? (
-        <section className="mt-6 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
+        <section className="mt-4 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
           {conversationsQuery.isLoading ? (
             <div className="space-y-3 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm">
               {Array.from({ length: 5 }, (_, index) => (
@@ -172,6 +171,7 @@ export default function ConversationPage() {
             <ConversationList
               conversations={conversationsQuery.data.conversations}
               selectedConversationId={conversationId}
+              userId={userId}
             />
           ) : null}
 

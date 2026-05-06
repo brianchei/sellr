@@ -6,22 +6,27 @@ import {
   conversationTitle,
   formatMessageTime,
 } from '@/lib/conversation-format';
-import { photoUrls } from '@/lib/listing-format';
+import { formatPrice, photoUrls } from '@/lib/listing-format';
 
 type ConversationListProps = {
   conversations: ApiConversationSummary[];
   selectedConversationId?: string | null;
+  userId?: string | null;
 };
 
 export function ConversationList({
   conversations,
   selectedConversationId,
+  userId,
 }: ConversationListProps) {
   return (
     <aside className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm">
       <div className="border-b border-[var(--border-default)] px-4 py-3">
         <h2 className="text-sm font-semibold text-[var(--text-primary)]">
           Conversations
+          <span className="ml-1 text-[var(--text-tertiary)]">
+            ({conversations.length})
+          </span>
         </h2>
       </div>
       <nav
@@ -32,6 +37,19 @@ export function ConversationList({
           const selected = conversation.id === selectedConversationId;
           const photos = photoUrls(conversation.listing?.photoUrls);
           const primaryPhoto = photos[0];
+          const isSeller =
+            userId != null && conversation.listing?.sellerId === userId;
+          const role = isSeller ? 'seller' : 'buyer';
+          const needsReply =
+            userId != null &&
+            conversation.latestMessage != null &&
+            conversation.latestMessage.senderId !== userId;
+          const titleClass = needsReply
+            ? 'truncate text-sm font-bold text-[var(--text-primary)]'
+            : 'truncate text-sm font-semibold text-[var(--text-primary)]';
+          const previewClass = needsReply
+            ? 'mt-1 truncate text-sm font-medium text-[var(--text-primary)]'
+            : 'mt-1 truncate text-sm text-[var(--text-secondary)]';
 
           return (
             <Link
@@ -57,21 +75,50 @@ export function ConversationList({
               </div>
               <div className="min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                  <p className={titleClass}>
                     {conversationTitle(conversation)}
                   </p>
                   {conversation.latestMessage ? (
-                    <span className="shrink-0 text-xs text-[var(--text-tertiary)]">
+                    <span
+                      className={`shrink-0 text-xs ${
+                        needsReply
+                          ? 'font-semibold text-[var(--color-brand-contrast)]'
+                          : 'text-[var(--text-tertiary)]'
+                      }`}
+                    >
                       {formatMessageTime(conversation.latestMessage.createdAt)}
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-1 text-xs font-medium text-[var(--color-brand-contrast)]">
-                  {conversationPeer(conversation)}
-                </p>
-                <p className="mt-1 truncate text-sm text-[var(--text-secondary)]">
-                  {conversationPreview(conversation)}
-                </p>
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                  <span className="font-medium text-[var(--color-brand-contrast)]">
+                    {conversationPeer(conversation)}
+                  </span>
+                  {userId != null ? (
+                    <span
+                      className="inline-flex items-center rounded-full bg-[var(--bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-secondary)]"
+                      title={`You are the ${role} in this conversation`}
+                    >
+                      You · {role}
+                    </span>
+                  ) : null}
+                  {conversation.listing ? (
+                    <span className="text-[var(--text-tertiary)]">
+                      · {formatPrice(conversation.listing.price)}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="mt-1 flex items-start gap-2">
+                  {needsReply ? (
+                    <span
+                      className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-contrast)]"
+                      aria-label="Needs reply"
+                    />
+                  ) : null}
+                  <p className={previewClass}>
+                    {conversationPreview(conversation)}
+                  </p>
+                </div>
               </div>
             </Link>
           );

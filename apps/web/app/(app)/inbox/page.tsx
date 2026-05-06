@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchConversations } from '@sellr/api-client';
 import { ConversationList } from '@/components/conversation-list';
 import { useAuth } from '@/components/auth-provider';
 import { MESSAGE_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
+
+type InboxFilter = 'all' | 'needs-reply';
 
 function InboxSkeleton() {
   return (
@@ -36,7 +38,8 @@ function InboxSkeleton() {
 
 export default function InboxPage() {
   const router = useRouter();
-  const { primaryCommunityId } = useAuth();
+  const { primaryCommunityId, userId } = useAuth();
+  const [filter, setFilter] = useState<InboxFilter>('all');
 
   useEffect(() => {
     const conversationId = new URLSearchParams(window.location.search).get(
@@ -54,7 +57,27 @@ export default function InboxPage() {
     refetchInterval: MESSAGE_REFETCH_INTERVAL_MS,
   });
 
-  const conversations = conversationsQuery.data?.conversations ?? [];
+  const conversations = useMemo(
+    () => conversationsQuery.data?.conversations ?? [],
+    [conversationsQuery.data?.conversations],
+  );
+
+  const needsReplyCount = useMemo(() => {
+    if (!userId) return 0;
+    return conversations.filter(
+      (c) =>
+        c.latestMessage != null && c.latestMessage.senderId !== userId,
+    ).length;
+  }, [conversations, userId]);
+
+  const filteredConversations = useMemo(() => {
+    if (filter === 'all') return conversations;
+    if (!userId) return conversations;
+    return conversations.filter(
+      (c) =>
+        c.latestMessage != null && c.latestMessage.senderId !== userId,
+    );
+  }, [conversations, filter, userId]);
 
   if (!primaryCommunityId) {
     return (
@@ -76,26 +99,30 @@ export default function InboxPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
-            Buyer and seller messages
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold text-[var(--text-primary)]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
             Inbox
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
+            Coordinate pickup with buyers and sellers
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Keep local pickup questions tied to the listing, buyer, and seller.
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            {conversations.length === 0
+              ? 'No conversations yet'
+              : needsReplyCount > 0
+                ? `${conversations.length} ${conversations.length === 1 ? 'conversation' : 'conversations'} · ${needsReplyCount} ${needsReplyCount === 1 ? 'needs' : 'need'} a reply`
+                : `${conversations.length} ${conversations.length === 1 ? 'conversation' : 'conversations'} · all caught up`}
           </p>
         </div>
         <Link
           href="/marketplace"
-          className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
+          className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)] sm:w-auto"
         >
-          Browse listings
+          Browse marketplace
         </Link>
-      </div>
+      </header>
 
       {conversationsQuery.isLoading ? <InboxSkeleton /> : null}
 
@@ -141,26 +168,123 @@ export default function InboxPage() {
       {!conversationsQuery.isLoading &&
       !conversationsQuery.isError &&
       conversations.length > 0 ? (
-        <section className="mt-6 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
-          <ConversationList conversations={conversations} />
+        <>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <FilterChip
+              active={filter === 'all'}
+              onClick={() => setFilter('all')}
+              label="All"
+              count={conversations.length}
+            />
+            <FilterChip
+              active={filter === 'needs-reply'}
+              onClick={() => setFilter('needs-reply')}
+              label="Needs reply"
+              count={needsReplyCount}
+              tone="contrast"
+            />
+          </div>
 
-          <article className="flex min-h-[320px] items-center justify-center rounded-lg border border-[var(--border-default)] bg-white p-8 text-center shadow-sm lg:min-h-[560px]">
-            <div>
-              <h2 className="text-xl font-semibold">Open a conversation</h2>
-              <p className="mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-                Choose a thread to review the listing context and continue
-                coordinating pickup.
+          {filteredConversations.length === 0 ? (
+            <section className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+              <h2 className="text-base font-semibold text-[var(--text-primary)]">
+                You are caught up
+              </h2>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
+                No conversations are waiting on your reply right now.
               </p>
-              <Link
-                href={`/inbox/${conversations[0].id}`}
-                className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+              <button
+                type="button"
+                onClick={() => setFilter('all')}
+                className="mt-5 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)]"
               >
-                Open latest
-              </Link>
-            </div>
-          </article>
-        </section>
+                View all conversations
+              </button>
+            </section>
+          ) : (
+            <section className="mt-4 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
+              <ConversationList
+                conversations={filteredConversations}
+                userId={userId}
+              />
+
+              <article className="flex min-h-[320px] items-center justify-center rounded-lg border border-[var(--border-default)] bg-white p-8 text-center shadow-sm lg:min-h-[560px]">
+                <div>
+                  <h2 className="text-xl font-semibold">Open a conversation</h2>
+                  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
+                    Choose a thread to review the listing context and continue
+                    coordinating pickup.
+                  </p>
+                  <Link
+                    href={`/inbox/${filteredConversations[0].id}`}
+                    className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+                  >
+                    Open latest
+                  </Link>
+                </div>
+              </article>
+            </section>
+          )}
+        </>
       ) : null}
     </main>
+  );
+}
+
+function FilterChip({
+  active,
+  onClick,
+  label,
+  count,
+  tone = 'default',
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  count: number;
+  tone?: 'default' | 'contrast';
+}) {
+  const activeBg =
+    tone === 'contrast'
+      ? 'var(--color-brand-contrast)'
+      : 'var(--color-brand-primary)';
+  const activeText =
+    tone === 'contrast' ? 'white' : 'var(--text-primary)';
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+      style={
+        active
+          ? {
+              background: activeBg,
+              color: activeText,
+              borderColor: activeBg,
+            }
+          : {
+              background: 'white',
+              color: 'var(--text-secondary)',
+              borderColor: 'var(--border-default)',
+            }
+      }
+    >
+      <span>{label}</span>
+      <span
+        className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
+        style={
+          active
+            ? { background: 'rgba(255,255,255,0.25)', color: activeText }
+            : {
+                background: 'var(--bg-tertiary)',
+                color: 'var(--text-tertiary)',
+              }
+        }
+      >
+        {count}
+      </span>
+    </button>
   );
 }

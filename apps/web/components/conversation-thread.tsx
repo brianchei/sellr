@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchConversationMessages,
@@ -14,14 +14,31 @@ import {
   conversationTitle,
   formatMessageTime,
   listingStatusLabel,
+  peerInitials,
 } from '@/lib/conversation-format';
-import { formatPrice } from '@/lib/listing-format';
+import {
+  formatPrice,
+  formatRelativeListedDate,
+  photoUrls,
+} from '@/lib/listing-format';
 import { ReportDialog } from '@/components/report-dialog';
 import { SellerProfileCard } from '@/components/seller-profile-card';
 import {
   invalidateConversationActivity,
   MESSAGE_REFETCH_INTERVAL_MS,
 } from '@/lib/query-refresh';
+
+const BUYER_QUICK_REPLIES = [
+  'Is this still available?',
+  'When can I pick it up?',
+  'Where would you like to meet?',
+];
+
+const SELLER_QUICK_REPLIES = [
+  'Yes, still available.',
+  'How does tomorrow work for pickup?',
+  'I can meet at a public spot — let me know what works.',
+];
 
 function MessageBubble({
   message,
@@ -69,6 +86,105 @@ function MessageBubble({
   );
 }
 
+function ListingContextHeader({
+  conversation,
+  role,
+}: {
+  conversation: ApiConversationSummary;
+  role: 'buyer' | 'seller';
+}) {
+  const listing = conversation.listing;
+  if (!listing) {
+    return (
+      <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-3">
+        <div>
+          <p className="text-sm font-semibold text-[var(--text-primary)]">
+            {conversationTitle(conversation)}
+          </p>
+          <p className="text-xs text-[var(--text-secondary)]">
+            Listing context unavailable.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const photos = photoUrls(listing.photoUrls);
+  const primaryPhoto = photos[0];
+  const freshness = formatRelativeListedDate(listing.createdAt);
+  const statusLower = listing.status?.toLowerCase() ?? 'active';
+  const status = listingStatusLabel(statusLower);
+  const statusTone =
+    statusLower === 'active'
+      ? {
+          bg: 'var(--color-brand-accent-soft)',
+          color: 'var(--color-brand-accent-strong)',
+        }
+      : statusLower === 'reserved' ||
+          statusLower === 'pending' ||
+          statusLower === 'in_progress'
+        ? {
+            bg: 'var(--color-brand-primary-soft)',
+            color: 'var(--color-brand-primary-strong)',
+          }
+        : {
+            bg: 'var(--bg-tertiary)',
+            color: 'var(--text-secondary)',
+          };
+  const freshnessTone =
+    freshness.tone === 'fresh'
+      ? 'text-[var(--color-brand-accent-strong)]'
+      : freshness.tone === 'recent'
+        ? 'text-[var(--color-brand-contrast)]'
+        : 'text-[var(--text-tertiary)]';
+
+  return (
+    <Link
+      href={`/marketplace/${listing.id}`}
+      className="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3 rounded-lg border border-[var(--border-default)] bg-white p-3 no-underline transition hover:border-[var(--color-brand-contrast-muted)] hover:bg-[var(--bg-secondary)]"
+    >
+      <div
+        className="aspect-square h-16 w-16 overflow-hidden rounded-md bg-[var(--bg-tertiary)] bg-cover bg-center"
+        style={
+          primaryPhoto
+            ? { backgroundImage: `url("${primaryPhoto}")` }
+            : undefined
+        }
+        aria-hidden="true"
+      />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <p className="min-w-0 truncate text-sm font-semibold text-[var(--text-primary)]">
+            {listing.title}
+          </p>
+          <p className="shrink-0 text-sm font-semibold text-[var(--text-primary)]">
+            {formatPrice(listing.price)}
+          </p>
+        </div>
+        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+            style={{ background: statusTone.bg, color: statusTone.color }}
+          >
+            {status}
+          </span>
+          <span className={`font-medium ${freshnessTone}`}>
+            {freshness.label}
+          </span>
+          {listing.locationNeighborhood ? (
+            <span className="text-[var(--text-tertiary)]">
+              · {listing.locationNeighborhood}
+            </span>
+          ) : null}
+          <span className="text-[var(--text-tertiary)]">
+            · You as {role}
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 type ConversationThreadProps = {
   conversation: ApiConversationSummary;
   userId: string | null;
@@ -81,11 +197,15 @@ export function ConversationThread({
   const queryClient = useQueryClient();
   const [reply, setReply] = useState('');
   const [replyError, setReplyError] = useState<string | null>(null);
-  const role = conversation.listing?.sellerId === userId ? 'Seller' : 'Buyer';
-  const peerRole =
-    conversation.peer?.id && conversation.peer.id === conversation.listing?.sellerId
-      ? 'Seller'
-      : 'Member';
+  const [showPeerDetails, setShowPeerDetails] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const isSeller = conversation.listing?.sellerId === userId;
+  const role: 'buyer' | 'seller' = isSeller ? 'seller' : 'buyer';
+  const peerIsListingSeller =
+    conversation.peer?.id != null &&
+    conversation.peer.id === conversation.listing?.sellerId;
+  const peerName = conversationPeer(conversation);
 
   const messagesQuery = useQuery({
     queryKey: ['conversation-messages', conversation.id],
@@ -122,57 +242,102 @@ export function ConversationThread({
     replyMutation.mutate(trimmed);
   };
 
+  const messages = messagesQuery.data?.messages ?? [];
+  const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+  const needsReply =
+    Boolean(userId) && lastMessage != null && lastMessage.senderId !== userId;
+  const quickReplies =
+    role === 'seller' ? SELLER_QUICK_REPLIES : BUYER_QUICK_REPLIES;
+  const showQuickReplies = reply.trim().length === 0;
+
+  function applyQuickReply(text: string) {
+    setReply(text);
+    setReplyError(null);
+    setTimeout(() => {
+      const node = textareaRef.current;
+      if (node) {
+        node.focus();
+        node.setSelectionRange(text.length, text.length);
+      }
+    }, 0);
+  }
+
   return (
     <article className="flex min-h-[460px] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm lg:min-h-[560px]">
-      <div className="border-b border-[var(--border-default)] p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="text-base font-semibold text-[var(--text-primary)]">
-              {conversationTitle(conversation)}
-            </h2>
-            <p className="text-sm text-[var(--text-secondary)]">
-              Conversation with {conversationPeer(conversation)}
-            </p>
-          </div>
-          {conversation.listing ? (
-            <div className="text-left sm:text-right">
-              <p className="text-sm font-semibold text-[var(--text-primary)]">
-                {formatPrice(conversation.listing.price)}
-              </p>
-              <Link
-                href={`/marketplace/${conversation.listing.id}`}
-                className="text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
-              >
-                View listing
-              </Link>
+      <header className="border-b border-[var(--border-default)] p-4">
+        <ListingContextHeader conversation={conversation} role={role} />
+
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <div
+              aria-hidden="true"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-primary)] text-xs font-bold text-[var(--text-primary)]"
+              style={
+                conversation.peer?.avatarUrl
+                  ? {
+                      backgroundImage: `url("${conversation.peer.avatarUrl}")`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }
+                  : undefined
+              }
+            >
+              {conversation.peer?.avatarUrl ? null : peerInitials(peerName)}
             </div>
-          ) : null}
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                {peerName}
+              </p>
+              <p className="text-xs text-[var(--text-secondary)]">
+                {peerIsListingSeller
+                  ? 'Seller in this conversation'
+                  : isSeller
+                    ? 'Buyer in this conversation'
+                    : 'Member in this conversation'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowPeerDetails((value) => !value)}
+            className="text-xs font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
+            aria-expanded={showPeerDetails}
+          >
+            {showPeerDetails ? 'Hide details' : 'Trust details'}
+          </button>
         </div>
 
-        <SellerProfileCard
-          profile={conversation.peer}
-          heading={`${peerRole} profile`}
-          contextLabel={`You are the ${role.toLowerCase()} in this conversation.`}
-          profileHref={
-            conversation.peer?.id &&
-            conversation.peer.id === conversation.listing?.sellerId
-              ? `/sellers/${conversation.peer.id}`
-              : undefined
-          }
-          className="mt-4 bg-[var(--bg-secondary)] shadow-none"
-        />
+        {showPeerDetails ? (
+          <SellerProfileCard
+            profile={conversation.peer}
+            heading={peerIsListingSeller ? 'Seller profile' : 'Member profile'}
+            contextLabel={
+              peerIsListingSeller
+                ? 'Buyer is reviewing this seller in your community.'
+                : 'This member is in your community.'
+            }
+            profileHref={
+              peerIsListingSeller && conversation.peer?.id
+                ? `/sellers/${conversation.peer.id}`
+                : undefined
+            }
+            className="mt-3 bg-[var(--bg-secondary)] shadow-none"
+          />
+        ) : null}
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-[var(--color-brand-contrast-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-contrast)]">
-            You are {role.toLowerCase()}
-          </span>
-          {conversation.listing?.status ? (
-            <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-medium text-[var(--text-secondary)]">
-              {listingStatusLabel(conversation.listing.status)}
-            </span>
-          ) : null}
-        </div>
-      </div>
+        {needsReply ? (
+          <p
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--color-brand-contrast-soft)] px-3 py-1 text-xs font-semibold text-[var(--color-brand-contrast)]"
+            role="status"
+          >
+            <span
+              aria-hidden="true"
+              className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-brand-contrast)]"
+            />
+            Awaiting your reply
+          </p>
+        ) : null}
+      </header>
 
       <div className="max-h-[520px] flex-1 overflow-y-auto bg-[var(--bg-secondary)] p-4 lg:max-h-none">
         {messagesQuery.isLoading ? (
@@ -205,20 +370,22 @@ export function ConversationThread({
 
         {!messagesQuery.isLoading &&
         !messagesQuery.isError &&
-        messagesQuery.data?.messages.length === 0 ? (
+        messages.length === 0 ? (
           <div className="rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-6 text-center">
             <h3 className="text-base font-semibold">
               No messages in this conversation
             </h3>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Send a message to start coordinating pickup.
+              {role === 'buyer'
+                ? 'Send a message to ask about availability or pickup.'
+                : 'Reply to start coordinating pickup with the buyer.'}
             </p>
           </div>
         ) : null}
 
-        {messagesQuery.data?.messages.length ? (
+        {messages.length > 0 ? (
           <ul className="space-y-3">
-            {messagesQuery.data.messages.map((message) => (
+            {messages.map((message) => (
               <MessageBubble
                 key={message.id}
                 message={message}
@@ -234,9 +401,28 @@ export function ConversationThread({
         onSubmit={onSubmit}
         className="border-t border-[var(--border-default)] bg-white p-4"
       >
+        {showQuickReplies ? (
+          <div
+            className="mb-3 flex flex-wrap gap-1.5"
+            aria-label="Quick replies"
+          >
+            {quickReplies.map((reply) => (
+              <button
+                key={reply}
+                type="button"
+                onClick={() => applyQuickReply(reply)}
+                className="inline-flex items-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)] transition hover:border-[var(--color-brand-contrast-muted)] hover:bg-white hover:text-[var(--color-brand-contrast)]"
+              >
+                {reply}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
         <label className="block text-sm font-medium text-[var(--text-primary)]">
-          Reply
+          <span className="sr-only">Reply</span>
           <textarea
+            ref={textareaRef}
             value={reply}
             onChange={(event) => {
               setReply(event.target.value);
@@ -244,8 +430,12 @@ export function ConversationThread({
             }}
             rows={3}
             maxLength={8000}
-            placeholder="Ask about timing, pickup location, or item details."
-            className="mt-2 w-full resize-y rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            placeholder={
+              role === 'buyer'
+                ? 'Ask about timing, pickup location, or item details.'
+                : 'Suggest a pickup window or confirm availability.'
+            }
+            className="w-full resize-y rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
           />
         </label>
 
@@ -275,7 +465,7 @@ export function ConversationThread({
           </p>
           <button
             type="submit"
-            disabled={replyMutation.isPending}
+            disabled={replyMutation.isPending || reply.trim().length === 0}
             className="w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {replyMutation.isPending ? 'Sending...' : 'Send reply'}
