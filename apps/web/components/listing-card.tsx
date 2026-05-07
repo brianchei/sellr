@@ -46,7 +46,6 @@ export function ListingCard({ listing }: ListingCardProps) {
             alt=""
             fill
             sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
-            unoptimized
             className="object-cover transition duration-300 group-hover:scale-[1.02]"
           />
         ) : (

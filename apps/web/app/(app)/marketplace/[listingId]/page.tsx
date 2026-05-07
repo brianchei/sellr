@@ -586,7 +586,6 @@ function PhotoGallery({
             alt={`${title} — photo ${safeIndex + 1} of ${photos.length}`}
             fill
             sizes="(min-width: 1024px) 720px, 100vw"
-            unoptimized
             priority
             className="object-cover"
           />
@@ -647,7 +646,6 @@ function PhotoGallery({
                   alt=""
                   fill
                   sizes="80px"
-                  unoptimized
                   className="object-cover"
                 />
               </button>

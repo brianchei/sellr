@@ -84,9 +84,16 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
     },
   );
 
+  // Listing photos are served publicly so the Next.js Image Optimizer (which
+  // fetches server-side without the user's session cookie) can pull them, and
+  // so any community member can render them without an extra auth round-trip.
+  // Filenames are random UUIDs, files are content-addressable / immutable, and
+  // listings inside a community are otherwise discoverable by members anyway.
+  // When uploads move to Cloudflare R2 (per the technical guide), this route
+  // goes away entirely.
   fastify.get(
     '/listing-images/:filename',
-    { preHandler: verifyJWT },
+    { config: { rateLimit: false } },
     async (request, reply) => {
       const { filename } = request.params as { filename: string };
       const filePath = listingImagePath(filename);
@@ -113,7 +120,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
 
       return reply
         .type(mimetype)
-        .header('Cache-Control', 'private, max-age=604800')
+        .header('Cache-Control', 'public, max-age=31536000, immutable')
         .send(createReadStream(filePath));
     },
   );
