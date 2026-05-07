@@ -34,7 +34,7 @@ export const SendOTPSchema = z.object({
 
 export const VerifyOTPSchema = z.object({
   phoneE164: z.string().regex(/^\+[1-9]\d{1,14}$/),
-  code: z.string().length(6),
+  code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit verification code.'),
   deviceFingerprint: z.string().optional(),
 });
 

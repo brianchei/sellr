@@ -13,6 +13,20 @@ import { sendOtp, setAccessToken, verifyOtp } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 
 const RESEND_COOLDOWN_SECONDS = 30;
+const OTP_CODE_LENGTH = 6;
+
+function getOtpErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : '';
+  if (
+    /body\/code|too small|too big|expected string|verification code/i.test(
+      message,
+    )
+  ) {
+    return 'Enter the 6-digit verification code.';
+  }
+
+  return message || 'Invalid or expired code';
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -82,13 +96,19 @@ export default function LoginPage() {
     }
   };
 
-  const onVerify = async () => {
+  const onVerify = async (verificationCode = code) => {
+    const trimmedCode = verificationCode.trim();
+    if (trimmedCode.length !== OTP_CODE_LENGTH) {
+      setError('Enter the 6-digit verification code.');
+      return;
+    }
+
     setError(null);
     setLoading(true);
     try {
       const res = await verifyOtp({
         phoneE164: phoneE164.trim(),
-        code: code.trim(),
+        code: trimmedCode,
       });
       if ('accessToken' in res) {
         setAccessToken(res.accessToken);
@@ -103,7 +123,7 @@ export default function LoginPage() {
           : '/onboarding',
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Invalid code');
+      setError(getOtpErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -117,16 +137,16 @@ export default function LoginPage() {
 
   const handleOtpSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (loading || code.length !== 6) return;
-    void onVerify();
+    if (loading || code.length !== OTP_CODE_LENGTH) return;
+    void onVerify(code);
   };
 
   const onCodeChange = (raw: string) => {
-    const next = raw.replace(/\D/g, '').slice(0, 6);
+    const next = raw.replace(/\D/g, '').slice(0, OTP_CODE_LENGTH);
     setCode(next);
     setError(null);
-    if (next.length === 6 && !loading) {
-      void onVerify();
+    if (next.length === OTP_CODE_LENGTH && !loading) {
+      void onVerify(next);
     }
   };
 
@@ -224,7 +244,7 @@ export default function LoginPage() {
                 inputMode="numeric"
                 pattern="\d*"
                 autoComplete="one-time-code"
-                maxLength={6}
+                maxLength={OTP_CODE_LENGTH}
                 placeholder="000000"
                 aria-label="6 digit verification code"
                 className="w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-3 text-center font-mono text-xl tracking-[0.4em] text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
@@ -232,7 +252,7 @@ export default function LoginPage() {
             </label>
             <button
               type="submit"
-              disabled={loading || code.length !== 6}
+              disabled={loading || code.length !== OTP_CODE_LENGTH}
               className="mt-4 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Verifying...' : 'Verify and continue'}
