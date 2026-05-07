@@ -110,7 +110,7 @@ async function start() {
         prefix: '/api/v1/notifications',
     });
     await fastify.register(routes_10.uploadRoutes, { prefix: '/api/v1/uploads' });
-    (0, socket_1.initSocketIO)(io);
+    (0, socket_1.initSocketIO)(io, fastify);
     (0, queue_1.initBullMQ)();
     const port = parseInt(process.env.PORT ?? '3001', 10);
     await fastify.listen({ port, host: '0.0.0.0' });

@@ -5,6 +5,7 @@ const shared_1 = require("@sellr/shared");
 const prisma_1 = require("../../lib/prisma");
 const notifyUser_1 = require("../../lib/notifyUser");
 const response_1 = require("../../lib/response");
+const socket_1 = require("../../lib/socket");
 const auth_1 = require("../../middleware/auth");
 function userTrustKey({ userId, communityId }) {
     return `${userId}:${communityId}`;
@@ -391,6 +392,10 @@ const plugin = (fastify, _opts, done) => {
                 preview: body.content.slice(0, 120),
             });
         }
+        (0, socket_1.emitToUsers)(conv.participantIds, 'message:new', {
+            conversationId,
+            message,
+        });
         return reply.code(201).send((0, response_1.ok)({ message }));
     });
     done();

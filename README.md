@@ -162,6 +162,36 @@ pnpm slc:ready    # run the full web SLC release readiness gate
 pnpm --filter @sellr/api exec prisma db seed
 ```
 
+## API Integration Tests
+
+The API has unit tests plus an integration suite under `apps/api/tests/integration/`
+that boots the real Fastify app, hits a real Postgres database, and mocks Redis,
+BullMQ queues, Twilio, Expo Push, and Socket.IO emit. The suite **truncates every
+domain table between tests**, so it refuses to run unless the database name
+clearly identifies a test DB (must contain `test`).
+
+To run them locally against a dedicated test DB:
+
+```bash
+# 1. Create a separate test DB on the local Supabase Postgres cluster
+docker exec supabase_db_api psql -U postgres -d postgres \
+  -c "CREATE DATABASE sellr_integration_test"
+
+# 2. Apply Prisma migrations to it
+cd apps/api && \
+  DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:54322/sellr_integration_test' \
+  DIRECT_URL='postgresql://postgres:postgres@127.0.0.1:54322/sellr_integration_test' \
+  pnpm exec prisma migrate deploy
+cd ../..
+
+# 3. Run tests pointing at the test DB
+TEST_DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:54322/sellr_integration_test' \
+  pnpm test
+```
+
+In CI the `DATABASE_URL` already points at a `sellr_test` Postgres service, so
+no extra opt-in is required.
+
 ## Documentation
 
 The detailed implementation baseline lives in

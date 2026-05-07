@@ -17,7 +17,23 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "outputs": ["coverage/**"],
+      "passThroughEnv": [
+        "CI",
+        "NODE_ENV",
+        "DATABASE_URL",
+        "DIRECT_URL",
+        "TEST_DATABASE_URL",
+        "TEST_DIRECT_URL",
+        "REDIS_URL",
+        "JWT_SECRET",
+        "JWT_ACCESS_TOKEN_TTL",
+        "JWT_REFRESH_TOKEN_TTL",
+        "JWT_REALTIME_TOKEN_TTL",
+        "TWILIO_ACCOUNT_SID",
+        "TWILIO_AUTH_TOKEN",
+        "TWILIO_VERIFY_SERVICE_SID"
+      ]
     }
   }
 }
