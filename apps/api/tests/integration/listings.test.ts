@@ -142,12 +142,35 @@ describe.skipIf(!integrationDbAvailable)('listings integration', () => {
       });
       expect(resA.statusCode).toBe(200);
       const bodyA = resA.json<{
-        data: { listings: { id: string; status: string }[] };
+        data: {
+          listings: Array<{
+            id: string;
+            status: string;
+            seller: {
+              id: string;
+              displayName: string;
+              verifiedAt: string | null;
+              memberSince: string | null;
+              listingCount: number;
+              communityMember: boolean;
+            } | null;
+          }>;
+        };
       }>();
       expect(bodyA.data.listings.map((l) => l.id)).toEqual([listingA.id]);
       expect(bodyA.data.listings.every((l) => l.status === 'active')).toBe(
         true,
       );
+      expect(bodyA.data.listings[0]).toMatchObject({
+        seller: {
+          id: sellerA.id,
+          displayName: sellerA.displayName,
+          communityMember: true,
+          listingCount: 1,
+        },
+      });
+      expect(bodyA.data.listings[0]?.seller?.verifiedAt).toBeTruthy();
+      expect(bodyA.data.listings[0]?.seller?.memberSince).toBeTruthy();
 
       const resB = await app.inject({
         method: 'GET',

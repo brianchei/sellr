@@ -183,9 +183,7 @@ export function logout() {
 
 /** Short-lived JWT used for the realtime websocket handshake. */
 export function fetchRealtimeToken() {
-  return apiFetch<{ token: string; expiresIn: number }>(
-    '/auth/realtime-token',
-  );
+  return apiFetch<{ token: string; expiresIn: number }>('/auth/realtime-token');
 }
 
 export function fetchMe() {

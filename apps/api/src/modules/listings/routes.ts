@@ -16,10 +16,49 @@ import { findListingsNearby, setListingLocationGeom } from './repository';
 import { searchSyncQueue } from '../../lib/queues';
 import { notifyUser } from '../../lib/notifyUser';
 
-async function findListingSellerProfile(userId: string, communityId: string) {
-  const [seller, membership, listingCount] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
+type SellerProfileLookup = {
+  sellerId: string;
+  communityId: string;
+};
+
+type ListingSellerProfile = {
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+  verifiedAt: Date | null;
+  createdAt: Date;
+  memberSince: Date | null;
+  listingCount: number;
+  communityMember: boolean;
+};
+
+function sellerProfileKey(lookup: SellerProfileLookup): string {
+  return `${lookup.sellerId}:${lookup.communityId}`;
+}
+
+async function findListingSellerProfiles(
+  lookups: SellerProfileLookup[],
+): Promise<Map<string, ListingSellerProfile>> {
+  const uniqueLookups = Array.from(
+    new Map(
+      lookups.map((lookup) => [sellerProfileKey(lookup), lookup]),
+    ).values(),
+  );
+
+  if (uniqueLookups.length === 0) {
+    return new Map<string, ListingSellerProfile>();
+  }
+
+  const sellerIds = Array.from(
+    new Set(uniqueLookups.map((lookup) => lookup.sellerId)),
+  );
+  const communityIds = Array.from(
+    new Set(uniqueLookups.map((lookup) => lookup.communityId)),
+  );
+
+  const [sellers, memberships, listingCounts] = await Promise.all([
+    prisma.user.findMany({
+      where: { id: { in: sellerIds } },
       select: {
         id: true,
         displayName: true,
@@ -28,33 +67,88 @@ async function findListingSellerProfile(userId: string, communityId: string) {
         createdAt: true,
       },
     }),
-    prisma.communityMember.findFirst({
+    prisma.communityMember.findMany({
       where: {
-        userId,
-        communityId,
+        userId: { in: sellerIds },
+        communityId: { in: communityIds },
         status: 'active',
       },
-      select: { joinedAt: true },
+      select: { userId: true, communityId: true, joinedAt: true },
     }),
-    prisma.listing.count({
+    prisma.listing.groupBy({
+      by: ['sellerId', 'communityId'],
       where: {
-        sellerId: userId,
-        communityId,
+        sellerId: { in: sellerIds },
+        communityId: { in: communityIds },
         status: 'active',
       },
+      _count: { _all: true },
     }),
   ]);
 
-  if (!seller) {
-    return null;
+  const sellersById = new Map(sellers.map((seller) => [seller.id, seller]));
+  const membershipsByKey = new Map(
+    memberships.map((membership) => [
+      sellerProfileKey({
+        sellerId: membership.userId,
+        communityId: membership.communityId,
+      }),
+      membership,
+    ]),
+  );
+  const listingCountsByKey = new Map(
+    listingCounts.map((count) => [
+      sellerProfileKey({
+        sellerId: count.sellerId,
+        communityId: count.communityId,
+      }),
+      count._count._all,
+    ]),
+  );
+
+  const profiles = new Map<string, ListingSellerProfile>();
+  for (const lookup of uniqueLookups) {
+    const seller = sellersById.get(lookup.sellerId);
+    if (!seller) {
+      continue;
+    }
+
+    const key = sellerProfileKey(lookup);
+    const membership = membershipsByKey.get(key);
+    profiles.set(key, {
+      ...seller,
+      memberSince: membership?.joinedAt ?? null,
+      listingCount: listingCountsByKey.get(key) ?? 0,
+      communityMember: Boolean(membership),
+    });
   }
 
-  return {
-    ...seller,
-    memberSince: membership?.joinedAt ?? null,
-    listingCount,
-    communityMember: Boolean(membership),
-  };
+  return profiles;
+}
+
+async function findListingSellerProfile(userId: string, communityId: string) {
+  const profiles = await findListingSellerProfiles([
+    { sellerId: userId, communityId },
+  ]);
+  return (
+    profiles.get(sellerProfileKey({ sellerId: userId, communityId })) ?? null
+  );
+}
+
+async function withListingSellerProfiles<
+  TListing extends { sellerId: string; communityId: string },
+>(listings: TListing[]) {
+  const profiles = await findListingSellerProfiles(listings);
+  return listings.map((listing) => ({
+    ...listing,
+    seller:
+      profiles.get(
+        sellerProfileKey({
+          sellerId: listing.sellerId,
+          communityId: listing.communityId,
+        }),
+      ) ?? null,
+  }));
 }
 
 function jsonStableValue(value: unknown): string {
@@ -169,7 +263,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         radiusM,
       });
 
-      return reply.send(ok({ listings }));
+      return reply.send(
+        ok({ listings: await withListingSellerProfiles(listings) }),
+      );
     },
   );
 
@@ -195,7 +291,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         take: limit,
       });
 
-      return reply.send(ok({ listings }));
+      return reply.send(
+        ok({ listings: await withListingSellerProfiles(listings) }),
+      );
     },
   );
 
@@ -264,7 +362,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         take: limit,
       });
 
-      return reply.send(ok({ seller, listings }));
+      return reply.send(
+        ok({ seller, listings: await withListingSellerProfiles(listings) }),
+      );
     },
   );
 
