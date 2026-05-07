@@ -6,8 +6,15 @@ import type {
   ApiNotification,
 } from '@sellr/api-client';
 
-export const ACTIVITY_REFETCH_INTERVAL_MS = 15_000;
-export const MESSAGE_REFETCH_INTERVAL_MS = 10_000;
+/**
+ * Background refetch cadences. These existed when polling was the only
+ * freshness mechanism; with `RealtimeProvider` pushing `message:new` events
+ * and invalidating notification activity in-cache, polling is now a fallback
+ * for connection drops, missed events, and tabs the user hasn't focused
+ * recently. Both intervals can stay long without making the UI feel stale.
+ */
+export const ACTIVITY_REFETCH_INTERVAL_MS = 60_000;
+export const MESSAGE_REFETCH_INTERVAL_MS = 45_000;
 
 type ListingCollection = { listings: ApiListing[] };
 type NotificationCollection = { notifications: ApiNotification[] };

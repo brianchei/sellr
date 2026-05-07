@@ -58,6 +58,11 @@ fastify.setErrorHandler((error: FastifyError, request, reply) => {
 });
 
 const io = new Server(fastify.server, {
+  // The Socket.IO mount path defaults to `/socket.io`. Override via
+  // `SOCKET_IO_PATH` when a reverse proxy serves the realtime endpoint
+  // under a different prefix (e.g. `/realtime/socket.io`). The web client
+  // mirrors this through `NEXT_PUBLIC_REALTIME_PATH`.
+  ...(process.env.SOCKET_IO_PATH ? { path: process.env.SOCKET_IO_PATH } : {}),
   cors: {
     origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [
       'http://localhost:3000',

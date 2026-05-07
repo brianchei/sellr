@@ -4,7 +4,7 @@ import { ApiError, fetchReports, updateReportStatus } from '@sellr/api-client';
 import type { ApiReport, ApiReportStatus } from '@sellr/api-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type StatusFilter = ApiReportStatus | 'all';
 type SeverityFilter = 'safety' | 'quality' | 'all';
@@ -168,11 +168,17 @@ function ReportCard({
   onStatusChange,
   isUpdating,
   pendingStatus,
+  selected,
+  onSelectChange,
+  bulkBusy,
 }: {
   report: ApiReport;
   onStatusChange: (status: ApiReportStatus) => void;
   isUpdating: boolean;
   pendingStatus: ApiReportStatus | null;
+  selected: boolean;
+  onSelectChange: (next: boolean) => void;
+  bulkBusy: boolean;
 }) {
   const { primary, secondary } = actionsForStatus(report.status);
   const statusStyle = statusToneStyle(report.status);
@@ -182,6 +188,14 @@ function ReportCard({
     <article className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="checkbox"
+            aria-label={`Select report ${report.id}`}
+            checked={selected}
+            disabled={bulkBusy}
+            onChange={(event) => onSelectChange(event.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-[var(--border-strong)] text-[var(--color-brand-contrast)] focus:ring-[var(--color-brand-contrast)] disabled:cursor-not-allowed"
+          />
           <span
             className="inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
             style={statusStyle}
@@ -298,6 +312,9 @@ export default function AdminReportsPage() {
   const [status, setStatus] = useState<StatusFilter>('open');
   const [severity, setSeverity] = useState<SeverityFilter>('all');
   const [targetType, setTargetType] = useState<TargetTypeFilter>('all');
+  const [search, setSearch] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkPending, setBulkPending] = useState<ApiReportStatus | null>(null);
   const queryClient = useQueryClient();
 
   const reportsQuery = useQuery({
@@ -323,6 +340,38 @@ export default function AdminReportsPage() {
     [reportsQuery.data?.reports],
   );
 
+  const filteredReports = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    if (needle.length === 0) return reports;
+    return reports.filter((report) => {
+      if (report.reason.toLowerCase().includes(needle)) return true;
+      if (report.reporter.displayName.toLowerCase().includes(needle))
+        return true;
+      if (report.reporter.phoneE164.toLowerCase().includes(needle))
+        return true;
+      if (report.target?.label.toLowerCase().includes(needle)) return true;
+      return false;
+    });
+  }, [reports, search]);
+
+  // Drop selections that are no longer visible (filter changed, query
+  // reloaded, or search trimmed away the row).
+  useEffect(() => {
+    const visibleIds = new Set(filteredReports.map((r) => r.id));
+    setSelectedIds((current) => {
+      let changed = false;
+      const next = new Set<string>();
+      current.forEach((id) => {
+        if (visibleIds.has(id)) {
+          next.add(id);
+        } else {
+          changed = true;
+        }
+      });
+      return changed ? next : current;
+    });
+  }, [filteredReports]);
+
   const statusCounts = useMemo(() => {
     return reports.reduce<Record<string, number>>(
       (counts, report) => ({
@@ -335,7 +384,11 @@ export default function AdminReportsPage() {
   }, [reports]);
 
   const summaryLine = useMemo(() => {
-    if (reports.length === 0) return 'No reports in this view.';
+    if (filteredReports.length === 0) {
+      return search.trim().length > 0
+        ? 'No reports match this search.'
+        : 'No reports in this view.';
+    }
     const open = statusCounts['open'] ?? 0;
     const inReview = statusCounts['in_review'] ?? 0;
     const resolved = statusCounts['resolved'] ?? 0;
@@ -345,10 +398,15 @@ export default function AdminReportsPage() {
     if (inReview > 0) parts.push(`${inReview} in review`);
     if (resolved > 0) parts.push(`${resolved} resolved`);
     if (dismissed > 0) parts.push(`${dismissed} dismissed`);
+    if (search.trim().length > 0) {
+      parts.unshift(
+        `${filteredReports.length} matching ${filteredReports.length === 1 ? 'report' : 'reports'}`,
+      );
+    }
     return parts.length > 0
       ? parts.join(' · ')
       : `${reports.length} ${reports.length === 1 ? 'report' : 'reports'}`;
-  }, [reports.length, statusCounts]);
+  }, [filteredReports.length, reports.length, search, statusCounts]);
 
   const pendingStatusForId = (reportId: string): ApiReportStatus | null => {
     if (!updateMutation.isPending) return null;
@@ -356,6 +414,53 @@ export default function AdminReportsPage() {
     if (!variables) return null;
     return variables.reportId === reportId ? variables.nextStatus : null;
   };
+
+  const toggleSelected = (reportId: string, next: boolean) => {
+    setSelectedIds((current) => {
+      const updated = new Set(current);
+      if (next) updated.add(reportId);
+      else updated.delete(reportId);
+      return updated;
+    });
+  };
+
+  const allVisibleSelected =
+    filteredReports.length > 0 &&
+    filteredReports.every((report) => selectedIds.has(report.id));
+  const someVisibleSelected =
+    !allVisibleSelected &&
+    filteredReports.some((report) => selectedIds.has(report.id));
+
+  const toggleSelectAllVisible = () => {
+    if (allVisibleSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredReports.map((report) => report.id)));
+    }
+  };
+
+  const runBulkUpdate = async (nextStatus: ApiReportStatus) => {
+    const ids = filteredReports
+      .filter(
+        (report) =>
+          selectedIds.has(report.id) && report.status !== nextStatus,
+      )
+      .map((report) => report.id);
+    if (ids.length === 0) return;
+    setBulkPending(nextStatus);
+    try {
+      await Promise.allSettled(
+        ids.map((reportId) => updateReportStatus(reportId, nextStatus)),
+      );
+    } finally {
+      setBulkPending(null);
+      setSelectedIds(new Set());
+      await queryClient.invalidateQueries({ queryKey: ['admin-reports'] });
+    }
+  };
+
+  const selectedCount = selectedIds.size;
+  const isBulkBusy = bulkPending !== null;
 
   if (
     reportsQuery.isError &&
@@ -494,7 +599,89 @@ export default function AdminReportsPage() {
             value={targetType}
             onChange={(next) => setTargetType(next)}
           />
+          <label className="ml-auto inline-flex w-full items-center gap-2 rounded-full border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs sm:w-auto sm:min-w-[260px]">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+              Search
+            </span>
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Reason, reporter, or target"
+              className="flex-1 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none"
+              aria-label="Search reports"
+            />
+            {search.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                aria-label="Clear search"
+                className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-[var(--text-tertiary)] hover:bg-[var(--bg-secondary)]"
+              >
+                Clear
+              </button>
+            ) : null}
+          </label>
         </div>
+
+        {filteredReports.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[var(--border-default)] bg-white px-3 py-2 text-xs">
+            <label className="inline-flex items-center gap-2 text-[var(--text-secondary)]">
+              <input
+                type="checkbox"
+                checked={allVisibleSelected}
+                ref={(node) => {
+                  if (node) node.indeterminate = someVisibleSelected;
+                }}
+                disabled={isBulkBusy}
+                onChange={toggleSelectAllVisible}
+                aria-label={
+                  allVisibleSelected
+                    ? 'Clear selection'
+                    : 'Select all visible reports'
+                }
+                className="h-4 w-4 rounded border-[var(--border-strong)] text-[var(--color-brand-contrast)] focus:ring-[var(--color-brand-contrast)] disabled:cursor-not-allowed"
+              />
+              <span>
+                {selectedCount > 0
+                  ? `${selectedCount} selected`
+                  : 'Select reports for bulk action'}
+              </span>
+            </label>
+            <div className="ml-auto flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={selectedCount === 0 || isBulkBusy}
+                onClick={() => void runBulkUpdate('resolved')}
+                className="rounded-lg bg-[var(--color-brand-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {bulkPending === 'resolved'
+                  ? 'Resolving…'
+                  : `Resolve${selectedCount > 0 ? ` ${String(selectedCount)}` : ''}`}
+              </button>
+              <button
+                type="button"
+                disabled={selectedCount === 0 || isBulkBusy}
+                onClick={() => void runBulkUpdate('dismissed')}
+                className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {bulkPending === 'dismissed'
+                  ? 'Dismissing…'
+                  : `Dismiss${selectedCount > 0 ? ` ${String(selectedCount)}` : ''}`}
+              </button>
+              <button
+                type="button"
+                disabled={selectedCount === 0 || isBulkBusy}
+                onClick={() => void runBulkUpdate('in_review')}
+                className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {bulkPending === 'in_review'
+                  ? 'Moving…'
+                  : 'Move to review'}
+              </button>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {reportsQuery.isLoading ? <ReportSkeleton /> : null}
@@ -516,19 +703,24 @@ export default function AdminReportsPage() {
 
       {!reportsQuery.isLoading &&
       !reportsQuery.isError &&
-      reports.length === 0 ? (
+      filteredReports.length === 0 ? (
         <section className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
-          <h2 className="text-xl font-semibold">No reports in this view</h2>
+          <h2 className="text-xl font-semibold">
+            {search.trim().length > 0
+              ? 'No reports match this search'
+              : 'No reports in this view'}
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            New listing, message, and member reports for your admin
-            communities will appear here.
+            {search.trim().length > 0
+              ? 'Try clearing the search or widening the status / severity filters.'
+              : 'New listing, message, and member reports for your admin communities will appear here.'}
           </p>
         </section>
       ) : null}
 
-      {reports.length > 0 ? (
+      {filteredReports.length > 0 ? (
         <section className="mt-4 space-y-3">
-          {reports.map((report) => (
+          {filteredReports.map((report) => (
             <ReportCard
               key={report.id}
               report={report}
@@ -540,6 +732,9 @@ export default function AdminReportsPage() {
               onStatusChange={(nextStatus) =>
                 updateMutation.mutate({ reportId: report.id, nextStatus })
               }
+              selected={selectedIds.has(report.id)}
+              onSelectChange={(next) => toggleSelected(report.id, next)}
+              bulkBusy={isBulkBusy}
             />
           ))}
         </section>

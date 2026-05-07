@@ -162,6 +162,35 @@ pnpm slc:ready    # run the full web SLC release readiness gate
 pnpm --filter @sellr/api exec prisma db seed
 ```
 
+## Realtime Deployment
+
+The web app talks to Fastify over WebSocket (Socket.IO) for inbox/notification
+freshness. Configuration is via env vars on the **web** client:
+
+- `NEXT_PUBLIC_REALTIME_URL` — origin of the realtime endpoint. Set to a
+  dedicated API subdomain in production (e.g. `https://api.example.com`),
+  or to your own origin if a reverse proxy forwards `/socket.io/` to
+  Fastify. Falls back to `NEXT_PUBLIC_API_URL`, then to
+  `http://localhost:3001` in dev.
+- `NEXT_PUBLIC_REALTIME_PATH` — Socket.IO mount path. Default
+  `/socket.io`; override when a proxy mounts the websocket under a
+  different prefix.
+
+And on the **API** side:
+
+- `SOCKET_IO_PATH` — must match `NEXT_PUBLIC_REALTIME_PATH` when a
+  custom mount path is in use.
+- `ALLOWED_ORIGINS` — comma-separated origin list for CORS and for the
+  Socket.IO handshake; include the web app origin.
+
+Vercel + a separate Fastify host is the simplest topology: point
+`NEXT_PUBLIC_REALTIME_URL` at the Fastify host's public URL and leave
+the path defaults alone. Same-origin proxying is also supported via any
+reverse proxy that forwards the WebSocket upgrade for `/socket.io/`
+(Nginx, Cloud Run, Caddy, Fly.io, etc.) — Next.js's own `rewrites` do
+not forward WebSocket upgrades, so a real reverse proxy is required for
+that topology.
+
 ## API Integration Tests
 
 The API has unit tests plus an integration suite under `apps/api/tests/integration/`
