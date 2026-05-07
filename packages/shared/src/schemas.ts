@@ -89,10 +89,7 @@ export const CreateListingSchema = z.object({
   locationRadiusM: z.number().min(100).max(5000).default(1000),
   locationNeighborhood: z.string().max(100),
   availabilityWindows: z.array(AvailabilityWindowSchema).min(1).max(4),
-  photoUrls: z
-    .array(ListingPhotoUrlSchema)
-    .min(1)
-    .max(LISTING_IMAGE_MAX_COUNT),
+  photoUrls: z.array(ListingPhotoUrlSchema).min(1).max(LISTING_IMAGE_MAX_COUNT),
   aiGenerated: z.boolean().default(false),
   lat: z.number().gte(-90).lte(90).optional(),
   lng: z.number().gte(-180).lte(180).optional(),

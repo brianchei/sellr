@@ -287,6 +287,9 @@ importers:
       typescript:
         specifier: ^5
         version: 5.9.3
+      vitest:
+        specifier: ^2.0.0
+        version: 2.1.9(@types/node@20.19.39)(lightningcss@1.32.0)(terser@5.46.1)
 
   packages/api-client:
     dependencies:
@@ -322,6 +325,9 @@ importers:
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
+      vitest:
+        specifier: ^2.0.0
+        version: 2.1.9(@types/node@20.19.39)(lightningcss@1.32.0)(terser@5.46.1)
 
   packages/tsconfig: {}
 

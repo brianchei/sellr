@@ -78,10 +78,7 @@ exports.CreateListingSchema = zod_1.z.object({
     locationRadiusM: zod_1.z.number().min(100).max(5000).default(1000),
     locationNeighborhood: zod_1.z.string().max(100),
     availabilityWindows: zod_1.z.array(exports.AvailabilityWindowSchema).min(1).max(4),
-    photoUrls: zod_1.z
-        .array(exports.ListingPhotoUrlSchema)
-        .min(1)
-        .max(exports.LISTING_IMAGE_MAX_COUNT),
+    photoUrls: zod_1.z.array(exports.ListingPhotoUrlSchema).min(1).max(exports.LISTING_IMAGE_MAX_COUNT),
     aiGenerated: zod_1.z.boolean().default(false),
     lat: zod_1.z.number().gte(-90).lte(90).optional(),
     lng: zod_1.z.number().gte(-180).lte(180).optional(),
