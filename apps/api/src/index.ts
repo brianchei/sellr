@@ -91,7 +91,7 @@ async function start() {
   });
   await fastify.register(uploadRoutes, { prefix: '/api/v1/uploads' });
 
-  initSocketIO(io);
+  initSocketIO(io, fastify);
   initBullMQ();
 
   const port = parseInt(process.env.PORT ?? '3001', 10);

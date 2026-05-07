@@ -7,6 +7,7 @@ import {
 import { prisma } from '../../lib/prisma';
 import { notifyUser } from '../../lib/notifyUser';
 import { ok } from '../../lib/response';
+import { emitToUsers } from '../../lib/socket';
 import { verifyJWT } from '../../middleware/auth';
 
 type UserTrustProfile = {
@@ -506,6 +507,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           preview: body.content.slice(0, 120),
         });
       }
+
+      emitToUsers(conv.participantIds, 'message:new', {
+        conversationId,
+        message,
+      });
 
       return reply.code(201).send(ok({ message }));
     },

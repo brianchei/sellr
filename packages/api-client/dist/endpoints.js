@@ -4,6 +4,7 @@ exports.sendOtp = sendOtp;
 exports.verifyOtp = verifyOtp;
 exports.refreshTokens = refreshTokens;
 exports.logout = logout;
+exports.fetchRealtimeToken = fetchRealtimeToken;
 exports.fetchMe = fetchMe;
 exports.updateProfile = updateProfile;
 exports.registerPushToken = registerPushToken;
@@ -64,6 +65,10 @@ function logout() {
         method: 'POST',
         body: JSON.stringify({}),
     });
+}
+/** Short-lived JWT used for the realtime websocket handshake. */
+function fetchRealtimeToken() {
+    return (0, fetch_1.apiFetch)('/auth/realtime-token');
 }
 function fetchMe() {
     return (0, fetch_1.apiFetch)('/auth/me');

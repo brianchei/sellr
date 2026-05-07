@@ -144,6 +144,11 @@ export declare function refreshTokens(refreshToken?: string): Promise<{
 export declare function logout(): Promise<{
     loggedOut: boolean;
 }>;
+/** Short-lived JWT used for the realtime websocket handshake. */
+export declare function fetchRealtimeToken(): Promise<{
+    token: string;
+    expiresIn: number;
+}>;
 export declare function fetchMe(): Promise<{
     user: ApiUserTrustProfile & {
         id: string;

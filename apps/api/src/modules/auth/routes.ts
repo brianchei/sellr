@@ -182,6 +182,26 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
     },
   );
 
+  fastify.get(
+    '/realtime-token',
+    { preHandler: verifyJWT },
+    async (request, reply) => {
+      const ttlSec = Number.parseInt(
+        process.env.JWT_REALTIME_TOKEN_TTL ?? '120',
+        10,
+      );
+      const token = fastify.jwt.sign(
+        {
+          sub: request.user.sub,
+          communityIds: request.user.communityIds,
+          role: request.user.role,
+        },
+        { expiresIn: ttlSec },
+      );
+      return reply.send(ok({ token, expiresIn: ttlSec }));
+    },
+  );
+
   fastify.get('/me', { preHandler: verifyJWT }, async (request, reply) => {
     const user = await findMeProfile(
       request.user.sub,

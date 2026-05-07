@@ -1,5 +1,10 @@
 import type { QueryClient } from '@tanstack/react-query';
-import type { ApiListing, ApiNotification } from '@sellr/api-client';
+import type {
+  ApiConversationSummary,
+  ApiListing,
+  ApiMessage,
+  ApiNotification,
+} from '@sellr/api-client';
 
 export const ACTIVITY_REFETCH_INTERVAL_MS = 15_000;
 export const MESSAGE_REFETCH_INTERVAL_MS = 10_000;
@@ -199,4 +204,95 @@ export async function invalidateNotificationActivity(queryClient: QueryClient) {
     queryClient.invalidateQueries({ queryKey: ['notifications'] }),
     queryClient.invalidateQueries({ queryKey: ['notifications-unread'] }),
   ]);
+}
+
+type ConversationListData = { conversations: ApiConversationSummary[] };
+type ConversationData = { conversation: ApiConversationSummary };
+type MessagesData = { messages: ApiMessage[] };
+
+function sortConversationsByActivity(
+  conversations: ApiConversationSummary[],
+): ApiConversationSummary[] {
+  return [...conversations].sort((left, right) => {
+    const leftAt =
+      left.latestMessage?.createdAt ?? left.createdAt;
+    const rightAt =
+      right.latestMessage?.createdAt ?? right.createdAt;
+    return new Date(rightAt).getTime() - new Date(leftAt).getTime();
+  });
+}
+
+function applyMessageToConversationSummary(
+  summary: ApiConversationSummary,
+  message: ApiMessage,
+): ApiConversationSummary {
+  const existing = summary.latestMessage;
+  if (existing && existing.id === message.id) return summary;
+  return {
+    ...summary,
+    latestMessage: message,
+    messageCount: summary.messageCount + 1,
+  };
+}
+
+/**
+ * Apply an incoming `message:new` realtime event to all React Query caches
+ * that touch this conversation: the active thread's messages, the single
+ * conversation summary cache, and every conversation list cache.
+ *
+ * Returns whether the message was applied to a known conversation. When
+ * `false`, the caller should consider invalidating the conversations list
+ * so a brand-new conversation appears.
+ */
+export function applyIncomingMessage(
+  queryClient: QueryClient,
+  payload: { conversationId: string; message: ApiMessage },
+): boolean {
+  const { conversationId, message } = payload;
+  let appliedToKnown = false;
+
+  queryClient.setQueryData<MessagesData>(
+    ['conversation-messages', conversationId],
+    (current) => {
+      if (!current) return current;
+      if (current.messages.some((existing) => existing.id === message.id)) {
+        return current;
+      }
+      return { messages: [...current.messages, message] };
+    },
+  );
+
+  queryClient.setQueryData<ConversationData>(
+    ['conversation', conversationId],
+    (current) => {
+      if (!current) return current;
+      appliedToKnown = true;
+      return {
+        conversation: applyMessageToConversationSummary(
+          current.conversation,
+          message,
+        ),
+      };
+    },
+  );
+
+  queryClient.setQueriesData<ConversationListData>(
+    { queryKey: ['conversations'] },
+    (current) => {
+      if (!current) return current;
+      const matchIndex = current.conversations.findIndex(
+        (conversation) => conversation.id === conversationId,
+      );
+      if (matchIndex === -1) return current;
+      appliedToKnown = true;
+      const next = current.conversations.slice();
+      next[matchIndex] = applyMessageToConversationSummary(
+        next[matchIndex],
+        message,
+      );
+      return { conversations: sortConversationsByActivity(next) };
+    },
+  );
+
+  return appliedToKnown;
 }
