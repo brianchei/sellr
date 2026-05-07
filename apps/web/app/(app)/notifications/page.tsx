@@ -161,7 +161,7 @@ function NotificationCard({
             <button
               type="button"
               onClick={handleMarkReadClick}
-              className="mt-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold text-[var(--color-brand-contrast)] hover:bg-[var(--bg-secondary)] hover:underline"
+              className="mt-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold text-[var(--color-brand-contrast)] hover:bg-[var(--bg-secondary)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             >
               <svg
                 width="11"

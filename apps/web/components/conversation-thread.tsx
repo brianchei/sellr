@@ -300,7 +300,7 @@ export function ConversationThread({
           <button
             type="button"
             onClick={() => setShowPeerDetails((value) => !value)}
-            className="text-xs font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
+            className="-mr-2 inline-flex shrink-0 items-center rounded-md px-2 py-1.5 text-xs font-medium text-[var(--color-brand-contrast)] hover:bg-[var(--color-brand-contrast-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             aria-expanded={showPeerDetails}
           >
             {showPeerDetails ? 'Hide details' : 'Trust details'}

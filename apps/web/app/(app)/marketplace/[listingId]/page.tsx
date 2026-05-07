@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
   useMemo,
+  useRef,
   useState,
   type FormEvent,
-  type KeyboardEvent,
 } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -206,18 +206,6 @@ export default function ListingDetailPage() {
     setMessageError(null);
   };
 
-  const handleThumbKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (photos.length <= 1) return;
-    if (event.key === 'ArrowRight') {
-      event.preventDefault();
-      setSelectedPhotoIndex((index) => (index + 1) % photos.length);
-    } else if (event.key === 'ArrowLeft') {
-      event.preventDefault();
-      setSelectedPhotoIndex(
-        (index) => (index - 1 + photos.length) % photos.length,
-      );
-    }
-  };
 
   if (listingQuery.isLoading) {
     return (
@@ -303,7 +291,6 @@ export default function ListingDetailPage() {
             photos={photos}
             selectedIndex={selectedPhotoIndex}
             onSelect={setSelectedPhotoIndex}
-            onKeyDown={handleThumbKeyDown}
             title={listing.title}
             category={listing.category}
             subcategory={listing.subcategory}
@@ -549,7 +536,6 @@ function PhotoGallery({
   photos,
   selectedIndex,
   onSelect,
-  onKeyDown,
   title,
   category,
   subcategory,
@@ -557,13 +543,38 @@ function PhotoGallery({
   photos: string[];
   selectedIndex: number;
   onSelect: (index: number) => void;
-  onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
   title: string;
   category: string;
   subcategory: string | null;
 }) {
   const safeIndex = Math.min(selectedIndex, Math.max(photos.length - 1, 0));
   const primaryPhoto = photos[safeIndex];
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  function focusTab(index: number) {
+    requestAnimationFrame(() => {
+      tabRefs.current[index]?.focus();
+    });
+  }
+
+  function handleTabKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    if (photos.length <= 1) return;
+    let nextIndex: number | null = null;
+    if (event.key === 'ArrowRight') {
+      nextIndex = (safeIndex + 1) % photos.length;
+    } else if (event.key === 'ArrowLeft') {
+      nextIndex = (safeIndex - 1 + photos.length) % photos.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = photos.length - 1;
+    }
+    if (nextIndex !== null) {
+      event.preventDefault();
+      onSelect(nextIndex);
+      focusTab(nextIndex);
+    }
+  }
 
   return (
     <div>
@@ -607,29 +618,28 @@ function PhotoGallery({
         <div
           role="tablist"
           aria-label="Listing photos"
-          tabIndex={0}
-          onKeyDown={onKeyDown}
-          className="flex gap-2 overflow-x-auto border-b border-[var(--border-default)] bg-[var(--bg-secondary)] p-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast)]"
+          className="flex gap-2 overflow-x-auto border-b border-[var(--border-default)] bg-[var(--bg-secondary)] p-3"
         >
           {photos.map((photo, index) => {
             const selected = index === safeIndex;
             return (
               <button
                 key={photo}
+                ref={(node) => {
+                  tabRefs.current[index] = node;
+                }}
                 type="button"
                 role="tab"
                 aria-selected={selected}
                 aria-label={`Show photo ${index + 1}`}
+                tabIndex={selected ? 0 : -1}
                 onClick={() => onSelect(index)}
-                className="relative h-16 w-20 shrink-0 overflow-hidden rounded-md border bg-white transition"
+                onKeyDown={handleTabKeyDown}
+                className="relative h-16 w-20 shrink-0 overflow-hidden rounded-md border bg-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast)] focus-visible:ring-offset-1"
                 style={{
                   borderColor: selected
                     ? 'var(--color-brand-contrast)'
                     : 'var(--border-default)',
-                  outline: selected
-                    ? '2px solid var(--color-brand-contrast-muted)'
-                    : 'none',
-                  outlineOffset: '1px',
                 }}
               >
                 <Image

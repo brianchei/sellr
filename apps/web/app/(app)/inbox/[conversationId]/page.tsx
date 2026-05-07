@@ -133,7 +133,7 @@ export default function ConversationPage() {
       conversationQuery.data?.conversation ? (
         <section className="mt-4 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
           {conversationsQuery.isLoading ? (
-            <div className="space-y-3 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm">
+            <div className="hidden space-y-3 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm lg:block">
               {Array.from({ length: 5 }, (_, index) => (
                 <div key={index} className="flex gap-3 rounded-lg p-3">
                   <div className="h-12 w-12 rounded-lg bg-[var(--bg-tertiary)]" />
@@ -148,7 +148,7 @@ export default function ConversationPage() {
 
           {conversationsQuery.isError ? (
             <aside
-              className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-[var(--color-brand-warm-strong)]"
+              className="hidden rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-[var(--color-brand-warm-strong)] lg:block"
               role="alert"
             >
               <h2 className="text-sm font-semibold">
@@ -168,11 +168,13 @@ export default function ConversationPage() {
           ) : null}
 
           {conversationsQuery.data?.conversations ? (
-            <ConversationList
-              conversations={conversationsQuery.data.conversations}
-              selectedConversationId={conversationId}
-              userId={userId}
-            />
+            <div className="hidden lg:block">
+              <ConversationList
+                conversations={conversationsQuery.data.conversations}
+                selectedConversationId={conversationId}
+                userId={userId}
+              />
+            </div>
           ) : null}
 
           <ConversationThread
