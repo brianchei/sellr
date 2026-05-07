@@ -8,8 +8,11 @@ import { fetchConversations } from '@sellr/api-client';
 import { ConversationList } from '@/components/conversation-list';
 import { useAuth } from '@/components/auth-provider';
 import { MESSAGE_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
-
-type InboxFilter = 'all' | 'needs-reply';
+import {
+  countConversationsNeedingReply,
+  filterConversations,
+  type InboxFilter,
+} from '@/lib/inbox-filter';
 
 function InboxSkeleton() {
   return (
@@ -62,22 +65,15 @@ export default function InboxPage() {
     [conversationsQuery.data?.conversations],
   );
 
-  const needsReplyCount = useMemo(() => {
-    if (!userId) return 0;
-    return conversations.filter(
-      (c) =>
-        c.latestMessage != null && c.latestMessage.senderId !== userId,
-    ).length;
-  }, [conversations, userId]);
+  const needsReplyCount = useMemo(
+    () => countConversationsNeedingReply(conversations, userId),
+    [conversations, userId],
+  );
 
-  const filteredConversations = useMemo(() => {
-    if (filter === 'all') return conversations;
-    if (!userId) return conversations;
-    return conversations.filter(
-      (c) =>
-        c.latestMessage != null && c.latestMessage.senderId !== userId,
-    );
-  }, [conversations, filter, userId]);
+  const filteredConversations = useMemo(
+    () => filterConversations(conversations, filter, userId),
+    [conversations, filter, userId],
+  );
 
   if (!primaryCommunityId) {
     return (
