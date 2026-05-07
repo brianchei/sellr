@@ -5,7 +5,7 @@
 
 */
 -- DropIndex
-DROP INDEX "listings_location_geom_idx";
+DROP INDEX IF EXISTS "listings_location_geom_idx";
 
 -- AlterTable
-ALTER TABLE "listings" DROP COLUMN "location_geom";
+ALTER TABLE "listings" DROP COLUMN IF EXISTS "location_geom";
