@@ -129,3 +129,47 @@ gate.
 - Call out touched packages/apps.
 - Include verification commands and results.
 - Mention any migrations, env changes, new dependencies, or follow-up risks.
+
+## Cursor Cloud specific instructions
+
+### Infrastructure startup
+
+Before running dev servers, start the backing services:
+
+1. **Docker daemon** — required for Redis. Start with `sudo dockerd &>/tmp/dockerd.log &`
+   then `sudo chmod 666 /var/run/docker.sock`.
+2. **Redis** — `docker compose up -d redis` (port 6379).
+3. **Supabase (Postgres 17 + PostGIS)** — `cd apps/api && supabase start` (port 54322).
+   First run pulls ~1 GB of Docker images; subsequent starts are fast.
+4. **Migrations** — `pnpm db:migrate` (idempotent; safe to re-run).
+
+### Running dev servers
+
+- API: `pnpm --filter @sellr/api dev` → http://localhost:3001
+- Web: `pnpm --filter @sellr/web dev` → http://localhost:3000
+
+The web app proxies `/api/v1/*` to the API via Next.js rewrites (same-origin
+cookie auth). Both servers support hot reload.
+
+### Environment files
+
+- Root `.env` — copied from `.env.example`; holds DB, Redis, JWT, and
+  third-party keys. Generate real JWT secrets with `openssl rand -base64 64`.
+- `apps/web/.env.local` — created by `pnpm env:web` (copies from
+  `apps/web/.env.example`).
+
+### Gotchas
+
+- The `pnpm install` output warns about ignored build scripts for
+  `@sentry/cli`, `esbuild`, `msgpackr-extract`, `sharp`, `unrs-resolver`.
+  These are covered by `pnpm.onlyBuiltDependencies` for the Prisma packages
+  only. The warnings are safe to ignore; those packages work without native
+  builds in dev.
+- Prisma client must be generated before typecheck/build: `pnpm --filter
+  @sellr/api db:generate` or it runs automatically in the `typecheck`/`build`
+  scripts.
+- Twilio, Algolia, OpenAI, R2, and other external service keys are optional
+  for local dev. The app degrades gracefully without them (OTP flow hits the
+  API but no SMS is sent; search is unavailable; AI features are disabled).
+- The `@sellr/mobile` workspace typechecks and lints but is not the current
+  development priority (web SLC focus).
