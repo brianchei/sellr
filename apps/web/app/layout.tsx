@@ -18,7 +18,16 @@ const instrumentSerif = Instrument_Serif({
   display: 'swap',
 });
 
+function resolveSiteUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit;
+  const vercel = process.env.VERCEL_URL;
+  if (vercel) return `https://${vercel}`;
+  return 'http://localhost:3000';
+}
+
 export const metadata: Metadata = {
+  metadataBase: new URL(resolveSiteUrl()),
   title: 'Sellr — The Marketplace That Actually Closes',
   description: 'A trust-native local marketplace for verified communities.',
   icons: {
