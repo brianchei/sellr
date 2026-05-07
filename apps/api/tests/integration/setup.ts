@@ -23,6 +23,7 @@ import {
   validatorCompiler,
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
+import { Prisma } from '../../src/generated/prisma/client';
 
 import { cookiesPlugin } from '../../src/plugins/cookies';
 import { corsPlugin } from '../../src/plugins/cors';
@@ -169,6 +170,98 @@ export async function addMember(
     },
   });
 }
+
+let listingCounter = 0;
+export async function createListing(args: {
+  sellerId: string;
+  communityId: string;
+  status?: 'draft' | 'pending_review' | 'active' | 'sold' | 'expired';
+  title?: string;
+  description?: string;
+  category?: string;
+  condition?: 'like_new' | 'good' | 'fair' | 'for_parts';
+  price?: number;
+  locationNeighborhood?: string;
+  photoUrls?: string[];
+}) {
+  listingCounter += 1;
+  return prisma.listing.create({
+    data: {
+      communityId: args.communityId,
+      sellerId: args.sellerId,
+      title: args.title ?? `Test listing ${String(listingCounter)}`,
+      description:
+        args.description ?? 'A normal-looking description for an item.',
+      category: args.category ?? 'electronics',
+      condition: args.condition ?? 'good',
+      price: new Prisma.Decimal(String(args.price ?? 25)),
+      negotiable: false,
+      locationNeighborhood: args.locationNeighborhood ?? 'Westside',
+      locationRadiusM: 1000,
+      availabilityWindows: [
+        { dayOfWeek: 6, startHour: 10, endHour: 18 },
+      ] as unknown as Prisma.InputJsonValue,
+      photoUrls: (args.photoUrls ?? [
+        'https://example.com/test-photo-1.jpg',
+      ]) as unknown as Prisma.InputJsonValue,
+      aiGenerated: false,
+      status: args.status ?? 'active',
+    },
+  });
+}
+
+export async function createConversation(args: {
+  listingId: string;
+  participantIds: string[];
+  type?: 'pre_offer' | 'post_acceptance';
+}) {
+  return prisma.conversation.create({
+    data: {
+      listingId: args.listingId,
+      participantIds: args.participantIds,
+      type: args.type ?? 'pre_offer',
+    },
+  });
+}
+
+export async function createMessage(args: {
+  conversationId: string;
+  senderId: string;
+  content: string;
+}) {
+  return prisma.message.create({
+    data: {
+      conversationId: args.conversationId,
+      senderId: args.senderId,
+      content: args.content,
+    },
+  });
+}
+
+export const validListingPayload = (
+  communityId: string,
+  overrides: Partial<{
+    title: string;
+    description: string;
+    price: number;
+    photoUrls: string[];
+  }> = {},
+) => ({
+  communityId,
+  title: overrides.title ?? 'Mid-century lamp',
+  description:
+    overrides.description ??
+    'A nice-looking lamp from a smoke-free home, lightly used.',
+  category: 'home',
+  condition: 'good' as const,
+  price: overrides.price ?? 35,
+  negotiable: false,
+  locationRadiusM: 1000,
+  locationNeighborhood: 'Westside',
+  availabilityWindows: [{ dayOfWeek: 6, startHour: 10, endHour: 18 }],
+  photoUrls: overrides.photoUrls ?? ['https://example.com/test-lamp.jpg'],
+  aiGenerated: false,
+});
 
 /* -------------------------------------------------------------------------- */
 /* Auth helpers                                                                */
