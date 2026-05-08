@@ -3,7 +3,17 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "dist/**", "!.next/cache/**"]
+      "outputs": [".next/**", "dist/**", "!.next/cache/**"],
+      "env": [
+        "INTERNAL_API_URL",
+        "NEXT_PUBLIC_USE_SAME_ORIGIN_API",
+        "NEXT_PUBLIC_REALTIME_URL",
+        "NEXT_PUBLIC_REALTIME_PATH",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_SENTRY_DSN_WEB",
+        "SENTRY_DSN_WEB",
+        "VERCEL_URL"
+      ]
     },
     "dev": {
       "cache": false,
