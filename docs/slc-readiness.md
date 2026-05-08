@@ -83,6 +83,30 @@ pnpm --filter @sellr/api build
 The local web build may print a Sentry auth-token warning. That is expected
 unless release upload credentials are configured.
 
+## Production Deployment Gate
+
+The current production API is deployed on Railway at:
+
+```text
+https://api-production-be29.up.railway.app
+```
+
+Before a production web demo:
+
+- Confirm `https://api-production-be29.up.railway.app/health` returns `ok`.
+- Confirm Railway API logs do not show Redis fallback errors such as
+  `127.0.0.1:6379` or `::1:6379`.
+- Remove the temporary Railway `NO_CACHE=1` variable if it is still present.
+- Deploy `apps/web` to Vercel with `INTERNAL_API_URL` set to the Railway API
+  origin and `NEXT_PUBLIC_USE_SAME_ORIGIN_API=1`.
+- Add the final Vercel web origin to Railway API `ALLOWED_ORIGINS`.
+- Confirm Twilio Verify env vars are configured in Railway before testing
+  production login.
+
+See [`deployment.md`](./deployment.md) and
+[`next-session-context.md`](./next-session-context.md) for the detailed
+deployment handoff.
+
 ## Manual Visual Acceptance
 
 After automated checks pass, review the core routes at desktop and mobile

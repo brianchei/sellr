@@ -39,6 +39,25 @@ admin-only reports dashboard, and a seller readiness panel on `/dashboard`.
 Before adding breadth, keep these flows polished and covered by the readiness
 gate.
 
+## Current Deployment Context
+- GitHub Actions CI and production migration checks are passing.
+- GitHub `main` is protected; use pull requests for changes to `main`.
+- Supabase is the production Postgres/PostGIS database.
+- Railway hosts the Fastify API and Redis. The current public API origin is
+  `https://api-production-be29.up.railway.app`.
+- The API currently starts with `tsx src/index.ts` to avoid the Prisma 7
+  generated-client ESM/CommonJS runtime crash from `node dist/index.js`.
+- Do not add `"type": "module"` to `apps/api/package.json` unless doing the full
+  NodeNext ESM migration, including explicit `.js` relative imports.
+- The next deployment step is deploying `apps/web` to Vercel with
+  `INTERNAL_API_URL=https://api-production-be29.up.railway.app`,
+  `NEXT_PUBLIC_USE_SAME_ORIGIN_API=1`, and
+  `NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app`.
+- After Vercel generates a web origin, add that origin to the Railway API
+  `ALLOWED_ORIGINS` variable and redeploy the API.
+- See `docs/deployment.md` and `docs/next-session-context.md` before continuing
+  deployment work.
+
 ## Repository Map
 - `apps/web`: Next.js 16 App Router web SLC and seller/admin surfaces.
 - `apps/api`: Fastify API, Prisma 7 schema/client, BullMQ workers, Socket.IO.
