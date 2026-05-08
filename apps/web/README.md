@@ -39,6 +39,34 @@ The app expects the API to be available through the local rewrite at
 `http://localhost:3000/api/v1`. In the normal local stack, run the API dev server
 on `http://localhost:3001`.
 
+## Production Deployment
+
+The recommended production host for the web SLC is Vercel. Use `apps/web` as
+the project root and keep browser API calls same-origin so httpOnly auth cookies
+work correctly.
+
+Required production web variables:
+
+```text
+INTERNAL_API_URL=https://api-production-be29.up.railway.app
+NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
+NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
+```
+
+Do not include `/api/v1` in `INTERNAL_API_URL`; `next.config.ts` appends that
+path in the rewrite.
+
+Do not set `NEXT_PUBLIC_API_URL` for the normal web deployment unless the auth
+flow is intentionally changed away from same-origin cookie sessions.
+
+After Vercel creates the web origin, add it to the Railway API service:
+
+```text
+ALLOWED_ORIGINS=https://<vercel-web-origin>
+```
+
+See `../../docs/deployment.md` for the full deployment notes.
+
 ## Verification
 
 Useful focused checks:

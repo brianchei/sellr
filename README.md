@@ -20,6 +20,19 @@ seller storefronts, buyer contact, inbox replies, notifications, basic
 reporting, a restricted admin reports dashboard, and a seller readiness panel on
 the dashboard.
 
+Deployment is in progress. GitHub Actions CI and production migration checks
+are passing, the Fastify API is deployed on Railway, and the next deployment
+step is the Next.js web app. The current Railway API origin is:
+
+```text
+https://api-production-be29.up.railway.app
+```
+
+See [`docs/deployment.md`](docs/deployment.md) for the current production
+topology, required environment variables, and the remaining web deployment
+steps. See [`docs/next-session-context.md`](docs/next-session-context.md) for a
+short handoff brief for continuing work in a new agent session.
+
 ## Repository Layout
 
 ```text
@@ -191,6 +204,24 @@ reverse proxy that forwards the WebSocket upgrade for `/socket.io/`
 not forward WebSocket upgrades, so a real reverse proxy is required for
 that topology.
 
+## Production Deployment Snapshot
+
+- GitHub `main` is protected and should be updated through pull requests.
+- The production migration workflow in `.github/workflows/deploy.yml` runs
+  `pnpm db:deploy` against Supabase using GitHub Actions secrets.
+- The API service is deployed on Railway and currently starts with
+  `tsx src/index.ts`. This avoids the Prisma 7 generated-client runtime issue
+  that occurred when running the compiled `dist/index.js` output directly.
+- Railway API variables must include full Supabase `DATABASE_URL`/`DIRECT_URL`,
+  a full Redis URL in `REDIS_URL`, `JWT_SECRET`, and Twilio Verify variables for
+  real production OTP.
+- `NO_CACHE=1` was only a one-time Railway cache repair flag. Remove it after a
+  successful clean deploy.
+- The web app should call same-origin `/api/v1` in the browser. For Vercel,
+  set `INTERNAL_API_URL` to the Railway API origin and keep
+  `NEXT_PUBLIC_USE_SAME_ORIGIN_API=1`; do not set `NEXT_PUBLIC_API_URL` for the
+  normal cookie-auth web flow.
+
 ## API Integration Tests
 
 The API has unit tests plus an integration suite under `apps/api/tests/integration/`
@@ -227,6 +258,7 @@ The detailed implementation baseline lives in
 `sellr-technical-implementation-guide-v2.md`. It documents the Phase 0
 architecture, local setup expectations, infrastructure decisions, and planned
 next phases. The web visual direction is documented in
-`docs/design-language.md`; SLC readiness is documented in
-`docs/slc-readiness.md`; and the detailed smoke checklist is documented in
-`docs/slc-smoke-test.md`.
+`docs/design-language.md`; deployment is documented in `docs/deployment.md`;
+SLC readiness is documented in `docs/slc-readiness.md`; the detailed smoke
+checklist is documented in `docs/slc-smoke-test.md`; and the current handoff
+brief is documented in `docs/next-session-context.md`.
