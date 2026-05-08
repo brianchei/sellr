@@ -61,6 +61,35 @@ export const JoinCommunitySchema = z
     error: 'Either inviteCode or institutionalEmail is required',
   });
 
+export const CommunityAdminParamsSchema = z.object({
+  communityId: z.uuid(),
+});
+
+export const CommunityMemberAdminParamsSchema = z.object({
+  communityId: z.uuid(),
+  userId: z.uuid(),
+});
+
+export const CreateCommunityInviteCodeSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(3)
+    .max(20)
+    .regex(/^[a-zA-Z0-9_-]+$/, 'Use letters, numbers, dashes, or underscores'),
+  maxUses: z.number().int().min(1).max(10000).nullable().optional(),
+  expiresAt: z.iso.datetime().nullable().optional(),
+});
+
+export const UpdateCommunityMemberSchema = z
+  .object({
+    role: z.enum(['member', 'admin']).optional(),
+    status: z.enum(['active', 'inactive']).optional(),
+  })
+  .refine((data) => data.role !== undefined || data.status !== undefined, {
+    error: 'Role or status is required',
+  });
+
 // Listings
 export const AvailabilityWindowSchema = z.object({
   dayOfWeek: z.number().min(0).max(6),

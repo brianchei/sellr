@@ -486,31 +486,39 @@ export default function AdminReportsPage() {
             {summaryLine}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => void reportsQuery.refetch()}
-          disabled={reportsQuery.isFetching}
-          className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className={reportsQuery.isFetching ? 'animate-spin' : ''}
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+          <Link
+            href="/admin/community"
+            className="inline-flex flex-1 justify-center rounded-lg border border-[var(--border-default)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)] sm:flex-none"
           >
-            <path d="M21 12a9 9 0 0 0-15.5-6.4L3 8" />
-            <path d="M3 3v5h5" />
-            <path d="M3 12a9 9 0 0 0 15.5 6.4L21 16" />
-            <path d="M21 21v-5h-5" />
-          </svg>
-          {reportsQuery.isFetching ? 'Refreshing' : 'Refresh'}
-        </button>
+            Community setup
+          </Link>
+          <button
+            type="button"
+            onClick={() => void reportsQuery.refetch()}
+            disabled={reportsQuery.isFetching}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className={reportsQuery.isFetching ? 'animate-spin' : ''}
+            >
+              <path d="M21 12a9 9 0 0 0-15.5-6.4L3 8" />
+              <path d="M3 3v5h5" />
+              <path d="M3 12a9 9 0 0 0 15.5 6.4L21 16" />
+              <path d="M21 21v-5h-5" />
+            </svg>
+            {reportsQuery.isFetching ? 'Refreshing' : 'Refresh'}
+          </button>
+        </div>
       </header>
 
       <div className="mt-4 space-y-2">

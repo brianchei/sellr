@@ -74,6 +74,8 @@ export type ApiMessage = {
 };
 export type ApiNotification = SharedNotification;
 export type ApiReportStatus = 'open' | 'in_review' | 'resolved' | 'dismissed';
+export type ApiCommunityMemberRole = 'member' | 'admin';
+export type ApiCommunityMemberStatus = 'active' | 'inactive';
 export type ApiReport = {
     id: string;
     reporterId: string;
@@ -96,6 +98,42 @@ export type ApiReport = {
         href: string | null;
         communityId: string | null;
     } | null;
+};
+export type ApiCommunityInviteCode = {
+    id: string;
+    communityId: string;
+    code: string;
+    maxUses: number | null;
+    useCount: number;
+    expiresAt: string | null;
+    createdBy: string;
+};
+export type ApiCommunityAdminMember = {
+    userId: string;
+    communityId: string;
+    role: ApiCommunityMemberRole;
+    status: ApiCommunityMemberStatus;
+    joinedAt: string;
+    user: {
+        id: string;
+        phoneE164: string;
+        displayName: string;
+        avatarUrl: string | null;
+        verifiedAt: string | null;
+        createdAt: string;
+    };
+};
+export type ApiCommunityAdminCommunity = {
+    id: string;
+    name: string;
+    type: 'campus' | 'coworking' | 'residential';
+    accessMethod: 'invite_code' | 'email_domain';
+    emailDomain: string | null;
+    rules: unknown;
+    status: string;
+    createdAt: string;
+    members: ApiCommunityAdminMember[];
+    inviteCodes: ApiCommunityInviteCode[];
 };
 export type ApiConversationSummary = ApiConversation & {
     listing: {
@@ -173,6 +211,22 @@ export declare function joinCommunity(body: {
     communityId: string;
     accessToken?: string;
     refreshToken?: string;
+}>;
+export declare function fetchCommunityAdmin(): Promise<{
+    communities: ApiCommunityAdminCommunity[];
+}>;
+export declare function createCommunityInviteCode(communityId: string, body: {
+    code: string;
+    maxUses?: number | null;
+    expiresAt?: string | null;
+}): Promise<{
+    inviteCode: ApiCommunityInviteCode;
+}>;
+export declare function updateCommunityMember(communityId: string, userId: string, body: {
+    role?: ApiCommunityMemberRole;
+    status?: ApiCommunityMemberStatus;
+}): Promise<{
+    member: ApiCommunityAdminMember;
 }>;
 export declare function fetchListingsNearby(params: {
     communityId: string;

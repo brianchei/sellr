@@ -20,6 +20,7 @@ The current web SLC includes:
 - Buyer contact, inbox threads, and replies.
 - Notifications and unread badges.
 - Basic reporting plus admin-only reports review.
+- Admin-only community invite and member access setup.
 - Dashboard profile/trust preview and seller readiness panel.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,

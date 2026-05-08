@@ -28,6 +28,28 @@ export declare const JoinCommunitySchema: z.ZodObject<{
     inviteCode: z.ZodOptional<z.ZodString>;
     institutionalEmail: z.ZodOptional<z.ZodEmail>;
 }, z.core.$strip>;
+export declare const CommunityAdminParamsSchema: z.ZodObject<{
+    communityId: z.ZodUUID;
+}, z.core.$strip>;
+export declare const CommunityMemberAdminParamsSchema: z.ZodObject<{
+    communityId: z.ZodUUID;
+    userId: z.ZodUUID;
+}, z.core.$strip>;
+export declare const CreateCommunityInviteCodeSchema: z.ZodObject<{
+    code: z.ZodString;
+    maxUses: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    expiresAt: z.ZodOptional<z.ZodNullable<z.ZodISODateTime>>;
+}, z.core.$strip>;
+export declare const UpdateCommunityMemberSchema: z.ZodObject<{
+    role: z.ZodOptional<z.ZodEnum<{
+        member: "member";
+        admin: "admin";
+    }>>;
+    status: z.ZodOptional<z.ZodEnum<{
+        active: "active";
+        inactive: "inactive";
+    }>>;
+}, z.core.$strip>;
 export declare const AvailabilityWindowSchema: z.ZodObject<{
     dayOfWeek: z.ZodNumber;
     startHour: z.ZodNumber;
