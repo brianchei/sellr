@@ -23,6 +23,8 @@ community:
 - Submit basic listing/message reports.
 - Review seeded and user-submitted reports from the admin-only
   `/admin/reports` dashboard.
+- Manage invite codes and member access from the admin-only
+  `/admin/community` setup page.
 - Use the dashboard seller readiness panel to see listing presence, photo
   quality, buyer activity, and the next best seller action.
 - Exercise the flow with seeded demo users and repeatable smoke scripts.
@@ -123,6 +125,8 @@ widths:
   inbox/listing detail, empty/error states.
 - `/admin/reports`: admin-only report list, filters, target links, status
   actions, restricted-access state for non-admin users.
+- `/admin/community`: admin-only community selector, invite creation, member
+  role/status actions, restricted-access state for non-admin users.
 - `/sell`: inline validation, file image upload feedback, buyer preview,
   submit state.
 - `/listings`: status filters, create/publish notices, listing actions, sold
