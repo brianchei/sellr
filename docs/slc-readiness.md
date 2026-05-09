@@ -157,8 +157,8 @@ fixtures.
   tests return stale endpoint behavior.
 - Databases without the optional `location_geom` column fall back to
   community-scoped listings without distance ranking.
-- Listing photos upload to local API storage for the web SLC. Production media
-  storage and cleanup policies are still outside the first SLC.
+- Listing photos upload to local API storage in development. Production uses
+  R2/CDN when Railway storage variables are configured.
 - Browser route smoke validates authenticated HTML responses, not pixel-level
   visual layout. Use the manual visual pass for layout sign-off.
 
@@ -166,7 +166,7 @@ fixtures.
 
 These are intentionally deferred until the core web loop is stable:
 
-- Production-grade media storage, CDN delivery, and cleanup policies.
+- Listing media cleanup/lifecycle policy after deletion or report retention.
 - Ratings, KYC, full reputation, or advanced moderation workflows.
 - Payments, offers, meetup scheduling, and delivery/logistics.
 - Push/realtime notification polish beyond existing API foundations.

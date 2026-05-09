@@ -15,7 +15,8 @@ The current web SLC includes:
 - Listing detail with seller trust signals.
 - File-based listing photo upload.
 - Structured listing creation and seller inventory management.
-- Edit, publish/unpublish, delete, and sold-listing lifecycle.
+- Durable R2/CDN listing image uploads, plus edit, publish/unpublish, delete,
+  and sold-listing lifecycle.
 - Seller storefront-lite pages.
 - Buyer contact, inbox threads, and replies.
 - Notifications and unread badges.
@@ -79,6 +80,7 @@ https://api-production-be29.up.railway.app/health
 INTERNAL_API_URL=https://api-production-be29.up.railway.app
 NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
 NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
+NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://cdn.sellr.com
 ```
 
 4. After Vercel generates the web origin, set Railway API:
@@ -95,9 +97,19 @@ TWILIO_AUTH_TOKEN
 TWILIO_VERIFY_SERVICE_SID
 ```
 
-6. Redeploy API after changing `ALLOWED_ORIGINS`.
-7. Redeploy or promote the Vercel web app.
-8. Run a manual production smoke test.
+6. Confirm Railway API has Cloudflare R2 listing image storage variables:
+
+```text
+CLOUDFLARE_ACCOUNT_ID
+R2_BUCKET_NAME
+R2_ACCESS_KEY_ID
+R2_SECRET_ACCESS_KEY
+CLOUDFLARE_CDN_URL
+```
+
+7. Redeploy API after changing `ALLOWED_ORIGINS` or storage variables.
+8. Redeploy or promote the Vercel web app.
+9. Run a manual production smoke test.
 
 ## Manual Production Smoke Test
 
@@ -150,8 +162,9 @@ Local OTP: 000000
 
 ## Follow-Up Engineering Risks
 
-- Move listing media from API-local storage to durable object storage/CDN
-  before any serious production usage.
+- Confirm Cloudflare R2/CDN listing image uploads stay healthy after production
+  deploy and add lifecycle cleanup once listing deletion/media retention policy
+  is decided.
 - Consider converting the API to a true ESM production build later, replacing
   the current `tsx src/index.ts` production start workaround.
 - Confirm Twilio Verify is configured before testing production login.

@@ -38,6 +38,9 @@ yarn-error.log*
 !/apps/api/dist/modules/uploads/
 /apps/api/dist/modules/uploads/*
 !/apps/api/dist/modules/uploads/routes.js
+!/apps/api/dist/lib/
+/apps/api/dist/lib/*
+!/apps/api/dist/lib/listingImageStorage.js
 
 # Test / coverage
 coverage

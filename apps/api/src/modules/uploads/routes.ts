@@ -1,49 +1,30 @@
-import { randomUUID } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, stat, writeFile } from 'node:fs/promises';
-import path from 'node:path';
+import { stat } from 'node:fs/promises';
 import type { FastifyPluginCallback } from 'fastify';
+import { LISTING_IMAGE_MAX_BYTES } from '@sellr/shared';
 import {
-  LISTING_IMAGE_MAX_BYTES,
-  LISTING_IMAGE_MIME_TYPES,
-  LISTING_IMAGE_UPLOAD_PATH_PREFIX,
-} from '@sellr/shared';
+  createListingImageStorage,
+  isListingImageMimeType,
+  LISTING_IMAGE_CACHE_CONTROL,
+  listingImageMimeTypeForFilename,
+  listingImagePath,
+  type ListingImageStorage,
+  type StoredListingImage,
+} from '../../lib/listingImageStorage';
 import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
 
-const MIME_TO_EXTENSION: Record<
-  (typeof LISTING_IMAGE_MIME_TYPES)[number],
-  string
-> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
+type UploadRoutesOptions = {
+  storage?: ListingImageStorage;
 };
 
-function uploadRoot(): string {
-  return process.env.SELLR_UPLOAD_DIR ?? path.resolve(process.cwd(), 'uploads');
-}
+const plugin: FastifyPluginCallback<UploadRoutesOptions> = (
+  fastify,
+  opts,
+  done,
+) => {
+  const storage = opts.storage ?? createListingImageStorage();
 
-function listingImagesDir(): string {
-  return path.join(uploadRoot(), 'listing-images');
-}
-
-function isSupportedMimeType(
-  mimetype: string,
-): mimetype is (typeof LISTING_IMAGE_MIME_TYPES)[number] {
-  return LISTING_IMAGE_MIME_TYPES.includes(
-    mimetype as (typeof LISTING_IMAGE_MIME_TYPES)[number],
-  );
-}
-
-function listingImagePath(filename: string): string | null {
-  if (!/^[a-f0-9-]+\.(jpg|png|webp)$/i.test(filename)) {
-    return null;
-  }
-  return path.join(listingImagesDir(), filename);
-}
-
-const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   fastify.post(
     '/listing-images',
     { preHandler: verifyJWT },
@@ -60,7 +41,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         return reply.code(400).send({ error: 'Choose an image to upload' });
       }
 
-      if (!isSupportedMimeType(file.mimetype)) {
+      if (!isListingImageMimeType(file.mimetype)) {
         return reply.code(400).send({
           error: 'Upload a JPG, PNG, or WebP image',
         });
@@ -71,16 +52,17 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         return reply.code(413).send({ error: 'Keep each image under 3 MB' });
       }
 
-      const extension = MIME_TO_EXTENSION[file.mimetype];
-      const filename = `${randomUUID()}.${extension}`;
-      await mkdir(listingImagesDir(), { recursive: true });
-      await writeFile(path.join(listingImagesDir(), filename), buffer, {
-        flag: 'wx',
-      });
+      let storedImage: StoredListingImage;
+      try {
+        storedImage = await storage.store(buffer, file.mimetype);
+      } catch (error) {
+        request.log.error({ err: error }, 'listing image upload failed');
+        return reply
+          .code(502)
+          .send({ error: 'Could not upload this image. Try again.' });
+      }
 
-      return reply
-        .code(201)
-        .send(ok({ url: `${LISTING_IMAGE_UPLOAD_PATH_PREFIX}${filename}` }));
+      return reply.code(201).send(ok({ url: storedImage.url }));
     },
   );
 
@@ -89,8 +71,8 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   // so any community member can render them without an extra auth round-trip.
   // Filenames are random UUIDs, files are content-addressable / immutable, and
   // listings inside a community are otherwise discoverable by members anyway.
-  // When uploads move to Cloudflare R2 (per the technical guide), this route
-  // goes away entirely.
+  // R2/CDN uploads return absolute CDN URLs, but this route remains for older
+  // same-origin upload paths and for local development/test storage.
   fastify.get(
     '/listing-images/:filename',
     { config: { rateLimit: false } },
@@ -110,17 +92,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         return reply.code(404).send({ error: 'Image not found' });
       }
 
-      const extension = path.extname(filename).toLowerCase();
-      const mimetype =
-        extension === '.png'
-          ? 'image/png'
-          : extension === '.webp'
-            ? 'image/webp'
-            : 'image/jpeg';
-
       return reply
-        .type(mimetype)
-        .header('Cache-Control', 'public, max-age=31536000, immutable')
+        .type(listingImageMimeTypeForFilename(filename))
+        .header('Cache-Control', LISTING_IMAGE_CACHE_CONTROL)
         .send(createReadStream(filePath));
     },
   );

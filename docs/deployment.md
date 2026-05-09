@@ -61,6 +61,11 @@ ALLOWED_ORIGINS
 TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN
 TWILIO_VERIFY_SERVICE_SID
+CLOUDFLARE_ACCOUNT_ID
+R2_BUCKET_NAME
+R2_ACCESS_KEY_ID
+R2_SECRET_ACCESS_KEY
+CLOUDFLARE_CDN_URL
 ```
 
 Recommended optional variables when the corresponding services are configured:
@@ -77,6 +82,32 @@ LANGFUSE_PUBLIC_KEY
 LANGFUSE_BASE_URL
 LOGTAIL_SOURCE_TOKEN
 ```
+
+### Listing Image Storage
+
+Production listing image uploads use Cloudflare R2 through its S3-compatible
+API, then serve immutable public URLs from the configured CDN/custom domain.
+
+Required Railway API variables:
+
+```text
+CLOUDFLARE_ACCOUNT_ID=<cloudflare-account-id>
+R2_BUCKET_NAME=sellr-media
+R2_ACCESS_KEY_ID=<r2-access-key-id>
+R2_SECRET_ACCESS_KEY=<r2-secret-access-key>
+CLOUDFLARE_CDN_URL=https://cdn.sellr.com
+```
+
+`NODE_ENV=production` makes the API require R2 storage. For local development,
+the API keeps using local disk unless you explicitly set:
+
+```text
+LISTING_IMAGE_STORAGE_DRIVER=r2
+```
+
+Keep the R2 bucket private for writes. Configure public read delivery through a
+Cloudflare R2 custom domain, not the `r2.dev` development URL, for production
+cache and security controls.
 
 ### Supabase URLs
 
@@ -162,6 +193,7 @@ Required Vercel web variables:
 INTERNAL_API_URL=https://api-production-be29.up.railway.app
 NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
 NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
+NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://cdn.sellr.com
 ```
 
 Do not include `/api/v1` in `INTERNAL_API_URL`; `apps/web/next.config.ts`
@@ -207,9 +239,10 @@ If these are missing in Railway, login will fail with
 
 ## Known Production Caveats
 
-- Listing image uploads currently write to API-local storage. On Railway this
-  is not a durable media architecture across redeploys or instance changes.
-  Cloudflare R2/CDN media storage remains a post-SLC follow-up.
+- Listing image uploads use Cloudflare R2/CDN when the required storage
+  variables are configured on Railway. Legacy same-origin upload URLs are still
+  served by the API for compatibility, but new production uploads should return
+  CDN URLs.
 - The API currently starts from TypeScript through `tsx`. This is acceptable for
   the immediate SLC deployment but should be revisited with a full ESM build
   path before heavier production use.
