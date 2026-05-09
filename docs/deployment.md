@@ -128,11 +128,18 @@ Listing media lifecycle cleanup is tracked in the database:
   the listing from marketplace search, clears its listing photos, resolves the
   report, and enqueues image deletion.
 
-If Redis delayed jobs need a catch-up pass, run:
+Useful media ops commands:
 
 ```bash
+pnpm --filter @sellr/api media:health
+pnpm --filter @sellr/api media:cleanup-expired -- --dry-run
 pnpm --filter @sellr/api media:cleanup-expired
+pnpm --filter @sellr/api media:retry-failed -- --dry-run
+pnpm --filter @sellr/api media:retry-failed
 ```
+
+See [`production-runbook.md`](./production-runbook.md) for safe usage and
+incident steps.
 
 ### Supabase URLs
 

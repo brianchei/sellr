@@ -40,16 +40,37 @@ fastify.setSerializerCompiler(serializerCompiler);
 fastify.setErrorHandler((error: FastifyError, request, reply) => {
   const statusCode =
     typeof error.statusCode === 'number' ? error.statusCode : 500;
+  const route = request.routeOptions.url ?? request.url;
+  const user = request.user as JWTPayload | undefined;
 
   if (statusCode >= 500) {
-    const user = request.user as JWTPayload | undefined;
     Sentry.captureException(error, {
-      tags: { route: request.routeOptions.url ?? 'unknown' },
+      tags: {
+        component: 'api',
+        operation: 'request_error',
+        method: request.method,
+        route,
+        statusCode: String(statusCode),
+      },
+      extra: {
+        requestId: request.id,
+        url: request.url,
+      },
       user: user?.sub ? { id: user.sub } : undefined,
     });
   }
 
-  fastify.log.error({ err: error, req: request.id }, 'Unhandled error');
+  fastify.log.error(
+    {
+      err: error,
+      requestId: request.id,
+      method: request.method,
+      route,
+      statusCode,
+      userId: user?.sub,
+    },
+    'API request failed',
+  );
 
   reply.status(statusCode).send({
     error: statusCode >= 500 ? 'Internal server error' : error.message,

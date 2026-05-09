@@ -42,9 +42,15 @@ yarn-error.log*
 /apps/api/dist/lib/*
 !/apps/api/dist/lib/listingImageStorage.js
 !/apps/api/dist/lib/mediaAssets.js
+!/apps/api/dist/lib/observability.js
 !/apps/api/dist/jobs/
 /apps/api/dist/jobs/*
 !/apps/api/dist/jobs/mediaCleanup.js
+!/apps/api/dist/scripts/
+/apps/api/dist/scripts/*
+!/apps/api/dist/scripts/mediaHealth.js
+!/apps/api/dist/scripts/queueExpiredMediaCleanup.js
+!/apps/api/dist/scripts/retryFailedMediaCleanup.js
 
 # Test / coverage
 coverage

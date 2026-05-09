@@ -279,5 +279,6 @@ architecture, local setup expectations, infrastructure decisions, and planned
 next phases. The web visual direction is documented in
 `docs/design-language.md`; deployment is documented in `docs/deployment.md`;
 SLC readiness is documented in `docs/slc-readiness.md`; the detailed smoke
-checklist is documented in `docs/slc-smoke-test.md`; and the current handoff
-brief is documented in `docs/next-session-context.md`.
+checklist is documented in `docs/slc-smoke-test.md`; production operations are
+documented in `docs/production-runbook.md`; and the current handoff brief is
+documented in `docs/next-session-context.md`.

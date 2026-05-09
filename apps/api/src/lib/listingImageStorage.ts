@@ -10,6 +10,8 @@ import {
   LISTING_IMAGE_MIME_TYPES,
   LISTING_IMAGE_UPLOAD_PATH_PREFIX,
 } from '@sellr/shared';
+import { logger } from './logger';
+import { captureOperationalError } from './observability';
 
 export type ListingImageMimeType = (typeof LISTING_IMAGE_MIME_TYPES)[number];
 
@@ -168,15 +170,38 @@ function createR2ListingImageStorage(): ListingImageStorage {
       const filename = createFilename(mimetype);
       const key = createListingImageKey(filename);
 
-      await s3.send(
-        new PutObjectCommand({
-          Bucket: bucket,
-          Key: key,
-          Body: buffer,
-          ContentType: mimetype,
-          CacheControl: ONE_YEAR_IMMUTABLE,
-        }),
-      );
+      try {
+        await s3.send(
+          new PutObjectCommand({
+            Bucket: bucket,
+            Key: key,
+            Body: buffer,
+            ContentType: mimetype,
+            CacheControl: ONE_YEAR_IMMUTABLE,
+          }),
+        );
+      } catch (error) {
+        logger.error(
+          {
+            err: error,
+            operation: 'r2.put_object',
+            bucket,
+            storageKey: key,
+            contentType: mimetype,
+          },
+          'R2 listing image upload failed',
+        );
+        captureOperationalError(error, {
+          component: 'r2',
+          operation: 'put_object',
+          extra: {
+            bucket,
+            storageKey: key,
+            contentType: mimetype,
+          },
+        });
+        throw error;
+      }
 
       return {
         filename,
@@ -264,10 +289,32 @@ export async function deleteListingImageObject(
     return;
   }
 
-  await createR2Client().send(
-    new DeleteObjectCommand({
-      Bucket: requireEnv('R2_BUCKET_NAME'),
-      Key: reference.storageKey,
-    }),
-  );
+  const bucket = requireEnv('R2_BUCKET_NAME');
+  try {
+    await createR2Client().send(
+      new DeleteObjectCommand({
+        Bucket: bucket,
+        Key: reference.storageKey,
+      }),
+    );
+  } catch (error) {
+    logger.error(
+      {
+        err: error,
+        operation: 'r2.delete_object',
+        bucket,
+        storageKey: reference.storageKey,
+      },
+      'R2 listing image deletion failed',
+    );
+    captureOperationalError(error, {
+      component: 'r2',
+      operation: 'delete_object',
+      extra: {
+        bucket,
+        storageKey: reference.storageKey,
+      },
+    });
+    throw error;
+  }
 }

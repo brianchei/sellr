@@ -17,6 +17,8 @@ const promises_1 = require("node:fs/promises");
 const node_path_1 = __importDefault(require("node:path"));
 const client_s3_1 = require("@aws-sdk/client-s3");
 const shared_1 = require("@sellr/shared");
+const logger_1 = require("./logger");
+const observability_1 = require("./observability");
 const MIME_TO_EXTENSION = {
     'image/jpeg': 'jpg',
     'image/png': 'png',
@@ -126,13 +128,34 @@ function createR2ListingImageStorage() {
         async store(buffer, mimetype) {
             const filename = createFilename(mimetype);
             const key = createListingImageKey(filename);
-            await s3.send(new client_s3_1.PutObjectCommand({
-                Bucket: bucket,
-                Key: key,
-                Body: buffer,
-                ContentType: mimetype,
-                CacheControl: ONE_YEAR_IMMUTABLE,
-            }));
+            try {
+                await s3.send(new client_s3_1.PutObjectCommand({
+                    Bucket: bucket,
+                    Key: key,
+                    Body: buffer,
+                    ContentType: mimetype,
+                    CacheControl: ONE_YEAR_IMMUTABLE,
+                }));
+            }
+            catch (error) {
+                logger_1.logger.error({
+                    err: error,
+                    operation: 'r2.put_object',
+                    bucket,
+                    storageKey: key,
+                    contentType: mimetype,
+                }, 'R2 listing image upload failed');
+                (0, observability_1.captureOperationalError)(error, {
+                    component: 'r2',
+                    operation: 'put_object',
+                    extra: {
+                        bucket,
+                        storageKey: key,
+                        contentType: mimetype,
+                    },
+                });
+                throw error;
+            }
             return {
                 filename,
                 key,
@@ -207,8 +230,28 @@ async function deleteListingImageObject(reference) {
         }
         return;
     }
-    await createR2Client().send(new client_s3_1.DeleteObjectCommand({
-        Bucket: requireEnv('R2_BUCKET_NAME'),
-        Key: reference.storageKey,
-    }));
+    const bucket = requireEnv('R2_BUCKET_NAME');
+    try {
+        await createR2Client().send(new client_s3_1.DeleteObjectCommand({
+            Bucket: bucket,
+            Key: reference.storageKey,
+        }));
+    }
+    catch (error) {
+        logger_1.logger.error({
+            err: error,
+            operation: 'r2.delete_object',
+            bucket,
+            storageKey: reference.storageKey,
+        }, 'R2 listing image deletion failed');
+        (0, observability_1.captureOperationalError)(error, {
+            component: 'r2',
+            operation: 'delete_object',
+            extra: {
+                bucket,
+                storageKey: reference.storageKey,
+            },
+        });
+        throw error;
+    }
 }
