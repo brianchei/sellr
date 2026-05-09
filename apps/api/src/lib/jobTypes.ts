@@ -53,3 +53,13 @@ export interface QuickReplyJob {
   listingId: string;
   sellerId: string;
 }
+
+// Media Cleanup Jobs
+export interface MediaCleanupJob {
+  mediaAssetId: string;
+  reason:
+    | 'abandoned_upload'
+    | 'listing_deleted'
+    | 'listing_photo_removed'
+    | 'moderation_listing_removed';
+}

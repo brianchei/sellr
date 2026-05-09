@@ -67,6 +67,11 @@ export type InviteCode = Prisma.InviteCodeModel
  */
 export type Listing = Prisma.ListingModel
 /**
+ * Model MediaAsset
+ * 
+ */
+export type MediaAsset = Prisma.MediaAssetModel
+/**
  * Model Offer
  * 
  */

@@ -5,6 +5,7 @@ import { searchSyncWorker } from '../jobs/searchSync';
 import { notificationWorker } from '../jobs/notifications';
 import { savedSearchWorker } from '../jobs/savedSearch';
 import { quickReplyWorker } from '../jobs/quickReply';
+import { mediaCleanupWorker } from '../jobs/mediaCleanup';
 
 export function initBullMQ(): void {
   new Worker('ai', imageForensicsWorker, {
@@ -26,6 +27,10 @@ export function initBullMQ(): void {
   new Worker('quick-reply', quickReplyWorker, {
     connection: redis,
     concurrency: 5,
+  });
+  new Worker('media-cleanup', mediaCleanupWorker, {
+    connection: redis,
+    concurrency: 3,
   });
 
   console.log('BullMQ workers initialized');

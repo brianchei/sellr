@@ -10,6 +10,8 @@ exports.listingImagesDir = listingImagesDir;
 exports.listingImagePath = listingImagePath;
 exports.listingImageMimeTypeForFilename = listingImageMimeTypeForFilename;
 exports.createListingImageStorage = createListingImageStorage;
+exports.listingImageStorageReferenceFromUrl = listingImageStorageReferenceFromUrl;
+exports.deleteListingImageObject = deleteListingImageObject;
 const node_crypto_1 = require("node:crypto");
 const promises_1 = require("node:fs/promises");
 const node_path_1 = __importDefault(require("node:path"));
@@ -50,6 +52,10 @@ function createFilename(mimetype) {
 function createListingImageKey(filename) {
     return `listing-images/${filename}`;
 }
+function filenameFromListingImageKey(storageKey) {
+    const match = /^listing-images\/([a-f0-9-]+\.(jpg|png|webp))$/i.exec(storageKey);
+    return match?.[1] ?? null;
+}
 function trimTrailingSlash(value) {
     return value.replace(/\/+$/, '');
 }
@@ -67,6 +73,10 @@ function requirePublicBaseUrl() {
         throw new Error('CLOUDFLARE_CDN_URL must be an http(s) URL');
     }
     return value;
+}
+function configuredPublicBaseUrl() {
+    const value = process.env.CLOUDFLARE_CDN_URL?.trim();
+    return value ? trimTrailingSlash(value) : null;
 }
 function shouldUseR2Storage() {
     const explicitDriver = process.env.LISTING_IMAGE_STORAGE_DRIVER?.trim();
@@ -91,15 +101,14 @@ function createLocalListingImageStorage() {
                 filename,
                 key: createListingImageKey(filename),
                 url: `${shared_1.LISTING_IMAGE_UPLOAD_PATH_PREFIX}${filename}`,
+                storageProvider: 'local',
             };
         },
     };
 }
-function createR2ListingImageStorage() {
+function createR2Client() {
     const accountId = requireEnv('CLOUDFLARE_ACCOUNT_ID');
-    const bucket = requireEnv('R2_BUCKET_NAME');
-    const publicBaseUrl = requirePublicBaseUrl();
-    const s3 = new client_s3_1.S3Client({
+    return new client_s3_1.S3Client({
         region: 'auto',
         endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
         requestChecksumCalculation: 'WHEN_REQUIRED',
@@ -108,6 +117,11 @@ function createR2ListingImageStorage() {
             secretAccessKey: requireEnv('R2_SECRET_ACCESS_KEY'),
         },
     });
+}
+function createR2ListingImageStorage() {
+    const bucket = requireEnv('R2_BUCKET_NAME');
+    const publicBaseUrl = requirePublicBaseUrl();
+    const s3 = createR2Client();
     return {
         async store(buffer, mimetype) {
             const filename = createFilename(mimetype);
@@ -123,6 +137,7 @@ function createR2ListingImageStorage() {
                 filename,
                 key,
                 url: `${publicBaseUrl}/${key}`,
+                storageProvider: 'r2',
             };
         },
     };
@@ -134,3 +149,66 @@ function createListingImageStorage() {
     return createLocalListingImageStorage();
 }
 exports.LISTING_IMAGE_CACHE_CONTROL = ONE_YEAR_IMMUTABLE;
+function listingImageStorageReferenceFromUrl(url) {
+    if (url.startsWith(shared_1.LISTING_IMAGE_UPLOAD_PATH_PREFIX)) {
+        const filename = url.slice(shared_1.LISTING_IMAGE_UPLOAD_PATH_PREFIX.length);
+        if (!filenameFromListingImageKey(createListingImageKey(filename))) {
+            return null;
+        }
+        return {
+            storageKey: createListingImageKey(filename),
+            storageProvider: 'local',
+        };
+    }
+    const publicBaseUrl = configuredPublicBaseUrl();
+    if (!publicBaseUrl)
+        return null;
+    let parsedUrl;
+    let parsedBase;
+    try {
+        parsedUrl = new URL(url);
+        parsedBase = new URL(publicBaseUrl);
+    }
+    catch {
+        return null;
+    }
+    if (parsedUrl.protocol !== parsedBase.protocol ||
+        parsedUrl.hostname !== parsedBase.hostname ||
+        parsedUrl.port !== parsedBase.port) {
+        return null;
+    }
+    const basePath = parsedBase.pathname.replace(/\/$/, '');
+    const pathPrefix = basePath ? `${basePath}/` : '/';
+    if (!parsedUrl.pathname.startsWith(pathPrefix))
+        return null;
+    const storageKey = decodeURIComponent(parsedUrl.pathname.slice(pathPrefix.length));
+    if (!filenameFromListingImageKey(storageKey))
+        return null;
+    return {
+        storageKey,
+        storageProvider: 'r2',
+    };
+}
+async function deleteListingImageObject(reference) {
+    if (reference.storageProvider === 'local') {
+        const filename = filenameFromListingImageKey(reference.storageKey);
+        if (!filename)
+            return;
+        const filePath = listingImagePath(filename);
+        if (!filePath)
+            return;
+        try {
+            await (0, promises_1.unlink)(filePath);
+        }
+        catch (error) {
+            if (error.code !== 'ENOENT') {
+                throw error;
+            }
+        }
+        return;
+    }
+    await createR2Client().send(new client_s3_1.DeleteObjectCommand({
+        Bucket: requireEnv('R2_BUCKET_NAME'),
+        Key: reference.storageKey,
+    }));
+}

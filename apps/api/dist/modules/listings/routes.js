@@ -9,6 +9,7 @@ const auth_1 = require("../../middleware/auth");
 const repository_1 = require("./repository");
 const queues_1 = require("../../lib/queues");
 const notifyUser_1 = require("../../lib/notifyUser");
+const mediaAssets_1 = require("../../lib/mediaAssets");
 function sellerProfileKey(lookup) {
     return `${lookup.sellerId}:${lookup.communityId}`;
 }
@@ -243,25 +244,34 @@ const plugin = (fastify, _opts, done) => {
                 .code(403)
                 .send({ error: 'Not a member of this community' });
         }
-        const listing = await prisma_1.prisma.listing.create({
-            data: {
-                communityId: body.communityId,
-                sellerId: request.user.sub,
-                title: body.title,
-                description: body.description,
-                category: body.category,
-                subcategory: body.subcategory,
-                condition: body.condition,
-                conditionNote: body.conditionNote,
-                price: new client_1.Prisma.Decimal(String(body.price)),
-                negotiable: body.negotiable,
-                locationNeighborhood: body.locationNeighborhood,
-                locationRadiusM: body.locationRadiusM,
-                availabilityWindows: body.availabilityWindows,
+        const listing = await prisma_1.prisma.$transaction(async (tx) => {
+            const created = await tx.listing.create({
+                data: {
+                    communityId: body.communityId,
+                    sellerId: request.user.sub,
+                    title: body.title,
+                    description: body.description,
+                    category: body.category,
+                    subcategory: body.subcategory,
+                    condition: body.condition,
+                    conditionNote: body.conditionNote,
+                    price: new client_1.Prisma.Decimal(String(body.price)),
+                    negotiable: body.negotiable,
+                    locationNeighborhood: body.locationNeighborhood,
+                    locationRadiusM: body.locationRadiusM,
+                    availabilityWindows: body.availabilityWindows,
+                    photoUrls: body.photoUrls,
+                    aiGenerated: body.aiGenerated,
+                    status: 'draft',
+                },
+            });
+            await (0, mediaAssets_1.attachListingMediaAssets)({
+                ownerId: request.user.sub,
+                listingId: created.id,
                 photoUrls: body.photoUrls,
-                aiGenerated: body.aiGenerated,
-                status: 'draft',
-            },
+                db: tx,
+            });
+            return created;
         });
         if (body.lat !== undefined && body.lng !== undefined) {
             await (0, repository_1.setListingLocationGeom)(listing.id, body.lat, body.lng);
@@ -287,6 +297,11 @@ const plugin = (fastify, _opts, done) => {
         if (listing.status === 'sold') {
             return reply.code(400).send({
                 error: 'Sold listings cannot be republished. Create a new listing.',
+            });
+        }
+        if (listing.status === 'expired') {
+            return reply.code(400).send({
+                error: 'Removed or expired listings cannot be republished. Create a new listing.',
             });
         }
         const shouldNotifyMarketplace = listing.status !== 'active';
@@ -318,6 +333,11 @@ const plugin = (fastify, _opts, done) => {
             return reply
                 .code(403)
                 .send({ error: 'Not a member of this community' });
+        }
+        if (listing.status === 'expired') {
+            return reply.code(400).send({
+                error: 'Removed or expired listings cannot be unpublished.',
+            });
         }
         const updated = await prisma_1.prisma.listing.update({
             where: { id: listingId },
@@ -396,6 +416,11 @@ const plugin = (fastify, _opts, done) => {
                 .code(403)
                 .send({ error: 'Not a member of this community' });
         }
+        if (listing.status === 'expired') {
+            return reply
+                .code(400)
+                .send({ error: 'Removed or expired listings cannot be deleted.' });
+        }
         if (listing._count.conversations > 0 || listing._count.offers > 0) {
             return reply.code(409).send({
                 error: 'Listings with buyer activity cannot be deleted. Unpublish it instead.',
@@ -415,6 +440,10 @@ const plugin = (fastify, _opts, done) => {
         await queues_1.searchSyncQueue.add('sync', {
             listingId,
             action: 'delete',
+        });
+        await (0, mediaAssets_1.queueListingPhotoUrlDeletion)({
+            photoUrls: listing.photoUrls,
+            reason: 'listing_deleted',
         });
         return reply.send((0, response_1.ok)({ deleted: true }));
     });
@@ -438,6 +467,11 @@ const plugin = (fastify, _opts, done) => {
                 .code(403)
                 .send({ error: 'Not a member of this community' });
         }
+        if (listing.status === 'expired') {
+            return reply
+                .code(400)
+                .send({ error: 'Removed or expired listings cannot be edited.' });
+        }
         const nextPrice = new client_1.Prisma.Decimal(String(body.price));
         const nextCondition = body.condition;
         const pickupChanged = listing.locationNeighborhood !== body.locationNeighborhood ||
@@ -453,22 +487,31 @@ const plugin = (fastify, _opts, done) => {
             listing.conditionNote !== (body.conditionNote ?? null) ||
             listing.negotiable !== body.negotiable ||
             jsonStableValue(listing.photoUrls) !== jsonStableValue(body.photoUrls);
-        const updated = await prisma_1.prisma.listing.update({
-            where: { id: listingId },
-            data: {
-                title: body.title,
-                description: body.description,
-                category: body.category,
-                subcategory: body.subcategory ?? null,
-                condition: nextCondition,
-                conditionNote: body.conditionNote ?? null,
-                price: nextPrice,
-                negotiable: body.negotiable,
-                locationNeighborhood: body.locationNeighborhood,
-                locationRadiusM: body.locationRadiusM,
-                availabilityWindows: body.availabilityWindows,
+        const updated = await prisma_1.prisma.$transaction(async (tx) => {
+            const nextListing = await tx.listing.update({
+                where: { id: listingId },
+                data: {
+                    title: body.title,
+                    description: body.description,
+                    category: body.category,
+                    subcategory: body.subcategory ?? null,
+                    condition: nextCondition,
+                    conditionNote: body.conditionNote ?? null,
+                    price: nextPrice,
+                    negotiable: body.negotiable,
+                    locationNeighborhood: body.locationNeighborhood,
+                    locationRadiusM: body.locationRadiusM,
+                    availabilityWindows: body.availabilityWindows,
+                    photoUrls: body.photoUrls,
+                },
+            });
+            await (0, mediaAssets_1.attachListingMediaAssets)({
+                ownerId: request.user.sub,
+                listingId: nextListing.id,
                 photoUrls: body.photoUrls,
-            },
+                db: tx,
+            });
+            return nextListing;
         });
         if (body.lat !== undefined && body.lng !== undefined) {
             await (0, repository_1.setListingLocationGeom)(updated.id, body.lat, body.lng);
@@ -479,6 +522,11 @@ const plugin = (fastify, _opts, done) => {
                 action: 'upsert',
             });
         }
+        await (0, mediaAssets_1.queueRemovedListingPhotoDeletion)({
+            listingId: updated.id,
+            previousPhotoUrls: listing.photoUrls,
+            nextPhotoUrls: body.photoUrls,
+        });
         if (listing.status === 'active' &&
             (pickupChanged || priceChanged || detailsChanged)) {
             const changeKind = pickupChanged

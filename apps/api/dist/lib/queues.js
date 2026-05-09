@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.quickReplyQueue = exports.savedSearchQueue = exports.notificationQueue = exports.searchSyncQueue = exports.aiQueue = void 0;
+exports.mediaCleanupQueue = exports.quickReplyQueue = exports.savedSearchQueue = exports.notificationQueue = exports.searchSyncQueue = exports.aiQueue = void 0;
 const bullmq_1 = require("bullmq");
 const redis_1 = require("./redis");
 const defaultJobOptions = {
@@ -26,6 +26,10 @@ exports.savedSearchQueue = new bullmq_1.Queue('saved-search', {
     defaultJobOptions,
 });
 exports.quickReplyQueue = new bullmq_1.Queue('quick-reply', {
+    connection: redis_1.redis,
+    defaultJobOptions,
+});
+exports.mediaCleanupQueue = new bullmq_1.Queue('media-cleanup', {
     connection: redis_1.redis,
     defaultJobOptions,
 });

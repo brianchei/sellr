@@ -159,6 +159,9 @@ fixtures.
   community-scoped listings without distance ranking.
 - Listing photos upload to local API storage in development. Production uses
   R2/CDN when Railway storage variables are configured.
+- Media cleanup is asynchronous: deleted/replaced listing images and explicit
+  admin listing removals enqueue object deletion, and abandoned uploads expire
+  after 24 hours.
 - Browser route smoke validates authenticated HTML responses, not pixel-level
   visual layout. Use the manual visual pass for layout sign-off.
 
@@ -166,7 +169,8 @@ fixtures.
 
 These are intentionally deferred until the core web loop is stable:
 
-- Listing media cleanup/lifecycle policy after deletion or report retention.
+- Long-term media retention/reconciliation jobs beyond the current 24-hour
+  abandoned-upload catch-up script.
 - Ratings, KYC, full reputation, or advanced moderation workflows.
 - Payments, offers, meetup scheduling, and delivery/logistics.
 - Push/realtime notification polish beyond existing API foundations.

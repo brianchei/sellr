@@ -17,6 +17,8 @@ The current web SLC includes:
 - Structured listing creation and seller inventory management.
 - Durable R2/CDN listing image uploads, plus edit, publish/unpublish, delete,
   and sold-listing lifecycle.
+- Media lifecycle cleanup for abandoned uploads, deleted/replaced listing
+  images, and explicit admin listing removals from reports.
 - Seller storefront-lite pages.
 - Buyer contact, inbox threads, and replies.
 - Notifications and unread badges.
@@ -162,9 +164,8 @@ Local OTP: 000000
 
 ## Follow-Up Engineering Risks
 
-- Confirm Cloudflare R2/CDN listing image uploads stay healthy after production
-  deploy and add lifecycle cleanup once listing deletion/media retention policy
-  is decided.
+- Confirm Cloudflare R2/CDN listing image uploads and media cleanup jobs stay
+  healthy after production deploy.
 - Consider converting the API to a true ESM production build later, replacing
   the current `tsx src/index.ts` production start workaround.
 - Confirm Twilio Verify is configured before testing production login.

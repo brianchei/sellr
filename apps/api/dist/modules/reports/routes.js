@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.reportRoutes = void 0;
 const shared_1 = require("@sellr/shared");
 const prisma_1 = require("../../lib/prisma");
+const mediaAssets_1 = require("../../lib/mediaAssets");
+const queues_1 = require("../../lib/queues");
 const response_1 = require("../../lib/response");
 const auth_1 = require("../../middleware/auth");
 function adminCommunityIds(role) {
@@ -352,6 +354,82 @@ const plugin = (fastify, _opts, done) => {
                 ...updated,
                 target: summaries.get(updated.targetId) ?? null,
             },
+        }));
+    });
+    fastify.post('/:reportId/remove-listing', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
+        const adminIds = adminCommunityIds(request.user.role);
+        if (adminIds.length === 0) {
+            return reply.code(403).send({ error: 'Admin access required' });
+        }
+        const { reportId } = request.params;
+        const report = await prisma_1.prisma.report.findUnique({
+            where: { id: reportId },
+            select: {
+                id: true,
+                targetId: true,
+                targetType: true,
+            },
+        });
+        if (!report) {
+            return reply.code(404).send({ error: 'Report not found' });
+        }
+        if (report.targetType !== 'listing') {
+            return reply
+                .code(400)
+                .send({ error: 'Only listing reports can remove listings' });
+        }
+        const allowed = await canAdminReport({ targetId: report.targetId, targetType: report.targetType }, adminIds);
+        if (!allowed) {
+            return reply.code(403).send({ error: 'Admin access required' });
+        }
+        const listing = await prisma_1.prisma.listing.findUnique({
+            where: { id: report.targetId },
+        });
+        if (!listing) {
+            return reply.code(404).send({ error: 'Listing not found' });
+        }
+        const [, updated] = await prisma_1.prisma.$transaction([
+            prisma_1.prisma.listing.update({
+                where: { id: listing.id },
+                data: {
+                    status: 'expired',
+                    photoUrls: [],
+                },
+            }),
+            prisma_1.prisma.report.update({
+                where: { id: report.id },
+                data: {
+                    status: 'resolved',
+                    moderatorId: request.user.sub,
+                    resolvedAt: new Date(),
+                },
+                include: {
+                    reporter: {
+                        select: {
+                            id: true,
+                            displayName: true,
+                            phoneE164: true,
+                        },
+                    },
+                },
+            }),
+        ]);
+        await queues_1.searchSyncQueue.add('sync', {
+            listingId: listing.id,
+            action: 'delete',
+        });
+        await (0, mediaAssets_1.queueListingPhotoUrlDeletion)({
+            listingId: listing.id,
+            photoUrls: listing.photoUrls,
+            reason: 'moderation_listing_removed',
+        });
+        const summaries = await targetSummaries([updated]);
+        return reply.send((0, response_1.ok)({
+            report: {
+                ...updated,
+                target: summaries.get(updated.targetId) ?? null,
+            },
+            listingRemoved: true,
         }));
     });
     done();

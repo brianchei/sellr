@@ -15,6 +15,11 @@ import { verifyJWT } from '../../middleware/auth';
 import { findListingsNearby, setListingLocationGeom } from './repository';
 import { searchSyncQueue } from '../../lib/queues';
 import { notifyUser } from '../../lib/notifyUser';
+import {
+  attachListingMediaAssets,
+  queueListingPhotoUrlDeletion,
+  queueRemovedListingPhotoDeletion,
+} from '../../lib/mediaAssets';
 
 type SellerProfileLookup = {
   sellerId: string;
@@ -382,25 +387,36 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           .send({ error: 'Not a member of this community' });
       }
 
-      const listing = await prisma.listing.create({
-        data: {
-          communityId: body.communityId,
-          sellerId: request.user.sub,
-          title: body.title,
-          description: body.description,
-          category: body.category,
-          subcategory: body.subcategory,
-          condition: body.condition,
-          conditionNote: body.conditionNote,
-          price: new Prisma.Decimal(String(body.price)),
-          negotiable: body.negotiable,
-          locationNeighborhood: body.locationNeighborhood,
-          locationRadiusM: body.locationRadiusM,
-          availabilityWindows: body.availabilityWindows,
+      const listing = await prisma.$transaction(async (tx) => {
+        const created = await tx.listing.create({
+          data: {
+            communityId: body.communityId,
+            sellerId: request.user.sub,
+            title: body.title,
+            description: body.description,
+            category: body.category,
+            subcategory: body.subcategory,
+            condition: body.condition,
+            conditionNote: body.conditionNote,
+            price: new Prisma.Decimal(String(body.price)),
+            negotiable: body.negotiable,
+            locationNeighborhood: body.locationNeighborhood,
+            locationRadiusM: body.locationRadiusM,
+            availabilityWindows: body.availabilityWindows,
+            photoUrls: body.photoUrls,
+            aiGenerated: body.aiGenerated,
+            status: 'draft',
+          },
+        });
+
+        await attachListingMediaAssets({
+          ownerId: request.user.sub,
+          listingId: created.id,
           photoUrls: body.photoUrls,
-          aiGenerated: body.aiGenerated,
-          status: 'draft',
-        },
+          db: tx,
+        });
+
+        return created;
       });
 
       if (body.lat !== undefined && body.lng !== undefined) {
@@ -433,6 +449,12 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       if (listing.status === 'sold') {
         return reply.code(400).send({
           error: 'Sold listings cannot be republished. Create a new listing.',
+        });
+      }
+      if (listing.status === 'expired') {
+        return reply.code(400).send({
+          error:
+            'Removed or expired listings cannot be republished. Create a new listing.',
         });
       }
 
@@ -472,6 +494,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         return reply
           .code(403)
           .send({ error: 'Not a member of this community' });
+      }
+      if (listing.status === 'expired') {
+        return reply.code(400).send({
+          error: 'Removed or expired listings cannot be unpublished.',
+        });
       }
 
       const updated = await prisma.listing.update({
@@ -569,6 +596,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           .code(403)
           .send({ error: 'Not a member of this community' });
       }
+      if (listing.status === 'expired') {
+        return reply
+          .code(400)
+          .send({ error: 'Removed or expired listings cannot be deleted.' });
+      }
       if (listing._count.conversations > 0 || listing._count.offers > 0) {
         return reply.code(409).send({
           error:
@@ -591,6 +623,10 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       await searchSyncQueue.add('sync', {
         listingId,
         action: 'delete',
+      });
+      await queueListingPhotoUrlDeletion({
+        photoUrls: listing.photoUrls,
+        reason: 'listing_deleted',
       });
 
       return reply.send(ok({ deleted: true }));
@@ -620,6 +656,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           .code(403)
           .send({ error: 'Not a member of this community' });
       }
+      if (listing.status === 'expired') {
+        return reply
+          .code(400)
+          .send({ error: 'Removed or expired listings cannot be edited.' });
+      }
 
       const nextPrice = new Prisma.Decimal(String(body.price));
       const nextCondition = body.condition as typeof listing.condition;
@@ -639,22 +680,33 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         listing.negotiable !== body.negotiable ||
         jsonStableValue(listing.photoUrls) !== jsonStableValue(body.photoUrls);
 
-      const updated = await prisma.listing.update({
-        where: { id: listingId },
-        data: {
-          title: body.title,
-          description: body.description,
-          category: body.category,
-          subcategory: body.subcategory ?? null,
-          condition: nextCondition,
-          conditionNote: body.conditionNote ?? null,
-          price: nextPrice,
-          negotiable: body.negotiable,
-          locationNeighborhood: body.locationNeighborhood,
-          locationRadiusM: body.locationRadiusM,
-          availabilityWindows: body.availabilityWindows,
+      const updated = await prisma.$transaction(async (tx) => {
+        const nextListing = await tx.listing.update({
+          where: { id: listingId },
+          data: {
+            title: body.title,
+            description: body.description,
+            category: body.category,
+            subcategory: body.subcategory ?? null,
+            condition: nextCondition,
+            conditionNote: body.conditionNote ?? null,
+            price: nextPrice,
+            negotiable: body.negotiable,
+            locationNeighborhood: body.locationNeighborhood,
+            locationRadiusM: body.locationRadiusM,
+            availabilityWindows: body.availabilityWindows,
+            photoUrls: body.photoUrls,
+          },
+        });
+
+        await attachListingMediaAssets({
+          ownerId: request.user.sub,
+          listingId: nextListing.id,
           photoUrls: body.photoUrls,
-        },
+          db: tx,
+        });
+
+        return nextListing;
       });
 
       if (body.lat !== undefined && body.lng !== undefined) {
@@ -667,6 +719,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           action: 'upsert',
         });
       }
+      await queueRemovedListingPhotoDeletion({
+        listingId: updated.id,
+        previousPhotoUrls: listing.photoUrls,
+        nextPhotoUrls: body.photoUrls,
+      });
       if (
         listing.status === 'active' &&
         (pickupChanged || priceChanged || detailsChanged)

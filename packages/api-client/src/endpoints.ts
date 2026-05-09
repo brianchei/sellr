@@ -498,3 +498,10 @@ export function updateReportStatus(reportId: string, status: ApiReportStatus) {
     body: JSON.stringify({ status }),
   });
 }
+
+export function removeReportedListing(reportId: string) {
+  return apiFetch<{ report: ApiReport; listingRemoved: boolean }>(
+    `/reports/${reportId}/remove-listing`,
+    { method: 'POST' },
+  );
+}

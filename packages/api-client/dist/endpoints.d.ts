@@ -306,4 +306,8 @@ export declare function fetchReports(params?: {
 export declare function updateReportStatus(reportId: string, status: ApiReportStatus): Promise<{
     report: ApiReport;
 }>;
+export declare function removeReportedListing(reportId: string): Promise<{
+    report: ApiReport;
+    listingRemoved: boolean;
+}>;
 //# sourceMappingURL=endpoints.d.ts.map

@@ -389,6 +389,7 @@ export const ModelName = {
   CommunityMember: 'CommunityMember',
   InviteCode: 'InviteCode',
   Listing: 'Listing',
+  MediaAsset: 'MediaAsset',
   Offer: 'Offer',
   Meetup: 'Meetup',
   Rating: 'Rating',
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "community" | "communityMember" | "inviteCode" | "listing" | "offer" | "meetup" | "rating" | "userReputation" | "conversation" | "message" | "savedSearch" | "report" | "userFlag" | "notification"
+    modelProps: "user" | "community" | "communityMember" | "inviteCode" | "listing" | "mediaAsset" | "offer" | "meetup" | "rating" | "userReputation" | "conversation" | "message" | "savedSearch" | "report" | "userFlag" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -785,6 +786,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ListingCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ListingCountAggregateOutputType> | number
+        }
+      }
+    }
+    MediaAsset: {
+      payload: Prisma.$MediaAssetPayload<ExtArgs>
+      fields: Prisma.MediaAssetFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MediaAssetFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MediaAssetFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>
+        }
+        findFirst: {
+          args: Prisma.MediaAssetFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MediaAssetFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>
+        }
+        findMany: {
+          args: Prisma.MediaAssetFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>[]
+        }
+        create: {
+          args: Prisma.MediaAssetCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>
+        }
+        createMany: {
+          args: Prisma.MediaAssetCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MediaAssetCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>[]
+        }
+        delete: {
+          args: Prisma.MediaAssetDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>
+        }
+        update: {
+          args: Prisma.MediaAssetUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>
+        }
+        deleteMany: {
+          args: Prisma.MediaAssetDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MediaAssetUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MediaAssetUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>[]
+        }
+        upsert: {
+          args: Prisma.MediaAssetUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaAssetPayload>
+        }
+        aggregate: {
+          args: Prisma.MediaAssetAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMediaAsset>
+        }
+        groupBy: {
+          args: Prisma.MediaAssetGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MediaAssetGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MediaAssetCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MediaAssetCountAggregateOutputType> | number
         }
       }
     }
@@ -1645,6 +1720,25 @@ export const ListingScalarFieldEnum = {
 export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
 
 
+export const MediaAssetScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  listingId: 'listingId',
+  url: 'url',
+  storageKey: 'storageKey',
+  storageProvider: 'storageProvider',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  attachedAt: 'attachedAt',
+  deletedAt: 'deletedAt',
+  lastError: 'lastError',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MediaAssetScalarFieldEnum = (typeof MediaAssetScalarFieldEnum)[keyof typeof MediaAssetScalarFieldEnum]
+
+
 export const OfferScalarFieldEnum = {
   id: 'id',
   listingId: 'listingId',
@@ -2171,6 +2265,7 @@ export type GlobalOmitConfig = {
   communityMember?: Prisma.CommunityMemberOmit
   inviteCode?: Prisma.InviteCodeOmit
   listing?: Prisma.ListingOmit
+  mediaAsset?: Prisma.MediaAssetOmit
   offer?: Prisma.OfferOmit
   meetup?: Prisma.MeetupOmit
   rating?: Prisma.RatingOmit
