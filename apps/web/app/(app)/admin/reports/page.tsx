@@ -288,9 +288,7 @@ function ReportCard({
               : action.label}
           </button>
         ))}
-        {report.targetType === 'listing' &&
-        report.status !== 'resolved' &&
-        report.status !== 'dismissed' ? (
+        {report.targetType === 'listing' && report.target ? (
           <button
             type="button"
             disabled={isUpdating || isRemoving}
