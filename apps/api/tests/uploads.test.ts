@@ -198,6 +198,10 @@ describe('listing image storage selection', () => {
   it('requires R2 configuration in production', () => {
     process.env.NODE_ENV = 'production';
     Reflect.deleteProperty(process.env, 'LISTING_IMAGE_STORAGE_DRIVER');
+    process.env.R2_BUCKET_NAME = 'sellr-media-test';
+    process.env.R2_ACCESS_KEY_ID = 'test-access-key';
+    process.env.R2_SECRET_ACCESS_KEY = 'test-secret-key';
+    process.env.CLOUDFLARE_CDN_URL = 'https://cdn.sellr.test';
     Reflect.deleteProperty(process.env, 'CLOUDFLARE_ACCOUNT_ID');
 
     expect(() => createListingImageStorage()).toThrow(
