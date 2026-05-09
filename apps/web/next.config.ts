@@ -4,22 +4,41 @@ import path from 'path';
 
 const monorepoRoot = path.resolve(process.cwd(), '../..');
 
+function listingImageCdnPattern() {
+  const value = process.env.NEXT_PUBLIC_LISTING_IMAGE_CDN_URL?.trim();
+  if (!value) return null;
+
+  const url = new URL(value);
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    throw new Error('NEXT_PUBLIC_LISTING_IMAGE_CDN_URL must be an http(s) URL');
+  }
+
+  const basePath = url.pathname === '/' ? '' : url.pathname.replace(/\/$/, '');
+  return {
+    protocol: url.protocol === 'http:' ? 'http' : 'https',
+    hostname: url.hostname,
+    port: url.port,
+    pathname: `${basePath}/**`,
+  } as const;
+}
+
+const listingImageRemotePattern = listingImageCdnPattern();
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: monorepoRoot,
   },
   images: {
-    // Listing photos are stored as same-origin paths
-    // (`/api/v1/uploads/listing-images/<uuid>.<ext>`) which are forwarded to
-    // the Fastify uploads route by the rewrite below — same-origin sources do
-    // not need to be allow-listed. Seed data and any future external CDN
-    // sources do; extend `remotePatterns` when uploads move to Cloudflare R2.
+    // Same-origin legacy upload paths are still served through the API rewrite.
+    // New durable listing images are returned as CDN URLs and must be
+    // allow-listed here for Next/Image optimization.
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '/**',
       },
+      ...(listingImageRemotePattern ? [listingImageRemotePattern] : []),
     ],
   },
   /** Same-origin `/api/v1` → Fastify so the browser can use httpOnly cookies (see auth). */

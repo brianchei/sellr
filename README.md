@@ -62,7 +62,7 @@ sellr/
 - **Web:** Next.js 16, React 19, Tailwind CSS 4
 - **Shared contracts:** `@sellr/shared` and `@sellr/api-client`
 - **Observability/integrations:** Sentry, PostHog, Langfuse, Twilio, Expo Push,
-  OpenAI, Anthropic, and Cloudflare R2 configuration hooks
+  OpenAI, Anthropic, and Cloudflare R2 listing media storage
 
 ## Key Capabilities
 
@@ -71,7 +71,8 @@ sellr/
   domains
 - Community-scoped listings with status, condition, pricing, photos,
   availability windows, and approximate neighborhood/radius location
-- Local web SLC listing photo uploads with JPG/PNG/WebP validation and preview
+- Web SLC listing photo uploads with JPG/PNG/WebP validation, local dev
+  fallback, and durable R2/CDN production delivery
 - Nearby listing lookup using PostGIS and full-text/product search through
   Algolia
 - Seller storefront-lite pages with trust signals, active listings, and
