@@ -185,21 +185,6 @@ Without it, local DB integration suites are skipped by the repo safety guard.
 - `apps/web/README.md`
 - `sellr-technical-implementation-guide-v2.md`
 
-## Current Branch Note
-
-At the time this context was refreshed, the workspace was on
-`codex/admin-report-remove-listing-visible`, which is one commit ahead of
-`origin/main`:
-
-```text
-fix(web): keep listing removal visible for admins
-```
-
-That branch makes the report **Remove listing** action visible for any listing
-report with an existing target, including already resolved/dismissed reports. If
-it has not been merged yet, merge/deploy it or switch back to updated `main`
-before starting unrelated work.
-
 ## Follow-Up Engineering Risks
 
 - Media cleanup health tooling is now implemented through API scripts:
@@ -208,8 +193,9 @@ before starting unrelated work.
 - Structured Railway/Sentry failure visibility now covers Twilio Verify
   failures, R2 upload/delete failures, media cleanup job failures, refresh-token
   failures, and API 500s by route.
-- Next observability step: configure alerting thresholds/destinations for the
-  structured failures and media health signals.
+- Production alerting thresholds/destinations for the structured failures and
+  media health signals are useful post-launch hardening, but are not a release
+  blocker for the SLC.
 - Move listing media from a temporary `r2.dev` public URL to a custom CDN domain
   before broader production launch, if that has not happened yet.
 - Consider converting the API to a true ESM production build later, replacing
@@ -217,11 +203,11 @@ before starting unrelated work.
 
 ## Suggested Next Request
 
-Ask the next session to wire alerts around the new visibility layer:
+Ask the next session to finish launch readiness:
 
 ```text
-Read AGENTS.md and docs/next-session-context.md. Configure production alerting
-for Sellr's key ops signals: API 500s by route, Twilio Verify failures, R2
-upload/delete failures, media cleanup job failures, and nonzero media
-delete_failed counts. Keep it scoped to observability configuration and docs.
+Read AGENTS.md and docs/next-session-context.md. Help complete Sellr launch
+readiness by running the production smoke baseline, creating real launch
+community/admin data, verifying media health, and recording any final release
+notes. Do not add new product scope.
 ```
