@@ -61,5 +61,6 @@ export interface MediaCleanupJob {
     | 'abandoned_upload'
     | 'listing_deleted'
     | 'listing_photo_removed'
-    | 'moderation_listing_removed';
+    | 'moderation_listing_removed'
+    | 'manual_retry';
 }

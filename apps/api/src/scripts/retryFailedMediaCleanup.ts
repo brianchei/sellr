@@ -1,4 +1,4 @@
-import { queueExpiredPendingMediaCleanupBatch } from '../lib/mediaAssets';
+import { retryFailedMediaCleanup } from '../lib/mediaAssets';
 import { prisma } from '../lib/prisma';
 
 type ScriptOptions = {
@@ -26,11 +26,6 @@ function parseOptions(argv: string[]): ScriptOptions {
       if (Number.isFinite(parsed) && parsed > 0) {
         limit = parsed;
       }
-      continue;
-    }
-    const positionalLimit = Number.parseInt(arg, 10);
-    if (Number.isFinite(positionalLimit) && positionalLimit > 0) {
-      limit = positionalLimit;
     }
   }
 
@@ -41,7 +36,7 @@ async function main(): Promise<void> {
   const options = parseOptions(process.argv.slice(2));
 
   try {
-    const result = await queueExpiredPendingMediaCleanupBatch(options);
+    const result = await retryFailedMediaCleanup(options);
     if (options.json) {
       console.log(JSON.stringify(result, null, 2));
       return;
@@ -49,7 +44,7 @@ async function main(): Promise<void> {
 
     const action = result.dryRun ? 'Would queue' : 'Queued';
     console.log(
-      `${action} ${String(result.queued || result.matched)} expired pending media cleanup job(s).`,
+      `${action} ${String(result.queued || result.matched)} failed media cleanup job(s).`,
     );
     if (result.assetIds.length > 0) {
       console.log(`Media asset ids: ${result.assetIds.join(', ')}`);

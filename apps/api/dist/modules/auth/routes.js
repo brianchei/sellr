@@ -7,6 +7,7 @@ const response_1 = require("../../lib/response");
 const authTokens_1 = require("../../lib/authTokens");
 const authCookies_1 = require("../../lib/authCookies");
 const otp_1 = require("../../lib/otp");
+const observability_1 = require("../../lib/observability");
 const auth_1 = require("../../middleware/auth");
 async function findMeProfile(userId, communityIds) {
     const [user, membership, listingCount] = await Promise.all([
@@ -63,14 +64,39 @@ const plugin = (fastify, _opts, done) => {
                 return reply.code(429).send({ error: 'Too many OTP requests' });
             }
         }
-        await (0, otp_1.sendVerificationSms)(body.phoneE164);
+        try {
+            await (0, otp_1.sendVerificationSms)(body.phoneE164);
+        }
+        catch (error) {
+            const phone = (0, observability_1.phoneLogContext)(body.phoneE164);
+            request.log.error({ err: error, operation: 'twilio.verify.send', ...phone }, 'Twilio Verify send failed');
+            (0, observability_1.captureOperationalError)(error, {
+                component: 'twilio',
+                operation: 'verify_send',
+                extra: phone,
+            });
+            throw error;
+        }
         return reply.send((0, response_1.ok)({ sent: true }));
     });
     fastify.post('/otp/verify', {
         schema: { body: shared_1.VerifyOTPSchema },
     }, async (request, reply) => {
         const body = shared_1.VerifyOTPSchema.parse(request.body);
-        const valid = await (0, otp_1.verifyOtpCode)(body.phoneE164, body.code);
+        let valid;
+        try {
+            valid = await (0, otp_1.verifyOtpCode)(body.phoneE164, body.code);
+        }
+        catch (error) {
+            const phone = (0, observability_1.phoneLogContext)(body.phoneE164);
+            request.log.error({ err: error, operation: 'twilio.verify.check', ...phone }, 'Twilio Verify check failed');
+            (0, observability_1.captureOperationalError)(error, {
+                component: 'twilio',
+                operation: 'verify_check',
+                extra: phone,
+            });
+            throw error;
+        }
         if (!valid) {
             return reply.code(400).send({ error: 'Invalid or expired code' });
         }
@@ -116,7 +142,8 @@ const plugin = (fastify, _opts, done) => {
             }
             return await reply.send((0, response_1.ok)(tokens));
         }
-        catch {
+        catch (error) {
+            request.log.warn({ err: error, operation: 'auth.refresh' }, 'Refresh token validation failed');
             return reply.code(401).send({ error: 'Invalid refresh token' });
         }
     });

@@ -5,6 +5,8 @@ import {
 } from '../lib/listingImageStorage';
 import { MEDIA_ASSET_STATUS } from '../lib/mediaAssets';
 import type { MediaCleanupJob } from '../lib/jobTypes';
+import { logger } from '../lib/logger';
+import { captureOperationalError } from '../lib/observability';
 import { prisma } from '../lib/prisma';
 
 function isStorageProvider(
@@ -38,14 +40,43 @@ export async function mediaCleanupWorker(
   }
 
   if (!isStorageProvider(asset.storageProvider)) {
+    const error = new Error(
+      `Unsupported storage provider: ${asset.storageProvider}`,
+    );
     await prisma.mediaAsset.update({
       where: { id: asset.id },
       data: {
         status: MEDIA_ASSET_STATUS.DeleteFailed,
-        lastError: `Unsupported storage provider: ${asset.storageProvider}`,
+        lastError: error.message,
       },
     });
-    throw new Error(`Unsupported storage provider: ${asset.storageProvider}`);
+    logger.error(
+      {
+        err: error,
+        operation: 'media_cleanup.delete',
+        jobId: job.id,
+        mediaAssetId: asset.id,
+        storageKey: asset.storageKey,
+        storageProvider: asset.storageProvider,
+        reason: job.data.reason,
+      },
+      'Media cleanup job failed',
+    );
+    captureOperationalError(error, {
+      component: 'media_cleanup',
+      operation: 'delete',
+      tags: {
+        reason: job.data.reason,
+        storageProvider: asset.storageProvider,
+      },
+      extra: {
+        jobId: job.id,
+        mediaAssetId: asset.id,
+        storageKey: asset.storageKey,
+      },
+      userId: asset.ownerId ?? undefined,
+    });
+    throw error;
   }
 
   await prisma.mediaAsset.update({
@@ -78,6 +109,34 @@ export async function mediaCleanupWorker(
         status: MEDIA_ASSET_STATUS.DeleteFailed,
         lastError: error instanceof Error ? error.message : String(error),
       },
+    });
+    logger.error(
+      {
+        err: error,
+        operation: 'media_cleanup.delete',
+        jobId: job.id,
+        mediaAssetId: asset.id,
+        storageKey: asset.storageKey,
+        storageProvider: asset.storageProvider,
+        reason: job.data.reason,
+        attemptsMade: job.attemptsMade,
+      },
+      'Media cleanup job failed',
+    );
+    captureOperationalError(error, {
+      component: 'media_cleanup',
+      operation: 'delete',
+      tags: {
+        reason: job.data.reason,
+        storageProvider: asset.storageProvider,
+      },
+      extra: {
+        jobId: job.id,
+        mediaAssetId: asset.id,
+        storageKey: asset.storageKey,
+        attemptsMade: job.attemptsMade,
+      },
+      userId: asset.ownerId ?? undefined,
     });
     throw error;
   }

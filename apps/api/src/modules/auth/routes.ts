@@ -21,6 +21,10 @@ import {
   sendVerificationSms,
   verifyOtpCode,
 } from '../../lib/otp';
+import {
+  captureOperationalError,
+  phoneLogContext,
+} from '../../lib/observability';
 import { verifyJWT } from '../../middleware/auth';
 
 async function findMeProfile(userId: string, communityIds: string[]) {
@@ -84,7 +88,21 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           return reply.code(429).send({ error: 'Too many OTP requests' });
         }
       }
-      await sendVerificationSms(body.phoneE164);
+      try {
+        await sendVerificationSms(body.phoneE164);
+      } catch (error) {
+        const phone = phoneLogContext(body.phoneE164);
+        request.log.error(
+          { err: error, operation: 'twilio.verify.send', ...phone },
+          'Twilio Verify send failed',
+        );
+        captureOperationalError(error, {
+          component: 'twilio',
+          operation: 'verify_send',
+          extra: phone,
+        });
+        throw error;
+      }
       return reply.send(ok({ sent: true }));
     },
   );
@@ -96,7 +114,22 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
     },
     async (request, reply) => {
       const body = VerifyOTPSchema.parse(request.body);
-      const valid = await verifyOtpCode(body.phoneE164, body.code);
+      let valid: boolean;
+      try {
+        valid = await verifyOtpCode(body.phoneE164, body.code);
+      } catch (error) {
+        const phone = phoneLogContext(body.phoneE164);
+        request.log.error(
+          { err: error, operation: 'twilio.verify.check', ...phone },
+          'Twilio Verify check failed',
+        );
+        captureOperationalError(error, {
+          component: 'twilio',
+          operation: 'verify_check',
+          extra: phone,
+        });
+        throw error;
+      }
       if (!valid) {
         return reply.code(400).send({ error: 'Invalid or expired code' });
       }
@@ -153,7 +186,11 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           return await reply.send(ok({ rotated: true }));
         }
         return await reply.send(ok(tokens));
-      } catch {
+      } catch (error) {
+        request.log.warn(
+          { err: error, operation: 'auth.refresh' },
+          'Refresh token validation failed',
+        );
         return reply.code(401).send({ error: 'Invalid refresh token' });
       }
     },

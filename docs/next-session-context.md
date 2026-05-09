@@ -202,13 +202,14 @@ before starting unrelated work.
 
 ## Follow-Up Engineering Risks
 
-- Add media cleanup health tooling: counts by `media_assets.status`, expired
-  pending assets, `delete_failed` assets, and a retry path.
-- Add production observability/alerting for Twilio Verify failures, R2
-  upload/delete failures, media cleanup job failures, auth/session failures, and
-  API 500s by route.
-- Create a short production runbook for health checks, media cleanup inspection,
-  catch-up script usage, and safe API/web redeploys.
+- Media cleanup health tooling is now implemented through API scripts:
+  `media:health`, `media:cleanup-expired`, and `media:retry-failed`.
+- Production runbook coverage lives in `docs/production-runbook.md`.
+- Structured Railway/Sentry failure visibility now covers Twilio Verify
+  failures, R2 upload/delete failures, media cleanup job failures, refresh-token
+  failures, and API 500s by route.
+- Next observability step: configure alerting thresholds/destinations for the
+  structured failures and media health signals.
 - Move listing media from a temporary `r2.dev` public URL to a custom CDN domain
   before broader production launch, if that has not happened yet.
 - Consider converting the API to a true ESM production build later, replacing
@@ -216,12 +217,11 @@ before starting unrelated work.
 
 ## Suggested Next Request
 
-Ask the next session to add the first ops visibility layer:
+Ask the next session to wire alerts around the new visibility layer:
 
 ```text
-Read AGENTS.md and docs/next-session-context.md. Add production-safe media
-cleanup health tooling for Sellr: summarize media_assets by status, surface
-expired pending and delete_failed records, and provide a safe retry path or
-script. Keep it scoped to observability/ops polish, update docs, and verify with
-focused API/web checks.
+Read AGENTS.md and docs/next-session-context.md. Configure production alerting
+for Sellr's key ops signals: API 500s by route, Twilio Verify failures, R2
+upload/delete failures, media cleanup job failures, and nonzero media
+delete_failed counts. Keep it scoped to observability configuration and docs.
 ```

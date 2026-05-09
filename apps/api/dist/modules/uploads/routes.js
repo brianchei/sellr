@@ -5,6 +5,7 @@ const node_fs_1 = require("node:fs");
 const promises_1 = require("node:fs/promises");
 const shared_1 = require("@sellr/shared");
 const listingImageStorage_1 = require("../../lib/listingImageStorage");
+const observability_1 = require("../../lib/observability");
 const response_1 = require("../../lib/response");
 const auth_1 = require("../../middleware/auth");
 async function defaultMediaTracker() {
@@ -54,6 +55,15 @@ const plugin = (fastify, opts, done) => {
         }
         catch (error) {
             request.log.error({ err: error }, 'listing image tracking failed');
+            (0, observability_1.captureOperationalError)(error, {
+                component: 'media_assets',
+                operation: 'record_pending_upload',
+                extra: {
+                    storageKey: storedImage.key,
+                    storageProvider: storedImage.storageProvider,
+                },
+                userId: request.user.sub,
+            });
             try {
                 await (0, listingImageStorage_1.deleteListingImageObject)({
                     storageKey: storedImage.key,
@@ -62,6 +72,15 @@ const plugin = (fastify, opts, done) => {
             }
             catch (deleteError) {
                 request.log.error({ err: deleteError }, 'untracked listing image cleanup failed');
+                (0, observability_1.captureOperationalError)(deleteError, {
+                    component: 'media_assets',
+                    operation: 'cleanup_untracked_upload',
+                    extra: {
+                        storageKey: storedImage.key,
+                        storageProvider: storedImage.storageProvider,
+                    },
+                    userId: request.user.sub,
+                });
             }
             return reply
                 .code(502)

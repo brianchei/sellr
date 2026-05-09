@@ -67,14 +67,32 @@ fastify.setValidatorCompiler(fastify_type_provider_zod_1.validatorCompiler);
 fastify.setSerializerCompiler(fastify_type_provider_zod_1.serializerCompiler);
 fastify.setErrorHandler((error, request, reply) => {
     const statusCode = typeof error.statusCode === 'number' ? error.statusCode : 500;
+    const route = request.routeOptions.url ?? request.url;
+    const user = request.user;
     if (statusCode >= 500) {
-        const user = request.user;
         Sentry.captureException(error, {
-            tags: { route: request.routeOptions.url ?? 'unknown' },
+            tags: {
+                component: 'api',
+                operation: 'request_error',
+                method: request.method,
+                route,
+                statusCode: String(statusCode),
+            },
+            extra: {
+                requestId: request.id,
+                url: request.url,
+            },
             user: user?.sub ? { id: user.sub } : undefined,
         });
     }
-    fastify.log.error({ err: error, req: request.id }, 'Unhandled error');
+    fastify.log.error({
+        err: error,
+        requestId: request.id,
+        method: request.method,
+        route,
+        statusCode,
+        userId: user?.sub,
+    }, 'API request failed');
     reply.status(statusCode).send({
         error: statusCode >= 500 ? 'Internal server error' : error.message,
         code: typeof error.code === 'string' ? error.code : undefined,

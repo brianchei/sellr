@@ -12,6 +12,7 @@ import {
   type ListingImageStorage,
   type StoredListingImage,
 } from '../../lib/listingImageStorage';
+import { captureOperationalError } from '../../lib/observability';
 import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
 
@@ -87,6 +88,15 @@ const plugin: FastifyPluginCallback<UploadRoutesOptions> = (
         });
       } catch (error) {
         request.log.error({ err: error }, 'listing image tracking failed');
+        captureOperationalError(error, {
+          component: 'media_assets',
+          operation: 'record_pending_upload',
+          extra: {
+            storageKey: storedImage.key,
+            storageProvider: storedImage.storageProvider,
+          },
+          userId: request.user.sub,
+        });
         try {
           await deleteListingImageObject({
             storageKey: storedImage.key,
@@ -97,6 +107,15 @@ const plugin: FastifyPluginCallback<UploadRoutesOptions> = (
             { err: deleteError },
             'untracked listing image cleanup failed',
           );
+          captureOperationalError(deleteError, {
+            component: 'media_assets',
+            operation: 'cleanup_untracked_upload',
+            extra: {
+              storageKey: storedImage.key,
+              storageProvider: storedImage.storageProvider,
+            },
+            userId: request.user.sub,
+          });
         }
         return reply
           .code(502)
