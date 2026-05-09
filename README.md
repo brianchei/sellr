@@ -14,24 +14,34 @@ completed transactions.
 
 This repository now has a working web SLC MVP for the core
 community-scoped buyer/seller loop. The app covers onboarding, browse/search,
-listing detail, file-based listing photo uploads, structured listing creation,
+listing detail, durable listing photo uploads, structured listing creation,
 listing management/editing, sold-listing lifecycle, seller trust signals,
 seller storefronts, buyer contact, inbox replies, notifications, basic
-reporting, a restricted admin reports dashboard, and a seller readiness panel on
+reporting, a restricted admin reports dashboard with explicit listing removal,
+admin community setup, media lifecycle cleanup, and a seller readiness panel on
 the dashboard.
 
-Deployment is in progress. GitHub Actions CI and production migration checks
-are passing, the Fastify API is deployed on Railway, and the next deployment
-step is the Next.js web app. The current Railway API origin is:
+The production web SLC is deployed and in hardening. GitHub Actions CI and
+production migration checks are passing, the Fastify API is deployed on Railway,
+the web app is deployed on Vercel, Twilio OTP works in production, and durable
+R2-backed listing media plus media lifecycle cleanup have been smoke-tested.
+The current production origins are:
 
 ```text
-https://api-production-be29.up.railway.app
+Web: https://sellr-web.vercel.app
+API: https://api-production-be29.up.railway.app
+```
+
+API health:
+
+```text
+https://api-production-be29.up.railway.app/health
 ```
 
 See [`docs/deployment.md`](docs/deployment.md) for the current production
-topology, required environment variables, and the remaining web deployment
-steps. See [`docs/next-session-context.md`](docs/next-session-context.md) for a
-short handoff brief for continuing work in a new agent session.
+topology, required environment variables, and post-deploy verification. See
+[`docs/next-session-context.md`](docs/next-session-context.md) for a short
+handoff brief for continuing work in a new agent session.
 
 ## Repository Layout
 
@@ -214,14 +224,22 @@ that topology.
   `tsx src/index.ts`. This avoids the Prisma 7 generated-client runtime issue
   that occurred when running the compiled `dist/index.js` output directly.
 - Railway API variables must include full Supabase `DATABASE_URL`/`DIRECT_URL`,
-  a full Redis URL in `REDIS_URL`, `JWT_SECRET`, and Twilio Verify variables for
-  real production OTP.
+  a full Redis URL in `REDIS_URL`, `JWT_SECRET`, Twilio Verify variables for
+  real production OTP, and Cloudflare R2 variables for durable listing media.
 - `NO_CACHE=1` was only a one-time Railway cache repair flag. Remove it after a
   successful clean deploy.
 - The web app should call same-origin `/api/v1` in the browser. For Vercel,
   set `INTERNAL_API_URL` to the Railway API origin and keep
   `NEXT_PUBLIC_USE_SAME_ORIGIN_API=1`; do not set `NEXT_PUBLIC_API_URL` for the
   normal cookie-auth web flow.
+- The Vercel web project should also set `NEXT_PUBLIC_REALTIME_URL` to the
+  Railway API origin and `NEXT_PUBLIC_LISTING_IMAGE_CDN_URL` to the public R2/CDN
+  origin used by `CLOUDFLARE_CDN_URL`.
+- New listing images should return R2/CDN URLs. Legacy same-origin image URLs
+  are still served by the API for compatibility.
+- Media cleanup tracks uploaded assets, attaches them to listings, queues
+  deletion for abandoned/replaced/deleted listing images, and supports explicit
+  admin listing removal from reports.
 
 ## API Integration Tests
 

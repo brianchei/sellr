@@ -24,7 +24,8 @@ React Query, and typed helpers from `@sellr/api-client`.
   message thread, reply composer, and report message.
 - `/notifications`: activity center with unread/listing/message filters and
   mark-read actions.
-- `/admin/reports`: admin-only report review and status updates.
+- `/admin/reports`: admin-only report review, status updates, and explicit
+  listing removal for listing reports.
 - `/admin/community`: admin-only community member access and invite-code setup.
 
 ## Local Development
@@ -52,6 +53,7 @@ Required production web variables:
 INTERNAL_API_URL=https://api-production-be29.up.railway.app
 NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
 NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
+NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://<listing-image-cdn-origin>
 ```
 
 Do not include `/api/v1` in `INTERNAL_API_URL`; `next.config.ts` appends that
@@ -63,8 +65,12 @@ flow is intentionally changed away from same-origin cookie sessions.
 After Vercel creates the web origin, add it to the Railway API service:
 
 ```text
-ALLOWED_ORIGINS=https://<vercel-web-origin>
+ALLOWED_ORIGINS=https://sellr-web.vercel.app
 ```
+
+Vercel Web Analytics and Speed Insights are mounted in `app/layout.tsx`; enable
+the matching dashboard-side Vercel features for the project if metrics are not
+appearing.
 
 See `../../docs/deployment.md` for the full deployment notes.
 
