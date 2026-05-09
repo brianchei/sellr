@@ -69,6 +69,7 @@ vi.mock('../../src/lib/queues', () => {
     notificationQueue: noopQueue,
     savedSearchQueue: noopQueue,
     quickReplyQueue: noopQueue,
+    mediaCleanupQueue: noopQueue,
   };
 });
 

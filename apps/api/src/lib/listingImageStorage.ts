@@ -1,7 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import {
   LISTING_IMAGE_MIME_TYPES,
   LISTING_IMAGE_UPLOAD_PATH_PREFIX,
@@ -13,6 +17,14 @@ export type StoredListingImage = {
   filename: string;
   key: string;
   url: string;
+  storageProvider: ListingImageStorageProvider;
+};
+
+export type ListingImageStorageProvider = 'local' | 'r2';
+
+export type ListingImageStorageReference = {
+  storageKey: string;
+  storageProvider: ListingImageStorageProvider;
 };
 
 export type ListingImageStorage = {
@@ -68,6 +80,13 @@ function createListingImageKey(filename: string): string {
   return `listing-images/${filename}`;
 }
 
+function filenameFromListingImageKey(storageKey: string): string | null {
+  const match = /^listing-images\/([a-f0-9-]+\.(jpg|png|webp))$/i.exec(
+    storageKey,
+  );
+  return match?.[1] ?? null;
+}
+
 function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/, '');
 }
@@ -87,6 +106,11 @@ function requirePublicBaseUrl(): string {
     throw new Error('CLOUDFLARE_CDN_URL must be an http(s) URL');
   }
   return value;
+}
+
+function configuredPublicBaseUrl(): string | null {
+  const value = process.env.CLOUDFLARE_CDN_URL?.trim();
+  return value ? trimTrailingSlash(value) : null;
 }
 
 function shouldUseR2Storage(): boolean {
@@ -114,17 +138,16 @@ function createLocalListingImageStorage(): ListingImageStorage {
         filename,
         key: createListingImageKey(filename),
         url: `${LISTING_IMAGE_UPLOAD_PATH_PREFIX}${filename}`,
+        storageProvider: 'local',
       };
     },
   };
 }
 
-function createR2ListingImageStorage(): ListingImageStorage {
+function createR2Client() {
   const accountId = requireEnv('CLOUDFLARE_ACCOUNT_ID');
-  const bucket = requireEnv('R2_BUCKET_NAME');
-  const publicBaseUrl = requirePublicBaseUrl();
 
-  const s3 = new S3Client({
+  return new S3Client({
     region: 'auto',
     endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
     requestChecksumCalculation: 'WHEN_REQUIRED',
@@ -133,6 +156,12 @@ function createR2ListingImageStorage(): ListingImageStorage {
       secretAccessKey: requireEnv('R2_SECRET_ACCESS_KEY'),
     },
   });
+}
+
+function createR2ListingImageStorage(): ListingImageStorage {
+  const bucket = requireEnv('R2_BUCKET_NAME');
+  const publicBaseUrl = requirePublicBaseUrl();
+  const s3 = createR2Client();
 
   return {
     async store(buffer, mimetype) {
@@ -153,6 +182,7 @@ function createR2ListingImageStorage(): ListingImageStorage {
         filename,
         key,
         url: `${publicBaseUrl}/${key}`,
+        storageProvider: 'r2',
       };
     },
   };
@@ -166,3 +196,78 @@ export function createListingImageStorage(): ListingImageStorage {
 }
 
 export const LISTING_IMAGE_CACHE_CONTROL = ONE_YEAR_IMMUTABLE;
+
+export function listingImageStorageReferenceFromUrl(
+  url: string,
+): ListingImageStorageReference | null {
+  if (url.startsWith(LISTING_IMAGE_UPLOAD_PATH_PREFIX)) {
+    const filename = url.slice(LISTING_IMAGE_UPLOAD_PATH_PREFIX.length);
+    if (!filenameFromListingImageKey(createListingImageKey(filename))) {
+      return null;
+    }
+    return {
+      storageKey: createListingImageKey(filename),
+      storageProvider: 'local',
+    };
+  }
+
+  const publicBaseUrl = configuredPublicBaseUrl();
+  if (!publicBaseUrl) return null;
+
+  let parsedUrl: URL;
+  let parsedBase: URL;
+  try {
+    parsedUrl = new URL(url);
+    parsedBase = new URL(publicBaseUrl);
+  } catch {
+    return null;
+  }
+
+  if (
+    parsedUrl.protocol !== parsedBase.protocol ||
+    parsedUrl.hostname !== parsedBase.hostname ||
+    parsedUrl.port !== parsedBase.port
+  ) {
+    return null;
+  }
+
+  const basePath = parsedBase.pathname.replace(/\/$/, '');
+  const pathPrefix = basePath ? `${basePath}/` : '/';
+  if (!parsedUrl.pathname.startsWith(pathPrefix)) return null;
+
+  const storageKey = decodeURIComponent(
+    parsedUrl.pathname.slice(pathPrefix.length),
+  );
+  if (!filenameFromListingImageKey(storageKey)) return null;
+
+  return {
+    storageKey,
+    storageProvider: 'r2',
+  };
+}
+
+export async function deleteListingImageObject(
+  reference: ListingImageStorageReference,
+): Promise<void> {
+  if (reference.storageProvider === 'local') {
+    const filename = filenameFromListingImageKey(reference.storageKey);
+    if (!filename) return;
+    const filePath = listingImagePath(filename);
+    if (!filePath) return;
+    try {
+      await unlink(filePath);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw error;
+      }
+    }
+    return;
+  }
+
+  await createR2Client().send(
+    new DeleteObjectCommand({
+      Bucket: requireEnv('R2_BUCKET_NAME'),
+      Key: reference.storageKey,
+    }),
+  );
+}

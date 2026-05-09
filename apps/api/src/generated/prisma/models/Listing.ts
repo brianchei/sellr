@@ -328,6 +328,7 @@ export type ListingWhereInput = {
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   offers?: Prisma.OfferListRelationFilter
   conversations?: Prisma.ConversationListRelationFilter
+  mediaAssets?: Prisma.MediaAssetListRelationFilter
 }
 
 export type ListingOrderByWithRelationInput = {
@@ -354,6 +355,7 @@ export type ListingOrderByWithRelationInput = {
   seller?: Prisma.UserOrderByWithRelationInput
   offers?: Prisma.OfferOrderByRelationAggregateInput
   conversations?: Prisma.ConversationOrderByRelationAggregateInput
+  mediaAssets?: Prisma.MediaAssetOrderByRelationAggregateInput
 }
 
 export type ListingWhereUniqueInput = Prisma.AtLeast<{
@@ -383,6 +385,7 @@ export type ListingWhereUniqueInput = Prisma.AtLeast<{
   seller?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   offers?: Prisma.OfferListRelationFilter
   conversations?: Prisma.ConversationListRelationFilter
+  mediaAssets?: Prisma.MediaAssetListRelationFilter
 }, "id">
 
 export type ListingOrderByWithAggregationInput = {
@@ -459,6 +462,7 @@ export type ListingCreateInput = {
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   offers?: Prisma.OfferCreateNestedManyWithoutListingInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateInput = {
@@ -483,6 +487,7 @@ export type ListingUncheckedCreateInput = {
   updatedAt?: Date | string
   offers?: Prisma.OfferUncheckedCreateNestedManyWithoutListingInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingUpdateInput = {
@@ -507,6 +512,7 @@ export type ListingUpdateInput = {
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   offers?: Prisma.OfferUpdateManyWithoutListingNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateInput = {
@@ -531,6 +537,7 @@ export type ListingUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offers?: Prisma.OfferUncheckedUpdateManyWithoutListingNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingCreateManyInput = {
@@ -679,14 +686,14 @@ export type ListingSumOrderByAggregateInput = {
   locationRadiusM?: Prisma.SortOrder
 }
 
-export type ListingScalarRelationFilter = {
-  is?: Prisma.ListingWhereInput
-  isNot?: Prisma.ListingWhereInput
-}
-
 export type ListingNullableScalarRelationFilter = {
   is?: Prisma.ListingWhereInput | null
   isNot?: Prisma.ListingWhereInput | null
+}
+
+export type ListingScalarRelationFilter = {
+  is?: Prisma.ListingWhereInput
+  isNot?: Prisma.ListingWhereInput
 }
 
 export type ListingCreateNestedManyWithoutSellerInput = {
@@ -793,6 +800,22 @@ export type EnumListingStatusFieldUpdateOperationsInput = {
   set?: $Enums.ListingStatus
 }
 
+export type ListingCreateNestedOneWithoutMediaAssetsInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutMediaAssetsInput, Prisma.ListingUncheckedCreateWithoutMediaAssetsInput>
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutMediaAssetsInput
+  connect?: Prisma.ListingWhereUniqueInput
+}
+
+export type ListingUpdateOneWithoutMediaAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.ListingCreateWithoutMediaAssetsInput, Prisma.ListingUncheckedCreateWithoutMediaAssetsInput>
+  connectOrCreate?: Prisma.ListingCreateOrConnectWithoutMediaAssetsInput
+  upsert?: Prisma.ListingUpsertWithoutMediaAssetsInput
+  disconnect?: Prisma.ListingWhereInput | boolean
+  delete?: Prisma.ListingWhereInput | boolean
+  connect?: Prisma.ListingWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ListingUpdateToOneWithWhereWithoutMediaAssetsInput, Prisma.ListingUpdateWithoutMediaAssetsInput>, Prisma.ListingUncheckedUpdateWithoutMediaAssetsInput>
+}
+
 export type ListingCreateNestedOneWithoutOffersInput = {
   create?: Prisma.XOR<Prisma.ListingCreateWithoutOffersInput, Prisma.ListingUncheckedCreateWithoutOffersInput>
   connectOrCreate?: Prisma.ListingCreateOrConnectWithoutOffersInput
@@ -844,6 +867,7 @@ export type ListingCreateWithoutSellerInput = {
   community: Prisma.CommunityCreateNestedOneWithoutListingsInput
   offers?: Prisma.OfferCreateNestedManyWithoutListingInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutSellerInput = {
@@ -867,6 +891,7 @@ export type ListingUncheckedCreateWithoutSellerInput = {
   updatedAt?: Date | string
   offers?: Prisma.OfferUncheckedCreateNestedManyWithoutListingInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutSellerInput = {
@@ -941,6 +966,7 @@ export type ListingCreateWithoutCommunityInput = {
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   offers?: Prisma.OfferCreateNestedManyWithoutListingInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutCommunityInput = {
@@ -964,6 +990,7 @@ export type ListingUncheckedCreateWithoutCommunityInput = {
   updatedAt?: Date | string
   offers?: Prisma.OfferUncheckedCreateNestedManyWithoutListingInput
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutCommunityInput = {
@@ -992,6 +1019,118 @@ export type ListingUpdateManyWithWhereWithoutCommunityInput = {
   data: Prisma.XOR<Prisma.ListingUpdateManyMutationInput, Prisma.ListingUncheckedUpdateManyWithoutCommunityInput>
 }
 
+export type ListingCreateWithoutMediaAssetsInput = {
+  id?: string
+  title: string
+  description: string
+  category: string
+  subcategory?: string | null
+  condition: $Enums.ListingCondition
+  conditionNote?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  negotiable?: boolean
+  status?: $Enums.ListingStatus
+  locationNeighborhood: string
+  locationRadiusM?: number
+  availabilityWindows: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  photoUrls: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  aiGenerated?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  community: Prisma.CommunityCreateNestedOneWithoutListingsInput
+  seller: Prisma.UserCreateNestedOneWithoutListingsInput
+  offers?: Prisma.OfferCreateNestedManyWithoutListingInput
+  conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+}
+
+export type ListingUncheckedCreateWithoutMediaAssetsInput = {
+  id?: string
+  communityId: string
+  sellerId: string
+  title: string
+  description: string
+  category: string
+  subcategory?: string | null
+  condition: $Enums.ListingCondition
+  conditionNote?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  negotiable?: boolean
+  status?: $Enums.ListingStatus
+  locationNeighborhood: string
+  locationRadiusM?: number
+  availabilityWindows: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  photoUrls: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  aiGenerated?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  offers?: Prisma.OfferUncheckedCreateNestedManyWithoutListingInput
+  conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+}
+
+export type ListingCreateOrConnectWithoutMediaAssetsInput = {
+  where: Prisma.ListingWhereUniqueInput
+  create: Prisma.XOR<Prisma.ListingCreateWithoutMediaAssetsInput, Prisma.ListingUncheckedCreateWithoutMediaAssetsInput>
+}
+
+export type ListingUpsertWithoutMediaAssetsInput = {
+  update: Prisma.XOR<Prisma.ListingUpdateWithoutMediaAssetsInput, Prisma.ListingUncheckedUpdateWithoutMediaAssetsInput>
+  create: Prisma.XOR<Prisma.ListingCreateWithoutMediaAssetsInput, Prisma.ListingUncheckedCreateWithoutMediaAssetsInput>
+  where?: Prisma.ListingWhereInput
+}
+
+export type ListingUpdateToOneWithWhereWithoutMediaAssetsInput = {
+  where?: Prisma.ListingWhereInput
+  data: Prisma.XOR<Prisma.ListingUpdateWithoutMediaAssetsInput, Prisma.ListingUncheckedUpdateWithoutMediaAssetsInput>
+}
+
+export type ListingUpdateWithoutMediaAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  subcategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  condition?: Prisma.EnumListingConditionFieldUpdateOperationsInput | $Enums.ListingCondition
+  conditionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  negotiable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  locationNeighborhood?: Prisma.StringFieldUpdateOperationsInput | string
+  locationRadiusM?: Prisma.IntFieldUpdateOperationsInput | number
+  availabilityWindows?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  photoUrls?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  aiGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  community?: Prisma.CommunityUpdateOneRequiredWithoutListingsNestedInput
+  seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
+  offers?: Prisma.OfferUpdateManyWithoutListingNestedInput
+  conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+}
+
+export type ListingUncheckedUpdateWithoutMediaAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  communityId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  subcategory?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  condition?: Prisma.EnumListingConditionFieldUpdateOperationsInput | $Enums.ListingCondition
+  conditionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  negotiable?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumListingStatusFieldUpdateOperationsInput | $Enums.ListingStatus
+  locationNeighborhood?: Prisma.StringFieldUpdateOperationsInput | string
+  locationRadiusM?: Prisma.IntFieldUpdateOperationsInput | number
+  availabilityWindows?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  photoUrls?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  aiGenerated?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  offers?: Prisma.OfferUncheckedUpdateManyWithoutListingNestedInput
+  conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+}
+
 export type ListingCreateWithoutOffersInput = {
   id?: string
   title: string
@@ -1013,6 +1152,7 @@ export type ListingCreateWithoutOffersInput = {
   community: Prisma.CommunityCreateNestedOneWithoutListingsInput
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   conversations?: Prisma.ConversationCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutOffersInput = {
@@ -1036,6 +1176,7 @@ export type ListingUncheckedCreateWithoutOffersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutOffersInput = {
@@ -1075,6 +1216,7 @@ export type ListingUpdateWithoutOffersInput = {
   community?: Prisma.CommunityUpdateOneRequiredWithoutListingsNestedInput
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutOffersInput = {
@@ -1098,6 +1240,7 @@ export type ListingUncheckedUpdateWithoutOffersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingCreateWithoutConversationsInput = {
@@ -1121,6 +1264,7 @@ export type ListingCreateWithoutConversationsInput = {
   community: Prisma.CommunityCreateNestedOneWithoutListingsInput
   seller: Prisma.UserCreateNestedOneWithoutListingsInput
   offers?: Prisma.OfferCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutListingInput
 }
 
 export type ListingUncheckedCreateWithoutConversationsInput = {
@@ -1144,6 +1288,7 @@ export type ListingUncheckedCreateWithoutConversationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   offers?: Prisma.OfferUncheckedCreateNestedManyWithoutListingInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutListingInput
 }
 
 export type ListingCreateOrConnectWithoutConversationsInput = {
@@ -1183,6 +1328,7 @@ export type ListingUpdateWithoutConversationsInput = {
   community?: Prisma.CommunityUpdateOneRequiredWithoutListingsNestedInput
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   offers?: Prisma.OfferUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutConversationsInput = {
@@ -1206,6 +1352,7 @@ export type ListingUncheckedUpdateWithoutConversationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offers?: Prisma.OfferUncheckedUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingCreateManySellerInput = {
@@ -1250,6 +1397,7 @@ export type ListingUpdateWithoutSellerInput = {
   community?: Prisma.CommunityUpdateOneRequiredWithoutListingsNestedInput
   offers?: Prisma.OfferUpdateManyWithoutListingNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutSellerInput = {
@@ -1273,6 +1421,7 @@ export type ListingUncheckedUpdateWithoutSellerInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offers?: Prisma.OfferUncheckedUpdateManyWithoutListingNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateManyWithoutSellerInput = {
@@ -1338,6 +1487,7 @@ export type ListingUpdateWithoutCommunityInput = {
   seller?: Prisma.UserUpdateOneRequiredWithoutListingsNestedInput
   offers?: Prisma.OfferUpdateManyWithoutListingNestedInput
   conversations?: Prisma.ConversationUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateWithoutCommunityInput = {
@@ -1361,6 +1511,7 @@ export type ListingUncheckedUpdateWithoutCommunityInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   offers?: Prisma.OfferUncheckedUpdateManyWithoutListingNestedInput
   conversations?: Prisma.ConversationUncheckedUpdateManyWithoutListingNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutListingNestedInput
 }
 
 export type ListingUncheckedUpdateManyWithoutCommunityInput = {
@@ -1392,11 +1543,13 @@ export type ListingUncheckedUpdateManyWithoutCommunityInput = {
 export type ListingCountOutputType = {
   offers: number
   conversations: number
+  mediaAssets: number
 }
 
 export type ListingCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   offers?: boolean | ListingCountOutputTypeCountOffersArgs
   conversations?: boolean | ListingCountOutputTypeCountConversationsArgs
+  mediaAssets?: boolean | ListingCountOutputTypeCountMediaAssetsArgs
 }
 
 /**
@@ -1421,6 +1574,13 @@ export type ListingCountOutputTypeCountOffersArgs<ExtArgs extends runtime.Types.
  */
 export type ListingCountOutputTypeCountConversationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ConversationWhereInput
+}
+
+/**
+ * ListingCountOutputType without action
+ */
+export type ListingCountOutputTypeCountMediaAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MediaAssetWhereInput
 }
 
 
@@ -1448,6 +1608,7 @@ export type ListingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   offers?: boolean | Prisma.Listing$offersArgs<ExtArgs>
   conversations?: boolean | Prisma.Listing$conversationsArgs<ExtArgs>
+  mediaAssets?: boolean | Prisma.Listing$mediaAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["listing"]>
 
@@ -1527,6 +1688,7 @@ export type ListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   seller?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   offers?: boolean | Prisma.Listing$offersArgs<ExtArgs>
   conversations?: boolean | Prisma.Listing$conversationsArgs<ExtArgs>
+  mediaAssets?: boolean | Prisma.Listing$mediaAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.ListingCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ListingIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1545,6 +1707,7 @@ export type $ListingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     seller: Prisma.$UserPayload<ExtArgs>
     offers: Prisma.$OfferPayload<ExtArgs>[]
     conversations: Prisma.$ConversationPayload<ExtArgs>[]
+    mediaAssets: Prisma.$MediaAssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1964,6 +2127,7 @@ export interface Prisma__ListingClient<T, Null = never, ExtArgs extends runtime.
   seller<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   offers<T extends Prisma.Listing$offersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$offersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OfferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   conversations<T extends Prisma.Listing$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  mediaAssets<T extends Prisma.Listing$mediaAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Listing$mediaAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2458,6 +2622,30 @@ export type Listing$conversationsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+}
+
+/**
+ * Listing.mediaAssets
+ */
+export type Listing$mediaAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MediaAsset
+   */
+  select?: Prisma.MediaAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MediaAsset
+   */
+  omit?: Prisma.MediaAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MediaAssetInclude<ExtArgs> | null
+  where?: Prisma.MediaAssetWhereInput
+  orderBy?: Prisma.MediaAssetOrderByWithRelationInput | Prisma.MediaAssetOrderByWithRelationInput[]
+  cursor?: Prisma.MediaAssetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MediaAssetScalarFieldEnum | Prisma.MediaAssetScalarFieldEnum[]
 }
 
 /**

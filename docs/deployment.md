@@ -109,6 +109,22 @@ Keep the R2 bucket private for writes. Configure public read delivery through a
 Cloudflare R2 custom domain, not the `r2.dev` development URL, for production
 cache and security controls.
 
+Listing media lifecycle cleanup is tracked in the database:
+
+- New uploads start as pending media assets and are queued for deletion if they
+  are not attached to a listing within 24 hours.
+- Listing creation and edit attach the referenced Sellr-owned images.
+- Deleted listings and removed/replaced listing photos enqueue object deletion.
+- Admin report moderation has an explicit "remove listing" action that removes
+  the listing from marketplace search, clears its listing photos, resolves the
+  report, and enqueues image deletion.
+
+If Redis delayed jobs need a catch-up pass, run:
+
+```bash
+pnpm --filter @sellr/api media:cleanup-expired
+```
+
 ### Supabase URLs
 
 Use the Supabase pooler URLs without wrapping quotes in Railway or GitHub

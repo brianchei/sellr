@@ -32,6 +32,7 @@ model User {
   reputation       UserReputation?
   flags            UserFlag[]
   notifications    Notification[]
+  mediaAssets      MediaAsset[]
 
   @@map("users")
 }
@@ -124,6 +125,7 @@ model Listing {
   seller    User      @relation(fields: [sellerId], references: [id])
   offers         Offer[]
   conversations  Conversation[]
+  mediaAssets    MediaAsset[]
 
   @@index([communityId])
   @@index([sellerId])
@@ -145,6 +147,32 @@ enum ListingCondition {
   good
   fair
   for_parts
+}
+
+// ─── Media ───────────────────────────────────────────────────────────────────
+
+model MediaAsset {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId         String?   @map("owner_id") @db.Uuid
+  listingId       String?   @map("listing_id") @db.Uuid
+  url             String    @unique @db.VarChar(2048)
+  storageKey      String    @unique @map("storage_key") @db.VarChar(512)
+  storageProvider String    @default("r2") @map("storage_provider") @db.VarChar(20)
+  status          String    @default("pending") @db.VarChar(30)
+  expiresAt       DateTime? @map("expires_at")
+  attachedAt      DateTime? @map("attached_at")
+  deletedAt       DateTime? @map("deleted_at")
+  lastError       String?   @map("last_error") @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  owner   User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  listing Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
+  @@index([listingId])
+  @@index([status, expiresAt])
+  @@map("media_assets")
 }
 
 // ─── Offers ──────────────────────────────────────────────────────────────────

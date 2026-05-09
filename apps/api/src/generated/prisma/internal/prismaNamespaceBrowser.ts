@@ -56,6 +56,7 @@ export const ModelName = {
   CommunityMember: 'CommunityMember',
   InviteCode: 'InviteCode',
   Listing: 'Listing',
+  MediaAsset: 'MediaAsset',
   Offer: 'Offer',
   Meetup: 'Meetup',
   Rating: 'Rating',
@@ -160,6 +161,25 @@ export const ListingScalarFieldEnum = {
 } as const
 
 export type ListingScalarFieldEnum = (typeof ListingScalarFieldEnum)[keyof typeof ListingScalarFieldEnum]
+
+
+export const MediaAssetScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  listingId: 'listingId',
+  url: 'url',
+  storageKey: 'storageKey',
+  storageProvider: 'storageProvider',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  attachedAt: 'attachedAt',
+  deletedAt: 'deletedAt',
+  lastError: 'lastError',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MediaAssetScalarFieldEnum = (typeof MediaAssetScalarFieldEnum)[keyof typeof MediaAssetScalarFieldEnum]
 
 
 export const OfferScalarFieldEnum = {

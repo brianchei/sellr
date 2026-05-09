@@ -32,3 +32,8 @@ export const quickReplyQueue = new Queue('quick-reply', {
   connection: redis,
   defaultJobOptions,
 });
+
+export const mediaCleanupQueue = new Queue('media-cleanup', {
+  connection: redis,
+  defaultJobOptions,
+});

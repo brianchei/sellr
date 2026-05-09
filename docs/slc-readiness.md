@@ -23,8 +23,6 @@ community:
 - Submit basic listing/message reports.
 - Review seeded and user-submitted reports from the admin-only
   `/admin/reports` dashboard.
-- Manage invite codes and member access from the admin-only
-  `/admin/community` setup page.
 - Use the dashboard seller readiness panel to see listing presence, photo
   quality, buyer activity, and the next best seller action.
 - Exercise the flow with seeded demo users and repeatable smoke scripts.
@@ -125,8 +123,6 @@ widths:
   inbox/listing detail, empty/error states.
 - `/admin/reports`: admin-only report list, filters, target links, status
   actions, restricted-access state for non-admin users.
-- `/admin/community`: admin-only community selector, invite creation, member
-  role/status actions, restricted-access state for non-admin users.
 - `/sell`: inline validation, file image upload feedback, buyer preview,
   submit state.
 - `/listings`: status filters, create/publish notices, listing actions, sold
@@ -163,6 +159,9 @@ fixtures.
   community-scoped listings without distance ranking.
 - Listing photos upload to local API storage in development. Production uses
   R2/CDN when Railway storage variables are configured.
+- Media cleanup is asynchronous: deleted/replaced listing images and explicit
+  admin listing removals enqueue object deletion, and abandoned uploads expire
+  after 24 hours.
 - Browser route smoke validates authenticated HTML responses, not pixel-level
   visual layout. Use the manual visual pass for layout sign-off.
 
@@ -170,7 +169,8 @@ fixtures.
 
 These are intentionally deferred until the core web loop is stable:
 
-- Listing media cleanup/lifecycle policy after deletion or report retention.
+- Long-term media retention/reconciliation jobs beyond the current 24-hour
+  abandoned-upload catch-up script.
 - Ratings, KYC, full reputation, or advanced moderation workflows.
 - Payments, offers, meetup scheduling, and delivery/logistics.
 - Push/realtime notification polish beyond existing API foundations.

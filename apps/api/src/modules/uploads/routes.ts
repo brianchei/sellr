@@ -4,6 +4,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import { LISTING_IMAGE_MAX_BYTES } from '@sellr/shared';
 import {
   createListingImageStorage,
+  deleteListingImageObject,
   isListingImageMimeType,
   LISTING_IMAGE_CACHE_CONTROL,
   listingImageMimeTypeForFilename,
@@ -14,9 +15,25 @@ import {
 import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
 
+type MediaTracker = {
+  recordPendingUpload(args: {
+    ownerId: string;
+    storedImage: StoredListingImage;
+  }): Promise<void>;
+};
+
 type UploadRoutesOptions = {
   storage?: ListingImageStorage;
+  mediaTracker?: MediaTracker;
 };
+
+async function defaultMediaTracker(): Promise<MediaTracker> {
+  const { recordPendingListingImageUpload } =
+    await import('../../lib/mediaAssets.js');
+  return {
+    recordPendingUpload: recordPendingListingImageUpload,
+  };
+}
 
 const plugin: FastifyPluginCallback<UploadRoutesOptions> = (
   fastify,
@@ -57,6 +74,30 @@ const plugin: FastifyPluginCallback<UploadRoutesOptions> = (
         storedImage = await storage.store(buffer, file.mimetype);
       } catch (error) {
         request.log.error({ err: error }, 'listing image upload failed');
+        return reply
+          .code(502)
+          .send({ error: 'Could not upload this image. Try again.' });
+      }
+
+      try {
+        const mediaTracker = opts.mediaTracker ?? (await defaultMediaTracker());
+        await mediaTracker.recordPendingUpload({
+          ownerId: request.user.sub,
+          storedImage,
+        });
+      } catch (error) {
+        request.log.error({ err: error }, 'listing image tracking failed');
+        try {
+          await deleteListingImageObject({
+            storageKey: storedImage.key,
+            storageProvider: storedImage.storageProvider,
+          });
+        } catch (deleteError) {
+          request.log.error(
+            { err: deleteError },
+            'untracked listing image cleanup failed',
+          );
+        }
         return reply
           .code(502)
           .send({ error: 'Could not upload this image. Try again.' });

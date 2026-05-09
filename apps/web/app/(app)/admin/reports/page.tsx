@@ -1,6 +1,11 @@
 'use client';
 
-import { ApiError, fetchReports, updateReportStatus } from '@sellr/api-client';
+import {
+  ApiError,
+  fetchReports,
+  removeReportedListing,
+  updateReportStatus,
+} from '@sellr/api-client';
 import type { ApiReport, ApiReportStatus } from '@sellr/api-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -166,7 +171,9 @@ function actionsForStatus(status: ApiReportStatus): {
 function ReportCard({
   report,
   onStatusChange,
+  onRemoveListing,
   isUpdating,
+  isRemoving,
   pendingStatus,
   selected,
   onSelectChange,
@@ -174,7 +181,9 @@ function ReportCard({
 }: {
   report: ApiReport;
   onStatusChange: (status: ApiReportStatus) => void;
+  onRemoveListing: () => void;
   isUpdating: boolean;
+  isRemoving: boolean;
   pendingStatus: ApiReportStatus | null;
   selected: boolean;
   onSelectChange: (next: boolean) => void;
@@ -279,6 +288,18 @@ function ReportCard({
               : action.label}
           </button>
         ))}
+        {report.targetType === 'listing' &&
+        report.status !== 'resolved' &&
+        report.status !== 'dismissed' ? (
+          <button
+            type="button"
+            disabled={isUpdating || isRemoving}
+            onClick={onRemoveListing}
+            className="rounded-lg border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-brand-warm-strong)] shadow-sm transition hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isRemoving ? 'Removing...' : 'Remove listing'}
+          </button>
+        ) : null}
         {report.target?.href ? (
           <Link
             href={report.target.href}
@@ -330,6 +351,14 @@ export default function AdminReportsPage() {
       reportId: string;
       nextStatus: ApiReportStatus;
     }) => updateReportStatus(reportId, nextStatus),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['admin-reports'] });
+    },
+  });
+
+  const removeListingMutation = useMutation({
+    mutationFn: ({ reportId }: { reportId: string }) =>
+      removeReportedListing(reportId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['admin-reports'] });
     },
@@ -736,10 +765,23 @@ export default function AdminReportsPage() {
                 updateMutation.isPending &&
                 updateMutation.variables?.reportId === report.id
               }
+              isRemoving={
+                removeListingMutation.isPending &&
+                removeListingMutation.variables?.reportId === report.id
+              }
               pendingStatus={pendingStatusForId(report.id)}
               onStatusChange={(nextStatus) =>
                 updateMutation.mutate({ reportId: report.id, nextStatus })
               }
+              onRemoveListing={() => {
+                if (
+                  window.confirm(
+                    'Remove this listing from the marketplace and delete its listing images?',
+                  )
+                ) {
+                  removeListingMutation.mutate({ reportId: report.id });
+                }
+              }}
               selected={selectedIds.has(report.id)}
               onSelectChange={(next) => toggleSelected(report.id, next)}
               bulkBusy={isBulkBusy}

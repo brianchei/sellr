@@ -40,6 +40,7 @@ exports.markAllNotificationsRead = markAllNotificationsRead;
 exports.createReport = createReport;
 exports.fetchReports = fetchReports;
 exports.updateReportStatus = updateReportStatus;
+exports.removeReportedListing = removeReportedListing;
 const fetch_1 = require("./fetch");
 function sendOtp(phoneE164) {
     return (0, fetch_1.apiFetch)('/auth/otp/send', {
@@ -289,4 +290,7 @@ function updateReportStatus(reportId, status) {
         method: 'PATCH',
         body: JSON.stringify({ status }),
     });
+}
+function removeReportedListing(reportId) {
+    return (0, fetch_1.apiFetch)(`/reports/${reportId}/remove-listing`, { method: 'POST' });
 }

@@ -242,4 +242,76 @@ describe.skipIf(!integrationDbAvailable)('reports integration', () => {
       expect(refreshed?.status).toBe('open');
     });
   });
+
+  describe('POST /api/v1/reports/:reportId/remove-listing', () => {
+    it('lets an admin explicitly remove a reported listing and queue media cleanup', async () => {
+      const originalCdnUrl = process.env.CLOUDFLARE_CDN_URL;
+      process.env.CLOUDFLARE_CDN_URL = 'https://cdn.sellr.test';
+      try {
+        const seller = await createUser();
+        const reporter = await createUser();
+        const admin = await createUser({ displayName: 'Mod' });
+        const community = await createCommunity();
+        await addMember(seller.id, community.id);
+        await addMember(reporter.id, community.id);
+        await addMember(admin.id, community.id, 'admin');
+        const photoUrl =
+          'https://cdn.sellr.test/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg';
+        const listing = await createListing({
+          sellerId: seller.id,
+          communityId: community.id,
+          status: 'active',
+          photoUrls: [photoUrl],
+        });
+        const report = await prisma.report.create({
+          data: {
+            reporterId: reporter.id,
+            targetId: listing.id,
+            targetType: 'listing',
+            reason: 'Counterfeit item photos should be removed.',
+            severity: 'safety',
+            status: 'in_review',
+          },
+        });
+
+        const res = await app.inject({
+          method: 'POST',
+          url: `/api/v1/reports/${report.id}/remove-listing`,
+          headers: { cookie: await accessCookieFor(app, admin.id) },
+        });
+
+        expect(res.statusCode).toBe(200);
+        const body = res.json<{
+          data: {
+            listingRemoved: boolean;
+            report: { status: string; moderatorId: string | null };
+          };
+        }>();
+        expect(body.data.listingRemoved).toBe(true);
+        expect(body.data.report.status).toBe('resolved');
+        expect(body.data.report.moderatorId).toBe(admin.id);
+
+        const refreshedListing = await prisma.listing.findUnique({
+          where: { id: listing.id },
+        });
+        expect(refreshedListing?.status).toBe('expired');
+        expect(refreshedListing?.photoUrls).toEqual([]);
+
+        const mediaAsset = await prisma.mediaAsset.findUnique({
+          where: {
+            storageKey:
+              'listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+          },
+        });
+        expect(mediaAsset?.status).toBe('deletion_queued');
+        expect(mediaAsset?.listingId).toBe(listing.id);
+      } finally {
+        if (originalCdnUrl == null) {
+          Reflect.deleteProperty(process.env, 'CLOUDFLARE_CDN_URL');
+        } else {
+          process.env.CLOUDFLARE_CDN_URL = originalCdnUrl;
+        }
+      }
+    });
+  });
 });

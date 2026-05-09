@@ -7,6 +7,7 @@ import { uploadRoutes } from '../src/modules/uploads/routes';
 import {
   createListingImageStorage,
   isListingImageMimeType,
+  listingImageStorageReferenceFromUrl,
   type ListingImageStorage,
 } from '../src/lib/listingImageStorage';
 
@@ -61,6 +62,7 @@ function multipartImagePayload({
 
 async function buildUploadApp(
   storage: ListingImageStorage,
+  recordPendingUpload = vi.fn(() => Promise.resolve()),
 ): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
   await app.register(cookiesPlugin);
@@ -69,6 +71,9 @@ async function buildUploadApp(
   await app.register(uploadRoutes, {
     prefix: '/api/v1/uploads',
     storage,
+    mediaTracker: {
+      recordPendingUpload,
+    },
   });
   await app.ready();
   return app;
@@ -95,9 +100,11 @@ describe('listing image upload route', () => {
         filename: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
         key: 'listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
         url: 'https://cdn.sellr.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+        storageProvider: 'r2' as const,
       }),
     );
-    const app = await buildUploadApp({ store });
+    const recordPendingUpload = vi.fn(() => Promise.resolve());
+    const app = await buildUploadApp({ store }, recordPendingUpload);
     const payload = multipartImagePayload();
 
     const res = await app.inject({
@@ -117,6 +124,15 @@ describe('listing image upload route', () => {
       },
     });
     expect(store).toHaveBeenCalledWith(expect.any(Buffer), 'image/jpeg');
+    expect(recordPendingUpload).toHaveBeenCalledWith({
+      ownerId: '11111111-1111-1111-1111-111111111111',
+      storedImage: {
+        filename: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+        key: 'listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+        url: 'https://cdn.sellr.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+        storageProvider: 'r2',
+      },
+    });
     await app.close();
   });
 
@@ -182,6 +198,10 @@ describe('listing image storage selection', () => {
   it('requires R2 configuration in production', () => {
     process.env.NODE_ENV = 'production';
     Reflect.deleteProperty(process.env, 'LISTING_IMAGE_STORAGE_DRIVER');
+    process.env.R2_BUCKET_NAME = 'sellr-media-test';
+    process.env.R2_ACCESS_KEY_ID = 'test-access-key';
+    process.env.R2_SECRET_ACCESS_KEY = 'test-secret-key';
+    process.env.CLOUDFLARE_CDN_URL = 'https://cdn.sellr.test';
     Reflect.deleteProperty(process.env, 'CLOUDFLARE_ACCOUNT_ID');
 
     expect(() => createListingImageStorage()).toThrow(
@@ -194,5 +214,31 @@ describe('listing image storage selection', () => {
     process.env.LISTING_IMAGE_STORAGE_DRIVER = 'local';
 
     expect(() => createListingImageStorage()).not.toThrow();
+  });
+
+  it('identifies only Sellr-owned media URLs for cleanup', () => {
+    process.env.CLOUDFLARE_CDN_URL = 'https://cdn.sellr.com';
+
+    expect(
+      listingImageStorageReferenceFromUrl(
+        'https://cdn.sellr.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+      ),
+    ).toEqual({
+      storageKey: 'listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+      storageProvider: 'r2',
+    });
+    expect(
+      listingImageStorageReferenceFromUrl(
+        '/api/v1/uploads/listing-images/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.png',
+      ),
+    ).toEqual({
+      storageKey: 'listing-images/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.png',
+      storageProvider: 'local',
+    });
+    expect(
+      listingImageStorageReferenceFromUrl(
+        'https://images.unsplash.com/photo-123.jpg',
+      ),
+    ).toBeNull();
   });
 });

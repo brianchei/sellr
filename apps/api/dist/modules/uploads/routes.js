@@ -7,6 +7,12 @@ const shared_1 = require("@sellr/shared");
 const listingImageStorage_1 = require("../../lib/listingImageStorage");
 const response_1 = require("../../lib/response");
 const auth_1 = require("../../middleware/auth");
+async function defaultMediaTracker() {
+    const { recordPendingListingImageUpload } = await import('../../lib/mediaAssets.js');
+    return {
+        recordPendingUpload: recordPendingListingImageUpload,
+    };
+}
 const plugin = (fastify, opts, done) => {
     const storage = opts.storage ?? (0, listingImageStorage_1.createListingImageStorage)();
     fastify.post('/listing-images', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
@@ -35,6 +41,28 @@ const plugin = (fastify, opts, done) => {
         }
         catch (error) {
             request.log.error({ err: error }, 'listing image upload failed');
+            return reply
+                .code(502)
+                .send({ error: 'Could not upload this image. Try again.' });
+        }
+        try {
+            const mediaTracker = opts.mediaTracker ?? (await defaultMediaTracker());
+            await mediaTracker.recordPendingUpload({
+                ownerId: request.user.sub,
+                storedImage,
+            });
+        }
+        catch (error) {
+            request.log.error({ err: error }, 'listing image tracking failed');
+            try {
+                await (0, listingImageStorage_1.deleteListingImageObject)({
+                    storageKey: storedImage.key,
+                    storageProvider: storedImage.storageProvider,
+                });
+            }
+            catch (deleteError) {
+                request.log.error({ err: deleteError }, 'untracked listing image cleanup failed');
+            }
             return reply
                 .code(502)
                 .send({ error: 'Could not upload this image. Try again.' });
