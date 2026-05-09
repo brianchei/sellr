@@ -104,4 +104,5 @@ for these accounts are not blocked by the per-phone SMS limiter.
 - The Sentry auth-token warning during local web builds is expected.
 - If the API was already running before route edits, restart it before endpoint smoke tests.
 - Databases without the optional `location_geom` column fall back to community-scoped listing results without distance ranking.
-- Uploaded listing images are stored in local API storage for the SLC; production media storage is deferred.
+- Uploaded listing images use local API storage in development; production uses
+  R2/CDN with async media lifecycle cleanup.

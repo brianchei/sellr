@@ -13,14 +13,21 @@ or examples.
   on `main`.
 - Supabase is the production PostgreSQL/PostGIS database.
 - Railway hosts the Fastify API and Redis service.
+- Vercel hosts the production Next.js web app at:
+
+```text
+https://sellr-web.vercel.app
+```
+
 - The current Railway API origin is:
 
 ```text
 https://api-production-be29.up.railway.app
 ```
 
-- The Next.js web app has not been finalized in production yet. The recommended
-  next step is deploying `apps/web` to Vercel.
+- Production Twilio OTP, same-origin web rewrites, admin/community setup,
+  durable R2 listing image uploads, and media lifecycle cleanup have been
+  deployed and smoke-tested.
 
 ## Production Topology
 
@@ -86,7 +93,8 @@ LOGTAIL_SOURCE_TOKEN
 ### Listing Image Storage
 
 Production listing image uploads use Cloudflare R2 through its S3-compatible
-API, then serve immutable public URLs from the configured CDN/custom domain.
+API, then serve immutable public URLs from the configured CDN/custom domain or
+temporary R2 public development URL.
 
 Required Railway API variables:
 
@@ -95,7 +103,7 @@ CLOUDFLARE_ACCOUNT_ID=<cloudflare-account-id>
 R2_BUCKET_NAME=sellr-media
 R2_ACCESS_KEY_ID=<r2-access-key-id>
 R2_SECRET_ACCESS_KEY=<r2-secret-access-key>
-CLOUDFLARE_CDN_URL=https://cdn.sellr.com
+CLOUDFLARE_CDN_URL=https://<listing-image-cdn-origin>
 ```
 
 `NODE_ENV=production` makes the API require R2 storage. For local development,
@@ -105,9 +113,10 @@ the API keeps using local disk unless you explicitly set:
 LISTING_IMAGE_STORAGE_DRIVER=r2
 ```
 
-Keep the R2 bucket private for writes. Configure public read delivery through a
-Cloudflare R2 custom domain, not the `r2.dev` development URL, for production
-cache and security controls.
+Keep the R2 bucket private for writes. A Cloudflare R2 Public Development URL
+can be used temporarily for smoke testing and early low-traffic production, but
+a custom media domain such as `cdn.<production-domain>` is preferred before
+broader launch for normal Cloudflare cache and security controls.
 
 Listing media lifecycle cleanup is tracked in the database:
 
@@ -209,7 +218,7 @@ Required Vercel web variables:
 INTERNAL_API_URL=https://api-production-be29.up.railway.app
 NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
 NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
-NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://cdn.sellr.com
+NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://<listing-image-cdn-origin>
 ```
 
 Do not include `/api/v1` in `INTERNAL_API_URL`; `apps/web/next.config.ts`
@@ -219,14 +228,18 @@ Do not set `NEXT_PUBLIC_API_URL` for the normal web cookie-auth flow. The web
 browser should call same-origin `/api/v1` so httpOnly auth cookies are sent
 correctly.
 
-After Vercel generates a web URL, update Railway API:
+The current production web origin should be present in Railway API:
 
 ```text
-ALLOWED_ORIGINS=https://<vercel-web-origin>
+ALLOWED_ORIGINS=https://sellr-web.vercel.app
 ```
 
 Use comma-separated origins with no spaces when adding preview or custom
 domains.
+
+Vercel Web Analytics and Speed Insights are mounted in the web root layout.
+Enable the dashboard-side features in the Vercel project if data is not
+appearing after production traffic.
 
 ## GitHub Secrets
 
@@ -259,6 +272,8 @@ If these are missing in Railway, login will fail with
   variables are configured on Railway. Legacy same-origin upload URLs are still
   served by the API for compatibility, but new production uploads should return
   CDN URLs.
+- Media lifecycle cleanup is asynchronous. If Redis delayed jobs need a catch-up
+  pass, run `pnpm --filter @sellr/api media:cleanup-expired`.
 - The API currently starts from TypeScript through `tsx`. This is acceptable for
   the immediate SLC deployment but should be revisited with a full ESM build
   path before heavier production use.
@@ -278,7 +293,12 @@ After deploying API and web:
 6. Open the listing detail page.
 7. Send a buyer contact message.
 8. Confirm inbox and notifications update.
-9. Sign in as an admin and open `/admin/reports`.
+9. Confirm `/admin/community` invite/member management as an admin.
+10. Sign in as an admin and open `/admin/reports`.
+11. For a listing report, use **Remove listing** and confirm the listing is
+    removed and associated media cleanup is queued/deleted.
+12. Confirm a newly uploaded listing image still loads after a Railway API
+    redeploy.
 
 For local release verification, keep using:
 

@@ -32,12 +32,13 @@ Prefer work that improves:
 
 ## Current Web SLC Surface
 The current web SLC includes OTP login, community onboarding, marketplace
-browse/search/filter, listing detail, file-based listing photo upload, seller
-inventory management, sold lifecycle, seller trust cards, seller storefront-lite
-pages, buyer contact and inbox replies, notifications, basic reporting, an
-admin-only reports dashboard, and a seller readiness panel on `/dashboard`.
-Before adding breadth, keep these flows polished and covered by the readiness
-gate.
+browse/search/filter, listing detail, durable R2-backed listing photo upload,
+seller inventory management, sold lifecycle, seller trust cards,
+seller storefront-lite pages, buyer contact and inbox replies, notifications,
+basic reporting, an admin-only reports dashboard with explicit listing removal,
+admin community setup, media lifecycle cleanup, and a seller readiness panel on
+`/dashboard`. Before adding breadth, keep these flows polished and covered by
+the readiness gate.
 
 ## Current Deployment Context
 - GitHub Actions CI and production migration checks are passing.
@@ -45,18 +46,21 @@ gate.
 - Supabase is the production Postgres/PostGIS database.
 - Railway hosts the Fastify API and Redis. The current public API origin is
   `https://api-production-be29.up.railway.app`.
+- Vercel hosts the production web app at `https://sellr-web.vercel.app`.
+- Production Twilio OTP, same-origin Vercel `/api/v1` rewrites, admin/community
+  setup, durable R2 listing image uploads, and media lifecycle cleanup have been
+  deployed and smoke-tested.
 - The API currently starts with `tsx src/index.ts` to avoid the Prisma 7
   generated-client ESM/CommonJS runtime crash from `node dist/index.js`.
 - Do not add `"type": "module"` to `apps/api/package.json` unless doing the full
   NodeNext ESM migration, including explicit `.js` relative imports.
-- The next deployment step is deploying `apps/web` to Vercel with
-  `INTERNAL_API_URL=https://api-production-be29.up.railway.app`,
-  `NEXT_PUBLIC_USE_SAME_ORIGIN_API=1`, and
-  `NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app`.
-- After Vercel generates a web origin, add that origin to the Railway API
-  `ALLOWED_ORIGINS` variable and redeploy the API.
+- Keep Vercel web env vars aligned with `docs/deployment.md`, especially
+  `INTERNAL_API_URL`, `NEXT_PUBLIC_USE_SAME_ORIGIN_API`,
+  `NEXT_PUBLIC_REALTIME_URL`, and `NEXT_PUBLIC_LISTING_IMAGE_CDN_URL`.
+- The next production-hardening priority is observability/ops polish, starting
+  with media cleanup health tooling and failed-job visibility.
 - See `docs/deployment.md` and `docs/next-session-context.md` before continuing
-  deployment work.
+  deployment or production-hardening work.
 
 ## Repository Map
 - `apps/web`: Next.js 16 App Router web SLC and seller/admin surfaces.

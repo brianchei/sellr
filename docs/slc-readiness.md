@@ -85,23 +85,37 @@ unless release upload credentials are configured.
 
 ## Production Deployment Gate
 
-The current production API is deployed on Railway at:
+The current production web SLC is deployed on Vercel and Railway:
 
 ```text
-https://api-production-be29.up.railway.app
+Web: https://sellr-web.vercel.app
+API: https://api-production-be29.up.railway.app
 ```
 
-Before a production web demo:
+API health:
+
+```text
+https://api-production-be29.up.railway.app/health
+```
+
+Before a production demo or release handoff:
 
 - Confirm `https://api-production-be29.up.railway.app/health` returns `ok`.
 - Confirm Railway API logs do not show Redis fallback errors such as
   `127.0.0.1:6379` or `::1:6379`.
 - Remove the temporary Railway `NO_CACHE=1` variable if it is still present.
-- Deploy `apps/web` to Vercel with `INTERNAL_API_URL` set to the Railway API
-  origin and `NEXT_PUBLIC_USE_SAME_ORIGIN_API=1`.
-- Add the final Vercel web origin to Railway API `ALLOWED_ORIGINS`.
-- Confirm Twilio Verify env vars are configured in Railway before testing
-  production login.
+- Confirm Vercel production is on latest `main` before debugging missing UI.
+- Confirm Vercel same-origin `/api/v1` proxy returns `{"error":"Unauthorized"}`
+  from `/api/v1/auth/me` when logged out.
+- Confirm Twilio Verify sends real OTP in production.
+- Confirm new listing image uploads return the configured R2/CDN origin and
+  still load after a Railway API redeploy.
+- Confirm admin/community setup works for invite creation and member
+  role/status management.
+- Confirm admin report **Remove listing** works for listing reports and queues
+  media cleanup.
+- Confirm Vercel Web Analytics and Speed Insights are enabled in the Vercel
+  dashboard if metrics are expected.
 
 See [`deployment.md`](./deployment.md) and
 [`next-session-context.md`](./next-session-context.md) for the detailed
