@@ -28,7 +28,7 @@ export interface CommunityMember {
     userId: string;
     communityId: string;
     role: UserRole;
-    status: 'active' | 'suspended' | 'banned';
+    status: 'active' | 'inactive';
     joinedAt: string;
 }
 export interface AvailabilityWindow {

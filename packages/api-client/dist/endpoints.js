@@ -9,6 +9,9 @@ exports.fetchMe = fetchMe;
 exports.updateProfile = updateProfile;
 exports.registerPushToken = registerPushToken;
 exports.joinCommunity = joinCommunity;
+exports.fetchCommunityAdmin = fetchCommunityAdmin;
+exports.createCommunityInviteCode = createCommunityInviteCode;
+exports.updateCommunityMember = updateCommunityMember;
 exports.fetchListingsNearby = fetchListingsNearby;
 exports.fetchCommunityListings = fetchCommunityListings;
 exports.fetchMyListings = fetchMyListings;
@@ -89,6 +92,21 @@ function registerPushToken(expoPushToken) {
 function joinCommunity(body) {
     return (0, fetch_1.apiFetch)('/communities/join', {
         method: 'POST',
+        body: JSON.stringify(body),
+    });
+}
+function fetchCommunityAdmin() {
+    return (0, fetch_1.apiFetch)('/communities/admin');
+}
+function createCommunityInviteCode(communityId, body) {
+    return (0, fetch_1.apiFetch)(`/communities/${communityId}/invites`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+    });
+}
+function updateCommunityMember(communityId, userId, body) {
+    return (0, fetch_1.apiFetch)(`/communities/${communityId}/members/${userId}`, {
+        method: 'PATCH',
         body: JSON.stringify(body),
     });
 }

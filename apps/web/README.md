@@ -25,6 +25,7 @@ React Query, and typed helpers from `@sellr/api-client`.
 - `/notifications`: activity center with unread/listing/message filters and
   mark-read actions.
 - `/admin/reports`: admin-only report review and status updates.
+- `/admin/community`: admin-only community member access and invite-code setup.
 
 ## Local Development
 
