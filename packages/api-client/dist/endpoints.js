@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOtp = sendOtp;
 exports.verifyOtp = verifyOtp;
+exports.sendEmailOtp = sendEmailOtp;
+exports.verifyEmailOtp = verifyEmailOtp;
 exports.refreshTokens = refreshTokens;
 exports.logout = logout;
 exports.fetchRealtimeToken = fetchRealtimeToken;
@@ -50,6 +52,18 @@ function sendOtp(phoneE164) {
 }
 function verifyOtp(body) {
     return (0, fetch_1.apiFetch)('/auth/otp/verify', {
+        method: 'POST',
+        body: JSON.stringify(body),
+    });
+}
+function sendEmailOtp(email) {
+    return (0, fetch_1.apiFetch)('/auth/email/send', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+    });
+}
+function verifyEmailOtp(body) {
+    return (0, fetch_1.apiFetch)('/auth/email/verify', {
         method: 'POST',
         body: JSON.stringify(body),
     });

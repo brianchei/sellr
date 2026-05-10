@@ -3,14 +3,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import {
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-} from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { joinCommunity } from '@sellr/api-client';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchMe, joinCommunity } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 
 type JoinMode = 'invite' | 'email';
@@ -24,14 +19,25 @@ export default function OnboardingPage() {
     isAuthenticated,
     logout,
     refreshSession,
+    userId,
   } = useAuth();
-  const [mode, setMode] = useState<JoinMode>('invite');
+  const [mode, setMode] = useState<JoinMode>('email');
   const [inviteCode, setInviteCode] = useState('');
   const [institutionalEmail, setInstitutionalEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inviteInputRef = useRef<HTMLInputElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
+
+  const meQuery = useQuery({
+    queryKey: ['me', userId],
+    queryFn: fetchMe,
+    enabled: hydrated && isAuthenticated && Boolean(userId),
+  });
+  const verifiedEmail =
+    meQuery.data?.user.email && meQuery.data.user.emailVerifiedAt
+      ? meQuery.data.user.email
+      : null;
 
   useEffect(() => {
     if (!hydrated) return;
@@ -52,6 +58,12 @@ export default function OnboardingPage() {
     }
   }, [mode]);
 
+  useEffect(() => {
+    if (verifiedEmail && institutionalEmail.trim().length === 0) {
+      setInstitutionalEmail(verifiedEmail);
+    }
+  }, [institutionalEmail, verifiedEmail]);
+
   const inviteValue = inviteCode.trim();
   const emailValue = institutionalEmail.trim();
   const canSubmit =
@@ -67,9 +79,22 @@ export default function OnboardingPage() {
       setError(
         mode === 'invite'
           ? 'Enter the invite code your community shared with you.'
-          : 'Enter the email address tied to your school, workplace, or building.',
+          : 'Enter your verified student email.',
       );
       return;
+    }
+
+    if (mode === 'email') {
+      if (!verifiedEmail) {
+        setError(
+          'Sign in with your student email first, or use an invite code.',
+        );
+        return;
+      }
+      if (emailValue.toLowerCase() !== verifiedEmail.toLowerCase()) {
+        setError('Use the same email you verified during sign-in.');
+        return;
+      }
     }
 
     setLoading(true);
@@ -188,8 +213,9 @@ export default function OnboardingPage() {
                 Verify community access
               </h2>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                Use the invite code your community shared, or a verified
-                community email address.
+                UW-Madison students can join Badger Market with a verified
+                wisc.edu email. Invite codes are a secondary path for trusted
+                early users.
               </p>
 
               <div
@@ -197,6 +223,23 @@ export default function OnboardingPage() {
                 aria-label="Choose a verification method"
                 className="mt-5 grid grid-cols-2 gap-2 rounded-lg bg-[var(--bg-tertiary)] p-1"
               >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === 'email'}
+                  aria-controls="onboarding-method-panel"
+                  onClick={() => {
+                    setMode('email');
+                    setError(null);
+                  }}
+                  className={`rounded-md px-3 py-2 text-sm font-medium transition ${
+                    mode === 'email'
+                      ? 'bg-white text-[var(--color-brand-contrast)] shadow-sm'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  Student email
+                </button>
                 <button
                   type="button"
                   role="tab"
@@ -213,23 +256,6 @@ export default function OnboardingPage() {
                   }`}
                 >
                   Invite code
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={mode === 'email'}
-                  aria-controls="onboarding-method-panel"
-                  onClick={() => {
-                    setMode('email');
-                    setError(null);
-                  }}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition ${
-                    mode === 'email'
-                      ? 'bg-white text-[var(--color-brand-contrast)] shadow-sm'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  Community email
                 </button>
               </div>
 
@@ -248,14 +274,14 @@ export default function OnboardingPage() {
                         setInviteCode(event.target.value.toUpperCase())
                       }
                       autoComplete="off"
-                      placeholder="DEV2026"
+                      placeholder="BADGER2026"
                       aria-describedby="onboarding-invite-help"
                       className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 font-mono text-sm uppercase tracking-wider text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                     />
                   </label>
                 ) : (
                   <label className="block text-sm font-medium text-[var(--text-primary)]">
-                    Community email
+                    Student email
                     <input
                       ref={emailInputRef}
                       value={institutionalEmail}
@@ -264,8 +290,9 @@ export default function OnboardingPage() {
                       }
                       type="email"
                       autoComplete="email"
-                      placeholder="you@school.edu"
+                      placeholder="you@wisc.edu"
                       aria-describedby="onboarding-email-help"
+                      readOnly={Boolean(verifiedEmail)}
                       className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                     />
                   </label>
@@ -293,7 +320,8 @@ export default function OnboardingPage() {
                     id="onboarding-email-help"
                     className="mt-1.5 text-xs text-[var(--text-tertiary)]"
                   >
-                    We&apos;ll match your domain against allowlisted communities.
+                    We&apos;ll match your verified email domain against
+                    allowlisted communities.
                   </p>
                 )}
 
@@ -322,14 +350,14 @@ export default function OnboardingPage() {
                 <p className="mt-2 leading-5">
                   Sellr is invite-only while we onboard new communities. Ask an
                   organizer or moderator in your community for an invite code,
-                  or sign up with the email tied to your school, workplace, or
-                  residence to check if it&apos;s already supported.
+                  or sign out and sign back in with the student email tied to a
+                  supported campus community.
                 </p>
               </details>
 
               <p className="mt-4 text-center text-xs leading-5 text-[var(--text-tertiary)]">
-                Your phone sign-in stays active. You can join more communities
-                later from your dashboard.
+                Your verified contact stays private. You can join more
+                communities later from your dashboard.
               </p>
             </section>
           </div>

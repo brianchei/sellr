@@ -25,9 +25,9 @@ pnpm slc:ready
 ```
 
 The seller script signs in through the web `/api/v1` proxy, confirms
-  `/auth/me`, uploads a temporary listing image, creates a temporary listing,
-  publishes it, verifies it appears in seller inventory, updates it, unpublishes
-  it, and deletes it.
+`/auth/me`, uploads a temporary listing image, creates a temporary listing,
+publishes it, verifies it appears in seller inventory, updates it, unpublishes
+it, and deletes it.
 
 The buyer script signs in as the seeded seller and buyer, opens or reuses a
 pre-offer conversation for an active seller listing, sends a buyer message, and
@@ -71,13 +71,14 @@ widths:
 
 ## Demo Accounts
 
-Local OTP accepts `000000`.
-When Twilio Verify is not configured in local development, repeated OTP sends
-for these accounts are not blocked by the per-phone SMS limiter.
+Local email and SMS OTP accept `000000` when Resend/Twilio are not configured.
+Email sign-in is the primary web path for the campus launch; phone sign-in
+still supports existing demo accounts and invite-code fallback testing.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera
 - Admin: `+15550000003` / Priya Shah
+- Student email domain: `wisc.edu` for the seeded `Dev Campus`
 - Community invite: `DEV2026`
 
 ## Happy Path

@@ -3,10 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  fetchCommunityListings,
-  type ApiListing,
-} from '@sellr/api-client';
+import { fetchCommunityListings, type ApiListing } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 import { ListingCard } from '@/components/listing-card';
 import { CONDITION_LABELS } from '@/lib/listing-format';
@@ -25,9 +22,11 @@ const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
 
 const CONDITION_FILTERS: Array<{ value: ConditionOption; label: string }> = [
   { value: 'all', label: 'Any' },
-  ...(Object.entries(CONDITION_LABELS_MAP) as Array<
-    [keyof typeof CONDITION_LABELS_MAP, string]
-  >).map(([value, label]) => ({
+  ...(
+    Object.entries(CONDITION_LABELS_MAP) as Array<
+      [keyof typeof CONDITION_LABELS_MAP, string]
+    >
+  ).map(([value, label]) => ({
     value: value as ConditionOption,
     label,
   })),
@@ -56,10 +55,7 @@ function priceNumber(price: ApiListing['price']): number {
   return Number.isFinite(value) ? value : 0;
 }
 
-function sortListings(
-  listings: ApiListing[],
-  sort: SortOption,
-): ApiListing[] {
+function sortListings(listings: ApiListing[], sort: SortOption): ApiListing[] {
   const copy = [...listings];
   if (sort === 'price-asc') {
     return copy.sort(
@@ -73,8 +69,7 @@ function sortListings(
   }
   return copy.sort((left, right) => {
     return (
-      new Date(right.createdAt).getTime() -
-      new Date(left.createdAt).getTime()
+      new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
     );
   });
 }
@@ -112,8 +107,7 @@ export default function MarketplacePage() {
   }, [listings]);
 
   const verifiedAvailable = useMemo(
-    () =>
-      listings.some((listing) => Boolean(listing.seller?.verifiedAt)),
+    () => listings.some((listing) => Boolean(listing.seller?.verifiedAt)),
     [listings],
   );
 
@@ -179,8 +173,8 @@ export default function MarketplacePage() {
             Browse local listings
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Verified-community items only. Pickup areas are approximate until
-            you and the seller agree on a precise spot.
+            Verified-community items only. Browse furniture, books, dorm and
+            apartment basics, electronics, and other local pickup finds.
           </p>
         </div>
         <Link
@@ -417,8 +411,9 @@ export default function MarketplacePage() {
         <section className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
           <h2 className="text-xl font-semibold">No active listings yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Your community marketplace is ready. Listings appear here as
-            members publish items for local pickup.
+            Your community marketplace is ready. Start with everyday items
+            students actually need: furniture, kitchen gear, books, electronics,
+            bikes, and free pickup items.
           </p>
           <Link
             href="/sell"
@@ -434,7 +429,9 @@ export default function MarketplacePage() {
       listings.length > 0 &&
       filteredListings.length === 0 ? (
         <section className="mt-4 rounded-lg border border-[var(--border-default)] bg-white p-8 text-center shadow-sm">
-          <h2 className="text-xl font-semibold">No listings match those filters</h2>
+          <h2 className="text-xl font-semibold">
+            No listings match those filters
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Try a broader search, a different category, or clearing the
             verified-only filter.
@@ -483,7 +480,11 @@ function FilterChipRow<TValue extends string>({
       <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
         {label}
       </p>
-      <div role="radiogroup" aria-label={label} className="mt-1.5 flex flex-wrap gap-1.5">
+      <div
+        role="radiogroup"
+        aria-label={label}
+        className="mt-1.5 flex flex-wrap gap-1.5"
+      >
         {options.map((option) => {
           const active = option.value === value;
           return (

@@ -54,7 +54,9 @@ export default function SellPage() {
       const published = await publishListing(created.listing.id);
       writeListingToCaches(queryClient, published.listing);
       await invalidateListingActivity(queryClient, published.listing.id);
-      router.push(`/listings?created=${encodeURIComponent(created.listing.id)}`);
+      router.push(
+        `/listings?created=${encodeURIComponent(created.listing.id)}`,
+      );
     } catch (e) {
       if (createdListingId) {
         await invalidateListingActivity(queryClient, createdListingId);
@@ -107,7 +109,8 @@ export default function SellPage() {
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-[var(--text-secondary)]">
             Photos, neighborhood, and an availability window help your listing
-            get replies. Publishes to your community marketplace.
+            get replies. Include dimensions, pickup area, and what is included
+            so campus buyers can decide quickly.
           </p>
         </div>
         <Link

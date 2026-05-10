@@ -1,19 +1,31 @@
 import type { ApiListing, UpdateListingInput } from '@sellr/api-client';
-import {
-  LISTING_IMAGE_MAX_COUNT,
-  isListingPhotoUrl,
-} from '@sellr/shared';
+import { LISTING_IMAGE_MAX_COUNT, isListingPhotoUrl } from '@sellr/shared';
 import { photoUrls } from '@/lib/listing-format';
 
 export const CATEGORIES = [
-  'Electronics',
   'Furniture',
-  'Home',
+  'Dorm',
+  'Kitchen',
   'Books',
+  'Electronics',
+  'Transportation',
   'Clothing',
   'Sports',
+  'Home',
   'Tools',
+  'Free',
   'Other',
+];
+
+export const PICKUP_AREA_SUGGESTIONS = [
+  'Lakeshore',
+  'Southeast',
+  'State Street',
+  'Langdon',
+  'Regent',
+  'Near West',
+  'Capitol',
+  'Engineering',
 ];
 
 export const CONDITIONS = [
@@ -81,21 +93,21 @@ export function isValidImageUrl(value: string): boolean {
 
 function parsePrice(value: string): number | null {
   const parsed = Number.parseFloat(value);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
+  if (!Number.isFinite(parsed) || parsed < 0) {
     return null;
   }
   return Math.round(parsed * 100) / 100;
 }
 
 function numberFromUnknown(value: unknown, fallback: number): number {
-  return typeof value === 'number' && Number.isFinite(value)
-    ? value
-    : fallback;
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
-function firstAvailabilityWindow(
-  value: unknown,
-): { dayOfWeek: number; startHour: number; endHour: number } {
+function firstAvailabilityWindow(value: unknown): {
+  dayOfWeek: number;
+  startHour: number;
+  endHour: number;
+} {
   const first = Array.isArray(value) ? value[0] : null;
   if (typeof first !== 'object' || first === null) {
     return { dayOfWeek: 6, startHour: 10, endHour: 14 };
@@ -118,9 +130,7 @@ export function conditionLabel(value: string): string {
 
 export function dayLabel(value: string): string {
   const parsedDay = Number.parseInt(value, 10);
-  return (
-    DAYS.find((day) => day.value === parsedDay)?.label ?? 'Pickup window'
-  );
+  return DAYS.find((day) => day.value === parsedDay)?.label ?? 'Pickup window';
 }
 
 export function listingFormValuesFromListing(
@@ -225,7 +235,7 @@ export function getListingFormErrors(
   }
 
   if (parsedPrice === null) {
-    errors.price = 'Enter a valid price greater than $0.';
+    errors.price = 'Enter a valid price, or 0 for a free item.';
   }
 
   if (cleanConditionNote.length > 200) {

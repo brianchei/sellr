@@ -38,6 +38,24 @@ export const VerifyOTPSchema = z.object({
   deviceFingerprint: z.string().optional(),
 });
 
+export const SendEmailOTPSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .pipe(z.email({ error: 'Enter a valid email address.' })),
+});
+
+export const VerifyEmailOTPSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .pipe(z.email({ error: 'Enter a valid email address.' })),
+  code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit verification code.'),
+  deviceFingerprint: z.string().optional(),
+});
+
 /** Mobile sends `refreshToken` in the body; the web app uses an httpOnly cookie (see API). */
 export const RefreshTokenSchema = z.object({
   refreshToken: z.string().min(10).optional(),
@@ -113,7 +131,7 @@ export const CreateListingSchema = z.object({
   subcategory: z.string().optional(),
   condition: z.enum(ListingCondition),
   conditionNote: z.string().max(200).optional(),
-  price: z.number().positive().multipleOf(0.01),
+  price: z.number().nonnegative().multipleOf(0.01),
   negotiable: z.boolean().default(false),
   locationRadiusM: z.number().min(100).max(5000).default(1000),
   locationNeighborhood: z.string().max(100),

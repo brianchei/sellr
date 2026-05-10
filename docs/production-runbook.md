@@ -14,7 +14,7 @@ curl https://api-production-be29.up.railway.app/health
 Expected shape:
 
 ```json
-{"status":"ok","ts":"..."}
+{ "status": "ok", "ts": "..." }
 ```
 
 Vercel same-origin API proxy:
@@ -26,7 +26,7 @@ https://sellr-web.vercel.app/api/v1/auth/me
 When logged out, the expected response is:
 
 ```json
-{"error":"Unauthorized"}
+{ "error": "Unauthorized" }
 ```
 
 That confirms Vercel is rewriting `/api/v1` to the Railway API. If this returns
@@ -112,6 +112,7 @@ or Railway issue has cleared.
 
 Railway logs and Sentry should surface structured context for:
 
+- Resend email OTP send failures, using email hash and domain only.
 - Twilio Verify send/check failures, using phone hash and last four digits only.
 - R2 upload/delete failures, including bucket and storage key.
 - Media cleanup worker failures, including media asset id, storage key, reason,
@@ -119,8 +120,8 @@ Railway logs and Sentry should surface structured context for:
 - API 500s by method, route, request id, status code, and user id when known.
 - Refresh-token validation failures without logging token values.
 
-Never log OTP codes, auth tokens, cookies, Twilio auth tokens, R2 secrets, or
-full phone numbers.
+Never log OTP codes, auth tokens, cookies, Resend API keys, Twilio auth tokens,
+R2 secrets, full email addresses, or full phone numbers.
 
 ## Redeploy Safely
 
@@ -138,10 +139,16 @@ Vercel web:
 1. Confirm production env vars match `docs/deployment.md`.
 2. Redeploy latest `main`.
 3. Check `/api/v1/auth/me` returns `{"error":"Unauthorized"}` when logged out.
-4. Smoke OTP login, marketplace browse, listing upload, inbox, notifications,
-   `/admin/community`, and `/admin/reports`.
+4. Smoke email OTP login, marketplace browse, listing upload, inbox,
+   notifications, `/admin/community`, and `/admin/reports`.
 
 ## Common Incidents
+
+Email OTP send fails:
+
+- Confirm Railway has `RESEND_API_KEY` and `EMAIL_FROM`.
+- Confirm `EMAIL_FROM` uses a verified Resend sending domain.
+- Confirm `EMAIL_OTP_ALLOWED_DOMAINS` includes the intended launch domain.
 
 Twilio OTP send fails:
 

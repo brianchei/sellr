@@ -14,6 +14,20 @@ export function phoneLogContext(phoneE164: string): {
   };
 }
 
+export function emailLogContext(email: string): {
+  emailHash: string;
+  emailDomain: string | null;
+} {
+  const normalized = email.trim().toLowerCase();
+  return {
+    emailHash: createHash('sha256')
+      .update(normalized)
+      .digest('hex')
+      .slice(0, 12),
+    emailDomain: normalized.split('@')[1] ?? null,
+  };
+}
+
 export function captureOperationalError(
   error: unknown,
   {

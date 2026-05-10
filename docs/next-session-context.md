@@ -11,7 +11,8 @@ feels clear, trustworthy, and usable without broad marketplace scope creep.
 
 The current web SLC includes:
 
-- Production Twilio OTP login and community onboarding.
+- Production Resend email OTP login, Twilio phone fallback, and community
+  onboarding.
 - Marketplace browse/search/filter and listing detail with seller trust signals.
 - Structured listing creation, durable R2-backed listing photo upload, edit,
   publish/unpublish, delete, and sold-listing lifecycle.
@@ -54,7 +55,8 @@ https://api-production-be29.up.railway.app
 https://api-production-be29.up.railway.app/health
 ```
 
-- Production OTP has been verified with real Twilio SMS.
+- Production login is moving to Resend email OTP for verified student email,
+  with Twilio SMS retained as a phone fallback for invite-only users.
 - Same-origin Vercel `/api/v1` rewrites to Railway have been verified; the
   expected unauthenticated proxy check is `{"error":"Unauthorized"}` from:
 
@@ -106,6 +108,10 @@ DIRECT_URL
 REDIS_URL
 JWT_SECRET
 ALLOWED_ORIGINS=https://sellr-web.vercel.app
+RESEND_API_KEY
+EMAIL_FROM
+EMAIL_OTP_TTL_SECONDS=600
+EMAIL_OTP_ALLOWED_DOMAINS=wisc.edu
 TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN
 TWILIO_VERIFY_SERVICE_SID
@@ -130,11 +136,12 @@ for the web project so data appears after the mounted components send events.
 
 ## Production Smoke Baseline
 
-Use real Twilio OTP in production. Local `000000` OTP is intentionally disabled
-when Twilio is configured in production.
+Use real Resend email OTP in production. Local `000000` email/SMS OTP is
+intentionally disabled in production. Twilio SMS is available only for the phone
+fallback path when Twilio variables are configured.
 
 1. Open `https://sellr-web.vercel.app`.
-2. Sign in with a real phone number.
+2. Sign in with a real `@wisc.edu` email address.
 3. Join or confirm community access.
 4. Browse `/marketplace`.
 5. Open a listing detail page.
@@ -165,10 +172,11 @@ Local demo data:
 
 ```text
 Community invite: DEV2026
+Local student email domain: wisc.edu
 Seller: +15550000001 / Maya Chen
 Buyer: +15550000002 / Jordan Rivera
 Admin: +15550000003 / Priya Shah
-Local OTP: 000000
+Local email/SMS OTP: 000000
 ```
 
 For API integration tests, use a dedicated test DB and `TEST_DATABASE_URL`.

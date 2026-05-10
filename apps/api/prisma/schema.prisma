@@ -11,7 +11,9 @@ datasource db {
 
 model User {
   id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  phoneE164         String    @unique @map("phone_e164") @db.VarChar(20)
+  phoneE164         String?   @unique @map("phone_e164") @db.VarChar(20)
+  email             String?   @unique @db.VarChar(254)
+  emailVerifiedAt   DateTime? @map("email_verified_at")
   displayName       String    @map("display_name") @db.VarChar(100)
   avatarUrl         String?   @map("avatar_url")
   verifiedAt        DateTime? @map("verified_at")
@@ -22,10 +24,10 @@ model User {
 
   communityMembers CommunityMember[]
   listings         Listing[]
-  buyerOffers      Offer[]         @relation("BuyerOffers")
-  sellerOffers     Offer[]         @relation("SellerOffers")
-  ratingsGiven     Rating[]        @relation("RatingsGiven")
-  ratingsReceived  Rating[]        @relation("RatingsReceived")
+  buyerOffers      Offer[]           @relation("BuyerOffers")
+  sellerOffers     Offer[]           @relation("SellerOffers")
+  ratingsGiven     Rating[]          @relation("RatingsGiven")
+  ratingsReceived  Rating[]          @relation("RatingsReceived")
   messages         Message[]
   savedSearches    SavedSearch[]
   reports          Report[]
@@ -121,11 +123,11 @@ model Listing {
   createdAt            DateTime         @default(now()) @map("created_at")
   updatedAt            DateTime         @updatedAt @map("updated_at")
 
-  community Community @relation(fields: [communityId], references: [id])
-  seller    User      @relation(fields: [sellerId], references: [id])
-  offers         Offer[]
-  conversations  Conversation[]
-  mediaAssets    MediaAsset[]
+  community     Community      @relation(fields: [communityId], references: [id])
+  seller        User           @relation(fields: [sellerId], references: [id])
+  offers        Offer[]
+  conversations Conversation[]
+  mediaAssets   MediaAsset[]
 
   @@index([communityId])
   @@index([sellerId])
@@ -282,8 +284,8 @@ model Conversation {
   type           ConversationType @default(pre_offer)
   createdAt      DateTime         @default(now()) @map("created_at")
 
-  listing  Listing? @relation(fields: [listingId], references: [id])
-  offer    Offer?   @relation(fields: [offerId], references: [id])
+  listing  Listing?  @relation(fields: [listingId], references: [id])
+  offer    Offer?    @relation(fields: [offerId], references: [id])
   messages Message[]
 
   @@index([listingId])

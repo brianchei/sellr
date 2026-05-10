@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.LISTING_IMAGE_MIME_TYPES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.LISTING_IMAGE_MIME_TYPES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
 exports.isListingPhotoUrl = isListingPhotoUrl;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
@@ -30,6 +30,22 @@ exports.SendOTPSchema = zod_1.z.object({
 });
 exports.VerifyOTPSchema = zod_1.z.object({
     phoneE164: zod_1.z.string().regex(/^\+[1-9]\d{1,14}$/),
+    code: zod_1.z.string().regex(/^\d{6}$/, 'Enter the 6-digit verification code.'),
+    deviceFingerprint: zod_1.z.string().optional(),
+});
+exports.SendEmailOTPSchema = zod_1.z.object({
+    email: zod_1.z
+        .string()
+        .trim()
+        .toLowerCase()
+        .pipe(zod_1.z.email({ error: 'Enter a valid email address.' })),
+});
+exports.VerifyEmailOTPSchema = zod_1.z.object({
+    email: zod_1.z
+        .string()
+        .trim()
+        .toLowerCase()
+        .pipe(zod_1.z.email({ error: 'Enter a valid email address.' })),
     code: zod_1.z.string().regex(/^\d{6}$/, 'Enter the 6-digit verification code.'),
     deviceFingerprint: zod_1.z.string().optional(),
 });
@@ -98,7 +114,7 @@ exports.CreateListingSchema = zod_1.z.object({
     subcategory: zod_1.z.string().optional(),
     condition: zod_1.z.enum(enums_1.ListingCondition),
     conditionNote: zod_1.z.string().max(200).optional(),
-    price: zod_1.z.number().positive().multipleOf(0.01),
+    price: zod_1.z.number().nonnegative().multipleOf(0.01),
     negotiable: zod_1.z.boolean().default(false),
     locationRadiusM: zod_1.z.number().min(100).max(5000).default(1000),
     locationNeighborhood: zod_1.z.string().max(100),

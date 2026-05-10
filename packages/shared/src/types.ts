@@ -14,7 +14,9 @@ import type {
 
 export interface User {
   id: string;
-  phoneE164: string;
+  phoneE164: string | null;
+  email: string | null;
+  emailVerifiedAt: string | null;
   displayName: string;
   avatarUrl: string | null;
   verifiedAt: string | null;

@@ -551,9 +551,7 @@ function RecentListingsPanel({
                   <div
                     className="aspect-square h-14 w-14 overflow-hidden rounded-md bg-[var(--bg-tertiary)] bg-cover bg-center"
                     style={
-                      photo
-                        ? { backgroundImage: `url("${photo}")` }
-                        : undefined
+                      photo ? { backgroundImage: `url("${photo}")` } : undefined
                     }
                   />
                   <div className="min-w-0">
@@ -680,9 +678,7 @@ function RecentInboxPanel({
                   </p>
                   {conversation.latestMessage ? (
                     <span className="shrink-0 text-xs text-[var(--text-tertiary)]">
-                      {formatMessageTime(
-                        conversation.latestMessage.createdAt,
-                      )}
+                      {formatMessageTime(conversation.latestMessage.createdAt)}
                     </span>
                   ) : null}
                 </div>
@@ -1009,10 +1005,10 @@ function ProfileEditor({
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
-            Phone
+            Verified contact
           </p>
-          <p className="mt-1.5 font-mono text-[var(--text-primary)]">
-            {data.user.phoneE164}
+          <p className="mt-1.5 break-all font-mono text-[var(--text-primary)]">
+            {data.user.email ?? data.user.phoneE164 ?? 'Not set'}
           </p>
         </div>
         <div>

@@ -4,6 +4,8 @@ export type ApiUserTrustProfile = {
     displayName: string;
     avatarUrl: string | null;
     verifiedAt: string | null;
+    email?: string | null;
+    emailVerifiedAt?: string | null;
     createdAt: string;
     memberSince: string | null;
     listingCount: number;
@@ -90,7 +92,9 @@ export type ApiReport = {
     reporter: {
         id: string;
         displayName: string;
-        phoneE164: string;
+        phoneE164: string | null;
+        email: string | null;
+        emailVerifiedAt: string | null;
     };
     target: {
         label: string;
@@ -116,7 +120,9 @@ export type ApiCommunityAdminMember = {
     joinedAt: string;
     user: {
         id: string;
-        phoneE164: string;
+        phoneE164: string | null;
+        email: string | null;
+        emailVerifiedAt: string | null;
         displayName: string;
         avatarUrl: string | null;
         verifiedAt: string | null;
@@ -164,6 +170,9 @@ export type AuthTokens = {
 export type VerifyOtpWebResult = {
     userId: string;
 };
+export type VerifyEmailOtpWebResult = {
+    userId: string;
+};
 export declare function sendOtp(phoneE164: string): Promise<{
     sent: boolean;
 }>;
@@ -172,6 +181,14 @@ export declare function verifyOtp(body: {
     code: string;
     deviceFingerprint?: string;
 }): Promise<AuthTokens | VerifyOtpWebResult>;
+export declare function sendEmailOtp(email: string): Promise<{
+    sent: boolean;
+}>;
+export declare function verifyEmailOtp(body: {
+    email: string;
+    code: string;
+    deviceFingerprint?: string;
+}): Promise<AuthTokens | VerifyEmailOtpWebResult>;
 /** Mobile: pass `refreshToken` from secure storage. Web: omit — uses httpOnly cookie. */
 export declare function refreshTokens(refreshToken?: string): Promise<{
     accessToken: string;
@@ -190,14 +207,18 @@ export declare function fetchRealtimeToken(): Promise<{
 export declare function fetchMe(): Promise<{
     user: ApiUserTrustProfile & {
         id: string;
-        phoneE164: string;
+        phoneE164: string | null;
+        email: string | null;
+        emailVerifiedAt: string | null;
     };
     communityIds: string[];
 }>;
 export declare function updateProfile(body: UpdateProfileInput): Promise<{
     user: ApiUserTrustProfile & {
         id: string;
-        phoneE164: string;
+        phoneE164: string | null;
+        email: string | null;
+        emailVerifiedAt: string | null;
     };
     communityIds: string[];
 }>;

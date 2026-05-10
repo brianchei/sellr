@@ -2,8 +2,10 @@ import type { FastifyPluginCallback } from 'fastify';
 import {
   RefreshTokenSchema,
   RegisterPushTokenSchema,
+  SendEmailOTPSchema,
   SendOTPSchema,
   UpdateProfileSchema,
+  VerifyEmailOTPSchema,
   VerifyOTPSchema,
 } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
@@ -17,15 +19,33 @@ import {
 } from '../../lib/authCookies';
 import {
   incrementOtpSendCount,
+  incrementEmailOtpSendCount,
+  isAllowedEmailOtpDomain,
+  normalizeEmail,
   isLocalOtpMode,
+  sendVerificationEmail,
   sendVerificationSms,
+  verifyEmailOtpCode,
   verifyOtpCode,
 } from '../../lib/otp';
 import {
   captureOperationalError,
+  emailLogContext,
   phoneLogContext,
 } from '../../lib/observability';
 import { verifyJWT } from '../../middleware/auth';
+
+function defaultDisplayNameForEmail(email: string): string {
+  const localPart = email.split('@')[0] ?? '';
+  const name = localPart
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join(' ')
+    .trim();
+
+  return name.slice(0, 60) || 'Sellr member';
+}
 
 async function findMeProfile(userId: string, communityIds: string[]) {
   const [user, membership, listingCount] = await Promise.all([
@@ -34,6 +54,8 @@ async function findMeProfile(userId: string, communityIds: string[]) {
       select: {
         id: true,
         phoneE164: true,
+        email: true,
+        emailVerifiedAt: true,
         displayName: true,
         avatarUrl: true,
         verifiedAt: true,
@@ -75,6 +97,110 @@ async function findMeProfile(userId: string, communityIds: string[]) {
 }
 
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
+  fastify.post(
+    '/email/send',
+    {
+      schema: { body: SendEmailOTPSchema },
+    },
+    async (request, reply) => {
+      const body = SendEmailOTPSchema.parse(request.body);
+      const email = normalizeEmail(body.email);
+      if (!isAllowedEmailOtpDomain(email)) {
+        return reply.code(400).send({
+          error: 'Use your wisc.edu student email for email sign-in.',
+        });
+      }
+
+      const n = await incrementEmailOtpSendCount(email);
+      if (n > 5) {
+        return reply.code(429).send({ error: 'Too many email code requests' });
+      }
+
+      try {
+        await sendVerificationEmail(email);
+      } catch (error) {
+        const emailContext = emailLogContext(email);
+        request.log.error(
+          { err: error, operation: 'resend.email_otp.send', ...emailContext },
+          'Resend email OTP send failed',
+        );
+        captureOperationalError(error, {
+          component: 'resend',
+          operation: 'email_otp_send',
+          extra: emailContext,
+        });
+        if (error instanceof Error && /not configured/i.test(error.message)) {
+          return reply
+            .code(503)
+            .send({ error: 'Email sign-in is not configured' });
+        }
+        throw error;
+      }
+
+      return reply.send(ok({ sent: true }));
+    },
+  );
+
+  fastify.post(
+    '/email/verify',
+    {
+      schema: { body: VerifyEmailOTPSchema },
+    },
+    async (request, reply) => {
+      const body = VerifyEmailOTPSchema.parse(request.body);
+      const email = normalizeEmail(body.email);
+      if (!isAllowedEmailOtpDomain(email)) {
+        return reply.code(400).send({
+          error: 'Use your wisc.edu student email for email sign-in.',
+        });
+      }
+
+      const result = await verifyEmailOtpCode(email, body.code);
+      if (result === 'too_many_attempts') {
+        return reply
+          .code(429)
+          .send({ error: 'Too many verification attempts' });
+      }
+      if (result !== 'valid') {
+        return reply.code(400).send({ error: 'Invalid or expired code' });
+      }
+
+      const verifiedAt = new Date();
+      const user = await prisma.user.upsert({
+        where: { email },
+        create: {
+          email,
+          emailVerifiedAt: verifiedAt,
+          displayName: defaultDisplayNameForEmail(email),
+          verifiedAt,
+          deviceFingerprint: body.deviceFingerprint,
+        },
+        update: {
+          emailVerifiedAt: verifiedAt,
+          verifiedAt,
+          ...(body.deviceFingerprint
+            ? { deviceFingerprint: body.deviceFingerprint }
+            : {}),
+        },
+      });
+
+      const tokens = await issueTokenPair(fastify, user.id);
+
+      if (isWebClient(request.headers)) {
+        setAuthCookies(reply, tokens);
+        return reply.send(ok({ userId: user.id }));
+      }
+
+      return reply.send(
+        ok({
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+          userId: user.id,
+        }),
+      );
+    },
+  );
+
   fastify.post(
     '/otp/send',
     {

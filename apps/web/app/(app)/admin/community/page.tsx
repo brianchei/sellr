@@ -43,7 +43,13 @@ function toIsoFromLocalDateTime(value: string): string | null {
   return date.toISOString();
 }
 
-function inviteState(invite: ApiCommunityAdminCommunity['inviteCodes'][number]) {
+function memberContact(member: ApiCommunityAdminMember): string {
+  return member.user.email ?? member.user.phoneE164 ?? 'No contact on file';
+}
+
+function inviteState(
+  invite: ApiCommunityAdminCommunity['inviteCodes'][number],
+) {
   if (invite.expiresAt && new Date(invite.expiresAt) <= new Date()) {
     return 'expired';
   }
@@ -572,7 +578,7 @@ export default function AdminCommunityPage() {
                         </span>
                       </div>
                       <p className="mt-1 font-mono text-xs text-[var(--text-tertiary)]">
-                        {member.user.phoneE164}
+                        {memberContact(member)}
                       </p>
                       <p className="mt-1 text-xs text-[var(--text-tertiary)]">
                         Joined {formatDate(member.joinedAt)}

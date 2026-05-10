@@ -51,6 +51,10 @@ export function formatPrice(price: ApiListing['price']): string {
     return '$--';
   }
 
+  if (amount === 0) {
+    return 'Free';
+  }
+
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
