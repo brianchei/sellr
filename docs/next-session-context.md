@@ -55,8 +55,8 @@ https://api-production-be29.up.railway.app
 https://api-production-be29.up.railway.app/health
 ```
 
-- Production login is moving to Resend email OTP for verified student email,
-  with Twilio SMS retained as a phone fallback for invite-only users.
+- Production login uses Resend email OTP for verified student email, with
+  Twilio SMS retained as a phone fallback for invite-only users.
 - Same-origin Vercel `/api/v1` rewrites to Railway have been verified; the
   expected unauthenticated proxy check is `{"error":"Unauthorized"}` from:
 
@@ -109,7 +109,7 @@ REDIS_URL
 JWT_SECRET
 ALLOWED_ORIGINS=https://sellr-web.vercel.app
 RESEND_API_KEY
-EMAIL_FROM
+EMAIL_FROM=Sellr <verify@send.sellr-ai.com>
 EMAIL_OTP_TTL_SECONDS=600
 EMAIL_OTP_ALLOWED_DOMAINS=wisc.edu
 TWILIO_ACCOUNT_SID
@@ -120,6 +120,12 @@ R2_BUCKET_NAME
 R2_ACCESS_KEY_ID
 R2_SECRET_ACCESS_KEY
 CLOUDFLARE_CDN_URL
+```
+
+Recommended Railway API:
+
+```text
+EMAIL_OTP_SECRET=<long-random-secret>
 ```
 
 Vercel web:
@@ -187,6 +193,7 @@ Without it, local DB integration suites are skipped by the repo safety guard.
 - `AGENTS.md`
 - `README.md`
 - `docs/deployment.md`
+- `docs/email-first-auth.md`
 - `docs/slc-readiness.md`
 - `docs/slc-smoke-test.md`
 - `docs/design-language.md`
@@ -198,6 +205,8 @@ Without it, local DB integration suites are skipped by the repo safety guard.
 - Media cleanup health tooling is now implemented through API scripts:
   `media:health`, `media:cleanup-expired`, and `media:retry-failed`.
 - Production runbook coverage lives in `docs/production-runbook.md`.
+- Email-first auth setup and launch community gating lives in
+  `docs/email-first-auth.md`.
 - Structured Railway/Sentry failure visibility now covers Twilio Verify
   failures, R2 upload/delete failures, media cleanup job failures, refresh-token
   failures, and API 500s by route.

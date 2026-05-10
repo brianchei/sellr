@@ -67,6 +67,7 @@ JWT_SECRET
 ALLOWED_ORIGINS
 RESEND_API_KEY
 EMAIL_FROM
+EMAIL_OTP_ALLOWED_DOMAINS
 CLOUDFLARE_ACCOUNT_ID
 R2_BUCKET_NAME
 R2_ACCESS_KEY_ID
@@ -78,7 +79,7 @@ Recommended optional variables when the corresponding services are configured:
 
 ```text
 EMAIL_OTP_TTL_SECONDS
-EMAIL_OTP_ALLOWED_DOMAINS
+EMAIL_OTP_SECRET
 TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN
 TWILIO_VERIFY_SERVICE_SID
@@ -270,10 +271,15 @@ uses Resend email OTP for verified student email sign-in:
 
 ```text
 RESEND_API_KEY
-EMAIL_FROM
+EMAIL_FROM=Sellr <verify@send.sellr-ai.com>
 EMAIL_OTP_TTL_SECONDS=600
 EMAIL_OTP_ALLOWED_DOMAINS=wisc.edu
+EMAIL_OTP_SECRET=<long-random-secret>
 ```
+
+For the launch domain, verify `send.sellr-ai.com` in Resend using Cloudflare
+DNS records. Create a sending-access Resend API key scoped to that domain and
+store it only in Railway.
 
 If `RESEND_API_KEY` or `EMAIL_FROM` is missing in Railway, email sign-in fails
 with `Email sign-in is not configured`.
@@ -288,6 +294,9 @@ TWILIO_VERIFY_SERVICE_SID
 
 If these are missing in Railway, phone sign-in will fail with
 `Twilio Verify is not configured`.
+
+See [`email-first-auth.md`](./email-first-auth.md) for the full auth flow,
+local `000000` behavior, Resend setup, and `wisc.edu` community-gate rules.
 
 ## Known Production Caveats
 
@@ -311,16 +320,17 @@ After deploying API and web:
 1. Open `/health` on the Railway API origin.
 2. Open the Vercel web origin.
 3. Log in with a real `@wisc.edu` email OTP.
-4. Browse marketplace listings.
-5. Create a listing with a local image upload.
-6. Open the listing detail page.
-7. Send a buyer contact message.
-8. Confirm inbox and notifications update.
-9. Confirm `/admin/community` invite/member management as an admin.
-10. Sign in as an admin and open `/admin/reports`.
-11. For a listing report, use **Remove listing** and confirm the listing is
+4. Join or confirm access to `Badger Market`.
+5. Browse marketplace listings.
+6. Create a listing with a local image upload.
+7. Open the listing detail page.
+8. Send a buyer contact message.
+9. Confirm inbox and notifications update.
+10. Confirm `/admin/community` invite/member management as an admin.
+11. Sign in as an admin and open `/admin/reports`.
+12. For a listing report, use **Remove listing** and confirm the listing is
     removed and associated media cleanup is queued/deleted.
-12. Confirm a newly uploaded listing image still loads after a Railway API
+13. Confirm a newly uploaded listing image still loads after a Railway API
     redeploy.
 
 For local release verification, keep using:

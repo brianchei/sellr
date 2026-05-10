@@ -9,7 +9,7 @@ handoff. It complements the detailed smoke path in
 The web SLC is the smallest complete buyer/seller loop for a verified local
 community:
 
-- Sign in with local OTP and join a seeded community.
+- Sign in with email OTP, or phone OTP fallback, and join a seeded community.
 - Browse active community listings and inspect listing detail.
 - See seller trust signals: display name, verified/community status, member
   since, and active listing count.
@@ -109,6 +109,8 @@ Before a production demo or release handoff:
   from `/api/v1/auth/me` when logged out.
 - Confirm Resend sends real email OTP in production; confirm Twilio only if the
   phone fallback is part of the release smoke.
+- Confirm `Badger Market` is configured as an `email_domain` community for
+  `wisc.edu`, with invite codes available only as a secondary path.
 - Confirm new listing image uploads return the configured R2/CDN origin and
   still load after a Railway API redeploy.
 - Confirm admin/community setup works for invite creation and member
@@ -154,6 +156,8 @@ Local email and SMS OTP accept `000000` when Resend/Twilio are not configured.
 Email sign-in is the primary web path for launch, while phone sign-in remains
 available for demo accounts and invite-code fallback testing. Real provider
 sends still use production-style rate limits.
+Use any `@wisc.edu` address with local code `000000` to test email-domain
+onboarding; use the seeded phone users below for the repeatable smoke fixtures.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera

@@ -147,8 +147,10 @@ Vercel web:
 Email OTP send fails:
 
 - Confirm Railway has `RESEND_API_KEY` and `EMAIL_FROM`.
-- Confirm `EMAIL_FROM` uses a verified Resend sending domain.
+- Confirm `EMAIL_FROM` is `Sellr <verify@send.sellr-ai.com>` or another sender
+  on a verified Resend sending domain.
 - Confirm `EMAIL_OTP_ALLOWED_DOMAINS` includes the intended launch domain.
+- Check Resend logs for delivery or domain-verification errors.
 
 Twilio OTP send fails:
 
