@@ -6,8 +6,9 @@ React Query, and typed helpers from `@sellr/api-client`.
 
 ## Current SLC Routes
 
-- `/login`: phone OTP sign-in for web cookie sessions.
-- `/onboarding`: join a verified community with an invite code or email.
+- `/login`: email OTP sign-in for web cookie sessions, with phone OTP fallback.
+- `/onboarding`: join a verified community with a verified email domain or an
+  invite code.
 - `/dashboard`: profile editor, trust preview, seller readiness panel, and next
   best action.
 - `/marketplace`: community-scoped browse, search, filters, and listing cards.
@@ -55,6 +56,9 @@ NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
 NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
 NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://<listing-image-cdn-origin>
 ```
+
+Resend and Twilio variables belong on the Railway API service, not in the web
+project. See `../../docs/email-first-auth.md` for the email OTP setup.
 
 Do not include `/api/v1` in `INTERNAL_API_URL`; `next.config.ts` appends that
 path in the rewrite.

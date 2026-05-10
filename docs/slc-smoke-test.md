@@ -74,6 +74,8 @@ widths:
 Local email and SMS OTP accept `000000` when Resend/Twilio are not configured.
 Email sign-in is the primary web path for the campus launch; phone sign-in
 still supports existing demo accounts and invite-code fallback testing.
+Use any `@wisc.edu` address to smoke the email-first onboarding path, then use
+the seeded phone accounts below for the fixed buyer/seller/admin fixtures.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera
@@ -85,7 +87,7 @@ still supports existing demo accounts and invite-code fallback testing.
 
 1. Start Redis, Supabase, API, and web.
 2. Open `http://localhost:3000`.
-3. Sign in as the buyer with OTP `000000`.
+3. Select the phone fallback and sign in as the buyer with OTP `000000`.
 4. Join `DEV2026` if prompted.
 5. Browse `/marketplace` and open `Walnut study desk`.
 6. Confirm the listing detail shows seller trust signals, pickup area, availability, report listing, and a seller profile link.
@@ -99,6 +101,15 @@ still supports existing demo accounts and invite-code fallback testing.
 14. Create a new listing from `/sell` using a local image file, edit it, publish it, then mark it sold.
 15. Confirm the sold listing leaves marketplace browse and appears in the Sold filter.
 16. Sign in as the admin and open `/admin/reports` to review the seeded report.
+
+## Email-First Onboarding Check
+
+1. Sign out.
+2. Open `/login`.
+3. Enter any `@wisc.edu` email address.
+4. Enter local OTP `000000`.
+5. Join `Dev Campus` by verified email domain.
+6. Confirm `/marketplace` loads without needing an invite code.
 
 ## Expected Local Notes
 

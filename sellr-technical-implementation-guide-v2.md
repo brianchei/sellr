@@ -64,7 +64,7 @@ This document now reflects the **checked-in Phase 0 baseline** for the monorepo.
 | AI (Vision) | OpenAI Responses API + GPT-5.4 / GPT-5.4-mini | Listing assistant, multimodal analysis, structured outputs |
 | AI (Text) | Anthropic Claude Haiku 4.5 | Quick-reply classification; fast and cheap |
 | Push Notifications | Expo Push (wraps FCM + APNs) | Free; works out-of-the-box with managed Expo workflow |
-| Auth | Custom OTP via Twilio Verify + JWT | Phone-number-first, no passwords — Supabase Auth is not used |
+| Auth | Custom OTP via Resend email + Twilio Verify fallback + JWT | Email-first web sign-in, phone fallback, no passwords — Supabase Auth is not used |
 | Hosting | Railway (API) + Supabase (Postgres) + Vercel (web) | Minimal ops; Supabase handles all database infrastructure |
 | Monorepo | Turborepo | Shared packages; incremental builds; Remote Build Cache |
 | Error Tracking | Sentry | Native Expo integration; session replay |
@@ -1113,9 +1113,9 @@ Supabase provides a fully managed PostgreSQL instance with PostGIS pre-installed
 - pgBouncer connection pooling is included — critical for serverless and concurrent workloads
 - The Supabase CLI spins up a local stack (Postgres + PostGIS + Studio UI) that is byte-for-byte compatible with the hosted project
 - Backups, point-in-time recovery, and branching are managed for you
-- Supabase Auth, Storage, and Realtime are available if needed in later phases — but are **not used at MVP** (custom OTP auth via Twilio, Cloudflare R2 for storage, Socket.IO for realtime)
+- Supabase Auth, Storage, and Realtime are available if needed in later phases — but are **not used at MVP** (custom OTP auth via Resend email with Twilio phone fallback, Cloudflare R2 for storage, Socket.IO for realtime)
 
-> **What Supabase Auth is NOT used for:** Sellr uses a custom phone OTP flow via Twilio Verify + JWT. Do not route auth through Supabase Auth — it doesn't natively support the phone-verified, community-gated identity model Sellr requires.
+> **What Supabase Auth is NOT used for:** Sellr uses custom email OTP via Resend, optional phone OTP via Twilio Verify, and JWT sessions. Do not route auth through Supabase Auth — the app needs its own verified-email and invite-code community gate.
 
 ### Step 1: Install the Supabase CLI
 
@@ -2114,7 +2114,7 @@ apps/mobile/app/
 │   ├── phone.tsx         ← Phone number entry
 │   ├── otp.tsx           ← OTP verification
 │   ├── profile.tsx       ← Display name + photo
-│   └── community.tsx     ← Join community (invite code / .edu)
+│   └── community.tsx     ← Join community (verified email domain / invite code)
 ├── (tabs)/
 │   ├── _layout.tsx       ← Tab bar layout
 │   ├── index.tsx         ← Feed (home)
@@ -2417,6 +2417,11 @@ DATABASE_URL=<Supabase pooled connection string, port 6543>
 DIRECT_URL=<Supabase direct connection string, port 5432>
 JWT_SECRET=<generate: openssl rand -base64 64>
 JWT_REFRESH_SECRET=<separate secret>
+RESEND_API_KEY=re_xxx
+EMAIL_FROM="Sellr <verify@send.sellr-ai.com>"
+EMAIL_OTP_ALLOWED_DOMAINS=wisc.edu
+EMAIL_OTP_TTL_SECONDS=600
+EMAIL_OTP_SECRET=<generate: openssl rand -base64 64>
 TWILIO_ACCOUNT_SID=...
 TWILIO_AUTH_TOKEN=...
 TWILIO_VERIFY_SERVICE_SID=...
@@ -2428,9 +2433,9 @@ CLOUDFLARE_ACCOUNT_ID=...
 R2_BUCKET_NAME=...
 R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
-CLOUDFLARE_CDN_URL=https://cdn.sellr.app
+CLOUDFLARE_CDN_URL=https://cdn.sellr-ai.com
 GOOGLE_CLOUD_API_KEY=...
-ALLOWED_ORIGINS=https://app.sellr.com,https://admin.sellr.com
+ALLOWED_ORIGINS=https://app.sellr-ai.com,https://admin.sellr-ai.com
 ```
 
 ### Vercel (Web App)
@@ -2444,10 +2449,11 @@ ALLOWED_ORIGINS=https://app.sellr.com,https://admin.sellr.com
 ### Cloudflare (CDN + DNS)
 
 1. Add your domain to Cloudflare
-2. Point `api.sellr.com` → Railway API URL (proxied)
-3. Point `app.sellr.com` → Vercel deployment (proxied)
-4. Point `cdn.sellr.com` → Cloudflare R2 bucket (for image delivery)
-5. Enable **Cloudflare Images** or configure a Worker for on-the-fly resizing
+2. Point `api.sellr-ai.com` -> Railway API URL (proxied)
+3. Point `app.sellr-ai.com` -> Vercel deployment (proxied)
+4. Point `cdn.sellr-ai.com` -> Cloudflare R2 bucket (for image delivery)
+5. Verify `send.sellr-ai.com` in Resend for transactional email OTP
+6. Enable **Cloudflare Images** or configure a Worker for on-the-fly resizing
 
 **Cloudflare R2 presigned URL setup** (used by the API):
 ```typescript
@@ -2618,14 +2624,14 @@ eas submit --platform all   # Submits to App Store + Google Play
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "env": { "EXPO_PUBLIC_API_URL": "https://api-staging.sellr.com" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://api-staging.sellr-ai.com" }
     },
     "preview": {
       "distribution": "internal",
-      "env": { "EXPO_PUBLIC_API_URL": "https://api-staging.sellr.com" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://api-staging.sellr-ai.com" }
     },
     "production": {
-      "env": { "EXPO_PUBLIC_API_URL": "https://api.sellr.com" },
+      "env": { "EXPO_PUBLIC_API_URL": "https://api.sellr-ai.com" },
       "cache": {
         "key": "sellr-production-cache-v1"
       }
@@ -2634,7 +2640,7 @@ eas submit --platform all   # Submits to App Store + Google Play
   "submit": {
     "production": {
       "ios": {
-        "appleId": "team@sellr.com",
+        "appleId": "team@sellr-ai.com",
         "ascAppId": "YOUR_APP_ID",
         "appleTeamId": "YOUR_TEAM_ID"
       },
@@ -3016,7 +3022,14 @@ JWT_REFRESH_SECRET=change_me_separate_secret
 JWT_ACCESS_TOKEN_TTL=900         # 15 minutes in seconds
 JWT_REFRESH_TOKEN_TTL=2592000    # 30 days in seconds
 
-# ── Twilio ────────────────────────────────────────────────────────────────────
+# ── Auth email OTP ────────────────────────────────────────────────────────────
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+EMAIL_FROM="Sellr <verify@send.sellr-ai.com>"
+EMAIL_OTP_TTL_SECONDS=600
+EMAIL_OTP_ALLOWED_DOMAINS=wisc.edu
+EMAIL_OTP_SECRET=change_me_generate_with_openssl_rand_base64_64
+
+# ── Twilio phone fallback ─────────────────────────────────────────────────────
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_VERIFY_SERVICE_SID=VAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -3040,7 +3053,7 @@ CLOUDFLARE_ACCOUNT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 R2_BUCKET_NAME=sellr-media
 R2_ACCESS_KEY_ID=xxxxxxxxxxxxxxxxxxxx
 R2_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-CLOUDFLARE_CDN_URL=https://cdn.sellr.com
+CLOUDFLARE_CDN_URL=https://cdn.sellr-ai.com
 
 # ── Google Cloud ──────────────────────────────────────────────────────────────
 GOOGLE_CLOUD_API_KEY=AIza...

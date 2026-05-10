@@ -41,8 +41,9 @@ https://api-production-be29.up.railway.app/health
 
 See [`docs/deployment.md`](docs/deployment.md) for the current production
 topology, required environment variables, and post-deploy verification. See
-[`docs/next-session-context.md`](docs/next-session-context.md) for a short
-handoff brief for continuing work in a new agent session.
+[`docs/email-first-auth.md`](docs/email-first-auth.md) for the Resend email OTP
+flow, and [`docs/next-session-context.md`](docs/next-session-context.md) for a
+short handoff brief for continuing work in a new agent session.
 
 ## Repository Layout
 
@@ -155,7 +156,9 @@ server.
 The seed creates a `Dev Campus` community, enables `wisc.edu` email-domain
 join, keeps invite code `DEV2026`, and creates demo listings, a buyer/seller
 conversation, and a demo report. Local email/SMS OTP accepts `000000` when
-providers are not configured.
+providers are not configured. Use any `@wisc.edu` address to test the
+email-first onboarding path locally; the seeded buyer/seller/admin fixtures
+still use phone numbers for repeatable smoke scripts.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera
