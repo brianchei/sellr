@@ -50,6 +50,10 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
+function reporterContact(report: ApiReport): string {
+  return report.reporter.email ?? report.reporter.phoneE164 ?? 'No contact';
+}
+
 function statusToneStyle(status: ApiReportStatus): {
   background: string;
   color: string;
@@ -256,8 +260,7 @@ function ReportCard({
           </span>
         </span>
         <span>
-          ·{' '}
-          <span className="font-mono">{report.reporter.phoneE164}</span>
+          · <span className="font-mono">{reporterContact(report)}</span>
         </span>
         <span>· Resolved {formatDate(report.resolvedAt)}</span>
       </p>
@@ -374,8 +377,7 @@ export default function AdminReportsPage() {
       if (report.reason.toLowerCase().includes(needle)) return true;
       if (report.reporter.displayName.toLowerCase().includes(needle))
         return true;
-      if (report.reporter.phoneE164.toLowerCase().includes(needle))
-        return true;
+      if (reporterContact(report).toLowerCase().includes(needle)) return true;
       if (report.target?.label.toLowerCase().includes(needle)) return true;
       return false;
     });
@@ -469,8 +471,7 @@ export default function AdminReportsPage() {
   const runBulkUpdate = async (nextStatus: ApiReportStatus) => {
     const ids = filteredReports
       .filter(
-        (report) =>
-          selectedIds.has(report.id) && report.status !== nextStatus,
+        (report) => selectedIds.has(report.id) && report.status !== nextStatus,
       )
       .map((report) => report.id);
     if (ids.length === 0) return;
@@ -558,8 +559,8 @@ export default function AdminReportsPage() {
             const active = status === item.value;
             const count =
               item.value === 'all'
-                ? statusCounts['all'] ?? 0
-                : statusCounts[item.value] ?? 0;
+                ? (statusCounts['all'] ?? 0)
+                : (statusCounts[item.value] ?? 0);
             const isOpen = item.value === 'open';
             const isReview = item.value === 'in_review';
             return (
@@ -602,7 +603,10 @@ export default function AdminReportsPage() {
                     active
                       ? {
                           background: 'rgba(255,255,255,0.25)',
-                          color: isOpen || isReview ? 'white' : 'var(--text-primary)',
+                          color:
+                            isOpen || isReview
+                              ? 'white'
+                              : 'var(--text-primary)',
                         }
                       : {
                           background: 'var(--bg-tertiary)',
@@ -710,9 +714,7 @@ export default function AdminReportsPage() {
                 onClick={() => void runBulkUpdate('in_review')}
                 className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {bulkPending === 'in_review'
-                  ? 'Moving…'
-                  : 'Move to review'}
+                {bulkPending === 'in_review' ? 'Moving…' : 'Move to review'}
               </button>
             </div>
           </div>
@@ -722,7 +724,10 @@ export default function AdminReportsPage() {
       {reportsQuery.isLoading ? <ReportSkeleton /> : null}
 
       {reportsQuery.isError &&
-      !(reportsQuery.error instanceof ApiError && reportsQuery.error.status === 403) ? (
+      !(
+        reportsQuery.error instanceof ApiError &&
+        reportsQuery.error.status === 403
+      ) ? (
         <section
           className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"

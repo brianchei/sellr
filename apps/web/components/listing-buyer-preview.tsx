@@ -15,7 +15,7 @@ type ListingBuyerPreviewProps = {
 
 function formatPreviewPrice(value: string): string {
   const amount = Number.parseFloat(value);
-  return Number.isFinite(amount) && amount > 0 ? formatPrice(amount) : '$--';
+  return Number.isFinite(amount) && amount >= 0 ? formatPrice(amount) : '$--';
 }
 
 function formatPreviewAvailability(values: ListingFormValues): string {

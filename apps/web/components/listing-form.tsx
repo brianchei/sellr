@@ -15,6 +15,7 @@ import {
   CATEGORIES,
   CONDITIONS,
   DAYS,
+  PICKUP_AREA_SUGGESTIONS,
   getListingFormErrors,
   type ListingFormValues,
 } from '@/lib/listing-form';
@@ -79,10 +80,10 @@ export function ListingForm({
     : isUploadingImage
       ? 'loading'
       : loadedImageUrl === cleanPhotoUrl
-      ? 'loaded'
-      : failedImageUrl === cleanPhotoUrl
-        ? 'error'
-        : 'loading';
+        ? 'loaded'
+        : failedImageUrl === cleanPhotoUrl
+          ? 'error'
+          : 'loading';
 
   useEffect(() => {
     latestValuesRef.current = values;
@@ -338,7 +339,7 @@ export function ListingForm({
               onChange={(event) => setField('price', event.target.value)}
               onBlur={() => markTouched('price')}
               inputMode="decimal"
-              placeholder="45"
+              placeholder="45 or 0"
               aria-invalid={Boolean(visibleError('price'))}
               aria-describedby="listing-price-error"
               className={fieldClassName(Boolean(visibleError('price')))}
@@ -456,8 +457,8 @@ export function ListingForm({
         <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
           <h2 className="text-base font-semibold">Pickup context</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-            Share enough location detail for discovery without exposing an
-            exact address.
+            Share enough location detail for discovery without exposing an exact
+            address.
           </p>
 
           <label className="mt-4 block text-sm font-medium text-[var(--text-primary)]">
@@ -468,13 +469,19 @@ export function ListingForm({
                 setField('locationNeighborhood', event.target.value)
               }
               onBlur={() => markTouched('locationNeighborhood')}
-              placeholder="North Campus"
+              placeholder="Lakeshore, State Street, or near campus"
+              list="listing-pickup-area-suggestions"
               aria-invalid={Boolean(visibleError('locationNeighborhood'))}
               aria-describedby="listing-neighborhood-error"
               className={fieldClassName(
                 Boolean(visibleError('locationNeighborhood')),
               )}
             />
+            <datalist id="listing-pickup-area-suggestions">
+              {PICKUP_AREA_SUGGESTIONS.map((area) => (
+                <option key={area} value={area} />
+              ))}
+            </datalist>
             <FieldError
               id="listing-neighborhood-error"
               message={visibleError('locationNeighborhood')}

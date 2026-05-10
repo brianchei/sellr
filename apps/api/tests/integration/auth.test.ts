@@ -11,6 +11,7 @@ import {
   prisma,
   truncateAll,
 } from './setup';
+import { clearFakeRedis } from './mocks';
 
 describe.skipIf(!integrationDbAvailable)('auth integration', () => {
   let app: FastifyInstance;
@@ -26,6 +27,91 @@ describe.skipIf(!integrationDbAvailable)('auth integration', () => {
 
   beforeEach(async () => {
     await truncateAll();
+    clearFakeRedis();
+  });
+
+  describe('POST /api/v1/auth/email/send + verify', () => {
+    it('sends and verifies a wisc.edu email OTP in local mode', async () => {
+      const email = 'Bucky.Badger@wisc.edu';
+      const send = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/email/send',
+        payload: { email },
+      });
+      expect(send.statusCode).toBe(200);
+
+      const verify = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/email/verify',
+        headers: { 'x-sellr-client': 'web' },
+        payload: { email, code: '000000' },
+      });
+
+      expect(verify.statusCode).toBe(200);
+      const body = verify.json<{ data: { userId: string } }>();
+      expect(body.data.userId).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      );
+
+      const setCookie = verify.headers['set-cookie'];
+      const cookies = Array.isArray(setCookie)
+        ? setCookie
+        : typeof setCookie === 'string'
+          ? [setCookie]
+          : [];
+      expect(cookies.some((c) => c.startsWith('sellr_access='))).toBe(true);
+      expect(cookies.some((c) => c.startsWith('sellr_refresh='))).toBe(true);
+
+      const user = await prisma.user.findUnique({
+        where: { email: email.toLowerCase() },
+      });
+      expect(user).not.toBeNull();
+      expect(user?.phoneE164).toBeNull();
+      expect(user?.emailVerifiedAt).toBeInstanceOf(Date);
+      expect(user?.verifiedAt).toBeInstanceOf(Date);
+    });
+
+    it('rejects email OTP sends outside the launch student domain', async () => {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/email/send',
+        payload: { email: 'friend@example.com' },
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.json<{ error: string }>().error).toMatch(/wisc\.edu/i);
+    });
+
+    it('refuses production email OTP sends without Resend config', async () => {
+      const originalNodeEnv = process.env.NODE_ENV;
+      const originalResendKey = process.env.RESEND_API_KEY;
+      const originalEmailFrom = process.env.EMAIL_FROM;
+      process.env.NODE_ENV = 'production';
+      Reflect.deleteProperty(process.env, 'RESEND_API_KEY');
+      Reflect.deleteProperty(process.env, 'EMAIL_FROM');
+
+      try {
+        const res = await app.inject({
+          method: 'POST',
+          url: '/api/v1/auth/email/send',
+          payload: { email: 'student@wisc.edu' },
+        });
+
+        expect(res.statusCode).toBe(503);
+      } finally {
+        process.env.NODE_ENV = originalNodeEnv;
+        if (originalResendKey === undefined) {
+          Reflect.deleteProperty(process.env, 'RESEND_API_KEY');
+        } else {
+          process.env.RESEND_API_KEY = originalResendKey;
+        }
+        if (originalEmailFrom === undefined) {
+          Reflect.deleteProperty(process.env, 'EMAIL_FROM');
+        } else {
+          process.env.EMAIL_FROM = originalEmailFrom;
+        }
+      }
+    });
   });
 
   describe('POST /api/v1/auth/otp/verify', () => {

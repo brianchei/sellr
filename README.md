@@ -23,8 +23,9 @@ the dashboard.
 
 The production web SLC is deployed and in hardening. GitHub Actions CI and
 production migration checks are passing, the Fastify API is deployed on Railway,
-the web app is deployed on Vercel, Twilio OTP works in production, and durable
-R2-backed listing media plus media lifecycle cleanup have been smoke-tested.
+the web app is deployed on Vercel, email OTP is the primary launch sign-in path,
+Twilio remains available for phone fallback, and durable R2-backed listing media
+plus media lifecycle cleanup have been smoke-tested.
 The current production origins are:
 
 ```text
@@ -71,12 +72,13 @@ sellr/
 - **Mobile:** Expo React Native with Expo Router
 - **Web:** Next.js 16, React 19, Tailwind CSS 4
 - **Shared contracts:** `@sellr/shared` and `@sellr/api-client`
-- **Observability/integrations:** Sentry, PostHog, Langfuse, Twilio, Expo Push,
-  OpenAI, Anthropic, and Cloudflare R2 listing media storage
+- **Observability/integrations:** Sentry, PostHog, Langfuse, Resend, Twilio,
+  Expo Push, OpenAI, Anthropic, and Cloudflare R2 listing media storage
 
 ## Key Capabilities
 
-- Phone-first OTP authentication with mobile tokens and web httpOnly cookies
+- Email-first OTP authentication on web, with phone OTP fallback and mobile
+  tokens/web httpOnly cookies
 - Verified community membership through invite codes or institutional email
   domains
 - Community-scoped listings with status, condition, pricing, photos,
@@ -150,8 +152,10 @@ server.
 
 ## Local Demo Flow
 
-The seed creates a `Dev Campus` community, invite code `DEV2026`, demo listings,
-a buyer/seller conversation, and a demo report. Local OTP accepts `000000`.
+The seed creates a `Dev Campus` community, enables `wisc.edu` email-domain
+join, keeps invite code `DEV2026`, and creates demo listings, a buyer/seller
+conversation, and a demo report. Local email/SMS OTP accepts `000000` when
+providers are not configured.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera
@@ -224,8 +228,9 @@ that topology.
   `tsx src/index.ts`. This avoids the Prisma 7 generated-client runtime issue
   that occurred when running the compiled `dist/index.js` output directly.
 - Railway API variables must include full Supabase `DATABASE_URL`/`DIRECT_URL`,
-  a full Redis URL in `REDIS_URL`, `JWT_SECRET`, Twilio Verify variables for
-  real production OTP, and Cloudflare R2 variables for durable listing media.
+  a full Redis URL in `REDIS_URL`, `JWT_SECRET`, Resend email OTP variables for
+  primary web sign-in, and Cloudflare R2 variables for durable listing media.
+  Twilio Verify variables are still used for the phone sign-in fallback.
 - `NO_CACHE=1` was only a one-time Railway cache repair flag. Remove it after a
   successful clean deploy.
 - The web app should call same-origin `/api/v1` in the browser. For Vercel,

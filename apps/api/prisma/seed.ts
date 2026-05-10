@@ -105,10 +105,7 @@ async function resetDemoCommunityData({
 
   const conversations = await prisma.conversation.findMany({
     where: {
-      OR: [
-        { listingId: { in: listingIds } },
-        { offerId: { in: offerIds } },
-      ],
+      OR: [{ listingId: { in: listingIds } }, { offerId: { in: offerIds } }],
     },
     select: { id: true },
   });
@@ -290,8 +287,20 @@ async function main() {
       data: {
         name: 'Dev Campus',
         type: 'campus',
-        accessMethod: 'invite_code',
+        accessMethod: 'email_domain',
+        emailDomain: 'wisc.edu',
         rules: [],
+      },
+    });
+  } else if (
+    community.accessMethod !== 'email_domain' ||
+    community.emailDomain !== 'wisc.edu'
+  ) {
+    community = await prisma.community.update({
+      where: { id: community.id },
+      data: {
+        accessMethod: 'email_domain',
+        emailDomain: 'wisc.edu',
       },
     });
   }

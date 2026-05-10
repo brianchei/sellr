@@ -107,7 +107,8 @@ Before a production demo or release handoff:
 - Confirm Vercel production is on latest `main` before debugging missing UI.
 - Confirm Vercel same-origin `/api/v1` proxy returns `{"error":"Unauthorized"}`
   from `/api/v1/auth/me` when logged out.
-- Confirm Twilio Verify sends real OTP in production.
+- Confirm Resend sends real email OTP in production; confirm Twilio only if the
+  phone fallback is part of the release smoke.
 - Confirm new listing image uploads return the configured R2/CDN origin and
   still load after a Railway API redeploy.
 - Confirm admin/community setup works for invite creation and member
@@ -147,12 +148,12 @@ widths:
 
 ## Demo Data
 
-The seed creates the `Dev Campus` community and invite code `DEV2026`.
-Local OTP accepts `000000`.
-When Twilio Verify is not configured locally, OTP send requests skip the
-per-phone hourly SMS limiter so repeated demo sign-ins do not get stuck before
-the verification-code step. Real SMS sends still use the production-style
-per-phone limiter.
+The seed creates the `Dev Campus` community, enables `wisc.edu` email-domain
+join locally, and keeps invite code `DEV2026` for fallback testing.
+Local email and SMS OTP accept `000000` when Resend/Twilio are not configured.
+Email sign-in is the primary web path for launch, while phone sign-in remains
+available for demo accounts and invite-code fallback testing. Real provider
+sends still use production-style rate limits.
 
 - Seller: `+15550000001` / Maya Chen
 - Buyer: `+15550000002` / Jordan Rivera

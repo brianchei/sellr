@@ -25,9 +25,9 @@ https://sellr-web.vercel.app
 https://api-production-be29.up.railway.app
 ```
 
-- Production Twilio OTP, same-origin web rewrites, admin/community setup,
-  durable R2 listing image uploads, and media lifecycle cleanup have been
-  deployed and smoke-tested.
+- Production email OTP, same-origin web rewrites, admin/community setup,
+  durable R2 listing image uploads, and media lifecycle cleanup are part of the
+  launch path. Twilio remains available for the phone sign-in fallback.
 
 ## Production Topology
 
@@ -65,9 +65,8 @@ DIRECT_URL
 REDIS_URL
 JWT_SECRET
 ALLOWED_ORIGINS
-TWILIO_ACCOUNT_SID
-TWILIO_AUTH_TOKEN
-TWILIO_VERIFY_SERVICE_SID
+RESEND_API_KEY
+EMAIL_FROM
 CLOUDFLARE_ACCOUNT_ID
 R2_BUCKET_NAME
 R2_ACCESS_KEY_ID
@@ -78,6 +77,11 @@ CLOUDFLARE_CDN_URL
 Recommended optional variables when the corresponding services are configured:
 
 ```text
+EMAIL_OTP_TTL_SECONDS
+EMAIL_OTP_ALLOWED_DOMAINS
+TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN
+TWILIO_VERIFY_SERVICE_SID
 ALGOLIA_APP_ID
 ALGOLIA_API_KEY
 ALGOLIA_SEARCH_KEY
@@ -259,10 +263,22 @@ DIRECT_URL
 
 These belong in GitHub Actions **Secrets**, not GitHub Actions Variables.
 
-## Production OTP
+## Production Email OTP
 
-Local OTP code `000000` is disabled in production. Production login requires
-Twilio Verify:
+Local OTP code `000000` is disabled in production. The primary web login path
+uses Resend email OTP for verified student email sign-in:
+
+```text
+RESEND_API_KEY
+EMAIL_FROM
+EMAIL_OTP_TTL_SECONDS=600
+EMAIL_OTP_ALLOWED_DOMAINS=wisc.edu
+```
+
+If `RESEND_API_KEY` or `EMAIL_FROM` is missing in Railway, email sign-in fails
+with `Email sign-in is not configured`.
+
+Twilio Verify remains the phone sign-in fallback for invited testers or mobile:
 
 ```text
 TWILIO_ACCOUNT_SID
@@ -270,7 +286,7 @@ TWILIO_AUTH_TOKEN
 TWILIO_VERIFY_SERVICE_SID
 ```
 
-If these are missing in Railway, login will fail with
+If these are missing in Railway, phone sign-in will fail with
 `Twilio Verify is not configured`.
 
 ## Known Production Caveats
@@ -294,7 +310,7 @@ After deploying API and web:
 
 1. Open `/health` on the Railway API origin.
 2. Open the Vercel web origin.
-3. Log in with a real Twilio OTP.
+3. Log in with a real `@wisc.edu` email OTP.
 4. Browse marketplace listings.
 5. Create a listing with a local image upload.
 6. Open the listing detail page.

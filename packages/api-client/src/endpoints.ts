@@ -6,6 +6,8 @@ export type ApiUserTrustProfile = {
   displayName: string;
   avatarUrl: string | null;
   verifiedAt: string | null;
+  email?: string | null;
+  emailVerifiedAt?: string | null;
   createdAt: string;
   memberSince: string | null;
   listingCount: number;
@@ -103,7 +105,9 @@ export type ApiReport = {
   reporter: {
     id: string;
     displayName: string;
-    phoneE164: string;
+    phoneE164: string | null;
+    email: string | null;
+    emailVerifiedAt: string | null;
   };
   target: {
     label: string;
@@ -131,7 +135,9 @@ export type ApiCommunityAdminMember = {
   joinedAt: string;
   user: {
     id: string;
-    phoneE164: string;
+    phoneE164: string | null;
+    email: string | null;
+    emailVerifiedAt: string | null;
     displayName: string;
     avatarUrl: string | null;
     verifiedAt: string | null;
@@ -183,6 +189,8 @@ export type AuthTokens = {
 /** Web: OTP success via httpOnly cookies only (no tokens in JSON). */
 export type VerifyOtpWebResult = { userId: string };
 
+export type VerifyEmailOtpWebResult = { userId: string };
+
 export function sendOtp(phoneE164: string) {
   return apiFetch<{ sent: boolean }>('/auth/otp/send', {
     method: 'POST',
@@ -196,6 +204,24 @@ export function verifyOtp(body: {
   deviceFingerprint?: string;
 }) {
   return apiFetch<AuthTokens | VerifyOtpWebResult>('/auth/otp/verify', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
+export function sendEmailOtp(email: string) {
+  return apiFetch<{ sent: boolean }>('/auth/email/send', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function verifyEmailOtp(body: {
+  email: string;
+  code: string;
+  deviceFingerprint?: string;
+}) {
+  return apiFetch<AuthTokens | VerifyEmailOtpWebResult>('/auth/email/verify', {
     method: 'POST',
     body: JSON.stringify(body),
   });
@@ -231,7 +257,9 @@ export function fetchMe() {
   return apiFetch<{
     user: ApiUserTrustProfile & {
       id: string;
-      phoneE164: string;
+      phoneE164: string | null;
+      email: string | null;
+      emailVerifiedAt: string | null;
     };
     communityIds: string[];
   }>('/auth/me');
@@ -241,7 +269,9 @@ export function updateProfile(body: UpdateProfileInput) {
   return apiFetch<{
     user: ApiUserTrustProfile & {
       id: string;
-      phoneE164: string;
+      phoneE164: string | null;
+      email: string | null;
+      emailVerifiedAt: string | null;
     };
     communityIds: string[];
   }>('/auth/me', {

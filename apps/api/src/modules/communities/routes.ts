@@ -11,6 +11,7 @@ import { ok } from '../../lib/response';
 import { issueTokenPair } from '../../lib/authTokens';
 import { isWebClient, setAuthCookies } from '../../lib/authCookies';
 import { verifyJWT } from '../../middleware/auth';
+import { normalizeEmail } from '../../lib/otp';
 
 const INACTIVE_MEMBERSHIP_ERROR =
   'Membership is inactive. Ask a community admin to reactivate access.';
@@ -95,7 +96,22 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         inviteId = inv.id;
         inviteUseLimit = { maxUses: inv.maxUses, useCount: inv.useCount };
       } else if (body.institutionalEmail) {
-        const domain = body.institutionalEmail.split('@')[1];
+        const requestedEmail = normalizeEmail(body.institutionalEmail);
+        const user = await prisma.user.findUnique({
+          where: { id: request.user.sub },
+          select: { email: true, emailVerifiedAt: true },
+        });
+        if (
+          !user?.email ||
+          !user.emailVerifiedAt ||
+          normalizeEmail(user.email) !== requestedEmail
+        ) {
+          return reply.code(403).send({
+            error: 'Verify this email before joining by email domain',
+          });
+        }
+
+        const domain = requestedEmail.split('@')[1];
         if (!domain) {
           return reply.code(400).send({ error: 'Invalid email' });
         }
@@ -189,6 +205,8 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
               select: {
                 id: true,
                 phoneE164: true,
+                email: true,
+                emailVerifiedAt: true,
                 displayName: true,
                 avatarUrl: true,
                 verifiedAt: true,
@@ -284,6 +302,8 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
             select: {
               id: true,
               phoneE164: true,
+              email: true,
+              emailVerifiedAt: true,
               displayName: true,
               avatarUrl: true,
               verifiedAt: true,
@@ -328,6 +348,8 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
             select: {
               id: true,
               phoneE164: true,
+              email: true,
+              emailVerifiedAt: true,
               displayName: true,
               avatarUrl: true,
               verifiedAt: true,

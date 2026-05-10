@@ -1,7 +1,9 @@
 import type { UserRole, CommunityType, CommunityAccessMethod, ListingStatus, ListingCondition, OfferStatus, MeetupStatus, ConversationType, ReportTargetType, ReportSeverity, NotificationType } from './enums';
 export interface User {
     id: string;
-    phoneE164: string;
+    phoneE164: string | null;
+    email: string | null;
+    emailVerifiedAt: string | null;
     displayName: string;
     avatarUrl: string | null;
     verifiedAt: string | null;

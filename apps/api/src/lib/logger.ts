@@ -17,5 +17,10 @@ export const logger = pino({
     res: pino.stdSerializers.res,
     err: pino.stdSerializers.err,
   },
-  redact: ['req.headers.authorization', 'body.phoneE164', 'body.code'],
+  redact: [
+    'req.headers.authorization',
+    'body.phoneE164',
+    'body.email',
+    'body.code',
+  ],
 });

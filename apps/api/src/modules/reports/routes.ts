@@ -213,7 +213,12 @@ async function targetSummaries(
     userIds.length
       ? prisma.user.findMany({
           where: { id: { in: userIds } },
-          select: { id: true, displayName: true, phoneE164: true },
+          select: {
+            id: true,
+            displayName: true,
+            phoneE164: true,
+            email: true,
+          },
         })
       : [],
   ]);
@@ -262,7 +267,7 @@ async function targetSummaries(
         user
           ? {
               label: user.displayName,
-              detail: `Member - ${user.phoneE164}`,
+              detail: `Member - ${user.email ?? user.phoneE164 ?? 'No contact on file'}`,
               href: null,
               communityId: null,
             }
@@ -331,6 +336,8 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
               id: true,
               displayName: true,
               phoneE164: true,
+              email: true,
+              emailVerifiedAt: true,
             },
           },
         },
@@ -432,6 +439,8 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
               id: true,
               displayName: true,
               phoneE164: true,
+              email: true,
+              emailVerifiedAt: true,
             },
           },
         },
@@ -512,6 +521,8 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
                 id: true,
                 displayName: true,
                 phoneE164: true,
+                email: true,
+                emailVerifiedAt: true,
               },
             },
           },

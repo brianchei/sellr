@@ -3,17 +3,20 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-} from 'react';
-import { sendOtp, setAccessToken, verifyOtp } from '@sellr/api-client';
+  sendEmailOtp,
+  sendOtp,
+  setAccessToken,
+  verifyEmailOtp,
+  verifyOtp,
+} from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 
 const RESEND_COOLDOWN_SECONDS = 30;
 const OTP_CODE_LENGTH = 6;
+
+type LoginStep = 'email' | 'email-code' | 'phone' | 'phone-code';
 
 function getOtpErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : '';
@@ -28,6 +31,10 @@ function getOtpErrorMessage(error: unknown): string {
   return message || 'Invalid or expired code';
 }
 
+function isWiscEmail(value: string): boolean {
+  return value.trim().toLowerCase().endsWith('@wisc.edu');
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const {
@@ -37,14 +44,20 @@ export default function LoginPage() {
     refreshSession,
     setSession,
   } = useAuth();
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [step, setStep] = useState<LoginStep>('email');
+  const [email, setEmail] = useState('');
   const [phoneE164, setPhoneE164] = useState('+1');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendIn, setResendIn] = useState(0);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
   const phoneInputRef = useRef<HTMLInputElement | null>(null);
   const codeInputRef = useRef<HTMLInputElement | null>(null);
+
+  const isEmailFlow = step === 'email' || step === 'email-code';
+  const isCodeStep = step === 'email-code' || step === 'phone-code';
+  const destination = isEmailFlow ? email.trim().toLowerCase() : phoneE164;
 
   useEffect(() => {
     if (hydrated && isAuthenticated && communityIds !== null) {
@@ -61,19 +74,57 @@ export default function LoginPage() {
   }, [resendIn]);
 
   useEffect(() => {
-    if (step === 'phone') {
+    if (step === 'email') {
+      emailInputRef.current?.focus();
+    } else if (step === 'phone') {
       phoneInputRef.current?.focus();
-    } else if (step === 'otp') {
+    } else {
       codeInputRef.current?.focus();
     }
   }, [step]);
 
-  const onSendOtp = async () => {
+  const finishAuth = async (res: { userId: string; accessToken?: string }) => {
+    if (res.accessToken) {
+      setAccessToken(res.accessToken);
+    } else {
+      setAccessToken(null);
+    }
+    setSession(res.userId);
+    const session = await refreshSession();
+    router.replace(
+      session && session.communityIds.length > 0 ? '/dashboard' : '/onboarding',
+    );
+  };
+
+  const onSendEmailOtp = async () => {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!isWiscEmail(cleanEmail)) {
+      setError('Use your wisc.edu email for student email sign-in.');
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+    try {
+      await sendEmailOtp(cleanEmail);
+      setEmail(cleanEmail);
+      setCode('');
+      setStep('email-code');
+      setResendIn(RESEND_COOLDOWN_SECONDS);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to send code');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSendPhoneOtp = async () => {
     setError(null);
     setLoading(true);
     try {
       await sendOtp(phoneE164.trim());
-      setStep('otp');
+      setCode('');
+      setStep('phone-code');
       setResendIn(RESEND_COOLDOWN_SECONDS);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to send code');
@@ -84,15 +135,12 @@ export default function LoginPage() {
 
   const onResend = async () => {
     if (resendIn > 0 || loading) return;
-    setError(null);
-    setLoading(true);
-    try {
-      await sendOtp(phoneE164.trim());
-      setResendIn(RESEND_COOLDOWN_SECONDS);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to send code');
-    } finally {
-      setLoading(false);
+    if (step === 'email-code') {
+      await onSendEmailOtp();
+      return;
+    }
+    if (step === 'phone-code') {
+      await onSendPhoneOtp();
     }
   };
 
@@ -106,22 +154,17 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await verifyOtp({
-        phoneE164: phoneE164.trim(),
-        code: trimmedCode,
-      });
-      if ('accessToken' in res) {
-        setAccessToken(res.accessToken);
-      } else {
-        setAccessToken(null);
-      }
-      setSession(res.userId);
-      const session = await refreshSession();
-      router.replace(
-        session && session.communityIds.length > 0
-          ? '/dashboard'
-          : '/onboarding',
-      );
+      const res =
+        step === 'email-code'
+          ? await verifyEmailOtp({
+              email: email.trim().toLowerCase(),
+              code: trimmedCode,
+            })
+          : await verifyOtp({
+              phoneE164: phoneE164.trim(),
+              code: trimmedCode,
+            });
+      await finishAuth(res);
     } catch (e) {
       setError(getOtpErrorMessage(e));
     } finally {
@@ -129,10 +172,16 @@ export default function LoginPage() {
     }
   };
 
+  const handleEmailSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (loading) return;
+    void onSendEmailOtp();
+  };
+
   const handlePhoneSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (loading || phoneE164.trim().length < 8) return;
-    void onSendOtp();
+    void onSendPhoneOtp();
   };
 
   const handleOtpSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -148,6 +197,13 @@ export default function LoginPage() {
     if (next.length === OTP_CODE_LENGTH && !loading) {
       void onVerify(next);
     }
+  };
+
+  const switchStep = (nextStep: LoginStep) => {
+    setStep(nextStep);
+    setCode('');
+    setError(null);
+    setResendIn(0);
   };
 
   if (!hydrated) {
@@ -191,9 +247,51 @@ export default function LoginPage() {
           Sign in to Sellr
         </h1>
         <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-          We verify one phone per member so your community knows who they are
-          buying from.
+          UW-Madison students can use a verified wisc.edu email. Invited testers
+          can still use phone sign-in.
         </p>
+
+        {step === 'email' ? (
+          <form onSubmit={handleEmailSubmit} className="mt-6">
+            <label className="block text-sm font-medium text-[var(--text-primary)]">
+              Student email
+              <input
+                ref={emailInputRef}
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setError(null);
+                }}
+                type="email"
+                autoComplete="email"
+                placeholder="you@wisc.edu"
+                aria-describedby="login-email-help"
+                className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              />
+            </label>
+            <p
+              id="login-email-help"
+              className="mt-1.5 text-xs text-[var(--text-tertiary)]"
+            >
+              Email verification keeps the launch community student-scoped
+              without relying on SMS.
+            </p>
+            <button
+              type="submit"
+              disabled={loading || !isWiscEmail(email)}
+              className="mt-4 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? 'Sending code...' : 'Send code'}
+            </button>
+            <button
+              type="button"
+              onClick={() => switchStep('phone')}
+              className="mt-3 w-full text-center text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--color-brand-contrast)] hover:underline"
+            >
+              Use phone sign-in instead
+            </button>
+          </form>
+        ) : null}
 
         {step === 'phone' ? (
           <form onSubmit={handlePhoneSubmit} className="mt-6">
@@ -215,8 +313,7 @@ export default function LoginPage() {
               id="login-phone-help"
               className="mt-1.5 text-xs text-[var(--text-tertiary)]"
             >
-              Use international format like +15551234567. Standard SMS rates
-              apply.
+              Use this path only if you are joining with an invite code.
             </p>
             <button
               type="submit"
@@ -225,13 +322,22 @@ export default function LoginPage() {
             >
               {loading ? 'Sending code...' : 'Send code'}
             </button>
+            <button
+              type="button"
+              onClick={() => switchStep('email')}
+              className="mt-3 w-full text-center text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--color-brand-contrast)] hover:underline"
+            >
+              Use student email instead
+            </button>
           </form>
-        ) : (
+        ) : null}
+
+        {isCodeStep ? (
           <form onSubmit={handleOtpSubmit} className="mt-6">
             <p className="text-sm text-[var(--text-secondary)]">
               We sent a code to{' '}
               <span className="font-medium text-[var(--text-primary)]">
-                {phoneE164}
+                {destination}
               </span>
               .
             </p>
@@ -268,19 +374,14 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setStep('phone');
-                  setCode('');
-                  setError(null);
-                  setResendIn(0);
-                }}
+                onClick={() => switchStep(isEmailFlow ? 'email' : 'phone')}
                 className="font-medium text-[var(--text-tertiary)] hover:text-[var(--color-brand-contrast)] hover:underline"
               >
-                Change number
+                Change {isEmailFlow ? 'email' : 'number'}
               </button>
             </div>
           </form>
-        )}
+        ) : null}
 
         {error ? (
           <p
@@ -293,10 +394,10 @@ export default function LoginPage() {
 
         <ul className="mt-6 space-y-2 border-t border-[var(--border-default)] pt-5 text-xs text-[var(--text-secondary)]">
           <TrustPoint>
-            We keep your number private from other community members.
+            Student email verification is the primary launch trust signal.
           </TrustPoint>
           <TrustPoint>
-            Verified phone is used to sign in and recover your account.
+            Phone sign-in remains available for invite-only access.
           </TrustPoint>
         </ul>
 
@@ -305,9 +406,8 @@ export default function LoginPage() {
             Trouble receiving the code?
           </summary>
           <p className="mt-2 leading-5">
-            Make sure the number is in international format (for example,{' '}
-            <span className="font-mono">+15551234567</span>). In a development
-            build without Twilio, the demo code is{' '}
+            Check spam for email codes. In a local development build without an
+            email or SMS provider, the demo code is{' '}
             <span className="font-mono text-[var(--text-primary)]">000000</span>
             .
           </p>

@@ -181,6 +181,84 @@ describe.skipIf(!integrationDbAvailable)('communities integration', () => {
   });
 
   describe('POST /api/v1/communities/join', () => {
+    it('lets a verified student email join a matching email-domain community', async () => {
+      const user = await createUser({
+        phoneE164: null,
+        email: 'student@wisc.edu',
+      });
+      const community = await createCommunity({
+        name: 'Badger Market',
+        type: 'campus',
+        accessMethod: 'email_domain',
+        emailDomain: 'wisc.edu',
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/v1/communities/join',
+        headers: { cookie: await accessCookieFor(app, user.id) },
+        payload: { institutionalEmail: 'student@wisc.edu' },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(
+        res.json<{ data: { communityId: string } }>().data.communityId,
+      ).toBe(community.id);
+
+      const membership = await prisma.communityMember.findUnique({
+        where: {
+          userId_communityId: {
+            userId: user.id,
+            communityId: community.id,
+          },
+        },
+      });
+      expect(membership?.status).toBe('active');
+    });
+
+    it('rejects email-domain join when the requested email is not verified on the user', async () => {
+      const user = await createUser({
+        phoneE164: null,
+        email: 'student@wisc.edu',
+      });
+      await createCommunity({
+        type: 'campus',
+        accessMethod: 'email_domain',
+        emailDomain: 'wisc.edu',
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/v1/communities/join',
+        headers: { cookie: await accessCookieFor(app, user.id) },
+        payload: { institutionalEmail: 'other@wisc.edu' },
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
+
+    it('rejects email-domain join for unverified email users', async () => {
+      const user = await createUser({
+        phoneE164: null,
+        email: 'student@wisc.edu',
+        emailVerified: false,
+      });
+      await createCommunity({
+        type: 'campus',
+        accessMethod: 'email_domain',
+        emailDomain: 'wisc.edu',
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/v1/communities/join',
+        headers: { cookie: await accessCookieFor(app, user.id) },
+        payload: { institutionalEmail: 'student@wisc.edu' },
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
+
     it('does not let inactive members reactivate themselves with an invite code', async () => {
       const admin = await createUser();
       const member = await createUser();

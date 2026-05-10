@@ -13,6 +13,14 @@ export declare const VerifyOTPSchema: z.ZodObject<{
     code: z.ZodString;
     deviceFingerprint: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+export declare const SendEmailOTPSchema: z.ZodObject<{
+    email: z.ZodPipe<z.ZodString, z.ZodEmail>;
+}, z.core.$strip>;
+export declare const VerifyEmailOTPSchema: z.ZodObject<{
+    email: z.ZodPipe<z.ZodString, z.ZodEmail>;
+    code: z.ZodString;
+    deviceFingerprint: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
 /** Mobile sends `refreshToken` in the body; the web app uses an httpOnly cookie (see API). */
 export declare const RefreshTokenSchema: z.ZodObject<{
     refreshToken: z.ZodOptional<z.ZodString>;

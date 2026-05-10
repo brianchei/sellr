@@ -119,16 +119,28 @@ export function uniquePhone(): string {
 
 export async function createUser(
   overrides: Partial<{
-    phoneE164: string;
+    phoneE164: string | null;
+    email: string;
+    emailVerified: boolean;
     displayName: string;
     verified: boolean;
   }> = {},
 ) {
-  const phoneE164 = overrides.phoneE164 ?? uniquePhone();
+  const phoneE164 =
+    overrides.phoneE164 === undefined ? uniquePhone() : overrides.phoneE164;
+  const email = overrides.email?.trim().toLowerCase();
+  const contactLabel = phoneE164 ?? email ?? 'member';
   return prisma.user.create({
     data: {
-      phoneE164,
-      displayName: overrides.displayName ?? `Member ${phoneE164.slice(-4)}`,
+      ...(phoneE164 ? { phoneE164 } : {}),
+      ...(email
+        ? {
+            email,
+            emailVerifiedAt:
+              overrides.emailVerified === false ? null : new Date(),
+          }
+        : {}),
+      displayName: overrides.displayName ?? `Member ${contactLabel.slice(-4)}`,
       verifiedAt: overrides.verified === false ? null : new Date(),
     },
   });
