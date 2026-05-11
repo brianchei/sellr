@@ -2435,7 +2435,7 @@ R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
 CLOUDFLARE_CDN_URL=https://cdn.sellr-ai.com
 GOOGLE_CLOUD_API_KEY=...
-ALLOWED_ORIGINS=https://app.sellr-ai.com,https://admin.sellr-ai.com
+ALLOWED_ORIGINS=https://sellr-ai.com,https://www.sellr-ai.com
 ```
 
 ### Vercel (Web App)
@@ -2449,8 +2449,8 @@ ALLOWED_ORIGINS=https://app.sellr-ai.com,https://admin.sellr-ai.com
 ### Cloudflare (CDN + DNS)
 
 1. Add your domain to Cloudflare
-2. Point `api.sellr-ai.com` -> Railway API URL (proxied)
-3. Point `app.sellr-ai.com` -> Vercel deployment (proxied)
+2. Point `api.sellr-ai.com` -> Railway API custom domain
+3. Point `sellr-ai.com` and `www.sellr-ai.com` -> Vercel deployment
 4. Point `cdn.sellr-ai.com` -> Cloudflare R2 bucket (for image delivery)
 5. Verify `send.sellr-ai.com` in Resend for transactional email OTP
 6. Enable **Cloudflare Images** or configure a Worker for on-the-fly resizing

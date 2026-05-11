@@ -51,10 +51,11 @@ work correctly.
 Required production web variables:
 
 ```text
-INTERNAL_API_URL=https://api-production-be29.up.railway.app
+INTERNAL_API_URL=https://api.sellr-ai.com
 NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
-NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
-NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://<listing-image-cdn-origin>
+NEXT_PUBLIC_REALTIME_URL=https://api.sellr-ai.com
+NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://cdn.sellr-ai.com
+NEXT_PUBLIC_SITE_URL=https://sellr-ai.com
 ```
 
 Resend and Twilio variables belong on the Railway API service, not in the web
@@ -69,7 +70,7 @@ flow is intentionally changed away from same-origin cookie sessions.
 After Vercel creates the web origin, add it to the Railway API service:
 
 ```text
-ALLOWED_ORIGINS=https://sellr-web.vercel.app
+ALLOWED_ORIGINS=https://sellr-ai.com,https://www.sellr-ai.com,https://sellr-web.vercel.app
 ```
 
 Vercel Web Analytics and Speed Insights are mounted in `app/layout.tsx`; enable

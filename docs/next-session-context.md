@@ -40,20 +40,24 @@ explicitly requested.
 - Vercel hosts the production web app:
 
 ```text
-https://sellr-web.vercel.app
+https://sellr-ai.com
 ```
 
-- Current Railway API origin:
+- Current public Railway API origin:
 
 ```text
-https://api-production-be29.up.railway.app
+https://api.sellr-ai.com
 ```
 
 - API health URL:
 
 ```text
-https://api-production-be29.up.railway.app/health
+https://api.sellr-ai.com/health
 ```
+
+- Provider backing URLs remain available for diagnostics and rollback:
+  `https://sellr-web.vercel.app` and
+  `https://api-production-be29.up.railway.app`.
 
 - Production login uses Resend email OTP for verified student email, with
   Twilio SMS retained as a phone fallback for invite-only users.
@@ -61,7 +65,7 @@ https://api-production-be29.up.railway.app/health
   expected unauthenticated proxy check is `{"error":"Unauthorized"}` from:
 
 ```text
-https://sellr-web.vercel.app/api/v1/auth/me
+https://sellr-ai.com/api/v1/auth/me
 ```
 
 - Durable listing image storage has been verified: new uploads return an R2/CDN
@@ -87,16 +91,17 @@ https://sellr-web.vercel.app/api/v1/auth/me
   it is still present after a successful clean deploy.
 - The web app should preserve httpOnly cookie auth by calling same-origin
   `/api/v1` in the browser. Vercel/Next rewrites that path to Railway through
-  `INTERNAL_API_URL`.
+  `INTERNAL_API_URL=https://api.sellr-ai.com`.
 - `turbo.json` must allow production web build env vars such as
   `INTERNAL_API_URL`, `NEXT_PUBLIC_USE_SAME_ORIGIN_API`,
-  `NEXT_PUBLIC_REALTIME_URL`, and `NEXT_PUBLIC_LISTING_IMAGE_CDN_URL`; otherwise
-  Vercel can silently bake local fallback values into the build.
+  `NEXT_PUBLIC_REALTIME_URL`, `NEXT_PUBLIC_LISTING_IMAGE_CDN_URL`, and
+  `NEXT_PUBLIC_SITE_URL`; otherwise Vercel can silently bake local fallback
+  values into the build.
 - Do not set `NEXT_PUBLIC_API_URL` for the normal production web flow unless the
   auth architecture is intentionally changed.
 - Production can temporarily use a Cloudflare R2 Public Development URL for
   listing images, but a real custom media domain such as
-  `cdn.<production-domain>` is the better long-term production setup.
+  `cdn.sellr-ai.com` is the better long-term production setup.
 
 ## Required Production Env Vars
 
@@ -107,7 +112,7 @@ DATABASE_URL
 DIRECT_URL
 REDIS_URL
 JWT_SECRET
-ALLOWED_ORIGINS=https://sellr-web.vercel.app
+ALLOWED_ORIGINS=https://sellr-ai.com,https://www.sellr-ai.com,https://sellr-web.vercel.app
 RESEND_API_KEY
 EMAIL_FROM=Sellr <verify@send.sellr-ai.com>
 EMAIL_OTP_TTL_SECONDS=600
@@ -119,7 +124,7 @@ CLOUDFLARE_ACCOUNT_ID
 R2_BUCKET_NAME
 R2_ACCESS_KEY_ID
 R2_SECRET_ACCESS_KEY
-CLOUDFLARE_CDN_URL
+CLOUDFLARE_CDN_URL=https://cdn.sellr-ai.com
 ```
 
 Recommended Railway API:
@@ -131,10 +136,11 @@ EMAIL_OTP_SECRET=<long-random-secret>
 Vercel web:
 
 ```text
-INTERNAL_API_URL=https://api-production-be29.up.railway.app
+INTERNAL_API_URL=https://api.sellr-ai.com
 NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
-NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
-NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=<same public origin as CLOUDFLARE_CDN_URL>
+NEXT_PUBLIC_REALTIME_URL=https://api.sellr-ai.com
+NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://cdn.sellr-ai.com
+NEXT_PUBLIC_SITE_URL=https://sellr-ai.com
 ```
 
 Vercel dashboard-side Web Analytics and Speed Insights should also be enabled
@@ -146,7 +152,7 @@ Use real Resend email OTP in production. Local `000000` email/SMS OTP is
 intentionally disabled in production. Twilio SMS is available only for the phone
 fallback path when Twilio variables are configured.
 
-1. Open `https://sellr-web.vercel.app`.
+1. Open `https://sellr-ai.com`.
 2. Sign in with a real `@wisc.edu` email address.
 3. Join or confirm community access.
 4. Browse `/marketplace`.
@@ -193,6 +199,7 @@ Without it, local DB integration suites are skipped by the repo safety guard.
 - `AGENTS.md`
 - `README.md`
 - `docs/deployment.md`
+- `docs/custom-domain-cutover.md`
 - `docs/email-first-auth.md`
 - `docs/slc-readiness.md`
 - `docs/slc-smoke-test.md`
@@ -207,6 +214,8 @@ Without it, local DB integration suites are skipped by the repo safety guard.
 - Production runbook coverage lives in `docs/production-runbook.md`.
 - Email-first auth setup and launch community gating lives in
   `docs/email-first-auth.md`.
+- Domain cutover setup for Cloudflare, Vercel, Railway, Resend, and R2 lives in
+  `docs/custom-domain-cutover.md`.
 - Structured Railway/Sentry failure visibility now covers Twilio Verify
   failures, R2 upload/delete failures, media cleanup job failures, refresh-token
   failures, and API 500s by route.
@@ -223,8 +232,9 @@ Without it, local DB integration suites are skipped by the repo safety guard.
 Ask the next session to finish launch readiness:
 
 ```text
-Read AGENTS.md and docs/next-session-context.md. Help complete Sellr launch
-readiness by running the production smoke baseline, creating real launch
+Read AGENTS.md, docs/next-session-context.md, and docs/custom-domain-cutover.md.
+Help complete Sellr launch readiness by verifying the sellr-ai.com production
+domain cutover, running the production smoke baseline, creating real launch
 community/admin data, verifying media health, and recording any final release
 notes. Do not add new product scope.
 ```

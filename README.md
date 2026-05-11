@@ -29,18 +29,20 @@ plus media lifecycle cleanup have been smoke-tested.
 The current production origins are:
 
 ```text
-Web: https://sellr-web.vercel.app
-API: https://api-production-be29.up.railway.app
+Web: https://sellr-ai.com
+API: https://api.sellr-ai.com
 ```
 
 API health:
 
 ```text
-https://api-production-be29.up.railway.app/health
+https://api.sellr-ai.com/health
 ```
 
 See [`docs/deployment.md`](docs/deployment.md) for the current production
 topology, required environment variables, and post-deploy verification. See
+[`docs/custom-domain-cutover.md`](docs/custom-domain-cutover.md) for the
+Cloudflare/Vercel/Railway domain cutover guide,
 [`docs/email-first-auth.md`](docs/email-first-auth.md) for the Resend email OTP
 flow, and [`docs/next-session-context.md`](docs/next-session-context.md) for a
 short handoff brief for continuing work in a new agent session.
@@ -237,12 +239,13 @@ that topology.
 - `NO_CACHE=1` was only a one-time Railway cache repair flag. Remove it after a
   successful clean deploy.
 - The web app should call same-origin `/api/v1` in the browser. For Vercel,
-  set `INTERNAL_API_URL` to the Railway API origin and keep
+  set `INTERNAL_API_URL` to `https://api.sellr-ai.com` and keep
   `NEXT_PUBLIC_USE_SAME_ORIGIN_API=1`; do not set `NEXT_PUBLIC_API_URL` for the
   normal cookie-auth web flow.
-- The Vercel web project should also set `NEXT_PUBLIC_REALTIME_URL` to the
-  Railway API origin and `NEXT_PUBLIC_LISTING_IMAGE_CDN_URL` to the public R2/CDN
-  origin used by `CLOUDFLARE_CDN_URL`.
+- The Vercel web project should also set `NEXT_PUBLIC_SITE_URL` to
+  `https://sellr-ai.com`, `NEXT_PUBLIC_REALTIME_URL` to
+  `https://api.sellr-ai.com`, and `NEXT_PUBLIC_LISTING_IMAGE_CDN_URL` to the
+  public R2/CDN origin used by `CLOUDFLARE_CDN_URL`.
 - New listing images should return R2/CDN URLs. Legacy same-origin image URLs
   are still served by the API for compatibility.
 - Media cleanup tracks uploaded assets, attaches them to listings, queues
