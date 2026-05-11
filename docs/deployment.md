@@ -16,13 +16,20 @@ or examples.
 - Vercel hosts the production Next.js web app at:
 
 ```text
-https://sellr-web.vercel.app
+https://sellr-ai.com
 ```
 
-- The current Railway API origin is:
+- The current public API origin is:
 
 ```text
-https://api-production-be29.up.railway.app
+https://api.sellr-ai.com
+```
+
+- Backing provider URLs remain useful for diagnostics and rollback:
+
+```text
+Web backing URL: https://sellr-web.vercel.app
+API backing URL: https://api-production-be29.up.railway.app
 ```
 
 - Production email OTP, same-origin web rewrites, admin/community setup,
@@ -41,8 +48,8 @@ Browser
 ```
 
 Realtime inbox and notification freshness uses Socket.IO directly from the web
-client to the Railway API origin unless a future reverse proxy forwards
-WebSocket upgrades.
+client to `https://api.sellr-ai.com` unless a future reverse proxy forwards
+WebSocket upgrades through the web origin.
 
 ## Railway API Service
 
@@ -73,6 +80,14 @@ R2_BUCKET_NAME
 R2_ACCESS_KEY_ID
 R2_SECRET_ACCESS_KEY
 CLOUDFLARE_CDN_URL
+```
+
+Production domain values:
+
+```text
+ALLOWED_ORIGINS=https://sellr-ai.com,https://www.sellr-ai.com,https://sellr-web.vercel.app
+CLOUDFLARE_CDN_URL=https://cdn.sellr-ai.com
+EMAIL_FROM=Sellr <verify@send.sellr-ai.com>
 ```
 
 Recommended optional variables when the corresponding services are configured:
@@ -108,7 +123,7 @@ CLOUDFLARE_ACCOUNT_ID=<cloudflare-account-id>
 R2_BUCKET_NAME=sellr-media
 R2_ACCESS_KEY_ID=<r2-access-key-id>
 R2_SECRET_ACCESS_KEY=<r2-secret-access-key>
-CLOUDFLARE_CDN_URL=https://<listing-image-cdn-origin>
+CLOUDFLARE_CDN_URL=https://cdn.sellr-ai.com
 ```
 
 `NODE_ENV=production` makes the API require R2 storage. For local development,
@@ -145,6 +160,9 @@ pnpm --filter @sellr/api media:retry-failed
 
 See [`production-runbook.md`](./production-runbook.md) for safe usage and
 incident steps.
+
+See [`custom-domain-cutover.md`](./custom-domain-cutover.md) for the manual
+Cloudflare, Vercel, Railway, R2, and Resend setup behind `sellr-ai.com`.
 
 ### Supabase URLs
 
@@ -193,7 +211,7 @@ clean deployment.
 Use:
 
 ```text
-https://api-production-be29.up.railway.app/health
+https://api.sellr-ai.com/health
 ```
 
 Expected response shape:
@@ -227,10 +245,11 @@ Build Command: pnpm --filter @sellr/web build
 Required Vercel web variables:
 
 ```text
-INTERNAL_API_URL=https://api-production-be29.up.railway.app
+INTERNAL_API_URL=https://api.sellr-ai.com
 NEXT_PUBLIC_USE_SAME_ORIGIN_API=1
-NEXT_PUBLIC_REALTIME_URL=https://api-production-be29.up.railway.app
-NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://<listing-image-cdn-origin>
+NEXT_PUBLIC_REALTIME_URL=https://api.sellr-ai.com
+NEXT_PUBLIC_LISTING_IMAGE_CDN_URL=https://cdn.sellr-ai.com
+NEXT_PUBLIC_SITE_URL=https://sellr-ai.com
 ```
 
 Do not include `/api/v1` in `INTERNAL_API_URL`; `apps/web/next.config.ts`
@@ -240,14 +259,14 @@ Do not set `NEXT_PUBLIC_API_URL` for the normal web cookie-auth flow. The web
 browser should call same-origin `/api/v1` so httpOnly auth cookies are sent
 correctly.
 
-The current production web origin should be present in Railway API:
+The current production web origins should be present in Railway API:
 
 ```text
-ALLOWED_ORIGINS=https://sellr-web.vercel.app
+ALLOWED_ORIGINS=https://sellr-ai.com,https://www.sellr-ai.com,https://sellr-web.vercel.app
 ```
 
-Use comma-separated origins with no spaces when adding preview or custom
-domains.
+Use comma-separated origins with no spaces. Keep the `vercel.app` origin only
+if you want direct rollback or diagnostic access to the backing deployment.
 
 Vercel Web Analytics and Speed Insights are mounted in the web root layout.
 Enable the dashboard-side features in the Vercel project if data is not
@@ -317,8 +336,8 @@ local `000000` behavior, Resend setup, and `wisc.edu` community-gate rules.
 
 After deploying API and web:
 
-1. Open `/health` on the Railway API origin.
-2. Open the Vercel web origin.
+1. Open `/health` on the public API origin, `https://api.sellr-ai.com`.
+2. Open the public web origin, `https://sellr-ai.com`.
 3. Log in with a real `@wisc.edu` email OTP.
 4. Join or confirm access to `Badger Market`.
 5. Browse marketplace listings.

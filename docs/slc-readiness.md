@@ -88,25 +88,26 @@ unless release upload credentials are configured.
 The current production web SLC is deployed on Vercel and Railway:
 
 ```text
-Web: https://sellr-web.vercel.app
-API: https://api-production-be29.up.railway.app
+Web: https://sellr-ai.com
+API: https://api.sellr-ai.com
 ```
 
 API health:
 
 ```text
-https://api-production-be29.up.railway.app/health
+https://api.sellr-ai.com/health
 ```
 
 Before a production demo or release handoff:
 
-- Confirm `https://api-production-be29.up.railway.app/health` returns `ok`.
+- Confirm `https://api.sellr-ai.com/health` returns `ok`.
+- Confirm `https://sellr-ai.com/api/v1/auth/me` returns
+  `{"error":"Unauthorized"}` when logged out.
 - Confirm Railway API logs do not show Redis fallback errors such as
   `127.0.0.1:6379` or `::1:6379`.
 - Remove the temporary Railway `NO_CACHE=1` variable if it is still present.
 - Confirm Vercel production is on latest `main` before debugging missing UI.
-- Confirm Vercel same-origin `/api/v1` proxy returns `{"error":"Unauthorized"}`
-  from `/api/v1/auth/me` when logged out.
+- Confirm `www.sellr-ai.com` redirects to the chosen primary web domain.
 - Confirm Resend sends real email OTP in production; confirm Twilio only if the
   phone fallback is part of the release smoke.
 - Confirm `Badger Market` is configured as an `email_domain` community for

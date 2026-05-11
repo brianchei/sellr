@@ -99,7 +99,7 @@ describe('listing image upload route', () => {
       Promise.resolve({
         filename: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
         key: 'listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
-        url: 'https://cdn.sellr.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+        url: 'https://cdn.sellr-ai.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
         storageProvider: 'r2' as const,
       }),
     );
@@ -120,7 +120,7 @@ describe('listing image upload route', () => {
     expect(res.statusCode).toBe(201);
     expect(res.json()).toEqual({
       data: {
-        url: 'https://cdn.sellr.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+        url: 'https://cdn.sellr-ai.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
       },
     });
     expect(store).toHaveBeenCalledWith(expect.any(Buffer), 'image/jpeg');
@@ -129,7 +129,7 @@ describe('listing image upload route', () => {
       storedImage: {
         filename: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
         key: 'listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
-        url: 'https://cdn.sellr.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+        url: 'https://cdn.sellr-ai.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
         storageProvider: 'r2',
       },
     });
@@ -217,11 +217,11 @@ describe('listing image storage selection', () => {
   });
 
   it('identifies only Sellr-owned media URLs for cleanup', () => {
-    process.env.CLOUDFLARE_CDN_URL = 'https://cdn.sellr.com';
+    process.env.CLOUDFLARE_CDN_URL = 'https://cdn.sellr-ai.com';
 
     expect(
       listingImageStorageReferenceFromUrl(
-        'https://cdn.sellr.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
+        'https://cdn.sellr-ai.com/listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',
       ),
     ).toEqual({
       storageKey: 'listing-images/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.jpg',

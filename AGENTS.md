@@ -44,9 +44,11 @@ polished and covered by the readiness gate.
 - GitHub Actions CI and production migration checks are passing.
 - GitHub `main` is protected; use pull requests for changes to `main`.
 - Supabase is the production Postgres/PostGIS database.
-- Railway hosts the Fastify API and Redis. The current public API origin is
+- Railway hosts the Fastify API and Redis. The primary public API origin is
+  `https://api.sellr-ai.com`, backed by
   `https://api-production-be29.up.railway.app`.
-- Vercel hosts the production web app at `https://sellr-web.vercel.app`.
+- Vercel hosts the production web app at `https://sellr-ai.com`, backed by
+  `https://sellr-web.vercel.app`.
 - Production Resend email OTP is the primary web sign-in path, with Twilio
   Verify retained as phone fallback. Same-origin Vercel `/api/v1` rewrites,
   admin/community setup, durable R2 listing image uploads, and media lifecycle
@@ -57,16 +59,17 @@ polished and covered by the readiness gate.
   NodeNext ESM migration, including explicit `.js` relative imports.
 - Keep Vercel web env vars aligned with `docs/deployment.md`, especially
   `INTERNAL_API_URL`, `NEXT_PUBLIC_USE_SAME_ORIGIN_API`,
-  `NEXT_PUBLIC_REALTIME_URL`, and `NEXT_PUBLIC_LISTING_IMAGE_CDN_URL`.
+  `NEXT_PUBLIC_REALTIME_URL`, `NEXT_PUBLIC_LISTING_IMAGE_CDN_URL`, and
+  `NEXT_PUBLIC_SITE_URL`.
 - Keep Railway API env vars aligned with `docs/deployment.md`, especially
   `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_OTP_ALLOWED_DOMAINS`, and the optional
   `EMAIL_OTP_SECRET`.
 - Media cleanup health tooling is implemented. Next production-hardening work
   should focus on launch readiness, production smoke coverage, and alerting for
   the structured ops signals.
-- See `docs/deployment.md`, `docs/email-first-auth.md`, and
-  `docs/next-session-context.md` before continuing deployment or
-  production-hardening work.
+- See `docs/deployment.md`, `docs/custom-domain-cutover.md`,
+  `docs/email-first-auth.md`, and `docs/next-session-context.md` before
+  continuing deployment or production-hardening work.
 
 ## Repository Map
 - `apps/web`: Next.js 16 App Router web SLC and seller/admin surfaces.

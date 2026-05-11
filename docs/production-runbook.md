@@ -8,7 +8,7 @@ Do not paste secrets into chat, issues, or logs.
 API health:
 
 ```bash
-curl https://api-production-be29.up.railway.app/health
+curl https://api.sellr-ai.com/health
 ```
 
 Expected shape:
@@ -20,7 +20,7 @@ Expected shape:
 Vercel same-origin API proxy:
 
 ```text
-https://sellr-web.vercel.app/api/v1/auth/me
+https://sellr-ai.com/api/v1/auth/me
 ```
 
 When logged out, the expected response is:
@@ -31,6 +31,8 @@ When logged out, the expected response is:
 
 That confirms Vercel is rewriting `/api/v1` to the Railway API. If this returns
 `DNS_HOSTNAME_RESOLVED_PRIVATE`, check `INTERNAL_API_URL` and redeploy Vercel.
+If the custom domain is still propagating, repeat the same check against the
+backing Vercel URL `https://sellr-web.vercel.app/api/v1/auth/me`.
 
 ## Media Cleanup Health
 
@@ -139,7 +141,9 @@ Vercel web:
 1. Confirm production env vars match `docs/deployment.md`.
 2. Redeploy latest `main`.
 3. Check `/api/v1/auth/me` returns `{"error":"Unauthorized"}` when logged out.
-4. Smoke email OTP login, marketplace browse, listing upload, inbox,
+4. Confirm `https://sellr-ai.com` is the primary domain and `www` redirects to
+   the chosen primary domain.
+5. Smoke email OTP login, marketplace browse, listing upload, inbox,
    notifications, `/admin/community`, and `/admin/reports`.
 
 ## Common Incidents
