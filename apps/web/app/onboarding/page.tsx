@@ -214,8 +214,8 @@ export default function OnboardingPage() {
               </h2>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">
                 UW-Madison students can join Badger Market with a verified
-                wisc.edu email. If you received an invite, you can also join
-                with an invite code.
+                wisc.edu email. Invite codes are a secondary path for trusted
+                early users.
               </p>
 
               <div
@@ -274,7 +274,7 @@ export default function OnboardingPage() {
                         setInviteCode(event.target.value.toUpperCase())
                       }
                       autoComplete="off"
-                      placeholder="INVITE2026"
+                      placeholder="BADGER2026"
                       aria-describedby="onboarding-invite-help"
                       className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 font-mono text-sm uppercase tracking-wider text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                     />
@@ -303,8 +303,17 @@ export default function OnboardingPage() {
                     id="onboarding-invite-help"
                     className="mt-1.5 text-xs text-[var(--text-tertiary)]"
                   >
-                    Codes are case-insensitive. Use the code shared by your
-                    community organizer.
+                    Codes are case-insensitive.
+                    {process.env.NODE_ENV === 'development' ? (
+                      <>
+                        {' '}
+                        Local seed code:{' '}
+                        <span className="font-mono text-[var(--text-secondary)]">
+                          DEV2026
+                        </span>
+                        .
+                      </>
+                    ) : null}
                   </p>
                 ) : (
                   <p

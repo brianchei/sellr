@@ -517,8 +517,7 @@ export function ListingForm({
         <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
           <h2 className="text-base font-semibold">Availability</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-            Add a recurring pickup window so buyers know when you are usually
-            available.
+            Add one recurring pickup window for the MVP.
           </p>
 
           <label className="mt-4 block text-sm font-medium text-[var(--text-primary)]">

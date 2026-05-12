@@ -247,8 +247,8 @@ export default function LoginPage() {
           Sign in to Sellr
         </h1>
         <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-          UW-Madison students can use a verified wisc.edu email. If you received
-          an invite, phone sign-in is also available.
+          UW-Madison students can use a verified wisc.edu email. Invited testers
+          can still use phone sign-in.
         </p>
 
         {step === 'email' ? (
@@ -273,8 +273,8 @@ export default function LoginPage() {
               id="login-email-help"
               className="mt-1.5 text-xs text-[var(--text-tertiary)]"
             >
-              Email verification keeps campus community access tied to your
-              student account.
+              Email verification keeps the launch community student-scoped
+              without relying on SMS.
             </p>
             <button
               type="submit"
@@ -351,7 +351,7 @@ export default function LoginPage() {
                 pattern="\d*"
                 autoComplete="one-time-code"
                 maxLength={OTP_CODE_LENGTH}
-                placeholder="123456"
+                placeholder="000000"
                 aria-label="6 digit verification code"
                 className="w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-3 text-center font-mono text-xl tracking-[0.4em] text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
               />
@@ -394,7 +394,7 @@ export default function LoginPage() {
 
         <ul className="mt-6 space-y-2 border-t border-[var(--border-default)] pt-5 text-xs text-[var(--text-secondary)]">
           <TrustPoint>
-            Student email verification is the primary community trust signal.
+            Student email verification is the primary launch trust signal.
           </TrustPoint>
           <TrustPoint>
             Phone sign-in remains available for invite-only access.
@@ -406,8 +406,10 @@ export default function LoginPage() {
             Trouble receiving the code?
           </summary>
           <p className="mt-2 leading-5">
-            Check spam or junk for email codes. You can request a new code after
-            the resend timer finishes.
+            Check spam for email codes. In a local development build without an
+            email or SMS provider, the demo code is{' '}
+            <span className="font-mono text-[var(--text-primary)]">000000</span>
+            .
           </p>
         </details>
 
