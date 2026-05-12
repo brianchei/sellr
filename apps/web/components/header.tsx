@@ -19,16 +19,21 @@ function SellrWordmark({ className = '' }: { className?: string }) {
       className={`group inline-flex items-center no-underline ${className}`}
     >
       <Image
-        src="/brand/sellr-logo-mark.png"
+        src="/brand/sellr-symbol.png"
         alt=""
-        width={32}
-        height={32}
+        width={36}
+        height={36}
         priority
-        className="h-8 w-8 rounded-md object-contain"
+        className="h-9 w-9 rounded-lg object-contain sm:hidden"
       />
-      <span className="ml-2 text-lg font-bold tracking-tight text-[var(--text-primary)]">
-        Sellr
-      </span>
+      <Image
+        src="/brand/sellr-logo-full.png"
+        alt=""
+        width={128}
+        height={40}
+        priority
+        className="hidden h-9 w-auto object-contain sm:block"
+      />
     </Link>
   );
 }

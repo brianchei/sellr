@@ -153,16 +153,13 @@ export default function OnboardingPage() {
             aria-label="Sellr home"
           >
             <Image
-              src="/brand/sellr-logo-mark.png"
+              src="/brand/sellr-logo-full.png"
               alt=""
-              width={28}
-              height={28}
-              className="h-7 w-7 object-contain"
+              width={112}
+              height={36}
+              className="h-8 w-auto object-contain"
               priority
             />
-            <span className="text-base font-bold text-[var(--text-primary)]">
-              Sellr
-            </span>
           </Link>
           <button
             type="button"

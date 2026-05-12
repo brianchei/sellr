@@ -352,3 +352,20 @@ Keep this guide aligned with:
 - `docs/slc-readiness.md`
 - `docs/next-session-context.md`
 - `apps/web/README.md`
+
+## Implementation Log
+
+### May 12, 2026
+
+- Started Phase 1 brand, landing, and mobile polish.
+- Wired production logo/favicon/apple-touch assets into web metadata and primary
+  UI surfaces.
+- Updated the public landing hero to emphasize Sellr as a campus/community
+  marketplace with Badger Market as the first launch community.
+- Made primary headers use compact symbol assets on small screens and full logo
+  lockups on larger screens.
+- Revamped the landing page around the approved structure: hook, community
+  proof, problem/pain, static product flow, outcome-led benefits, trust
+  commitments, FAQ, and final CTA. Pricing remains omitted for launch.
+- Reduced mobile hero preview height and adjusted dashboard greeting layout to
+  avoid cramped or vertically stretched text on small screens.

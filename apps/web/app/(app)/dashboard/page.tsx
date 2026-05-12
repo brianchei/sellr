@@ -214,18 +214,18 @@ function GreetingHero({
           'linear-gradient(135deg, var(--color-brand-primary-soft) 0%, var(--bg-elevated) 55%, var(--color-brand-accent-soft) 100%)',
       }}
     >
-      <div className="relative z-10 flex flex-wrap items-center gap-4 sm:gap-5">
+      <div className="relative z-10 grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-5">
         <div
           className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-primary)] text-base font-bold text-[var(--text-primary)] shadow-sm sm:h-16 sm:w-16 sm:text-lg"
           aria-hidden="true"
         >
           {isLoading ? '··' : initials}
         </div>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
             Account home
           </p>
-          <h1 className="mt-1 break-words text-xl font-semibold text-[var(--text-primary)] sm:text-2xl">
+          <h1 className="mt-1 text-balance text-xl font-semibold leading-tight text-[var(--text-primary)] sm:text-2xl">
             {isLoading
               ? 'Welcome back'
               : displayName
@@ -277,10 +277,10 @@ function GreetingHero({
             </span>
           </div>
         </div>
-        <div className="flex shrink-0 flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 sm:shrink-0 sm:justify-end">
           <Link
             href="/sell"
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm transition hover:-translate-y-px hover:bg-[var(--color-brand-primary-hover)] hover:shadow-md"
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm transition hover:-translate-y-px hover:bg-[var(--color-brand-primary-hover)] hover:shadow-md sm:flex-none"
           >
             <svg
               width="14"
@@ -300,7 +300,7 @@ function GreetingHero({
           </Link>
           <Link
             href="/marketplace"
-            className="inline-flex items-center justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+            className="inline-flex flex-1 items-center justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)] sm:flex-none"
           >
             Browse
           </Link>
