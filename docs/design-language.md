@@ -33,6 +33,23 @@ Current checked-in brand assets live in `apps/web/public/brand`:
 - `sellr-app-icon.png`: app icon and metadata icon source.
 - `sellr-logo-mark.png`: compact logo mark used in headers and compact app UI.
 - `sellr-logo-wordmark.png`: wordmark source for Open Graph/social previews.
+- `sellr-symbol.png`: production standalone symbol for compact brand moments.
+- `sellr-symbol-transparent.png`: transparent standalone symbol variant.
+- `sellr-symbol-large.png`: large standalone symbol asset for hero or empty-state
+  artwork.
+- `sellr-logo-full.png`: production full logo lockup.
+- `sellr-logo-full-transparent.png`: transparent full logo lockup.
+- `sellr-logo-full-light.png`: full logo lockup on a light background.
+- `sellr-logo-full-alt.png`: alternate full logo lockup.
+- `sellr-logo-light-reversed.png`: reversed logo for dark surfaces.
+- `sellr-logo-dark-monochrome.png`: monochrome logo for constrained or print-like
+  contexts.
+- `sellr-app-icon-square.png`: square app icon asset.
+- `sellr-app-icon-transparent.png`: transparent app icon asset.
+- `sellr-app-icon-1024.png`: high-resolution app icon source.
+- `apple-touch-icon-180.png`: Apple touch icon source.
+- `favicon-16.png`, `favicon-32.png`, and `favicon-48.png`: favicon sources.
+- `maskable-pwa-icon-512.png`: maskable PWA icon source.
 
 The Expo app mirrors the icon assets in `apps/mobile/assets`. Prefer these files
 over recreating the mark in CSS or inline SVG.

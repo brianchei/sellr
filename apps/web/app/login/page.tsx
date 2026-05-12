@@ -228,16 +228,13 @@ export default function LoginPage() {
           className="mb-7 inline-flex items-center gap-2 no-underline"
         >
           <Image
-            src="/brand/sellr-logo-mark.png"
+            src="/brand/sellr-logo-full.png"
             alt=""
-            width={32}
-            height={32}
-            className="h-8 w-8 object-contain"
+            width={128}
+            height={40}
+            className="h-9 w-auto object-contain"
             priority
           />
-          <span className="text-lg font-bold text-[var(--text-primary)]">
-            Sellr
-          </span>
         </Link>
 
         <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">

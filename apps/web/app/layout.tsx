@@ -33,15 +33,25 @@ export const metadata: Metadata = {
   title: 'Sellr — The Marketplace That Actually Closes',
   description: 'A trust-native local marketplace for verified communities.',
   icons: {
-    icon: [{ url: '/brand/sellr-app-icon.png', type: 'image/png' }],
-    apple: [{ url: '/brand/sellr-app-icon.png', type: 'image/png' }],
+    icon: [
+      { url: '/brand/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/brand/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/brand/favicon-48.png', sizes: '48x48', type: 'image/png' },
+    ],
+    apple: [
+      {
+        url: '/brand/apple-touch-icon-180.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
   },
   openGraph: {
     type: 'website',
     siteName: 'Sellr',
     images: [
       {
-        url: '/brand/sellr-logo-wordmark.png',
+        url: '/brand/sellr-logo-full.png',
         alt: 'Sellr logo',
       },
     ],

@@ -86,16 +86,21 @@ export function AppHeader() {
           className="flex shrink-0 items-center gap-2 no-underline"
         >
           <Image
-            src="/brand/sellr-logo-mark.png"
+            src="/brand/sellr-symbol.png"
             alt=""
             width={32}
             height={32}
-            className="h-8 w-8 object-contain"
+            className="h-8 w-8 rounded-lg object-contain sm:hidden"
             priority
           />
-          <span className="text-lg font-bold text-[var(--text-primary)]">
-            Sellr
-          </span>
+          <Image
+            src="/brand/sellr-logo-full.png"
+            alt=""
+            width={112}
+            height={36}
+            className="hidden h-8 w-auto object-contain sm:block"
+            priority
+          />
         </Link>
 
         <nav
