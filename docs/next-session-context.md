@@ -69,7 +69,12 @@ https://sellr-ai.com/api/v1/auth/me
 ```
 
 - Durable listing image storage has been verified: new uploads return an R2/CDN
-  URL and still load after a Railway API redeploy.
+  URL beginning with `https://cdn.sellr-ai.com`.
+- Production `Badger Market` has been bootstrapped for `wisc.edu` email-domain
+  join, and invite code `BADGER2026` works as a secondary join path.
+- Production smoke has passed for `@wisc.edu` email OTP, community join,
+  listing creation with image upload, listing detail, buyer contact, inbox,
+  notifications, seller listing lifecycle, and test-listing deletion.
 - Media lifecycle cleanup has been deployed and production-smoke-tested for the
   main paths: pending/attached media tracking, image replacement, listing
   deletion, and explicit admin listing removal from reports.
@@ -99,9 +104,8 @@ https://sellr-ai.com/api/v1/auth/me
   values into the build.
 - Do not set `NEXT_PUBLIC_API_URL` for the normal production web flow unless the
   auth architecture is intentionally changed.
-- Production can temporarily use a Cloudflare R2 Public Development URL for
-  listing images, but a real custom media domain such as
-  `cdn.sellr-ai.com` is the better long-term production setup.
+- Production listing images should use `https://cdn.sellr-ai.com`. Do not
+  switch back to a temporary `r2.dev` URL unless debugging a CDN incident.
 
 ## Required Production Env Vars
 
@@ -198,6 +202,7 @@ Without it, local DB integration suites are skipped by the repo safety guard.
 
 - `AGENTS.md`
 - `README.md`
+- `docs/current-state-and-scope.md`
 - `docs/deployment.md`
 - `docs/custom-domain-cutover.md`
 - `docs/email-first-auth.md`
@@ -222,19 +227,18 @@ Without it, local DB integration suites are skipped by the repo safety guard.
 - Production alerting thresholds/destinations for the structured failures and
   media health signals are useful post-launch hardening, but are not a release
   blocker for the SLC.
-- Move listing media from a temporary `r2.dev` public URL to a custom CDN domain
-  before broader production launch, if that has not happened yet.
+- Watch Railway, Resend, and media health during the first real-user wave.
+- Seed enough high-quality active listings for the initial UW-Madison launch.
 - Consider converting the API to a true ESM production build later, replacing
   the current `tsx src/index.ts` production start workaround.
 
 ## Suggested Next Request
 
-Ask the next session to finish launch readiness:
+Ask the next session to help with launch operations:
 
 ```text
-Read AGENTS.md, docs/next-session-context.md, and docs/custom-domain-cutover.md.
-Help complete Sellr launch readiness by verifying the sellr-ai.com production
-domain cutover, running the production smoke baseline, creating real launch
-community/admin data, verifying media health, and recording any final release
-notes. Do not add new product scope.
+Read AGENTS.md, docs/current-state-and-scope.md, and docs/next-session-context.md.
+Help operate the initial Sellr campus launch: seed or review launch listings,
+verify admin/community access, run media health checks, watch Railway/Resend
+logs, and record any launch notes. Do not add new product scope.
 ```

@@ -26,6 +26,9 @@ POST /api/v1/auth/otp/verify
 The email endpoints are intentionally domain-limited. For the initial campus
 launch, the allowed domain is `wisc.edu`.
 
+Production status: `@wisc.edu` email OTP sign-in and `Badger Market`
+email-domain join have been verified on `https://sellr-ai.com`.
+
 ## Data Model
 
 The email-first migration adds email identity fields while preserving existing
@@ -101,6 +104,7 @@ Name: Badger Market
 Type: campus
 Access method: email_domain
 Email domain: wisc.edu
+Invite code: BADGER2026
 ```
 
 Invite codes remain a secondary path for trusted non-Wisc users, seed sellers,
@@ -117,6 +121,7 @@ Production:
 5. Confirm Resend logs show a successful send without exposing the full email
    address in application logs.
 6. Verify the code and join `Badger Market` by email domain.
+7. Confirm `BADGER2026` works as the invite-code fallback.
 
 Local:
 

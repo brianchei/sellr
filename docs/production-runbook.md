@@ -34,6 +34,11 @@ That confirms Vercel is rewriting `/api/v1` to the Railway API. If this returns
 If the custom domain is still propagating, repeat the same check against the
 backing Vercel URL `https://sellr-web.vercel.app/api/v1/auth/me`.
 
+Current production baseline: custom web/API/media domains, `@wisc.edu` email
+OTP, `Badger Market` join, `BADGER2026`, `cdn.sellr-ai.com` listing media,
+buyer contact, inbox, notifications, and seller listing lifecycle were verified
+on May 11, 2026.
+
 ## Media Cleanup Health
 
 Run from the repository root with production API environment variables available
@@ -155,6 +160,15 @@ Email OTP send fails:
   on a verified Resend sending domain.
 - Confirm `EMAIL_OTP_ALLOWED_DOMAINS` includes the intended launch domain.
 - Check Resend logs for delivery or domain-verification errors.
+
+Community join fails:
+
+- `No community for this email domain` means production is missing an active
+  `communities` row with `access_method = email_domain` and
+  `email_domain = wisc.edu`.
+- `Invalid invite code` means `BADGER2026` is missing, points to an inactive
+  community, or was typed differently from the uppercase stored code.
+- Confirm `Badger Market` exists, is active, and has invite code `BADGER2026`.
 
 Twilio OTP send fails:
 

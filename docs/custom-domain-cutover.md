@@ -3,6 +3,9 @@
 Use this guide to make `sellr-ai.com` the production-facing Sellr domain while
 keeping Vercel, Railway, Resend, and Cloudflare R2 as the underlying services.
 
+Status: completed and production-smoke-tested on May 11, 2026. Keep this guide
+for audits, rollback, and future domain/provider changes.
+
 ## Domain Map
 
 ```text
@@ -140,6 +143,11 @@ EMAIL_OTP_SECRET=<long-random-secret>
 ```
 
 ## Post-Cutover Smoke
+
+Latest status: the post-cutover smoke passed for API health, same-origin web API
+proxying, `@wisc.edu` email OTP, `Badger Market` join, `BADGER2026`, listing
+image upload to `https://cdn.sellr-ai.com`, listing detail, buyer contact,
+inbox, notifications, seller listing lifecycle, and test-listing deletion.
 
 Run these checks after DNS verification and redeploys complete:
 

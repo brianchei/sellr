@@ -98,6 +98,16 @@ API health:
 https://api.sellr-ai.com/health
 ```
 
+Latest production smoke status, May 11, 2026:
+
+- Custom web/API/media domains are active.
+- `@wisc.edu` email OTP works through Resend.
+- `Badger Market` join works by verified email domain.
+- `BADGER2026` works as the invite-code fallback.
+- Listing image uploads return `https://cdn.sellr-ai.com` URLs.
+- Listing detail, buyer contact, inbox, notifications, seller lifecycle, and
+  test-listing deletion checks passed.
+
 Before a production demo or release handoff:
 
 - Confirm `https://api.sellr-ai.com/health` returns `ok`.

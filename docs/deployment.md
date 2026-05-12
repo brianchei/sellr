@@ -35,6 +35,10 @@ API backing URL: https://api-production-be29.up.railway.app
 - Production email OTP, same-origin web rewrites, admin/community setup,
   durable R2 listing image uploads, and media lifecycle cleanup are part of the
   launch path. Twilio remains available for the phone sign-in fallback.
+- As of May 11, 2026, the `sellr-ai.com` custom domain stack, `@wisc.edu`
+  email OTP, `Badger Market` join, `BADGER2026`, `cdn.sellr-ai.com` media
+  uploads, buyer contact/inbox, notifications, and seller listing lifecycle
+  have been production-smoke-tested.
 
 ## Production Topology
 
@@ -162,7 +166,9 @@ See [`production-runbook.md`](./production-runbook.md) for safe usage and
 incident steps.
 
 See [`custom-domain-cutover.md`](./custom-domain-cutover.md) for the manual
-Cloudflare, Vercel, Railway, R2, and Resend setup behind `sellr-ai.com`.
+Cloudflare, Vercel, Railway, R2, and Resend setup behind `sellr-ai.com`, and
+[`current-state-and-scope.md`](./current-state-and-scope.md) for the current
+launch state.
 
 ### Supabase URLs
 
@@ -322,7 +328,7 @@ local `000000` behavior, Resend setup, and `wisc.edu` community-gate rules.
 - Listing image uploads use Cloudflare R2/CDN when the required storage
   variables are configured on Railway. Legacy same-origin upload URLs are still
   served by the API for compatibility, but new production uploads should return
-  CDN URLs.
+  `https://cdn.sellr-ai.com` URLs.
 - Media lifecycle cleanup is asynchronous. If Redis delayed jobs need a catch-up
   pass, run `pnpm --filter @sellr/api media:cleanup-expired`.
 - The API currently starts from TypeScript through `tsx`. This is acceptable for
@@ -334,7 +340,9 @@ local `000000` behavior, Resend setup, and `wisc.edu` community-gate rules.
 
 ## Post-Deploy Verification
 
-After deploying API and web:
+The full production smoke path has passed on `sellr-ai.com`. Repeat it after
+domain/env changes, migrations, or deploys that touch auth, communities,
+listings, uploads, messaging, notifications, or reports:
 
 1. Open `/health` on the public API origin, `https://api.sellr-ai.com`.
 2. Open the public web origin, `https://sellr-ai.com`.
