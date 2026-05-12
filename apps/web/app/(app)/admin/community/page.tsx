@@ -433,7 +433,7 @@ export default function AdminCommunityPage() {
                 onChange={(event) =>
                   setInviteCode(event.target.value.toUpperCase())
                 }
-                placeholder="SLC2026"
+                placeholder="INVITE2026"
                 autoComplete="off"
                 className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 font-mono text-sm uppercase tracking-wider text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
               />
