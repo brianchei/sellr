@@ -64,12 +64,14 @@ polished and covered by the readiness gate.
 - Keep Railway API env vars aligned with `docs/deployment.md`, especially
   `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_OTP_ALLOWED_DOMAINS`, and the optional
   `EMAIL_OTP_SECRET`.
-- Media cleanup health tooling is implemented. Next production-hardening work
-  should focus on launch readiness, production smoke coverage, and alerting for
-  the structured ops signals.
-- See `docs/deployment.md`, `docs/custom-domain-cutover.md`,
-  `docs/email-first-auth.md`, and `docs/next-session-context.md` before
-  continuing deployment or production-hardening work.
+- Custom domains, email-first auth, `Badger Market` community access, R2/CDN
+  uploads, and the buyer/seller loop have been production-smoke-tested. Next
+  production-hardening work should focus on launch monitoring, seed inventory,
+  media health, and alerting for structured ops signals.
+- See `docs/current-state-and-scope.md`, `docs/deployment.md`,
+  `docs/custom-domain-cutover.md`, `docs/email-first-auth.md`, and
+  `docs/next-session-context.md` before continuing deployment or
+  production-hardening work.
 
 ## Repository Map
 - `apps/web`: Next.js 16 App Router web SLC and seller/admin surfaces.

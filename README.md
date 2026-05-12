@@ -21,11 +21,12 @@ reporting, a restricted admin reports dashboard with explicit listing removal,
 admin community setup, media lifecycle cleanup, and a seller readiness panel on
 the dashboard.
 
-The production web SLC is deployed and in hardening. GitHub Actions CI and
-production migration checks are passing, the Fastify API is deployed on Railway,
-the web app is deployed on Vercel, email OTP is the primary launch sign-in path,
-Twilio remains available for phone fallback, and durable R2-backed listing media
-plus media lifecycle cleanup have been smoke-tested.
+The production web SLC is deployed and launch-ready for the initial campus
+release. GitHub Actions CI and production migration checks are passing, the
+Fastify API is deployed on Railway, the web app is deployed on Vercel, email OTP
+is the primary launch sign-in path, Twilio remains available for phone fallback,
+and durable R2-backed listing media plus media lifecycle cleanup have been
+smoke-tested.
 The current production origins are:
 
 ```text
@@ -41,6 +42,8 @@ https://api.sellr-ai.com/health
 
 See [`docs/deployment.md`](docs/deployment.md) for the current production
 topology, required environment variables, and post-deploy verification. See
+[`docs/current-state-and-scope.md`](docs/current-state-and-scope.md) for the
+current production state and launch scope,
 [`docs/custom-domain-cutover.md`](docs/custom-domain-cutover.md) for the
 Cloudflare/Vercel/Railway domain cutover guide,
 [`docs/email-first-auth.md`](docs/email-first-auth.md) for the Resend email OTP
@@ -84,6 +87,8 @@ sellr/
   tokens/web httpOnly cookies
 - Verified community membership through invite codes or institutional email
   domains
+- Production `Badger Market` community access through verified `wisc.edu`
+  email or invite code `BADGER2026`
 - Community-scoped listings with status, condition, pricing, photos,
   availability windows, and approximate neighborhood/radius location
 - Web SLC listing photo uploads with JPG/PNG/WebP validation, local dev
