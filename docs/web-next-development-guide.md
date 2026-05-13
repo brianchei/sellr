@@ -245,13 +245,15 @@ Shipped:
   `PATCH /communities/:communityId`, covering name, type, access method, email
   domain, and member-facing rules/guidance stored in the existing community
   fields.
+- Improved `/admin/community` member management with search, role/status
+  filters, result counts, clearer access action labels, and no-results states.
 
 Work items:
 
 - Add richer community branding/theme config and optional imagery.
 - Expand the decorated Badger Market experience with approved imagery or
   additional admin-editable fields when available.
-- Improve member management in the admin dashboard.
+- Connect reports to member management for deeper moderation actions.
 
 Acceptance notes:
 
@@ -382,12 +384,14 @@ Completed in Phase 3:
 - Add post-login join-another-community flow.
 - Add admin management-community switcher.
 - Add admin-editable community details and rules/guidance.
+- Improve member management in the admin dashboard.
 
 Remaining:
 
 - Expand Badger Market / UW-Madison decoration with approved imagery or
   additional admin-editable fields.
 - Add richer branding/theme controls to admin dashboard.
+- Connect reports to member management for deeper moderation actions.
 
 ### Profile And Trust
 
@@ -544,3 +548,5 @@ Keep this guide aligned with:
 - Added admin-editable community details to `/admin/community` with a typed API
   client helper and admin-only API route for updating name, type, access method,
   email domain, and homepage rules/guidance.
+- Added member search, role/status filters, result counts, clearer access action
+  labels, and empty states to `/admin/community`.
