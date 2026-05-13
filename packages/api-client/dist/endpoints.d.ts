@@ -11,6 +11,13 @@ export type ApiUserTrustProfile = {
     listingCount: number;
     communityMember: boolean;
 };
+export type ApiCommunitySummary = {
+    id: string;
+    name: string;
+    type: 'campus' | 'coworking' | 'residential';
+    role: string;
+    joinedAt: string;
+};
 export type ApiListing = {
     id: string;
     communityId: string;
@@ -210,8 +217,10 @@ export declare function fetchMe(): Promise<{
         phoneE164: string | null;
         email: string | null;
         emailVerifiedAt: string | null;
+        communities: ApiCommunitySummary[];
     };
     communityIds: string[];
+    communities: ApiCommunitySummary[];
 }>;
 export declare function updateProfile(body: UpdateProfileInput): Promise<{
     user: ApiUserTrustProfile & {
@@ -219,8 +228,10 @@ export declare function updateProfile(body: UpdateProfileInput): Promise<{
         phoneE164: string | null;
         email: string | null;
         emailVerifiedAt: string | null;
+        communities: ApiCommunitySummary[];
     };
     communityIds: string[];
+    communities: ApiCommunitySummary[];
 }>;
 export declare function registerPushToken(expoPushToken: string): Promise<{
     registered: boolean;

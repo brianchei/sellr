@@ -29,12 +29,21 @@ function isActive(pathname: string, href: string): boolean {
 }
 
 export function AppHeader() {
-  const { logout, primaryCommunityId, userId } = useAuth();
+  const {
+    communities,
+    logout,
+    primaryCommunity,
+    primaryCommunityId,
+    setPrimaryCommunityId,
+    userId,
+  } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [communityOpen, setCommunityOpen] = useState(false);
   const accountRef = useRef<HTMLDivElement | null>(null);
+  const communityRef = useRef<HTMLDivElement | null>(null);
 
   const unreadNotificationsQuery = useQuery({
     queryKey: ['notifications-unread'],
@@ -51,25 +60,37 @@ export function AppHeader() {
     setTrackedPathname(pathname);
     if (drawerOpen) setDrawerOpen(false);
     if (accountOpen) setAccountOpen(false);
+    if (communityOpen) setCommunityOpen(false);
   }
 
   useEffect(() => {
-    if (!drawerOpen && !accountOpen) return;
+    if (!drawerOpen && !accountOpen && !communityOpen) return;
     const handler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setDrawerOpen(false);
         setAccountOpen(false);
+        setCommunityOpen(false);
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [drawerOpen, accountOpen]);
+  }, [drawerOpen, accountOpen, communityOpen]);
 
   const handleLogout = () => {
     setAccountOpen(false);
     logout();
     router.push('/login');
   };
+
+  const handleCommunityChange = (communityId: string) => {
+    setPrimaryCommunityId(communityId);
+    setCommunityOpen(false);
+    setAccountOpen(false);
+    setDrawerOpen(false);
+  };
+
+  const communityCount = communities?.length ?? 0;
+  const canSwitchCommunity = communityCount > 1;
 
   return (
     <header
@@ -103,6 +124,83 @@ export function AppHeader() {
             priority
           />
         </Link>
+
+        {primaryCommunity ? (
+          <div className="relative hidden lg:block" ref={communityRef}>
+            <button
+              type="button"
+              onClick={() => {
+                if (canSwitchCommunity) {
+                  setCommunityOpen((value) => !value);
+                  setAccountOpen(false);
+                }
+              }}
+              aria-label={
+                canSwitchCommunity
+                  ? 'Switch active community'
+                  : 'Current community'
+              }
+              aria-expanded={canSwitchCommunity ? communityOpen : undefined}
+              className="inline-flex max-w-[190px] items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+            >
+              <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-accent)]" />
+              <span className="truncate">{primaryCommunity.name}</span>
+              {canSwitchCommunity ? (
+                <span
+                  aria-hidden="true"
+                  className="text-xs text-[var(--text-tertiary)]"
+                >
+                  v
+                </span>
+              ) : null}
+            </button>
+
+            {communityOpen && canSwitchCommunity ? (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setCommunityOpen(false)}
+                  aria-hidden="true"
+                />
+                <div
+                  className="absolute left-0 z-50 mt-2 min-w-[240px] overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-2 shadow-xl backdrop-blur"
+                  role="menu"
+                >
+                  <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+                    Active community
+                  </p>
+                  {communities?.map((community) => {
+                    const active = community.id === primaryCommunityId;
+                    return (
+                      <button
+                        key={community.id}
+                        type="button"
+                        role="menuitemradio"
+                        aria-checked={active}
+                        onClick={() => handleCommunityChange(community.id)}
+                        className="flex w-full items-center justify-between gap-3 rounded-xl border-0 bg-transparent px-3 py-2 text-left text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
+                      >
+                        <span className="min-w-0">
+                          <span className="block truncate">
+                            {community.name}
+                          </span>
+                          <span className="block text-xs font-normal capitalize text-[var(--text-tertiary)]">
+                            {community.type.replaceAll('_', ' ')}
+                          </span>
+                        </span>
+                        {active ? (
+                          <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--color-brand-accent-strong)]">
+                            Current
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : null}
+          </div>
+        ) : null}
 
         <nav
           className="hidden items-center gap-0.5 md:flex"
@@ -165,7 +263,10 @@ export function AppHeader() {
           <div className="relative" ref={accountRef}>
             <button
               type="button"
-              onClick={() => setAccountOpen((value) => !value)}
+              onClick={() => {
+                setAccountOpen((value) => !value);
+                setCommunityOpen(false);
+              }}
               aria-label="Account menu"
               aria-expanded={accountOpen}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--text-primary)] text-[var(--color-brand-primary)] shadow-sm transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
@@ -196,6 +297,45 @@ export function AppHeader() {
                   className="absolute right-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-2xl border border-black/10 bg-white/95 py-2 shadow-xl backdrop-blur"
                   role="menu"
                 >
+                  {primaryCommunity && canSwitchCommunity ? (
+                    <>
+                      <div className="mx-2 rounded-xl bg-[var(--color-brand-primary-soft)] px-3 py-2">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-primary-strong)]">
+                          Active community
+                        </p>
+                        <p className="mt-1 truncate text-sm font-semibold text-[var(--text-primary)]">
+                          {primaryCommunity.name}
+                        </p>
+                      </div>
+                      <div className="mx-2 mt-1 grid gap-1">
+                        {communities?.map((community) => {
+                          const active = community.id === primaryCommunityId;
+                          return (
+                            <button
+                              key={community.id}
+                              type="button"
+                              role="menuitemradio"
+                              aria-checked={active}
+                              onClick={() =>
+                                handleCommunityChange(community.id)
+                              }
+                              className={`rounded-xl border-0 px-3 py-2 text-left text-xs font-semibold ${
+                                active
+                                  ? 'bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]'
+                                  : 'bg-transparent text-[var(--text-secondary)] hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]'
+                              }`}
+                            >
+                              {community.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div
+                        aria-hidden="true"
+                        className="my-1 border-t border-black/10"
+                      />
+                    </>
+                  ) : null}
                   <Link
                     href="/dashboard"
                     role="menuitem"
@@ -254,6 +394,37 @@ export function AppHeader() {
             aria-label="Primary"
           >
             <div className="mx-auto max-w-6xl px-4 py-3">
+              {primaryCommunity ? (
+                <div className="mb-3 rounded-2xl border border-black/10 bg-[var(--color-brand-primary-soft)] p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-primary-strong)]">
+                    Current community
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+                    {primaryCommunity.name}
+                  </p>
+                  {canSwitchCommunity ? (
+                    <div className="mt-3 grid gap-1">
+                      {communities?.map((community) => {
+                        const active = community.id === primaryCommunityId;
+                        return (
+                          <button
+                            key={community.id}
+                            type="button"
+                            onClick={() => handleCommunityChange(community.id)}
+                            className={`rounded-xl border px-3 py-2 text-left text-xs font-semibold ${
+                              active
+                                ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]'
+                                : 'border-black/10 bg-white/80 text-[var(--text-secondary)]'
+                            }`}
+                          >
+                            {community.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
               <Link
                 href="/sell"
                 onClick={() => setDrawerOpen(false)}

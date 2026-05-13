@@ -199,7 +199,7 @@ describe.skipIf(!integrationDbAvailable)('auth integration', () => {
       expect(res.statusCode).toBe(401);
     });
 
-    it('returns the authed user profile and their community ids', async () => {
+    it('returns the authed user profile and their community summaries', async () => {
       const user = await createUser({ displayName: 'Alex' });
       const community = await createCommunity({ name: 'Westside' });
       await addMember(user.id, community.id, 'member');
@@ -217,14 +217,20 @@ describe.skipIf(!integrationDbAvailable)('auth integration', () => {
             id: string;
             displayName: string;
             communityMember: boolean;
+            communities: Array<{ id: string; name: string }>;
           };
           communityIds: string[];
+          communities: Array<{ id: string; name: string }>;
         };
       }>();
       expect(body.data.user.id).toBe(user.id);
       expect(body.data.user.displayName).toBe('Alex');
       expect(body.data.user.communityMember).toBe(true);
       expect(body.data.communityIds).toContain(community.id);
+      expect(body.data.communities).toEqual([
+        expect.objectContaining({ id: community.id, name: 'Westside' }),
+      ]);
+      expect(body.data.user.communities).toEqual(body.data.communities);
     });
   });
 

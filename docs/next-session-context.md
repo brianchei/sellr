@@ -39,6 +39,9 @@ The current web SLC includes:
   dashboard readiness guidance, seller-owned listing identity previews, and
   buyer-facing seller-card cache refreshes now point users toward that profile
   surface.
+- Phase 3 community product work has started with active community summaries on
+  `/auth/me` and a quiet authenticated app-shell community indicator/switcher for
+  multi-community users.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -263,12 +266,13 @@ verify admin/community access, run media health checks, watch Railway/Resend
 logs, and record any launch notes. Do not add new product scope.
 ```
 
-If continuing product development, start Phase 3 community product surface work:
+If continuing product development, continue Phase 3 community product surface work:
 
 ```text
 Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
-docs/design-language.md, and docs/next-session-context.md. Begin Phase 3:
-community product surface. Start with the smallest useful community-facing slice,
-such as a quiet app-shell community switcher or community homepage, and keep the
-scope inside the web SLC.
+docs/design-language.md, and docs/next-session-context.md. Continue Phase 3:
+community product surface. The quiet app-shell community switcher has started;
+next, choose the smallest useful community-facing slice, such as a community
+homepage or lightweight community theme/config, and keep the scope inside the web
+SLC.
 ```

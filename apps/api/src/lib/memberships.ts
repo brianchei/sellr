@@ -3,7 +3,7 @@ import type { JWTPayload } from '../middleware/auth';
 
 export async function buildUserJwtPayload(userId: string): Promise<JWTPayload> {
   const rows = await prisma.communityMember.findMany({
-    where: { userId, status: 'active' },
+    where: { userId, status: 'active', community: { status: 'active' } },
     select: { communityId: true, role: true },
   });
   const communityIds = rows.map((r) => r.communityId);
