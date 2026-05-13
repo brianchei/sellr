@@ -126,7 +126,7 @@ export default function DashboardPage() {
   }, [conversations]);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <GreetingHero
         me={me}
         isLoading={meQuery.isLoading}
@@ -208,10 +208,10 @@ function GreetingHero({
 
   return (
     <section
-      className="relative overflow-hidden rounded-2xl border border-[var(--border-default)] p-5 sm:p-7"
+      className="app-panel-soft relative overflow-hidden p-5 sm:p-7"
       style={{
         background:
-          'linear-gradient(135deg, var(--color-brand-primary-soft) 0%, var(--bg-elevated) 55%, var(--color-brand-accent-soft) 100%)',
+          'linear-gradient(135deg, var(--color-brand-primary-soft) 0%, var(--bg-elevated) 48%, var(--color-brand-contrast-soft) 100%)',
       }}
     >
       <div className="relative z-10 grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-5">
@@ -280,7 +280,7 @@ function GreetingHero({
         <div className="flex flex-wrap gap-2 sm:shrink-0 sm:justify-end">
           <Link
             href="/sell"
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm transition hover:-translate-y-px hover:bg-[var(--color-brand-primary-hover)] hover:shadow-md sm:flex-none"
+            className="app-action-primary flex-1 px-4 py-2 text-sm sm:flex-none"
           >
             <svg
               width="14"
@@ -300,7 +300,7 @@ function GreetingHero({
           </Link>
           <Link
             href="/marketplace"
-            className="inline-flex flex-1 items-center justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)] sm:flex-none"
+            className="app-action-secondary flex-1 px-4 py-2 text-sm sm:flex-none"
           >
             Browse
           </Link>
@@ -413,7 +413,7 @@ function KpiStrip({
         <Link
           key={tile.label}
           href={tile.href}
-          className="group flex items-center gap-3 rounded-lg border border-[var(--border-default)] bg-white p-4 no-underline shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--color-brand-contrast-muted)] hover:shadow-md"
+          className="group flex items-center gap-3 rounded-3xl border border-black/10 bg-white/90 p-4 no-underline shadow-[var(--shadow-app-card)] backdrop-blur transition hover:-translate-y-1 hover:border-black/20 hover:bg-white hover:shadow-xl"
         >
           <span
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
@@ -480,7 +480,7 @@ function RecentListingsPanel({
   isError: boolean;
 }) {
   return (
-    <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+    <section className="app-panel p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
@@ -503,7 +503,7 @@ function RecentListingsPanel({
           {Array.from({ length: 3 }, (_, index) => (
             <li
               key={index}
-              className="grid grid-cols-[56px_minmax(0,1fr)_60px] gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3"
+              className="grid grid-cols-[56px_minmax(0,1fr)_60px] gap-3 rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3"
             >
               <div className="h-14 w-14 rounded-md bg-[var(--bg-tertiary)]" />
               <div className="space-y-2">
@@ -522,7 +522,7 @@ function RecentListingsPanel({
           Could not load your listings.
         </p>
       ) : listings.length === 0 ? (
-        <div className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-5 text-center">
+        <div className="mt-4 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-5 text-center">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             No listings yet
           </p>
@@ -532,7 +532,7 @@ function RecentListingsPanel({
           </p>
           <Link
             href="/sell"
-            className="mt-3 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-3 px-3 py-1.5 text-xs"
           >
             Create your first listing
           </Link>
@@ -546,10 +546,10 @@ function RecentListingsPanel({
               <li key={listing.id}>
                 <Link
                   href={`/marketplace/${listing.id}`}
-                  className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 rounded-lg border border-[var(--border-default)] p-3 no-underline transition hover:border-[var(--color-brand-contrast-muted)] hover:bg-[var(--bg-secondary)]"
+                  className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-black/10 p-3 no-underline transition hover:border-black/20 hover:bg-[var(--bg-secondary)]"
                 >
                   <div
-                    className="aspect-square h-14 w-14 overflow-hidden rounded-md bg-[var(--bg-tertiary)] bg-cover bg-center"
+                    className="aspect-square h-14 w-14 overflow-hidden rounded-2xl bg-[var(--bg-tertiary)] bg-cover bg-center"
                     style={
                       photo ? { backgroundImage: `url("${photo}")` } : undefined
                     }
@@ -618,7 +618,7 @@ function RecentInboxPanel({
   isError: boolean;
 }) {
   return (
-    <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+    <section className="app-panel p-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
@@ -641,7 +641,7 @@ function RecentInboxPanel({
           {Array.from({ length: 3 }, (_, index) => (
             <li
               key={index}
-              className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3"
+              className="rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3"
             >
               <div className="h-4 w-2/3 rounded bg-[var(--bg-tertiary)]" />
               <div className="mt-2 h-3 w-1/2 rounded bg-[var(--bg-tertiary)]" />
@@ -656,7 +656,7 @@ function RecentInboxPanel({
           Could not load conversations.
         </p>
       ) : conversations.length === 0 ? (
-        <div className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-5 text-center">
+        <div className="mt-4 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-5 text-center">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             No conversations yet
           </p>
@@ -670,7 +670,7 @@ function RecentInboxPanel({
             <li key={conversation.id}>
               <Link
                 href={`/inbox/${conversation.id}`}
-                className="block rounded-lg border border-[var(--border-default)] p-3 no-underline transition hover:border-[var(--color-brand-contrast-muted)] hover:bg-[var(--bg-secondary)]"
+                className="block rounded-2xl border border-black/10 p-3 no-underline transition hover:border-black/20 hover:bg-[var(--bg-secondary)]"
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="min-w-0 truncate text-sm font-semibold text-[var(--text-primary)]">
@@ -793,7 +793,7 @@ function SetupPanel({
             };
 
   return (
-    <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+    <section className="app-panel p-5">
       <header className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
@@ -836,7 +836,7 @@ function SetupPanel({
             {checks.map((check) => (
               <li
                 key={check.label}
-                className="flex gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3"
+              className="flex gap-3 rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3"
               >
                 <span
                   className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
@@ -875,7 +875,7 @@ function SetupPanel({
             ))}
           </ul>
 
-          <div className="mt-4 rounded-lg border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-3">
+          <div className="mt-4 rounded-2xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-3">
             <p className="text-xs font-semibold text-[var(--text-primary)]">
               Next best action
             </p>
@@ -884,7 +884,7 @@ function SetupPanel({
             </p>
             <Link
               href={nextAction.href}
-              className="mt-2 inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+              className="app-action-primary mt-2 w-full px-3 py-1.5 text-xs"
             >
               {nextAction.label}
             </Link>
@@ -909,7 +909,7 @@ function ProfileSection({
   const { data, isLoading, isError, error } = meQuery;
 
   return (
-    <section className="mt-8 rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+    <section className="app-panel mt-8 p-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
@@ -998,7 +998,7 @@ function ProfileEditor({
           }}
           maxLength={60}
           autoComplete="name"
-          className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+          className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
         />
       </label>
 
@@ -1045,7 +1045,7 @@ function ProfileEditor({
         <button
           type="submit"
           disabled={profileMutation.isPending || !dirty}
-          className="rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="app-action-primary px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
         >
           {profileMutation.isPending ? 'Saving...' : 'Save profile'}
         </button>

@@ -76,7 +76,7 @@ function EditListingForm({ listing }: { listing: ApiListing }) {
     <>
       {notice ? (
         <p
-          className="mt-6 rounded-lg border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm text-[var(--color-brand-accent-strong)]"
+          className="mt-6 rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm text-[var(--color-brand-accent-strong)]"
           role="status"
         >
           {notice}
@@ -118,14 +118,14 @@ export default function EditListingPage() {
   if (!primaryCommunityId) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <section className="rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+        <section className="app-panel p-6">
           <h1 className="text-2xl font-semibold">Join a community first</h1>
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
             Seller tools are scoped to verified local communities.
           </p>
           <Link
             href="/onboarding"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Join community
           </Link>
@@ -140,7 +140,7 @@ export default function EditListingPage() {
         <div className="h-5 w-28 rounded bg-[var(--bg-tertiary)]" />
         <div className="mt-3 h-9 w-64 rounded bg-[var(--bg-tertiary)]" />
         <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="space-y-5 rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+          <div className="space-y-5 rounded-3xl border border-black/10 bg-white/90 p-6 shadow-[var(--shadow-app-card)]">
             <div className="h-6 w-36 rounded bg-[var(--bg-tertiary)]" />
             <div className="h-11 rounded bg-[var(--bg-tertiary)]" />
             <div className="h-32 rounded bg-[var(--bg-tertiary)]" />
@@ -150,8 +150,8 @@ export default function EditListingPage() {
             </div>
           </div>
           <div className="space-y-5">
-            <div className="h-48 rounded-lg border border-[var(--border-default)] bg-white shadow-sm" />
-            <div className="h-48 rounded-lg border border-[var(--border-default)] bg-white shadow-sm" />
+            <div className="h-48 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
+            <div className="h-48 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
           </div>
         </section>
       </main>
@@ -162,7 +162,7 @@ export default function EditListingPage() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <section
-          className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h1 className="text-xl font-semibold">Could not load listing</h1>
@@ -181,7 +181,7 @@ export default function EditListingPage() {
             </button>
             <Link
               href="/listings"
-              className="rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
+              className="app-action-secondary px-4 py-2 text-sm"
             >
               Back to listings
             </Link>
@@ -198,7 +198,7 @@ export default function EditListingPage() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <section
-          className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h1 className="text-xl font-semibold">Only the seller can edit</h1>
@@ -208,7 +208,7 @@ export default function EditListingPage() {
           </p>
           <Link
             href={`/marketplace/${listing.id}`}
-            className="mt-5 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
+            className="app-action-secondary mt-5 px-4 py-2 text-sm"
           >
             View listing
           </Link>
@@ -227,7 +227,7 @@ export default function EditListingPage() {
           : 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]';
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-5xl px-4 py-6 pb-10 sm:py-8">
       <Link
         href="/listings"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
@@ -272,7 +272,7 @@ export default function EditListingPage() {
         </div>
         <Link
           href={`/marketplace/${listing.id}`}
-          className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] sm:w-auto"
+          className="app-action-secondary w-full px-4 py-2 text-sm sm:w-auto"
         >
           View as buyers see it
         </Link>

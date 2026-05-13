@@ -12,7 +12,7 @@ import { MESSAGE_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 function ThreadSkeleton() {
   return (
     <section className="mt-4 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
-      <div className="space-y-3 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm">
+      <div className="space-y-3 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)]">
         {Array.from({ length: 5 }, (_, index) => (
           <div key={index} className="flex gap-3 rounded-lg p-3">
             <div className="h-12 w-12 rounded-lg bg-[var(--bg-tertiary)]" />
@@ -23,7 +23,7 @@ function ThreadSkeleton() {
           </div>
         ))}
       </div>
-      <div className="rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-black/10 bg-white/90 p-6 shadow-[var(--shadow-app-card)]">
         <div className="h-6 w-48 rounded bg-[var(--bg-tertiary)]" />
         <div className="mt-8 space-y-4">
           <div className="h-16 w-2/3 rounded-lg bg-[var(--bg-tertiary)]" />
@@ -57,14 +57,14 @@ export default function ConversationPage() {
   if (!primaryCommunityId) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <section className="rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+        <section className="app-panel p-6">
           <h1 className="text-2xl font-semibold">Join a community first</h1>
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
             Conversations are scoped to verified local communities.
           </p>
           <Link
             href="/onboarding"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Join community
           </Link>
@@ -74,7 +74,7 @@ export default function ConversationPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <Link
         href="/inbox"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
@@ -99,7 +99,7 @@ export default function ConversationPage() {
 
       {conversationQuery.isError ? (
         <section
-          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="mt-4 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h2 className="text-base font-semibold">
@@ -120,7 +120,7 @@ export default function ConversationPage() {
             </button>
             <Link
               href="/inbox"
-              className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
+              className="app-action-secondary w-full px-4 py-2 text-sm sm:w-auto"
             >
               Inbox
             </Link>
@@ -133,7 +133,7 @@ export default function ConversationPage() {
       conversationQuery.data?.conversation ? (
         <section className="mt-4 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
           {conversationsQuery.isLoading ? (
-            <div className="hidden space-y-3 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm lg:block">
+            <div className="hidden space-y-3 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)] lg:block">
               {Array.from({ length: 5 }, (_, index) => (
                 <div key={index} className="flex gap-3 rounded-lg p-3">
                   <div className="h-12 w-12 rounded-lg bg-[var(--bg-tertiary)]" />
@@ -148,7 +148,7 @@ export default function ConversationPage() {
 
           {conversationsQuery.isError ? (
             <aside
-              className="hidden rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-[var(--color-brand-warm-strong)] lg:block"
+              className="hidden rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-[var(--color-brand-warm-strong)] lg:block"
               role="alert"
             >
               <h2 className="text-sm font-semibold">

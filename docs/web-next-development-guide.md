@@ -139,6 +139,9 @@ Work items:
 - Fix the dashboard mobile issue where the welcome-back element stretches text
   vertically.
 - Review loading, empty, and error states for brand consistency.
+- Add real social proof, usage statistics, testimonials, and student/seller
+  photos once they are available from launch usage or approved community
+  sources.
 
 Acceptance notes:
 
@@ -148,6 +151,9 @@ Acceptance notes:
   screens.
 - UW/Badger Market cues should support the launch community without hardcoding
   every future community assumption.
+- Do not publish invented testimonials, inflated metrics, or internal
+  implementation proof. Use real community proof only after it is acquired and
+  approved for public use.
 
 ### Phase 2: Profile And Auth Hardening
 
@@ -283,6 +289,20 @@ Acceptance notes:
 - Keep UI simple, opinionated, and recognizable.
 - Fix mobile landing page hero cutoff.
 - Fix mobile dashboard welcome-back layout issue.
+- Collect and add real landing-page proof later:
+  - verified launch member count.
+  - active listing count.
+  - successful contact or reply count.
+  - 2-3 real testimonials with approved names and photos.
+  - campus/community imagery that can be used publicly.
+- Add approved imagery where it improves trust and specificity:
+  - hero/app preview should use real Sellr marketplace, listing detail, and inbox
+    views.
+  - proof/testimonial sections can use real member or seller photos after
+    permission.
+  - Badger Market sections can use approved campus or neighborhood imagery.
+  - listing-quality sections can use real seed listing photos with seller
+    approval.
 
 ### Community
 
@@ -369,3 +389,9 @@ Keep this guide aligned with:
   commitments, FAQ, and final CTA. Pricing remains omitted for launch.
 - Reduced mobile hero preview height and adjusted dashboard greeting layout to
   avoid cramped or vertically stretched text on small screens.
+- Reworked the landing page visual system using the accessible Figma template
+  references: centered hero, early product demo, dark contrast bands, yellow
+  brand emphasis, compact proof cards, outcome cards, access cards, FAQ, and
+  final CTA.
+- Kept testimonials and pricing honest for launch by using trust commitments
+  and simple launch access instead of fake quotes or paid tiers.

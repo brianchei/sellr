@@ -9,7 +9,7 @@ export default function AppShellLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--bg-secondary)] text-[var(--text-primary)]">
+    <div className="app-shell-bg flex min-h-screen flex-col text-[var(--text-primary)]">
       <AuthGate>
         <RealtimeProvider />
         <AppHeader />

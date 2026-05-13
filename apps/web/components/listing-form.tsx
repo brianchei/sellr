@@ -34,10 +34,10 @@ type FieldName = keyof ListingFormValues;
 type TouchedFields = Partial<Record<FieldName, true>>;
 
 function fieldClassName(hasError: boolean): string {
-  return `mt-2 w-full rounded-lg border bg-white px-3 py-2.5 text-sm outline-none focus:ring-2 ${
+  return `mt-2 w-full rounded-2xl border bg-white/90 px-3 py-2.5 text-sm shadow-xs outline-none transition focus:ring-2 ${
     hasError
       ? 'border-[var(--color-brand-warm)] focus:border-[var(--color-brand-warm)] focus:ring-[var(--color-brand-warm-soft)]'
-      : 'border-[var(--border-default)] focus:border-[var(--color-brand-contrast)] focus:ring-[var(--color-brand-contrast-muted)]'
+      : 'border-black/10 focus:border-[var(--color-brand-contrast)] focus:ring-[var(--color-brand-contrast-muted)]'
   }`;
 }
 
@@ -221,7 +221,7 @@ export function ListingForm({
       onSubmit={handleSubmit}
       className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]"
     >
-      <section className="space-y-5 rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm sm:p-6">
+      <section className="app-panel space-y-5 p-5 sm:p-6">
         <div>
           <h2 className="text-lg font-semibold">Item details</h2>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
@@ -408,7 +408,7 @@ export function ListingForm({
               {values.photoUrls.map((photoUrl, index) => (
                 <div
                   key={photoUrl}
-                  className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white"
+                  className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm"
                 >
                   <div
                     className="flex aspect-square items-end bg-[var(--bg-tertiary)] bg-cover bg-center"
@@ -433,7 +433,7 @@ export function ListingForm({
           ) : null}
         </div>
 
-        <label className="flex items-start gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3 text-sm">
+        <label className="flex items-start gap-3 rounded-2xl border border-black/10 bg-[var(--color-brand-primary-soft)] p-3 text-sm">
           <input
             type="checkbox"
             checked={values.negotiable}
@@ -454,7 +454,7 @@ export function ListingForm({
       <aside className="space-y-5">
         <ListingBuyerPreview values={values} imageStatus={imageStatus} />
 
-        <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+        <section className="app-panel p-5">
           <h2 className="text-base font-semibold">Pickup context</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
             Share enough location detail for discovery without exposing an exact
@@ -514,7 +514,7 @@ export function ListingForm({
           </label>
         </section>
 
-        <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+        <section className="app-panel p-5">
           <h2 className="text-base font-semibold">Availability</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
             Add a recurring pickup window so buyers know when you are usually
@@ -578,7 +578,7 @@ export function ListingForm({
 
         {error ? (
           <p
-            className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+            className="rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
             role="alert"
           >
             {error}
@@ -588,7 +588,7 @@ export function ListingForm({
         <button
           type="submit"
           disabled={isSubmitting || isUploadingImage}
-          className="w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-3 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="app-action-primary w-full px-4 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting
             ? submittingLabel

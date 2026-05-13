@@ -29,10 +29,10 @@ function freshnessTextClass(tone: ListedFreshness['tone']): string {
 
 function StorefrontSkeleton() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <div className="h-5 w-28 rounded bg-[var(--bg-tertiary)]" />
       <section className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm sm:p-6">
+        <div className="app-panel p-5 sm:p-6">
           <div className="flex items-start gap-4">
             <div className="h-16 w-16 rounded-full bg-[var(--bg-tertiary)]" />
             <div className="flex-1 space-y-3">
@@ -42,13 +42,13 @@ function StorefrontSkeleton() {
             </div>
           </div>
         </div>
-        <div className="h-56 rounded-lg border border-[var(--border-default)] bg-white shadow-sm" />
+        <div className="h-56 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
       </section>
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={index}
-            className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm"
+            className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]"
           >
             <div className="aspect-[4/3] bg-[var(--bg-tertiary)]" />
             <div className="space-y-3 p-4">
@@ -98,14 +98,14 @@ export default function SellerStorefrontPage() {
   if (!primaryCommunityId) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <section className="rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+        <section className="app-panel p-6">
           <h1 className="text-2xl font-semibold">Join a community first</h1>
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
             Seller storefronts are visible inside verified local communities.
           </p>
           <Link
             href="/onboarding"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Join community
           </Link>
@@ -122,7 +122,7 @@ export default function SellerStorefrontPage() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <section
-          className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h1 className="text-xl font-semibold">Could not load seller</h1>
@@ -141,7 +141,7 @@ export default function SellerStorefrontPage() {
             </button>
             <Link
               href="/marketplace"
-              className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
+              className="app-action-secondary w-full px-4 py-2 text-sm sm:w-auto"
             >
               Back to marketplace
             </Link>
@@ -163,7 +163,7 @@ export default function SellerStorefrontPage() {
       : null;
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <Link
         href="/marketplace"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
@@ -185,11 +185,11 @@ export default function SellerStorefrontPage() {
       </Link>
 
       <section className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <article className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm sm:p-6">
+        <article className="app-panel-soft p-5 sm:p-6">
           <div className="flex flex-wrap items-start gap-4">
             <div
               aria-label={`${seller.displayName} avatar`}
-              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-lg font-bold text-[var(--text-primary)] shadow-sm"
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-lg font-bold text-[var(--text-primary)] shadow-md ring-4 ring-white/70"
               style={
                 seller.avatarUrl
                   ? { backgroundImage: `url("${seller.avatarUrl}")` }
@@ -257,7 +257,7 @@ export default function SellerStorefrontPage() {
           {mostRecentListing && recencyLabel ? (
             <Link
               href={`/marketplace/${mostRecentListing.id}`}
-              className="mt-5 flex items-center justify-between gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3 text-sm no-underline transition hover:border-[var(--color-brand-contrast-muted)] hover:bg-white"
+              className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/70 p-3 text-sm no-underline transition hover:border-black/20 hover:bg-white"
             >
               <div className="min-w-0">
                 <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
@@ -331,7 +331,7 @@ export default function SellerStorefrontPage() {
             ))}
           </div>
         ) : (
-          <div className="mt-5 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+          <div className="mt-5 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
             <h3 className="text-lg font-semibold">
               {isOwnProfile ? 'No active listings yet' : 'No active listings'}
             </h3>
@@ -342,7 +342,7 @@ export default function SellerStorefrontPage() {
             </p>
             <Link
               href={isOwnProfile ? '/sell' : '/marketplace'}
-              className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+              className="app-action-primary mt-5 px-4 py-2 text-sm"
             >
               {isOwnProfile ? 'Create your first listing' : 'Browse marketplace'}
             </Link>
@@ -367,7 +367,7 @@ function ContactCard({
   latestListingId: string | null;
 }) {
   return (
-    <div className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+    <div className="app-panel p-5">
       <h2 className="text-sm font-semibold text-[var(--text-primary)]">
         How to contact {sellerName.split(' ')[0] || sellerName}
       </h2>
@@ -391,7 +391,7 @@ function ContactCard({
           href={
             latestListingId ? `/marketplace/${latestListingId}` : '/marketplace'
           }
-          className="inline-flex justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+          className="app-action-primary justify-center px-4 py-2.5 text-sm"
         >
           {latestListingId ? 'Open most recent listing' : 'Browse marketplace'}
         </Link>
@@ -400,7 +400,7 @@ function ContactCard({
           targetType="user"
           subjectLabel={sellerName}
           triggerLabel="Report seller"
-          triggerClassName="inline-flex justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-warm-strong)] no-underline shadow-sm hover:bg-[var(--color-brand-warm-soft)]"
+          triggerClassName="inline-flex justify-center rounded-full border border-[var(--color-brand-warm)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-warm-strong)] no-underline shadow-sm hover:bg-[var(--color-brand-warm-soft)]"
         />
       </div>
     </div>
@@ -409,7 +409,7 @@ function ContactCard({
 
 function SelfStorefrontCard({ hasListings }: { hasListings: boolean }) {
   return (
-    <div className="rounded-lg border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-5">
+    <div className="rounded-3xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-5 shadow-[var(--shadow-app-card)]">
       <h2 className="text-sm font-semibold text-[var(--text-primary)]">
         Storefront preview
       </h2>
@@ -421,19 +421,19 @@ function SelfStorefrontCard({ hasListings }: { hasListings: boolean }) {
       <div className="mt-5 grid gap-2">
         <Link
           href="/listings"
-          className="inline-flex justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+          className="app-action-primary justify-center px-4 py-2.5 text-sm"
         >
           {hasListings ? 'Manage listings' : 'Manage inventory'}
         </Link>
         <Link
           href="/sell"
-          className="inline-flex justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+          className="app-action-secondary justify-center px-4 py-2 text-sm"
         >
           Sell another item
         </Link>
         <Link
           href="/dashboard"
-          className="inline-flex justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+          className="app-action-secondary justify-center px-4 py-2 text-sm"
         >
           Edit profile
         </Link>

@@ -37,7 +37,7 @@ export function ListingCard({ listing }: ListingCardProps) {
     <Link
       href={`/marketplace/${listing.id}`}
       aria-label={`${listing.title} — ${formatPrice(listing.price)}`}
-      className="group relative flex flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm no-underline transition hover:-translate-y-0.5 hover:border-[var(--color-brand-contrast-muted)] hover:shadow-md focus-visible:-translate-y-0.5 focus-visible:border-[var(--color-brand-contrast)] focus-visible:shadow-md"
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] no-underline backdrop-blur transition hover:-translate-y-1 hover:border-black/20 hover:bg-white hover:shadow-xl focus-visible:-translate-y-1 focus-visible:border-[var(--color-brand-contrast)] focus-visible:shadow-xl"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--bg-tertiary)]">
         {primaryPhoto ? (
@@ -55,12 +55,12 @@ export function ListingCard({ listing }: ListingCardProps) {
         )}
 
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-[var(--color-brand-contrast)] shadow-sm">
+          <span className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] shadow-sm backdrop-blur">
             {listing.category}
           </span>
           {isUnavailable ? (
             <span
-              className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold shadow-sm"
+              className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold shadow-sm backdrop-blur"
               style={{ color: 'var(--color-brand-warm-strong)' }}
             >
               {listing.status === 'sold'
@@ -97,7 +97,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           <h2 className="line-clamp-2 text-base font-semibold leading-6 text-[var(--text-primary)]">
             {listing.title}
           </h2>
-          <p className="shrink-0 text-base font-semibold text-[var(--text-primary)]">
+          <p className="shrink-0 rounded-full bg-[var(--color-brand-primary)] px-2.5 py-1 text-sm font-bold text-[var(--text-primary)]">
             {formatPrice(listing.price)}
           </p>
         </div>
@@ -131,16 +131,16 @@ export function ListingCard({ listing }: ListingCardProps) {
         </p>
 
         <div className="mt-4 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-medium text-[var(--text-secondary)]">
+          <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]">
             {formatCondition(listing.condition)}
           </span>
           {listing.negotiable ? (
-            <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-primary-strong)]">
+            <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
               Open to offers
             </span>
           ) : null}
           {verified ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-accent-strong)]">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
               <svg
                 width="11"
                 height="11"

@@ -76,14 +76,14 @@ export function ReportDialog({
 
       {open ? (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 px-4 py-6 sm:items-center"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/45 px-4 py-6 backdrop-blur-sm sm:items-center"
           role="presentation"
         >
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby={`report-${targetType}-${targetId}-title`}
-            className="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-y-auto rounded-xl border border-[var(--border-default)] bg-white p-5 shadow-xl"
+            className="app-panel max-h-[calc(100vh-3rem)] w-full max-w-md overflow-y-auto p-5"
           >
             {reportMutation.isSuccess ? (
               <div>
@@ -100,7 +100,7 @@ export function ReportDialog({
                 <button
                   type="button"
                   onClick={close}
-                  className="mt-5 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+                  className="app-action-primary mt-5 w-full px-4 py-2.5 text-sm"
                 >
                   Done
                 </button>
@@ -122,7 +122,7 @@ export function ReportDialog({
                   <button
                     type="button"
                     onClick={close}
-                    className="rounded-md px-2 py-1 text-sm font-medium text-[var(--text-tertiary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]"
+                    className="rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--text-tertiary)] hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
                   >
                     Close
                   </button>
@@ -136,10 +136,10 @@ export function ReportDialog({
                     {(['safety', 'quality'] as const).map((option) => (
                       <label
                         key={option}
-                        className={`rounded-lg border px-3 py-2 text-sm ${
+                        className={`rounded-2xl border px-3 py-2 text-sm font-semibold ${
                           severity === option
-                            ? 'border-[var(--color-brand-contrast)] bg-[var(--color-brand-contrast-soft)] text-[var(--color-brand-contrast)]'
-                            : 'border-[var(--border-default)] bg-white text-[var(--text-secondary)]'
+                            ? 'border-[#111111] bg-[#111111] text-[var(--color-brand-primary)]'
+                            : 'border-black/10 bg-white text-[var(--text-secondary)]'
                         }`}
                       >
                         <input
@@ -169,14 +169,14 @@ export function ReportDialog({
                     rows={4}
                     maxLength={500}
                     placeholder="Tell us what happened. Do not include sensitive personal details."
-                    className="mt-2 w-full resize-y rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                    className="mt-2 w-full resize-y rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                   />
                 </label>
 
                 {formError || reportMutation.isError ? (
                   <p
                     role="alert"
-                    className="mt-3 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+                    className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
                   >
                     {formError ??
                       (reportMutation.error instanceof Error
@@ -189,14 +189,14 @@ export function ReportDialog({
                   <button
                     type="button"
                     onClick={close}
-                    className="rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)]"
+                    className="app-action-secondary px-4 py-2.5 text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={reportMutation.isPending}
-                    className="rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="app-action-primary px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {reportMutation.isPending ? 'Submitting...' : 'Submit report'}
                   </button>

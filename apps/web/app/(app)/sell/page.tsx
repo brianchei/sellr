@@ -79,7 +79,7 @@ export default function SellPage() {
   if (!primaryCommunityId) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <section className="rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+        <section className="app-panel p-6">
           <h1 className="text-2xl font-semibold">
             Join a community before selling
           </h1>
@@ -88,7 +88,7 @@ export default function SellPage() {
           </p>
           <Link
             href="/onboarding"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Join community
           </Link>
@@ -98,7 +98,7 @@ export default function SellPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-5xl px-4 py-6 pb-10 sm:py-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
@@ -115,7 +115,7 @@ export default function SellPage() {
         </div>
         <Link
           href="/listings"
-          className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] sm:w-auto"
+          className="app-action-secondary w-full px-4 py-2 text-sm sm:w-auto"
         >
           My listings
         </Link>

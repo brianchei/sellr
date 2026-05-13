@@ -207,7 +207,7 @@ export default function ListingDetailPage() {
       <main className="mx-auto max-w-6xl px-4 py-8">
         <div className="h-5 w-28 rounded bg-[var(--bg-tertiary)]" />
         <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm">
+          <div className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]">
             <div className="aspect-[4/3] bg-[var(--bg-tertiary)]" />
             <div className="space-y-3 p-5">
               <div className="h-4 w-32 rounded bg-[var(--bg-tertiary)]" />
@@ -217,8 +217,8 @@ export default function ListingDetailPage() {
             </div>
           </div>
           <div className="space-y-4">
-            <div className="h-44 rounded-lg border border-[var(--border-default)] bg-white shadow-sm" />
-            <div className="h-64 rounded-lg border border-[var(--border-default)] bg-white shadow-sm" />
+            <div className="h-44 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
+            <div className="h-64 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
           </div>
         </section>
       </main>
@@ -229,7 +229,7 @@ export default function ListingDetailPage() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <section
-          className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h1 className="text-xl font-semibold">Could not load listing</h1>
@@ -248,7 +248,7 @@ export default function ListingDetailPage() {
             </button>
             <Link
               href="/marketplace"
-              className="inline-flex w-full justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)] sm:w-auto"
+              className="app-action-secondary w-full px-4 py-2 text-sm sm:w-auto"
             >
               Back to browse
             </Link>
@@ -259,7 +259,7 @@ export default function ListingDetailPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <Link
         href="/marketplace"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
@@ -281,7 +281,7 @@ export default function ListingDetailPage() {
       </Link>
 
       <section className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <article className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm">
+        <article className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] backdrop-blur">
           <PhotoGallery
             photos={photos}
             selectedIndex={selectedPhotoIndex}
@@ -403,7 +403,7 @@ export default function ListingDetailPage() {
             ) : null}
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <section className="rounded-lg border border-[var(--border-default)] bg-white p-4">
+              <section className="rounded-2xl border border-black/10 bg-white/80 p-4">
                 <h2 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-primary)]">
                   <svg
                     width="14"
@@ -430,7 +430,7 @@ export default function ListingDetailPage() {
                 </p>
               </section>
 
-              <section className="rounded-lg border border-[var(--border-default)] bg-white p-4">
+              <section className="rounded-2xl border border-black/10 bg-white/80 p-4">
                 <h2 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-primary)]">
                   <svg
                     width="14"
@@ -561,13 +561,13 @@ function ContactCard({
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   return (
-    <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+    <section className="app-panel p-5">
       <h2 className="text-base font-semibold text-[var(--text-primary)]">
         {isOwnListing ? 'Your listing' : 'Contact seller'}
       </h2>
 
       {isOwnListing ? (
-        <div className="mt-3 rounded-lg border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+        <div className="mt-3 rounded-2xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             This is your listing.
           </p>
@@ -578,20 +578,20 @@ function ContactCard({
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             <Link
               href={`/listings/${listing.id}/edit`}
-              className="inline-flex justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+              className="app-action-primary justify-center px-4 py-2 text-sm"
             >
               Edit listing
             </Link>
             <Link
               href="/listings"
-              className="inline-flex justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-tertiary)]"
+              className="app-action-secondary justify-center px-4 py-2 text-sm"
             >
               My listings
             </Link>
           </div>
         </div>
       ) : !isAvailable ? (
-        <div className="mt-3 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4">
+        <div className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4">
           <p className="text-sm font-medium text-[var(--color-brand-warm-strong)]">
             This listing is not currently available.
           </p>
@@ -609,7 +609,7 @@ function ContactCard({
           ) : null}
         </div>
       ) : sent ? (
-        <div className="mt-3 rounded-lg border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-4">
+        <div className="mt-3 rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-4">
           <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-brand-accent-strong)]">
             <svg
               width="14"
@@ -637,7 +637,7 @@ function ContactCard({
                 ? `/inbox/${sentConversationId}`
                 : '/inbox'
             }
-            className="mt-3 inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
+            className="app-action-primary mt-3 w-full px-4 py-2 text-sm sm:w-auto"
           >
             Open conversation
           </Link>
@@ -657,7 +657,7 @@ function ContactCard({
                     type="button"
                     onClick={() => onApplyQuickReply(reply)}
                     aria-pressed={active}
-                    className="rounded-full border px-3 py-1.5 text-xs font-medium transition"
+                    className="rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:-translate-y-0.5"
                     style={{
                       borderColor: active
                         ? 'var(--color-brand-contrast)'
@@ -685,19 +685,19 @@ function ContactCard({
               rows={5}
               maxLength={8000}
               placeholder="Be specific about timing and pickup preferences."
-              className="mt-2 w-full resize-y rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="mt-2 w-full resize-y rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
             />
           </label>
 
           {messageError ? (
-            <p className="mt-2 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]">
+            <p className="mt-2 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]">
               {messageError}
             </p>
           ) : null}
 
           {isError ? (
             <p
-              className="mt-2 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+              className="mt-2 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
               role="alert"
             >
               {errorMessage ?? 'Could not send your message. Try again.'}
@@ -707,7 +707,7 @@ function ContactCard({
           <button
             type="submit"
             disabled={isPending}
-            className="mt-3 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-3 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="app-action-primary mt-3 w-full px-4 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPending ? 'Sending...' : 'Send message'}
           </button>
@@ -742,7 +742,7 @@ function SafePickupCard({
 
   return (
     <section
-      className="rounded-lg border border-[var(--color-brand-accent-muted)] p-5 shadow-sm"
+      className="rounded-3xl border border-[var(--color-brand-accent-muted)] p-5 shadow-[var(--shadow-app-card)]"
       style={{
         background:
           'linear-gradient(180deg, var(--color-brand-accent-soft) 0%, var(--bg-elevated) 70%)',

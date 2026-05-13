@@ -52,10 +52,10 @@ function MessageBubble({
   return (
     <li className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[84%] rounded-lg px-4 py-3 shadow-sm ${
+        className={`max-w-[84%] rounded-2xl px-4 py-3 shadow-sm ${
           isMine
-            ? 'bg-[var(--color-brand-primary)] text-[var(--text-primary)]'
-            : 'border border-[var(--border-default)] bg-white text-[var(--text-primary)]'
+            ? 'bg-[#111111] text-white'
+            : 'border border-black/10 bg-white text-[var(--text-primary)]'
         }`}
       >
         <p className="whitespace-pre-wrap break-words text-sm leading-6">
@@ -64,7 +64,7 @@ function MessageBubble({
         <p
           className={`mt-2 text-xs ${
             isMine
-              ? 'text-[var(--color-brand-primary-strong)]'
+              ? 'text-white/60'
               : 'text-[var(--text-tertiary)]'
           }`}
         >
@@ -96,7 +96,7 @@ function ListingContextHeader({
   const listing = conversation.listing;
   if (!listing) {
     return (
-      <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-3">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-3">
         <div>
           <p className="text-sm font-semibold text-[var(--text-primary)]">
             {conversationTitle(conversation)}
@@ -141,10 +141,10 @@ function ListingContextHeader({
   return (
     <Link
       href={`/marketplace/${listing.id}`}
-      className="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3 rounded-lg border border-[var(--border-default)] bg-white p-3 no-underline transition hover:border-[var(--color-brand-contrast-muted)] hover:bg-[var(--bg-secondary)]"
+      className="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-black/10 bg-white/85 p-3 no-underline transition hover:border-black/20 hover:bg-white"
     >
       <div
-        className="aspect-square h-16 w-16 overflow-hidden rounded-md bg-[var(--bg-tertiary)] bg-cover bg-center"
+        className="aspect-square h-16 w-16 overflow-hidden rounded-2xl bg-[var(--bg-tertiary)] bg-cover bg-center"
         style={
           primaryPhoto
             ? { backgroundImage: `url("${primaryPhoto}")` }
@@ -263,8 +263,8 @@ export function ConversationThread({
   }
 
   return (
-    <article className="flex min-h-[460px] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm lg:min-h-[560px]">
-      <header className="border-b border-[var(--border-default)] p-4">
+    <article className="flex min-h-[460px] flex-col overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] backdrop-blur lg:min-h-[560px]">
+      <header className="border-b border-black/10 bg-white/70 p-4">
         <ListingContextHeader conversation={conversation} role={role} />
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -300,7 +300,7 @@ export function ConversationThread({
           <button
             type="button"
             onClick={() => setShowPeerDetails((value) => !value)}
-            className="-mr-2 inline-flex shrink-0 items-center rounded-md px-2 py-1.5 text-xs font-medium text-[var(--color-brand-contrast)] hover:bg-[var(--color-brand-contrast-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+            className="-mr-2 inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--color-brand-primary-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             aria-expanded={showPeerDetails}
           >
             {showPeerDetails ? 'Hide details' : 'Trust details'}
@@ -339,17 +339,17 @@ export function ConversationThread({
         ) : null}
       </header>
 
-      <div className="max-h-[520px] flex-1 overflow-y-auto bg-[var(--bg-secondary)] p-4 lg:max-h-none">
+      <div className="max-h-[520px] flex-1 overflow-y-auto bg-[linear-gradient(180deg,var(--color-brand-primary-soft)_0%,var(--bg-secondary)_32%,#ffffff_100%)] p-4 lg:max-h-none">
         {messagesQuery.isLoading ? (
           <div className="space-y-4">
-            <div className="h-16 w-2/3 rounded-lg bg-[var(--bg-tertiary)]" />
-            <div className="ml-auto h-16 w-2/3 rounded-lg bg-[var(--bg-tertiary)]" />
+            <div className="h-16 w-2/3 rounded-2xl bg-[var(--bg-tertiary)]" />
+            <div className="ml-auto h-16 w-2/3 rounded-2xl bg-[var(--bg-tertiary)]" />
           </div>
         ) : null}
 
         {messagesQuery.isError ? (
           <div
-            className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-[var(--color-brand-warm-strong)]"
+            className="rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-[var(--color-brand-warm-strong)]"
             role="alert"
           >
             <h3 className="text-sm font-semibold">Could not load messages</h3>
@@ -371,7 +371,7 @@ export function ConversationThread({
         {!messagesQuery.isLoading &&
         !messagesQuery.isError &&
         messages.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-6 text-center">
+          <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-white p-6 text-center">
             <h3 className="text-base font-semibold">
               No messages in this conversation
             </h3>
@@ -399,7 +399,7 @@ export function ConversationThread({
 
       <form
         onSubmit={onSubmit}
-        className="border-t border-[var(--border-default)] bg-white p-4"
+        className="border-t border-black/10 bg-white p-4"
       >
         {showQuickReplies ? (
           <div
@@ -411,7 +411,7 @@ export function ConversationThread({
                 key={reply}
                 type="button"
                 onClick={() => applyQuickReply(reply)}
-                className="inline-flex items-center rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)] transition hover:border-[var(--color-brand-contrast-muted)] hover:bg-white hover:text-[var(--color-brand-contrast)]"
+                className="inline-flex items-center rounded-full border border-black/10 bg-[var(--bg-secondary)] px-3 py-1 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-black/20 hover:bg-white hover:text-[var(--text-primary)]"
               >
                 {reply}
               </button>
@@ -435,13 +435,13 @@ export function ConversationThread({
                 ? 'Ask about timing, pickup location, or item details.'
                 : 'Suggest a pickup window or confirm availability.'
             }
-            className="w-full resize-y rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            className="w-full resize-y rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
           />
         </label>
 
         {replyError ? (
           <p
-            className="mt-3 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+            className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
             role="alert"
           >
             {replyError}
@@ -450,7 +450,7 @@ export function ConversationThread({
 
         {replyMutation.isError ? (
           <p
-            className="mt-3 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+            className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
             role="alert"
           >
             {replyMutation.error instanceof Error
@@ -466,7 +466,7 @@ export function ConversationThread({
           <button
             type="submit"
             disabled={replyMutation.isPending || reply.trim().length === 0}
-            className="w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            className="app-action-primary w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {replyMutation.isPending ? 'Sending...' : 'Send reply'}
           </button>
