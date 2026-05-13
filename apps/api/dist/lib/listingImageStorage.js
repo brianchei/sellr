@@ -7,10 +7,14 @@ exports.LISTING_IMAGE_CACHE_CONTROL = void 0;
 exports.isListingImageMimeType = isListingImageMimeType;
 exports.listingImageUploadRoot = listingImageUploadRoot;
 exports.listingImagesDir = listingImagesDir;
+exports.profileAvatarsDir = profileAvatarsDir;
 exports.listingImagePath = listingImagePath;
+exports.profileAvatarPath = profileAvatarPath;
 exports.listingImageMimeTypeForFilename = listingImageMimeTypeForFilename;
 exports.createListingImageStorage = createListingImageStorage;
+exports.createProfileAvatarStorage = createProfileAvatarStorage;
 exports.listingImageStorageReferenceFromUrl = listingImageStorageReferenceFromUrl;
+exports.profileAvatarStorageReferenceFromUrl = profileAvatarStorageReferenceFromUrl;
 exports.deleteListingImageObject = deleteListingImageObject;
 const node_crypto_1 = require("node:crypto");
 const promises_1 = require("node:fs/promises");
@@ -34,11 +38,20 @@ function listingImageUploadRoot() {
 function listingImagesDir() {
     return node_path_1.default.join(listingImageUploadRoot(), 'listing-images');
 }
+function profileAvatarsDir() {
+    return node_path_1.default.join(listingImageUploadRoot(), 'profile-avatars');
+}
 function listingImagePath(filename) {
     if (!/^[a-f0-9-]+\.(jpg|png|webp)$/i.test(filename)) {
         return null;
     }
     return node_path_1.default.join(listingImagesDir(), filename);
+}
+function profileAvatarPath(filename) {
+    if (!/^[a-f0-9-]+\.(jpg|png|webp)$/i.test(filename)) {
+        return null;
+    }
+    return node_path_1.default.join(profileAvatarsDir(), filename);
 }
 function listingImageMimeTypeForFilename(filename) {
     const extension = node_path_1.default.extname(filename).toLowerCase();
@@ -54,8 +67,15 @@ function createFilename(mimetype) {
 function createListingImageKey(filename) {
     return `listing-images/${filename}`;
 }
+function createProfileAvatarKey(filename) {
+    return `profile-avatars/${filename}`;
+}
 function filenameFromListingImageKey(storageKey) {
     const match = /^listing-images\/([a-f0-9-]+\.(jpg|png|webp))$/i.exec(storageKey);
+    return match?.[1] ?? null;
+}
+function filenameFromProfileAvatarKey(storageKey) {
+    const match = /^profile-avatars\/([a-f0-9-]+\.(jpg|png|webp))$/i.exec(storageKey);
     return match?.[1] ?? null;
 }
 function trimTrailingSlash(value) {
@@ -103,6 +123,23 @@ function createLocalListingImageStorage() {
                 filename,
                 key: createListingImageKey(filename),
                 url: `${shared_1.LISTING_IMAGE_UPLOAD_PATH_PREFIX}${filename}`,
+                storageProvider: 'local',
+            };
+        },
+    };
+}
+function createLocalProfileAvatarStorage() {
+    return {
+        async store(buffer, mimetype) {
+            const filename = createFilename(mimetype);
+            await (0, promises_1.mkdir)(profileAvatarsDir(), { recursive: true });
+            await (0, promises_1.writeFile)(node_path_1.default.join(profileAvatarsDir(), filename), buffer, {
+                flag: 'wx',
+            });
+            return {
+                filename,
+                key: createProfileAvatarKey(filename),
+                url: `${shared_1.PROFILE_AVATAR_UPLOAD_PATH_PREFIX}${filename}`,
                 storageProvider: 'local',
             };
         },
@@ -165,11 +202,62 @@ function createR2ListingImageStorage() {
         },
     };
 }
+function createR2ProfileAvatarStorage() {
+    const bucket = requireEnv('R2_BUCKET_NAME');
+    const publicBaseUrl = requirePublicBaseUrl();
+    const s3 = createR2Client();
+    return {
+        async store(buffer, mimetype) {
+            const filename = createFilename(mimetype);
+            const key = createProfileAvatarKey(filename);
+            try {
+                await s3.send(new client_s3_1.PutObjectCommand({
+                    Bucket: bucket,
+                    Key: key,
+                    Body: buffer,
+                    ContentType: mimetype,
+                    CacheControl: ONE_YEAR_IMMUTABLE,
+                }));
+            }
+            catch (error) {
+                logger_1.logger.error({
+                    err: error,
+                    operation: 'r2.put_object',
+                    bucket,
+                    storageKey: key,
+                    contentType: mimetype,
+                }, 'R2 profile avatar upload failed');
+                (0, observability_1.captureOperationalError)(error, {
+                    component: 'r2',
+                    operation: 'put_object',
+                    extra: {
+                        bucket,
+                        storageKey: key,
+                        contentType: mimetype,
+                    },
+                });
+                throw error;
+            }
+            return {
+                filename,
+                key,
+                url: `${publicBaseUrl}/${key}`,
+                storageProvider: 'r2',
+            };
+        },
+    };
+}
 function createListingImageStorage() {
     if (shouldUseR2Storage()) {
         return createR2ListingImageStorage();
     }
     return createLocalListingImageStorage();
+}
+function createProfileAvatarStorage() {
+    if (shouldUseR2Storage()) {
+        return createR2ProfileAvatarStorage();
+    }
+    return createLocalProfileAvatarStorage();
 }
 exports.LISTING_IMAGE_CACHE_CONTROL = ONE_YEAR_IMMUTABLE;
 function listingImageStorageReferenceFromUrl(url) {
@@ -206,6 +294,46 @@ function listingImageStorageReferenceFromUrl(url) {
         return null;
     const storageKey = decodeURIComponent(parsedUrl.pathname.slice(pathPrefix.length));
     if (!filenameFromListingImageKey(storageKey))
+        return null;
+    return {
+        storageKey,
+        storageProvider: 'r2',
+    };
+}
+function profileAvatarStorageReferenceFromUrl(url) {
+    if (url.startsWith(shared_1.PROFILE_AVATAR_UPLOAD_PATH_PREFIX)) {
+        const filename = url.slice(shared_1.PROFILE_AVATAR_UPLOAD_PATH_PREFIX.length);
+        if (!filenameFromProfileAvatarKey(createProfileAvatarKey(filename))) {
+            return null;
+        }
+        return {
+            storageKey: createProfileAvatarKey(filename),
+            storageProvider: 'local',
+        };
+    }
+    const publicBaseUrl = configuredPublicBaseUrl();
+    if (!publicBaseUrl)
+        return null;
+    let parsedUrl;
+    let parsedBase;
+    try {
+        parsedUrl = new URL(url);
+        parsedBase = new URL(publicBaseUrl);
+    }
+    catch {
+        return null;
+    }
+    if (parsedUrl.protocol !== parsedBase.protocol ||
+        parsedUrl.hostname !== parsedBase.hostname ||
+        parsedUrl.port !== parsedBase.port) {
+        return null;
+    }
+    const basePath = parsedBase.pathname.replace(/\/$/, '');
+    const pathPrefix = basePath ? `${basePath}/` : '/';
+    if (!parsedUrl.pathname.startsWith(pathPrefix))
+        return null;
+    const storageKey = decodeURIComponent(parsedUrl.pathname.slice(pathPrefix.length));
+    if (!filenameFromProfileAvatarKey(storageKey))
         return null;
     return {
         storageKey,

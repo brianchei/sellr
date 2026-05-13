@@ -20,6 +20,10 @@ React Query, and typed helpers from `@sellr/api-client`.
 - `/communities/[communityId]`: member-only community homepage with membership
   context, marketplace stats, recent listing previews, guidance, and scoped
   browse/sell actions.
+- `/communities/join`: post-login flow for joining another community with an
+  invite code or verified email-domain match.
+- `/admin/community`: admin invite/member management with a
+  management-community switcher for admins who operate multiple communities.
 - `/marketplace`: community-scoped browse, search, filters, and listing cards.
 - `/marketplace/[listingId]`: listing detail, seller trust card, contact seller,
   and report listing.
@@ -36,7 +40,6 @@ React Query, and typed helpers from `@sellr/api-client`.
   mark-read actions.
 - `/admin/reports`: admin-only report review, status updates, and explicit
   listing removal for listing reports.
-- `/admin/community`: admin-only community member access and invite-code setup.
 
 ## Local Development
 

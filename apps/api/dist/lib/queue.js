@@ -9,6 +9,7 @@ const notifications_1 = require("../jobs/notifications");
 const savedSearch_1 = require("../jobs/savedSearch");
 const quickReply_1 = require("../jobs/quickReply");
 const mediaCleanup_1 = require("../jobs/mediaCleanup");
+const logger_1 = require("./logger");
 function initBullMQ() {
     new bullmq_1.Worker('ai', imageForensics_1.imageForensicsWorker, {
         connection: redis_1.redis,
@@ -34,5 +35,5 @@ function initBullMQ() {
         connection: redis_1.redis,
         concurrency: 3,
     });
-    console.log('BullMQ workers initialized');
+    logger_1.logger.info('BullMQ workers initialized');
 }

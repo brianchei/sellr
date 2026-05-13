@@ -1,6 +1,6 @@
 # Sellr Current State And Scope
 
-Last updated: May 12, 2026.
+Last updated: May 13, 2026.
 
 ## Product Scope
 
@@ -43,6 +43,8 @@ Verified production checks:
 - `https://api.sellr-ai.com/health` returns `ok`.
 - `https://sellr-ai.com/api/v1/auth/me` returns the expected logged-out
   `Unauthorized` response through the same-origin Vercel rewrite.
+- The Phase 1 production visual smoke pass completed successfully across the
+  public, core authenticated, and admin web surfaces.
 - Resend email OTP works for verified `@wisc.edu` sign-in.
 - `Badger Market` exists in production with `email_domain = wisc.edu`.
 - Invite code `BADGER2026` works as the secondary join path.
@@ -65,7 +67,8 @@ Included:
 - Buyer contact, inbox threads, replies, notifications, and unread badges.
 - Basic reporting plus admin-only report review and explicit listing removal.
 - Admin-only community setup for invite codes and member role/status
-  management.
+  management, with an explicit management-community switcher for admins who
+  operate more than one community.
 - Dashboard profile/trust preview and seller readiness panel.
 - Vercel Web Analytics and Speed Insights mounted in the web root layout.
 - Media lifecycle cleanup for abandoned uploads, replaced/deleted listing
@@ -87,7 +90,11 @@ Included:
   community indicator/switcher backed by active community summaries from
   `/auth/me`, plus a member-only `/communities/[communityId]` homepage for
   community details, membership context, stats, guidance, recent listings, and
-  browse/sell actions scoped to that community.
+  browse/sell actions scoped to that community. Existing members can also use
+  `/communities/join` to join another community, refresh membership context,
+  switch to the joined community, and continue to its homepage. Admins with
+  multiple active admin memberships can switch the selected management
+  community on `/admin/community`.
 
 ## Deliberately Deferred
 
@@ -103,8 +110,6 @@ Do not add these before launch unless explicitly requested:
 ## Immediate Launch Priorities
 
 - Seed 25-40 high-quality active listings for the initial campus launch.
-- Run a production visual smoke pass after the Phase 1 design refresh is
-  deployed to `https://sellr-ai.com`.
 - Confirm launch admin can access `/admin/community` and `/admin/reports`.
 - Watch Railway logs and Resend logs during the first real-user wave.
 - Run `pnpm --filter @sellr/api media:health` after early listing activity.

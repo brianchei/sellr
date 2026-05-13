@@ -1,6 +1,6 @@
 # Sellr Web Next Development Guide
 
-Last updated: May 12, 2026.
+Last updated: May 13, 2026.
 
 Use this as the living guide for the next wave of Sellr web work after the
 current SLC/MVP. Update it as implementation progresses, decisions change, or
@@ -21,9 +21,10 @@ designed for the first campus launch while preserving the ability to support
 future communities.
 
 The Phase 1 brand, landing, and app-wide visual polish pass has now shipped in
-the web app. The remaining Phase 1 work is not new product functionality: it is
-production visual smoke testing after deploy and adding real launch proof,
-testimonials, statistics, and approved imagery once those assets exist.
+the web app, and the production visual smoke pass completed successfully. The
+remaining Phase 1 work is not new product functionality: it is adding real
+launch proof, testimonials, statistics, and approved imagery once those assets
+exist.
 
 ## Product Theme
 
@@ -149,7 +150,6 @@ Shipped:
 
 Remaining Phase 1 follow-ups:
 
-- Run a production visual smoke pass after the merged design refresh is deployed.
 - Add real social proof, usage statistics, testimonials, and student/seller
   photos once they are available from launch usage or approved community
   sources.
@@ -226,13 +226,21 @@ Shipped:
   `GET /communities/:communityId`, with community details, membership context,
   active member/listing/seller stats, recent listing previews, guidance, and
   browse/sell CTAs scoped to that community.
+- Added a signed-in `/communities/join` flow so existing members can join
+  another community with an invite code or verified email-domain match, refresh
+  their membership context, switch to the new community, and land on its
+  community homepage.
+- Added an explicit `/admin/community` management-community switcher so admins
+  with multiple active admin memberships can choose which community's invites
+  and members they are managing, with the selected community reflected in the
+  URL.
 
 Work items:
 
 - Add option to leave a community.
 - Add lightweight community theme/config data.
 - Create a decorated Badger Market community experience.
-- Expand admin community management controls.
+- Expand admin community editing controls.
 - Let admins edit community name, description, rules, branding/theme config, and
   invite code settings.
 - Improve member management in the admin dashboard.
@@ -357,27 +365,38 @@ Remaining Phase 1 content follow-ups:
 
 ### Community
 
+Completed in Phase 3:
+
 - Add global but quiet community switcher.
-- Add community homepage.
+- Add member community homepage.
+- Add post-login join-another-community flow.
+- Add admin management-community switcher.
+
+Remaining:
+
 - Add option to leave community.
 - Create decorated Badger Market / UW-Madison community.
 - Add lightweight community theme/config data.
-- Add more community controls to admin dashboard.
-- Update admin community management.
+- Add more community editing controls to admin dashboard.
 
 ### Profile And Trust
+
+Completed in Phase 2:
 
 - Add profile page.
 - Add profile completion requirements.
 - Require full name or real display name before key actions.
 - Add profile pictures.
-- Add more profile customization.
 - Add trust/profile progress.
 - Show seller info on user listings.
 
+Remaining:
+
+- Add more profile customization.
+
 ### Auth And Identity
 
-Started in Phase 2:
+Completed in Phase 2:
 
 - Improve login persistence across refresh and device sessions.
 - Change phone input to US-default phone number entry.
@@ -467,6 +486,9 @@ Keep this guide aligned with:
 - Verification reported for this Phase 1 pass: `pnpm --filter @sellr/web lint`,
   `pnpm --filter @sellr/web typecheck`, `pnpm --filter @sellr/web build`, and
   desktop/mobile browser checks for landing and key app entry points.
+- Production visual smoke for the Phase 1 refresh passed across the public
+  landing, auth/onboarding, dashboard, marketplace/listing, seller workflow,
+  messaging, notifications, and admin surfaces.
 
 ### Phase 2 Start
 
@@ -497,3 +519,9 @@ Keep this guide aligned with:
 - Added a member-only community homepage at `/communities/[communityId]` with a
   community detail API, membership context, active marketplace stats, recent
   listing previews, community guidance, and scoped browse/sell actions.
+- Added `/communities/join` for existing members to join another community,
+  refresh their auth/community context, switch to the newly joined community,
+  and continue to its community homepage.
+- Added a management-community switcher to `/admin/community` so admins with
+  multiple active admin memberships can choose which community's invites and
+  members they manage, with the selected community reflected in the URL.

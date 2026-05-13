@@ -7,6 +7,7 @@ const notifyUser_1 = require("../../lib/notifyUser");
 const response_1 = require("../../lib/response");
 const socket_1 = require("../../lib/socket");
 const auth_1 = require("../../middleware/auth");
+const profileRequirements_1 = require("../../lib/profileRequirements");
 function userTrustKey({ userId, communityId }) {
     return `${userId}:${communityId}`;
 }
@@ -283,6 +284,9 @@ const plugin = (fastify, _opts, done) => {
             return reply
                 .code(403)
                 .send({ error: 'Not a member of this community' });
+        }
+        if (!(await (0, profileRequirements_1.requireHighIntentProfile)(request, reply))) {
+            return;
         }
         const buyerId = request.user.sub;
         const sellerId = listing.sellerId;

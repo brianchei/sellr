@@ -21,7 +21,9 @@ The current web SLC includes:
 - Seller storefront-lite pages.
 - Buyer contact, inbox threads, replies, notifications, and unread badges.
 - Basic reporting plus admin-only report review and explicit listing removal.
-- Admin-only community setup for invite codes and member role/status management.
+- Admin-only community setup for invite codes and member role/status
+  management, including an explicit `/admin/community` management-community
+  switcher for admins with multiple active admin memberships.
 - Dashboard profile/trust preview and seller readiness panel.
 - Vercel Web Analytics and Speed Insights in the web app root layout.
 - Phase 1 web polish: refreshed public landing page, production brand assets,
@@ -43,7 +45,11 @@ The current web SLC includes:
   `/auth/me` and a quiet authenticated app-shell community indicator/switcher for
   multi-community users. A member-only `/communities/[communityId]` homepage now
   gives members community details, membership context, stats, guidance, recent
-  listings, and browse/sell actions scoped to that community.
+  listings, and browse/sell actions scoped to that community. Existing members
+  can use `/communities/join` to join another community by invite code or
+  verified email-domain match, then switch into that community context. Admins
+  can also switch which active admin community they are managing on
+  `/admin/community`.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -95,6 +101,8 @@ https://sellr-ai.com/api/v1/auth/me
 - Production smoke has passed for `@wisc.edu` email OTP, community join,
   listing creation with image upload, listing detail, buyer contact, inbox,
   notifications, seller listing lifecycle, and test-listing deletion.
+- The Phase 1 production visual smoke pass also passed across the refreshed
+  public, core authenticated, and admin web surfaces.
 - Media lifecycle cleanup has been deployed and production-smoke-tested for the
   main paths: pending/attached media tracking, image replacement, listing
   deletion, and explicit admin listing removal from reports.
@@ -249,8 +257,6 @@ Without it, local DB integration suites are skipped by the repo safety guard.
   blocker for the SLC.
 - Watch Railway, Resend, and media health during the first real-user wave.
 - Seed enough high-quality active listings for the initial UW-Madison launch.
-- Run a production visual smoke pass after the Phase 1 design refresh is live on
-  `https://sellr-ai.com`.
 - Add real landing-page proof, testimonials, statistics, and approved
   campus/member/listing imagery only after those assets are available and
   approved.
@@ -273,8 +279,10 @@ If continuing product development, continue Phase 3 community product surface wo
 ```text
 Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
 docs/design-language.md, and docs/next-session-context.md. Continue Phase 3:
-community product surface. The quiet app-shell community switcher has started;
-next, choose the smallest useful community-facing slice, such as lightweight
-community theme/config, community leave behavior, or admin-editable community
-details, and keep the scope inside the web SLC.
+community product surface. The app-shell community switcher, member community
+homepage, post-login join-another-community flow, and admin management-community
+switcher are already implemented. Next, choose the smallest useful
+community-facing slice, such as lightweight community theme/config, community
+leave behavior, or admin-editable community details, and keep the scope inside
+the web SLC.
 ```
