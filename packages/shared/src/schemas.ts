@@ -155,6 +155,10 @@ export const JoinCommunitySchema = z
     error: 'Either inviteCode or institutionalEmail is required',
   });
 
+export const LeaveCommunitySchema = z.object({
+  removeListings: z.boolean().optional().default(false),
+});
+
 export const CommunityAdminParamsSchema = z.object({
   communityId: z.uuid(),
 });

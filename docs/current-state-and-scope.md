@@ -95,10 +95,12 @@ Included:
   guidance, local-area chips, and trust highlights without adding a full
   theming system. Existing members can also use `/communities/join` to join
   another community, refresh membership context, switch to the joined community,
-  and continue to its homepage. Admins with multiple active admin memberships
-  can switch the selected management community on `/admin/community` and edit
-  basic community details, access method, email domain, and member-facing
-  rules/guidance.
+  and continue to its homepage. Members can leave a community from its homepage
+  after unpublishing active listings, or confirm removal of their active/draft
+  listings as part of the leave flow. Admins with multiple active admin
+  memberships can switch the selected management community on `/admin/community`
+  and edit basic community details, access method, email domain, and
+  member-facing rules/guidance.
 
 ## Deliberately Deferred
 

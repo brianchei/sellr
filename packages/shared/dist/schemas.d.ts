@@ -51,6 +51,9 @@ export declare const JoinCommunitySchema: z.ZodObject<{
     inviteCode: z.ZodOptional<z.ZodString>;
     institutionalEmail: z.ZodOptional<z.ZodEmail>;
 }, z.core.$strip>;
+export declare const LeaveCommunitySchema: z.ZodObject<{
+    removeListings: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
+}, z.core.$strip>;
 export declare const CommunityAdminParamsSchema: z.ZodObject<{
     communityId: z.ZodUUID;
 }, z.core.$strip>;

@@ -271,6 +271,15 @@ export declare function joinCommunity(body: {
     accessToken?: string;
     refreshToken?: string;
 }>;
+export declare function leaveCommunity(communityId: string, body: {
+    removeListings?: boolean;
+}): Promise<{
+    communityId: string;
+    communityIds: string[];
+    removedListingCount: number;
+    accessToken?: string;
+    refreshToken?: string;
+}>;
 export declare function fetchCommunityAdmin(): Promise<{
     communities: ApiCommunityAdminCommunity[];
 }>;

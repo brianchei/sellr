@@ -11,6 +11,7 @@ exports.fetchMe = fetchMe;
 exports.updateProfile = updateProfile;
 exports.registerPushToken = registerPushToken;
 exports.joinCommunity = joinCommunity;
+exports.leaveCommunity = leaveCommunity;
 exports.fetchCommunityAdmin = fetchCommunityAdmin;
 exports.fetchCommunityDetail = fetchCommunityDetail;
 exports.createCommunityInviteCode = createCommunityInviteCode;
@@ -108,6 +109,12 @@ function registerPushToken(expoPushToken) {
 }
 function joinCommunity(body) {
     return (0, fetch_1.apiFetch)('/communities/join', {
+        method: 'POST',
+        body: JSON.stringify(body),
+    });
+}
+function leaveCommunity(communityId, body) {
+    return (0, fetch_1.apiFetch)(`/communities/${communityId}/leave`, {
         method: 'POST',
         body: JSON.stringify(body),
     });

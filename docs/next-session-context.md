@@ -49,10 +49,12 @@ The current web SLC includes:
   listings, browse/sell actions, and lightweight Badger Market/campus
   presentation cues scoped to that community. Existing members can use
   `/communities/join` to join another community by invite code or verified
-  email-domain match, then switch into that community context. Admins can also
-  switch which active admin community they are managing on `/admin/community`
-  and edit basic community details, access method, email domain, and
-  member-facing rules/guidance.
+  email-domain match, then switch into that community context. Members can leave
+  a community from its homepage after unpublishing active listings, or confirm
+  removal of their active/draft listings while leaving. Admins can also switch
+  which active admin community they are managing on `/admin/community` and edit
+  basic community details, access method, email domain, and member-facing
+  rules/guidance.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -283,9 +285,10 @@ If continuing product development, continue Phase 3 community product surface wo
 Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
 docs/design-language.md, and docs/next-session-context.md. Continue Phase 3:
 community product surface. The app-shell community switcher, member community
-homepage, post-login join-another-community flow, and admin management-community
-switcher, admin-editable community details, and lightweight Badger Market/campus
-presentation cues are already implemented. Next, choose the smallest useful
-community-facing slice, such as community leave behavior or richer community
-theme/config, and keep the scope inside the web SLC.
+homepage, post-login join-another-community flow, community leave flow,
+admin management-community switcher, admin-editable community details, and
+lightweight Badger Market/campus presentation cues are already implemented.
+Next, choose the smallest useful community-facing slice, such as richer
+community theme/config or improved member management, and keep the scope inside
+the web SLC.
 ```

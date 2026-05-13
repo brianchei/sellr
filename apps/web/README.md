@@ -19,7 +19,8 @@ React Query, and typed helpers from `@sellr/api-client`.
   guidance.
 - `/communities/[communityId]`: member-only community homepage with membership
   context, marketplace stats, recent listing previews, lightweight Badger/campus
-  presentation cues, guidance, and scoped browse/sell actions.
+  presentation cues, guidance, scoped browse/sell actions, and leave-community
+  controls with active-listing protection.
 - `/communities/join`: post-login flow for joining another community with an
   invite code or verified email-domain match.
 - `/admin/community`: admin community detail editing, invite/member management,
