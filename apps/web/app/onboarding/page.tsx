@@ -131,7 +131,7 @@ export default function OnboardingPage() {
 
   if (!hydrated) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[var(--bg-secondary)] px-6 py-16">
+      <main className="app-shell-bg flex min-h-screen items-center justify-center px-6 py-16">
         <p className="text-center text-sm text-[var(--text-tertiary)]">
           Loading...
         </p>
@@ -144,9 +144,9 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--bg-secondary)] text-[var(--text-primary)]">
-      <header className="border-b border-[var(--border-default)] bg-white">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+    <div className="app-shell-bg flex min-h-screen flex-col text-[var(--text-primary)]">
+      <header className="border-b border-black/10 bg-white/80 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <Link
             href="/"
             className="flex items-center gap-2 no-underline"
@@ -205,7 +205,7 @@ export default function OnboardingPage() {
               </ul>
             </section>
 
-            <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm sm:p-7">
+            <section className="app-panel-soft p-5 sm:p-7">
               <h2 className="text-xl font-semibold text-[var(--text-primary)]">
                 Verify community access
               </h2>
@@ -218,7 +218,7 @@ export default function OnboardingPage() {
               <div
                 role="tablist"
                 aria-label="Choose a verification method"
-                className="mt-5 grid grid-cols-2 gap-2 rounded-lg bg-[var(--bg-tertiary)] p-1"
+                className="mt-5 grid grid-cols-2 gap-2 rounded-full bg-[var(--bg-tertiary)] p-1"
               >
                 <button
                   type="button"
@@ -229,9 +229,9 @@ export default function OnboardingPage() {
                     setMode('email');
                     setError(null);
                   }}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition ${
+                  className={`rounded-full px-3 py-2 text-sm font-semibold transition ${
                     mode === 'email'
-                      ? 'bg-white text-[var(--color-brand-contrast)] shadow-sm'
+                      ? 'bg-[#111111] text-[var(--color-brand-primary)] shadow-sm'
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
                 >
@@ -246,9 +246,9 @@ export default function OnboardingPage() {
                     setMode('invite');
                     setError(null);
                   }}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition ${
+                  className={`rounded-full px-3 py-2 text-sm font-semibold transition ${
                     mode === 'invite'
-                      ? 'bg-white text-[var(--color-brand-contrast)] shadow-sm'
+                      ? 'bg-[#111111] text-[var(--color-brand-primary)] shadow-sm'
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
                 >
@@ -273,7 +273,7 @@ export default function OnboardingPage() {
                       autoComplete="off"
                       placeholder="INVITE2026"
                       aria-describedby="onboarding-invite-help"
-                      className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 font-mono text-sm uppercase tracking-wider text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                      className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 font-mono text-sm uppercase tracking-wider text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                     />
                   </label>
                 ) : (
@@ -290,7 +290,7 @@ export default function OnboardingPage() {
                       placeholder="you@wisc.edu"
                       aria-describedby="onboarding-email-help"
                       readOnly={Boolean(verifiedEmail)}
-                      className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                      className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                     />
                   </label>
                 )}
@@ -315,7 +315,7 @@ export default function OnboardingPage() {
 
                 {error ? (
                   <p
-                    className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+                    className="mt-4 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
                     role="alert"
                   >
                     {error}
@@ -325,7 +325,7 @@ export default function OnboardingPage() {
                 <button
                   type="submit"
                   disabled={loading || !canSubmit}
-                  className="mt-5 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="app-action-primary mt-5 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? 'Joining...' : 'Join community'}
                 </button>
@@ -357,7 +357,7 @@ export default function OnboardingPage() {
 
 function TrustPillar({ title, body }: { title: string; body: string }) {
   return (
-    <li className="rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm">
+    <li className="rounded-3xl border border-black/10 bg-white/85 p-4 shadow-[var(--shadow-app-card)] backdrop-blur">
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"

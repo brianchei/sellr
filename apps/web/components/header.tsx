@@ -5,10 +5,10 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const NAV_LINKS = [
-  { label: 'Why Sellr', href: '/#why' },
+  { label: 'Proof', href: '/#proof' },
   { label: 'How it works', href: '/#how-it-works' },
-  { label: 'Trust & safety', href: '/#trust' },
-  { label: 'For sellers', href: '/#sellers' },
+  { label: 'Benefits', href: '/#benefits' },
+  { label: 'FAQ', href: '/#faq' },
 ] as const;
 
 function SellrWordmark({ className = '' }: { className?: string }) {
@@ -62,7 +62,7 @@ export function Header() {
     <header
       className={`sticky top-0 z-50 w-full transition-colors duration-200 ${
         scrolled
-          ? 'border-b border-[var(--border-default)] bg-[rgba(250,250,247,0.92)] backdrop-blur-md backdrop-saturate-150'
+          ? 'border-b border-black/10 bg-[rgba(255,255,255,0.86)] backdrop-blur-md backdrop-saturate-150'
           : 'border-b border-transparent bg-transparent'
       }`}
     >
@@ -77,7 +77,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline transition hover:bg-[var(--color-brand-contrast-soft)] hover:text-[var(--text-primary)]"
+              className="rounded-full px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] no-underline transition hover:bg-white/70 hover:text-[var(--text-primary)]"
             >
               {item.label}
             </Link>
@@ -87,13 +87,13 @@ export function Header() {
         <div className="hidden items-center gap-2 md:flex">
           <Link
             href="/login"
-            className="rounded-md px-3 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline transition hover:bg-[var(--color-brand-contrast-soft)]"
+            className="rounded-full px-3 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline transition hover:bg-white/70"
           >
             Sign in
           </Link>
           <Link
             href="/login"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm transition hover:-translate-y-px hover:bg-[var(--color-brand-primary-hover)] hover:shadow-md active:translate-y-0"
+            className="app-action-primary px-4 py-2 text-sm active:translate-y-0"
           >
             Join your community
             <svg
@@ -119,7 +119,7 @@ export function Header() {
           aria-expanded={mobileOpen}
           aria-controls="sellr-mobile-menu"
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-[var(--text-secondary)] transition hover:bg-[var(--color-brand-contrast-soft)] hover:text-[var(--text-primary)] md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-[var(--text-secondary)] transition hover:bg-white/70 hover:text-[var(--text-primary)] md:hidden"
         >
           {mobileOpen ? (
             <svg
@@ -154,7 +154,7 @@ export function Header() {
       {mobileOpen ? (
         <div
           id="sellr-mobile-menu"
-          className="animate-fade-in border-t border-[var(--border-default)] bg-[var(--bg-elevated)] md:hidden"
+          className="animate-fade-in border-t border-black/10 bg-white/95 backdrop-blur md:hidden"
         >
           <nav className="flex flex-col gap-1 px-4 py-4" aria-label="Mobile">
             {NAV_LINKS.map((item) => (
@@ -162,24 +162,24 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="rounded-md px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] no-underline transition hover:bg-[var(--color-brand-contrast-soft)] hover:text-[var(--text-primary)]"
+                className="rounded-2xl px-3 py-2.5 text-sm font-semibold text-[var(--text-secondary)] no-underline transition hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
-          <div className="flex flex-col gap-2 border-t border-[var(--border-default)] px-4 py-4">
+          <div className="flex flex-col gap-2 border-t border-black/10 px-4 py-4">
             <Link
               href="/login"
               onClick={() => setMobileOpen(false)}
-              className="inline-flex items-center justify-center rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+              className="app-action-secondary px-4 py-2.5 text-sm"
             >
               Sign in
             </Link>
             <Link
               href="/login"
               onClick={() => setMobileOpen(false)}
-              className="inline-flex items-center justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+              className="app-action-primary px-4 py-2.5 text-sm"
             >
               Join your community
             </Link>

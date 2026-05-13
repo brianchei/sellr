@@ -101,7 +101,7 @@ function MyListingsFallback() {
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={index}
-            className="grid gap-4 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm sm:grid-cols-[96px_minmax(0,1fr)_220px]"
+            className="grid gap-4 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)] sm:grid-cols-[96px_minmax(0,1fr)_220px]"
           >
             <div className="h-24 rounded-lg bg-[var(--bg-tertiary)]" />
             <div className="space-y-3">
@@ -251,14 +251,14 @@ function MyListingsContent() {
   if (!primaryCommunityId) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <section className="rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+        <section className="app-panel p-6">
           <h1 className="text-2xl font-semibold">Join a community first</h1>
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
             Seller tools are scoped to verified local communities.
           </p>
           <Link
             href="/onboarding"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Join community
           </Link>
@@ -268,7 +268,7 @@ function MyListingsContent() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
@@ -283,7 +283,7 @@ function MyListingsContent() {
         </div>
         <Link
           href="/sell"
-          className="inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
+          className="app-action-primary w-full px-4 py-2 text-sm sm:w-auto"
         >
           Create listing
         </Link>
@@ -315,7 +315,7 @@ function MyListingsContent() {
                       borderColor: 'var(--color-brand-primary)',
                     }
                   : {
-                      background: 'white',
+                      background: 'rgba(255,255,255,0.86)',
                       color: 'var(--text-secondary)',
                       borderColor: 'var(--border-default)',
                     }
@@ -345,7 +345,7 @@ function MyListingsContent() {
 
       {notice ? (
         <p
-          className="mt-4 rounded-lg border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm text-[var(--color-brand-accent-strong)]"
+          className="mt-4 rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm text-[var(--color-brand-accent-strong)]"
           role="status"
         >
           {notice}
@@ -354,7 +354,7 @@ function MyListingsContent() {
 
       {actionMutation.isError ? (
         <p
-          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+          className="mt-4 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           {actionMutation.error instanceof Error
@@ -368,7 +368,7 @@ function MyListingsContent() {
           {Array.from({ length: 4 }, (_, index) => (
             <div
               key={index}
-              className="grid gap-4 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm sm:grid-cols-[96px_minmax(0,1fr)_220px]"
+              className="grid gap-4 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)] sm:grid-cols-[96px_minmax(0,1fr)_220px]"
             >
               <div className="h-24 rounded-lg bg-[var(--bg-tertiary)]" />
               <div className="space-y-3">
@@ -384,7 +384,7 @@ function MyListingsContent() {
 
       {listingsQuery.isError ? (
         <section
-          className="mt-6 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="mt-6 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h2 className="text-base font-semibold">Could not load listings</h2>
@@ -406,7 +406,7 @@ function MyListingsContent() {
       {!listingsQuery.isLoading &&
       !listingsQuery.isError &&
       listings.length === 0 ? (
-        <section className="mt-6 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+        <section className="mt-6 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
           <h2 className="text-xl font-semibold">No listings yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Create your first structured listing so buyers have enough context
@@ -414,7 +414,7 @@ function MyListingsContent() {
           </p>
           <Link
             href="/sell"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Create listing
           </Link>
@@ -425,7 +425,7 @@ function MyListingsContent() {
       !listingsQuery.isError &&
       listings.length > 0 &&
       filteredListings.length === 0 ? (
-        <section className="mt-6 rounded-lg border border-[var(--border-default)] bg-white p-8 text-center shadow-sm">
+        <section className="app-panel mt-6 p-8 text-center">
           <h2 className="text-xl font-semibold">No {statusFilter} listings</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Try another status filter or create a new listing.
@@ -433,7 +433,7 @@ function MyListingsContent() {
           <button
             type="button"
             onClick={() => setStatusFilter('all')}
-            className="mt-4 rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-tertiary)]"
+            className="app-action-secondary mt-4 px-4 py-2 text-sm"
           >
             Show all
           </button>
@@ -506,11 +506,11 @@ function ListingRow({
       : null;
 
   return (
-    <article className="grid gap-4 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
+    <article className="grid gap-4 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white hover:shadow-xl sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
       <Link
         href={`/marketplace/${listing.id}`}
         aria-label={`Open ${listing.title} detail page`}
-        className="flex h-40 w-full items-center justify-center rounded-lg bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-medium text-[var(--text-tertiary)] no-underline transition hover:opacity-90 sm:h-24 sm:w-24"
+        className="flex h-40 w-full items-center justify-center rounded-2xl bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-medium text-[var(--text-tertiary)] no-underline transition hover:opacity-90 sm:h-24 sm:w-24"
         style={
           primaryPhoto
             ? { backgroundImage: `url("${primaryPhoto}")` }
@@ -564,16 +564,16 @@ function ListingRow({
             onClick={() =>
               runAction({ type: primaryAction.type, listing } as ListingAction)
             }
-            className="rounded-lg px-3 py-2 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full px-3 py-2 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
             style={
               primaryAction.tone === 'contrast'
                 ? {
-                    background: 'var(--color-brand-contrast)',
-                    color: 'white',
+                    background: '#111111',
+                    color: 'var(--color-brand-primary)',
                   }
                 : {
-                    background: 'var(--color-brand-primary)',
-                    color: 'var(--text-primary)',
+                    background: '#111111',
+                    color: 'var(--color-brand-primary)',
                   }
             }
           >
@@ -586,13 +586,13 @@ function ListingRow({
         <div className="grid grid-cols-2 gap-2">
           <Link
             href={`/listings/${listing.id}/edit`}
-            className="inline-flex justify-center rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+            className="inline-flex justify-center rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-soft)]"
           >
             Edit
           </Link>
           <Link
             href={`/marketplace/${listing.id}`}
-            className="inline-flex justify-center rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)]"
+            className="inline-flex justify-center rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-soft)]"
           >
             View
           </Link>
@@ -605,7 +605,7 @@ function ListingRow({
                 type="button"
                 disabled={isPending}
                 onClick={() => runAction({ type: 'unpublish', listing })}
-                className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isPending && pendingType === 'unpublish'
                   ? 'Unpublishing...'
@@ -619,7 +619,7 @@ function ListingRow({
                 type="button"
                 disabled={isPending}
                 onClick={() => runAction({ type: 'delete', listing })}
-                className="rounded-lg border border-[var(--color-brand-warm)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--color-brand-warm-strong)] shadow-sm hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] shadow-sm hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isPending && pendingType === 'delete'
                   ? 'Deleting...'

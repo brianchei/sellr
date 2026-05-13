@@ -60,7 +60,7 @@ function NotificationSkeleton() {
       {Array.from({ length: 4 }, (_, index) => (
         <div
           key={index}
-          className="rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm"
+          className="rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)]"
         >
           <div className="h-4 w-24 rounded bg-[var(--bg-tertiary)]" />
           <div className="mt-3 h-5 w-2/3 rounded bg-[var(--bg-tertiary)]" />
@@ -100,7 +100,7 @@ function NotificationCard({
 
   return (
     <article
-      className="group relative rounded-lg border border-[var(--border-default)] bg-white shadow-sm transition hover:border-[var(--color-brand-contrast-muted)] hover:shadow-md"
+      className="group relative rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] backdrop-blur transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white hover:shadow-xl"
       style={{
         borderLeftColor: accentColor,
         borderLeftWidth: accentColor === 'transparent' ? '1px' : '4px',
@@ -265,7 +265,7 @@ export default function NotificationsPage() {
   });
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-5xl px-4 py-6 pb-10 sm:py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
@@ -282,7 +282,7 @@ export default function NotificationsPage() {
           type="button"
           disabled={unreadCount === 0 || markAllMutation.isPending}
           onClick={() => markAllMutation.mutate()}
-          className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          className="app-action-secondary w-full px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
           {markAllMutation.isPending ? null : (
             <svg
@@ -320,7 +320,7 @@ export default function NotificationsPage() {
                 type="button"
                 onClick={() => setFilter(item.value)}
                 aria-pressed={active}
-                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:-translate-y-0.5"
                 style={
                   active
                     ? {
@@ -333,7 +333,7 @@ export default function NotificationsPage() {
                           : 'var(--color-brand-primary)',
                       }
                     : {
-                        background: 'white',
+                        background: 'rgba(255,255,255,0.86)',
                         color: 'var(--text-secondary)',
                         borderColor: 'var(--border-default)',
                       }
@@ -366,7 +366,7 @@ export default function NotificationsPage() {
 
       {notificationsQuery.isError ? (
         <section
-          className="mt-6 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="mt-6 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h2 className="text-base font-semibold">
@@ -390,7 +390,7 @@ export default function NotificationsPage() {
       {!notificationsQuery.isLoading &&
       !notificationsQuery.isError &&
       notifications.length === 0 ? (
-        <section className="mt-6 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+        <section className="mt-6 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
           <h2 className="text-xl font-semibold">No notifications yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Updates appear here after messages, marketplace posts, and listing
@@ -398,7 +398,7 @@ export default function NotificationsPage() {
           </p>
           <Link
             href="/marketplace"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Browse marketplace
           </Link>
@@ -409,7 +409,7 @@ export default function NotificationsPage() {
       !notificationsQuery.isError &&
       notifications.length > 0 &&
       filteredNotifications.length === 0 ? (
-        <section className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+        <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
             {filter === 'unread' ? 'You are caught up' : 'Nothing in this tab'}
           </h2>
@@ -421,7 +421,7 @@ export default function NotificationsPage() {
           <button
             type="button"
             onClick={() => setFilter('all')}
-            className="mt-4 inline-flex rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)]"
+            className="app-action-secondary mt-4 px-4 py-2 text-sm"
           >
             View all
           </button>

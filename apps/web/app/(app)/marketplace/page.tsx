@@ -146,14 +146,14 @@ export default function MarketplacePage() {
   if (!primaryCommunityId) {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
-        <section className="rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm">
+        <section className="app-panel p-6">
           <h1 className="text-2xl font-semibold">Join a community first</h1>
           <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
             Marketplace browsing is scoped to verified local communities.
           </p>
           <Link
             href="/onboarding"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Join community
           </Link>
@@ -163,7 +163,7 @@ export default function MarketplacePage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <p className="text-sm font-medium text-[var(--color-brand-contrast)]">
@@ -179,7 +179,7 @@ export default function MarketplacePage() {
         </div>
         <Link
           href="/sell"
-          className="inline-flex w-full justify-center gap-1.5 rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm transition hover:-translate-y-px hover:bg-[var(--color-brand-primary-hover)] hover:shadow-md sm:w-auto"
+          className="app-action-primary w-full px-4 py-2.5 text-sm sm:w-auto"
         >
           <svg
             width="14"
@@ -201,7 +201,7 @@ export default function MarketplacePage() {
 
       <section
         aria-label="Filter listings"
-        className="mt-6 rounded-lg border border-[var(--border-default)] bg-white p-4 shadow-sm sm:p-5"
+        className="app-panel-soft mt-6 p-4 sm:p-5"
       >
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
           <label className="block">
@@ -229,7 +229,7 @@ export default function MarketplacePage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search title, details, or neighborhood"
-                className="w-full rounded-lg border border-[var(--border-default)] bg-white py-2.5 pl-9 pr-3 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="w-full rounded-2xl border border-black/10 bg-white/90 py-2.5 pl-9 pr-3 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
               />
             </div>
           </label>
@@ -241,7 +241,7 @@ export default function MarketplacePage() {
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
             >
               <option value="all">All categories</option>
               {categories.map((item) => (
@@ -339,7 +339,7 @@ export default function MarketplacePage() {
           <button
             type="button"
             onClick={clearFilters}
-            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-[var(--color-brand-contrast)] transition hover:bg-[var(--color-brand-contrast-soft)]"
+            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold text-[var(--text-primary)] transition hover:bg-[var(--color-brand-primary-soft)]"
           >
             <svg
               width="12"
@@ -367,7 +367,7 @@ export default function MarketplacePage() {
           {Array.from({ length: 6 }, (_, index) => (
             <div
               key={index}
-              className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm"
+              className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]"
             >
               <div className="aspect-[4/3] bg-[var(--bg-tertiary)]" />
               <div className="space-y-3 p-4">
@@ -386,7 +386,7 @@ export default function MarketplacePage() {
 
       {listingsQuery.isError ? (
         <section
-          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="mt-4 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h2 className="text-base font-semibold">Could not load listings</h2>
@@ -408,7 +408,7 @@ export default function MarketplacePage() {
       {!listingsQuery.isLoading &&
       !listingsQuery.isError &&
       listings.length === 0 ? (
-        <section className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+        <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
           <h2 className="text-xl font-semibold">No active listings yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Your community marketplace is ready. Start with everyday items
@@ -417,7 +417,7 @@ export default function MarketplacePage() {
           </p>
           <Link
             href="/sell"
-            className="mt-5 inline-flex rounded-lg bg-[var(--color-brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Create the first listing
           </Link>
@@ -428,7 +428,7 @@ export default function MarketplacePage() {
       !listingsQuery.isError &&
       listings.length > 0 &&
       filteredListings.length === 0 ? (
-        <section className="mt-4 rounded-lg border border-[var(--border-default)] bg-white p-8 text-center shadow-sm">
+        <section className="app-panel mt-4 p-8 text-center">
           <h2 className="text-xl font-semibold">
             No listings match those filters
           </h2>
@@ -439,7 +439,7 @@ export default function MarketplacePage() {
           <button
             type="button"
             onClick={clearFilters}
-            className="mt-4 rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]"
+            className="app-action-secondary mt-4 px-4 py-2 text-sm"
           >
             Clear filters
           </button>
@@ -494,7 +494,7 @@ function FilterChipRow<TValue extends string>({
               role="radio"
               aria-checked={active}
               onClick={() => onChange(option.value)}
-              className="rounded-full border px-3 py-1.5 text-xs font-medium transition"
+              className="rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:-translate-y-0.5"
               style={{
                 borderColor: active
                   ? 'var(--color-brand-contrast)'

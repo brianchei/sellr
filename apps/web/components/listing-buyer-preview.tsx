@@ -45,16 +45,16 @@ export function ListingBuyerPreview({
   const category = values.subcategory.trim() || values.category;
 
   return (
-    <section className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+    <section className="app-panel-soft p-5">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold">Buyer preview</h2>
-        <span className="rounded-full bg-[var(--color-brand-contrast-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-contrast)]">
+        <span className="rounded-full bg-[#111111] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary)]">
           Draft
         </span>
       </div>
 
       <div
-        className="mt-4 flex aspect-[4/3] items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-tertiary)] bg-cover bg-center text-sm font-medium text-[var(--text-tertiary)]"
+        className="mt-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-black/10 bg-[var(--bg-tertiary)] bg-cover bg-center text-sm font-medium text-[var(--text-tertiary)] shadow-inner"
         style={
           hasLoadedImage ? { backgroundImage: `url("${cleanPhotoUrl}")` } : {}
         }
@@ -67,7 +67,7 @@ export function ListingBuyerPreview({
       </div>
 
       <div className="mt-4">
-        <p className="text-xl font-semibold text-[var(--text-primary)]">
+        <p className="inline-flex rounded-full bg-[var(--color-brand-primary)] px-3 py-1 text-xl font-bold text-[var(--text-primary)]">
           {formatPreviewPrice(values.price)}
         </p>
         <h3 className="mt-1 line-clamp-2 break-words text-base font-semibold text-[var(--text-primary)]">
@@ -79,13 +79,13 @@ export function ListingBuyerPreview({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-primary-strong)]">
+        <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
           {conditionLabel(values.condition)}
         </span>
-        <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-medium text-[var(--text-secondary)]">
+        <span className="rounded-full bg-white/75 px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]">
           {category}
         </span>
-        <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-accent-strong)]">
+        <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
           {values.negotiable ? 'Open to offers' : 'Firm price'}
         </span>
       </div>

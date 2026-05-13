@@ -63,7 +63,7 @@ export function SellerProfileCard({
 
   return (
     <section
-      className={`rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm ${className}`}
+      className={`app-panel p-5 ${className}`}
     >
       <div className="flex items-start justify-between gap-3">
         <h2 className="text-base font-semibold">{heading}</h2>
@@ -90,7 +90,7 @@ export function SellerProfileCard({
       <div className="mt-4 flex items-center gap-3">
         <div
           aria-label={`${displayName} avatar`}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-sm font-bold text-[var(--text-primary)] shadow-sm"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-sm font-bold text-[var(--text-primary)] shadow-md ring-4 ring-[var(--color-brand-primary-soft)]"
           style={
             profile?.avatarUrl
               ? { backgroundImage: `url("${profile.avatarUrl}")` }
@@ -109,18 +109,18 @@ export function SellerProfileCard({
 
       <div className="mt-4 flex flex-wrap gap-2">
         {profile?.communityMember !== false ? (
-          <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-accent-strong)]">
+          <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
             Community member
           </span>
         ) : null}
         {profile?.verifiedAt ? (
-          <span className="rounded-full bg-[var(--color-brand-contrast-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-brand-contrast)]">
+          <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
             Verified sign-in
           </span>
         ) : null}
       </div>
 
-      <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-[var(--border-default)] pt-4 text-sm">
+      <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-black/10 pt-4 text-sm">
         <div>
           <dt className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
             Member since

@@ -20,8 +20,8 @@ export function ConversationList({
   userId,
 }: ConversationListProps) {
   return (
-    <aside className="overflow-hidden rounded-lg border border-[var(--border-default)] bg-white shadow-sm">
-      <div className="border-b border-[var(--border-default)] px-4 py-3">
+    <aside className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] backdrop-blur">
+      <div className="border-b border-black/10 bg-[var(--color-brand-primary-soft)] px-4 py-3">
         <h2 className="text-sm font-semibold text-[var(--text-primary)]">
           Conversations
           <span className="ml-1 text-[var(--text-tertiary)]">
@@ -30,7 +30,7 @@ export function ConversationList({
         </h2>
       </div>
       <nav
-        className="max-h-[360px] overflow-y-auto lg:max-h-[640px]"
+        className="max-h-[360px] space-y-1 overflow-y-auto p-2 lg:max-h-[640px]"
         aria-label="Conversations"
       >
         {conversations.map((conversation) => {
@@ -44,27 +44,36 @@ export function ConversationList({
             userId != null &&
             conversation.latestMessage != null &&
             conversation.latestMessage.senderId !== userId;
-          const titleClass = needsReply
-            ? 'truncate text-sm font-bold text-[var(--text-primary)]'
-            : 'truncate text-sm font-semibold text-[var(--text-primary)]';
-          const previewClass = needsReply
-            ? 'mt-1 truncate text-sm font-medium text-[var(--text-primary)]'
-            : 'mt-1 truncate text-sm text-[var(--text-secondary)]';
+          const titleClass = selected
+            ? needsReply
+              ? 'truncate text-sm font-bold text-white'
+              : 'truncate text-sm font-semibold text-white'
+            : needsReply
+              ? 'truncate text-sm font-bold text-[var(--text-primary)]'
+              : 'truncate text-sm font-semibold text-[var(--text-primary)]';
+          const previewClass = selected
+            ? needsReply
+              ? 'mt-1 truncate text-sm font-medium text-white/85'
+              : 'mt-1 truncate text-sm text-white/72'
+            : needsReply
+              ? 'mt-1 truncate text-sm font-medium text-[var(--text-primary)]'
+              : 'mt-1 truncate text-sm text-[var(--text-secondary)]';
 
           return (
             <Link
               key={conversation.id}
               href={`/inbox/${conversation.id}`}
               aria-current={selected ? 'page' : undefined}
-              className="grid w-full grid-cols-[56px_minmax(0,1fr)] gap-3 border-b border-[var(--border-default)] px-4 py-3 text-left no-underline transition hover:bg-[var(--bg-secondary)]"
+              className="grid w-full grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-2xl px-3 py-3 text-left no-underline transition hover:bg-[var(--bg-secondary)]"
               style={{
                 background: selected
-                  ? 'var(--color-brand-primary-soft)'
+                  ? 'linear-gradient(135deg, var(--text-primary) 0%, #2e2a24 100%)'
                   : undefined,
+                color: selected ? 'white' : undefined,
               }}
             >
               <div
-                className="flex h-14 w-14 items-center justify-center rounded-lg bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-semibold text-[var(--text-tertiary)]"
+                className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-semibold text-[var(--text-tertiary)]"
                 style={
                   primaryPhoto
                     ? { backgroundImage: `url("${primaryPhoto}")` }
@@ -85,25 +94,44 @@ export function ConversationList({
                           ? 'font-semibold text-[var(--color-brand-contrast)]'
                           : 'text-[var(--text-tertiary)]'
                       }`}
+                      style={selected ? { color: 'rgba(255,255,255,0.68)' } : undefined}
                     >
                       {formatMessageTime(conversation.latestMessage.createdAt)}
                     </span>
                   ) : null}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                  <span className="font-medium text-[var(--color-brand-contrast)]">
+                  <span
+                    className={`font-medium ${
+                      selected
+                        ? 'text-[var(--color-brand-primary)]'
+                        : 'text-[var(--color-brand-contrast)]'
+                    }`}
+                  >
                     {conversationPeer(conversation)}
                   </span>
                   {userId != null ? (
                     <span
                       className="inline-flex items-center rounded-full bg-[var(--bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-secondary)]"
+                      style={
+                        selected
+                          ? {
+                              background: 'rgba(255,255,255,0.12)',
+                              color: 'rgba(255,255,255,0.76)',
+                            }
+                          : undefined
+                      }
                       title={`You are the ${role} in this conversation`}
                     >
                       You · {role}
                     </span>
                   ) : null}
                   {conversation.listing ? (
-                    <span className="text-[var(--text-tertiary)]">
+                    <span
+                      className={
+                        selected ? 'text-white/60' : 'text-[var(--text-tertiary)]'
+                      }
+                    >
                       · {formatPrice(conversation.listing.price)}
                     </span>
                   ) : null}

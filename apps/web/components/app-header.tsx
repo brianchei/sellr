@@ -73,14 +73,15 @@ export function AppHeader() {
 
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b border-[var(--border-default)]"
+      className="sticky top-0 z-50 w-full border-b border-black/10"
       style={{
-        background: 'rgba(250, 250, 247, 0.9)',
+        background:
+          'linear-gradient(135deg, rgba(255,249,215,0.92) 0%, rgba(255,255,255,0.92) 48%, rgba(241,240,251,0.86) 100%)',
         backdropFilter: 'blur(16px) saturate(180%)',
         WebkitBackdropFilter: 'blur(16px) saturate(180%)',
       }}
     >
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
         <Link
           href="/dashboard"
           className="flex shrink-0 items-center gap-2 no-underline"
@@ -116,13 +117,11 @@ export function AppHeader() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
-                className="relative inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium no-underline transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+                className="relative inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold no-underline transition hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
                 style={{
-                  color: active
-                    ? 'var(--color-brand-contrast)'
-                    : 'var(--text-secondary)',
+                  color: active ? 'var(--color-brand-primary)' : '#2e2a24',
                   background: active
-                    ? 'var(--color-brand-primary-soft)'
+                    ? 'var(--text-primary)'
                     : 'transparent',
                 }}
               >
@@ -141,7 +140,7 @@ export function AppHeader() {
         <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/sell"
-            className="hidden items-center gap-1.5 rounded-md bg-[var(--color-brand-primary)] px-3 py-1.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm transition hover:bg-[var(--color-brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)] md:inline-flex"
+            className="hidden items-center justify-center gap-2 rounded-full bg-[#111111] px-4 py-2 text-sm font-bold text-[var(--color-brand-primary)] no-underline shadow-[0_18px_30px_-18px_rgba(17,17,17,0.8)] transition hover:-translate-y-px hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)] md:inline-flex"
           >
             <SellIcon />
             Sell
@@ -153,7 +152,7 @@ export function AppHeader() {
             aria-label={drawerOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={drawerOpen}
             aria-controls="app-mobile-drawer"
-            className="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-[var(--border-default)] bg-white text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)] md:hidden"
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 text-[var(--text-primary)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)] md:hidden"
           >
             {drawerOpen ? <CloseIcon /> : <MenuIcon />}
             {!drawerOpen && unreadCount > 0 ? (
@@ -169,7 +168,7 @@ export function AppHeader() {
               onClick={() => setAccountOpen((value) => !value)}
               aria-label="Account menu"
               aria-expanded={accountOpen}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-brand-contrast-soft)] text-[var(--color-brand-contrast)] transition hover:bg-[var(--color-brand-contrast-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--text-primary)] text-[var(--color-brand-primary)] shadow-sm transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             >
               <svg
                 width="16"
@@ -194,14 +193,14 @@ export function AppHeader() {
                   aria-hidden="true"
                 />
                 <div
-                  className="absolute right-0 z-50 mt-2 min-w-[200px] overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] py-1 shadow-lg"
+                  className="absolute right-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-2xl border border-black/10 bg-white/95 py-2 shadow-xl backdrop-blur"
                   role="menu"
                 >
                   <Link
                     href="/dashboard"
                     role="menuitem"
                     onClick={() => setAccountOpen(false)}
-                    className="block px-4 py-2 text-sm text-[var(--text-secondary)] no-underline hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]"
+                    className="mx-2 block rounded-xl px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
                   >
                     Account
                   </Link>
@@ -210,20 +209,20 @@ export function AppHeader() {
                       href={`/sellers/${userId}`}
                       role="menuitem"
                       onClick={() => setAccountOpen(false)}
-                      className="block px-4 py-2 text-sm text-[var(--text-secondary)] no-underline hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]"
+                      className="mx-2 block rounded-xl px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
                     >
                       View public storefront
                     </Link>
                   ) : null}
                   <div
                     aria-hidden="true"
-                    className="my-1 border-t border-[var(--border-default)]"
+                    className="my-1 border-t border-black/10"
                   />
                   <button
                     type="button"
                     role="menuitem"
                     onClick={handleLogout}
-                    className="block w-full cursor-pointer border-none bg-transparent px-4 py-2 text-left text-sm text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
+                    className="mx-2 block w-[calc(100%-1rem)] cursor-pointer rounded-xl border-none bg-transparent px-3 py-2 text-left text-sm font-medium text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
                   >
                     Sign out
                   </button>
@@ -237,20 +236,20 @@ export function AppHeader() {
       {drawerOpen ? (
         <>
           <div
-            className="fixed inset-0 top-14 z-40 bg-black/30 md:hidden"
+            className="fixed inset-0 top-16 z-40 bg-black/30 backdrop-blur-sm md:hidden"
             onClick={() => setDrawerOpen(false)}
             aria-hidden="true"
           />
           <nav
             id="app-mobile-drawer"
-            className="absolute left-0 right-0 top-14 z-50 border-b border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-lg md:hidden"
+            className="absolute left-3 right-3 top-16 z-50 overflow-hidden rounded-b-3xl border border-black/10 bg-white/95 shadow-2xl backdrop-blur md:hidden"
             aria-label="Primary"
           >
             <div className="mx-auto max-w-6xl px-4 py-3">
               <Link
                 href="/sell"
                 onClick={() => setDrawerOpen(false)}
-                className="mb-2 flex items-center justify-center gap-1.5 rounded-md bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)]"
+                className="app-action-primary mb-2 flex px-4 py-2.5 text-sm"
               >
                 <SellIcon />
                 Sell an item
@@ -266,13 +265,13 @@ export function AppHeader() {
                         href={item.href}
                         onClick={() => setDrawerOpen(false)}
                         aria-current={active ? 'page' : undefined}
-                        className="flex items-center justify-between gap-3 rounded-md px-3 py-2.5 text-sm font-medium no-underline transition"
+                        className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold no-underline transition"
                         style={{
                           color: active
-                            ? 'var(--color-brand-contrast)'
+                            ? 'var(--color-brand-primary)'
                             : 'var(--text-secondary)',
                           background: active
-                            ? 'var(--color-brand-primary-soft)'
+                            ? 'var(--text-primary)'
                             : 'transparent',
                         }}
                       >

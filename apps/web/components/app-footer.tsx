@@ -3,10 +3,10 @@ export function AppFooter() {
 
   return (
     <footer
-      className="mt-auto border-t border-[var(--border-default)] bg-[var(--bg-elevated)]"
+      className="mt-auto border-t border-black bg-[#111111]"
       role="contentinfo"
     >
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-[var(--text-tertiary)]">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-5 text-xs text-white/65">
         <p className="inline-flex items-center gap-2">
           <svg
             width="12"
@@ -18,7 +18,7 @@ export function AppFooter() {
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
-            className="text-[var(--color-brand-accent-strong)]"
+            className="text-[var(--color-brand-primary)]"
           >
             <path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6l-8-4Z" />
           </svg>

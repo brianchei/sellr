@@ -208,7 +208,7 @@ export default function LoginPage() {
 
   if (!hydrated) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[var(--bg-secondary)] px-6 py-16">
+      <main className="app-shell-bg flex min-h-screen items-center justify-center px-6 py-16">
         <p className="text-center text-sm text-[var(--text-tertiary)]">
           Loading...
         </p>
@@ -221,8 +221,8 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[var(--bg-secondary)] px-6 py-12 sm:py-16">
-      <section className="w-full max-w-md rounded-lg border border-[var(--border-default)] bg-white p-6 shadow-sm sm:p-7">
+    <main className="app-shell-bg flex min-h-screen items-center justify-center px-6 py-12 sm:py-16">
+      <section className="app-panel-soft w-full max-w-md p-6 sm:p-7">
         <Link
           href="/"
           className="mb-7 inline-flex items-center gap-2 no-underline"
@@ -263,7 +263,7 @@ export default function LoginPage() {
                 autoComplete="email"
                 placeholder="you@wisc.edu"
                 aria-describedby="login-email-help"
-                className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
               />
             </label>
             <p
@@ -276,7 +276,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !isWiscEmail(email)}
-              className="mt-4 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Sending code...' : 'Send code'}
             </button>
@@ -303,7 +303,7 @@ export default function LoginPage() {
                 placeholder="+15551234567"
                 inputMode="tel"
                 aria-describedby="login-phone-help"
-                className="mt-1.5 w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
               />
             </label>
             <p
@@ -315,7 +315,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || phoneE164.trim().length < 8}
-              className="mt-4 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Sending code...' : 'Send code'}
             </button>
@@ -350,13 +350,13 @@ export default function LoginPage() {
                 maxLength={OTP_CODE_LENGTH}
                 placeholder="123456"
                 aria-label="6 digit verification code"
-                className="w-full rounded-lg border border-[var(--border-default)] bg-white px-3 py-3 text-center font-mono text-xl tracking-[0.4em] text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-3 text-center font-mono text-xl tracking-[0.4em] text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
               />
             </label>
             <button
               type="submit"
               disabled={loading || code.length !== OTP_CODE_LENGTH}
-              className="mt-4 w-full rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Verifying...' : 'Verify and continue'}
             </button>
@@ -382,14 +382,14 @@ export default function LoginPage() {
 
         {error ? (
           <p
-            className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+            className="mt-4 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
             role="alert"
           >
             {error}
           </p>
         ) : null}
 
-        <ul className="mt-6 space-y-2 border-t border-[var(--border-default)] pt-5 text-xs text-[var(--text-secondary)]">
+        <ul className="mt-6 space-y-2 border-t border-black/10 pt-5 text-xs text-[var(--text-secondary)]">
           <TrustPoint>
             Student email verification is the primary community trust signal.
           </TrustPoint>

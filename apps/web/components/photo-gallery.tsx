@@ -51,7 +51,7 @@ export function PhotoGallery({
 
   return (
     <div>
-      <div className="relative aspect-[4/3] w-full bg-[var(--bg-tertiary)] sm:aspect-[16/10]">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--bg-tertiary)] sm:aspect-[16/10]">
         {primaryPhoto ? (
           <Image
             key={primaryPhoto}
@@ -69,11 +69,11 @@ export function PhotoGallery({
         )}
 
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 sm:left-4 sm:top-4">
-          <span className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-[var(--color-brand-contrast)] shadow-sm">
+          <span className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-[var(--text-primary)] shadow-sm backdrop-blur">
             {category}
           </span>
           {subcategory ? (
-            <span className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)] shadow-sm">
+            <span className="rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-[var(--text-secondary)] shadow-sm backdrop-blur">
               {subcategory}
             </span>
           ) : null}
@@ -90,7 +90,7 @@ export function PhotoGallery({
         <div
           role="tablist"
           aria-label="Listing photos"
-          className="flex gap-2 overflow-x-auto border-b border-[var(--border-default)] bg-[var(--bg-secondary)] p-3"
+          className="flex gap-2 overflow-x-auto border-b border-black/10 bg-[var(--color-brand-primary-soft)] p-3"
         >
           {photos.map((photo, index) => {
             const selected = index === safeIndex;
@@ -107,7 +107,7 @@ export function PhotoGallery({
                 tabIndex={selected ? 0 : -1}
                 onClick={() => onSelect(index)}
                 onKeyDown={handleTabKeyDown}
-                className="relative h-16 w-20 shrink-0 overflow-hidden rounded-md border bg-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast)] focus-visible:ring-offset-1"
+                className="relative h-16 w-20 shrink-0 overflow-hidden rounded-2xl border bg-white transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast)] focus-visible:ring-offset-1"
                 style={{
                   borderColor: selected
                     ? 'var(--color-brand-contrast)'

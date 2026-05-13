@@ -102,7 +102,7 @@ function AdminRestricted({ message }: { message: string }) {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
       <section
-        className="rounded-lg border border-[var(--border-default)] bg-white p-8 shadow-sm"
+        className="app-panel p-8"
         role="alert"
       >
         <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
@@ -116,7 +116,7 @@ function AdminRestricted({ message }: { message: string }) {
         </p>
         <Link
           href="/dashboard"
-          className="mt-6 inline-flex w-full justify-center rounded-lg bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-hover)] sm:w-auto"
+          className="app-action-primary mt-6 w-full px-4 py-2.5 text-sm sm:w-auto"
         >
           Back to dashboard
         </Link>
@@ -131,7 +131,7 @@ function ReportSkeleton() {
       {[0, 1, 2].map((item) => (
         <div
           key={item}
-          className="animate-pulse rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm"
+          className="animate-pulse rounded-3xl border border-black/10 bg-white/90 p-5 shadow-[var(--shadow-app-card)]"
         >
           <div className="h-4 w-40 rounded bg-[var(--bg-tertiary)]" />
           <div className="mt-4 h-5 w-3/4 rounded bg-[var(--bg-tertiary)]" />
@@ -198,7 +198,7 @@ function ReportCard({
   const severityStyle = severityToneStyle(report.severity);
 
   return (
-    <article className="rounded-lg border border-[var(--border-default)] bg-white p-5 shadow-sm">
+    <article className="rounded-3xl border border-black/10 bg-white/90 p-5 shadow-[var(--shadow-app-card)] backdrop-blur">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <input
@@ -243,7 +243,7 @@ function ReportCard({
         {report.target?.detail ?? 'The target may have been removed.'}
       </p>
 
-      <div className="mt-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-secondary)] p-3">
+      <div className="mt-4 rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
           Report reason
         </p>
@@ -271,7 +271,7 @@ function ReportCard({
             type="button"
             disabled={isUpdating}
             onClick={() => onStatusChange(primary.status)}
-            className="rounded-lg bg-[var(--color-brand-primary)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="app-action-primary px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isUpdating && pendingStatus === primary.status
               ? 'Saving...'
@@ -284,7 +284,7 @@ function ReportCard({
             type="button"
             disabled={isUpdating}
             onClick={() => onStatusChange(action.status)}
-            className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-2 text-sm font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isUpdating && pendingStatus === action.status
               ? 'Saving...'
@@ -296,7 +296,7 @@ function ReportCard({
             type="button"
             disabled={isUpdating || isRemoving}
             onClick={onRemoveListing}
-            className="rounded-lg border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-brand-warm-strong)] shadow-sm transition hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-brand-warm-strong)] shadow-sm transition hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isRemoving ? 'Removing...' : 'Remove listing'}
           </button>
@@ -306,7 +306,7 @@ function ReportCard({
             href={report.target.href}
             target="_blank"
             rel="noreferrer"
-            className="ml-auto inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:bg-[var(--bg-secondary)] hover:underline"
+            className="ml-auto inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-semibold text-[var(--text-primary)] no-underline hover:bg-[var(--color-brand-primary-soft)]"
           >
             View target
             <svg
@@ -501,7 +501,7 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
@@ -517,7 +517,7 @@ export default function AdminReportsPage() {
         <div className="flex w-full flex-wrap gap-2 sm:w-auto">
           <Link
             href="/admin/community"
-            className="inline-flex flex-1 justify-center rounded-lg border border-[var(--border-default)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] no-underline shadow-sm hover:bg-[var(--bg-secondary)] sm:flex-none"
+            className="app-action-secondary flex-1 px-4 py-2 text-sm sm:flex-none"
           >
             Community setup
           </Link>
@@ -525,7 +525,7 @@ export default function AdminReportsPage() {
             type="button"
             onClick={() => void reportsQuery.refetch()}
             disabled={reportsQuery.isFetching}
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-[var(--border-strong)] bg-white px-4 py-2 text-sm font-medium text-[var(--color-brand-contrast)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+            className="app-action-secondary flex-1 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
           >
             <svg
               width="14"
@@ -569,7 +569,7 @@ export default function AdminReportsPage() {
                 type="button"
                 onClick={() => setStatus(item.value)}
                 aria-pressed={active}
-                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:-translate-y-0.5"
                 style={
                   active
                     ? isOpen
@@ -590,7 +590,7 @@ export default function AdminReportsPage() {
                             borderColor: 'var(--color-brand-primary)',
                           }
                     : {
-                        background: 'white',
+                        background: 'rgba(255,255,255,0.86)',
                         color: 'var(--text-secondary)',
                         borderColor: 'var(--border-default)',
                       }
@@ -664,7 +664,7 @@ export default function AdminReportsPage() {
         </div>
 
         {filteredReports.length > 0 ? (
-          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[var(--border-default)] bg-white px-3 py-2 text-xs">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/90 px-3 py-2 text-xs shadow-sm">
             <label className="inline-flex items-center gap-2 text-[var(--text-secondary)]">
               <input
                 type="checkbox"
@@ -692,7 +692,7 @@ export default function AdminReportsPage() {
                 type="button"
                 disabled={selectedCount === 0 || isBulkBusy}
                 onClick={() => void runBulkUpdate('resolved')}
-                className="rounded-lg bg-[var(--color-brand-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full bg-[#111111] px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-primary)] shadow-sm transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {bulkPending === 'resolved'
                   ? 'Resolving…'
@@ -702,7 +702,7 @@ export default function AdminReportsPage() {
                 type="button"
                 disabled={selectedCount === 0 || isBulkBusy}
                 onClick={() => void runBulkUpdate('dismissed')}
-                className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {bulkPending === 'dismissed'
                   ? 'Dismissing…'
@@ -712,7 +712,7 @@ export default function AdminReportsPage() {
                 type="button"
                 disabled={selectedCount === 0 || isBulkBusy}
                 onClick={() => void runBulkUpdate('in_review')}
-                className="rounded-lg border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {bulkPending === 'in_review' ? 'Moving…' : 'Move to review'}
               </button>
@@ -729,7 +729,7 @@ export default function AdminReportsPage() {
         reportsQuery.error.status === 403
       ) ? (
         <section
-          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="mt-4 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
         >
           <h2 className="text-base font-semibold">Could not load reports</h2>
@@ -744,7 +744,7 @@ export default function AdminReportsPage() {
       {!reportsQuery.isLoading &&
       !reportsQuery.isError &&
       filteredReports.length === 0 ? (
-        <section className="mt-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-white p-8 text-center">
+        <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
           <h2 className="text-xl font-semibold">
             {search.trim().length > 0
               ? 'No reports match this search'
@@ -812,7 +812,7 @@ function FilterPill<T extends string>({
   onChange: (next: T) => void;
 }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-default)] bg-white p-0.5">
+    <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/90 p-0.5 shadow-sm">
       <span className="px-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
         {label}
       </span>
