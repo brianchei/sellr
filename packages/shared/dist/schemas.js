@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.PROFILE_AVATAR_MIME_TYPES = exports.LISTING_IMAGE_MIME_TYPES = exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX = exports.PROFILE_AVATAR_MAX_BYTES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.UpdateCommunityDetailsSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.PROFILE_AVATAR_MIME_TYPES = exports.LISTING_IMAGE_MIME_TYPES = exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX = exports.PROFILE_AVATAR_MAX_BYTES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
 exports.hasRealDisplayName = hasRealDisplayName;
 exports.hasVerifiedContact = hasVerifiedContact;
 exports.getProfileCompletionIssues = getProfileCompletionIssues;
@@ -138,6 +138,31 @@ exports.CreateCommunityInviteCodeSchema = zod_1.z.object({
         .regex(/^[a-zA-Z0-9_-]+$/, 'Use letters, numbers, dashes, or underscores'),
     maxUses: zod_1.z.number().int().min(1).max(10000).nullable().optional(),
     expiresAt: zod_1.z.iso.datetime().nullable().optional(),
+});
+const CommunityEmailDomainSchema = zod_1.z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(3)
+    .max(100)
+    .regex(/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/, 'Enter a valid email domain such as wisc.edu');
+exports.UpdateCommunityDetailsSchema = zod_1.z
+    .object({
+    name: zod_1.z.string().trim().min(3).max(100).optional(),
+    type: zod_1.z.enum(['campus', 'coworking', 'residential']).optional(),
+    accessMethod: zod_1.z.enum(['invite_code', 'email_domain']).optional(),
+    emailDomain: CommunityEmailDomainSchema.nullable().optional(),
+    rules: zod_1.z.array(zod_1.z.string().trim().min(2).max(240)).max(8).optional(),
+})
+    .refine((data) => data.name !== undefined ||
+    data.type !== undefined ||
+    data.accessMethod !== undefined ||
+    data.emailDomain !== undefined ||
+    data.rules !== undefined, { error: 'At least one community detail field is required' })
+    .refine((data) => data.accessMethod !== 'email_domain' ||
+    (data.emailDomain !== undefined && data.emailDomain !== null), { error: 'Email-domain communities require an email domain' })
+    .refine((data) => data.emailDomain !== null || data.accessMethod === 'invite_code', {
+    error: 'Switch the community to invite-code access before clearing the email domain',
 });
 exports.UpdateCommunityMemberSchema = zod_1.z
     .object({

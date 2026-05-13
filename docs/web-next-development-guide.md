@@ -234,15 +234,17 @@ Shipped:
   with multiple active admin memberships can choose which community's invites
   and members they are managing, with the selected community reflected in the
   URL.
+- Added admin-editable community details on `/admin/community` backed by
+  `PATCH /communities/:communityId`, covering name, type, access method, email
+  domain, and member-facing rules/guidance stored in the existing community
+  fields.
 
 Work items:
 
 - Add option to leave a community.
 - Add lightweight community theme/config data.
 - Create a decorated Badger Market community experience.
-- Expand admin community editing controls.
-- Let admins edit community name, description, rules, branding/theme config, and
-  invite code settings.
+- Add richer community branding/theme config and optional imagery.
 - Improve member management in the admin dashboard.
 
 Acceptance notes:
@@ -371,13 +373,14 @@ Completed in Phase 3:
 - Add member community homepage.
 - Add post-login join-another-community flow.
 - Add admin management-community switcher.
+- Add admin-editable community details and rules/guidance.
 
 Remaining:
 
 - Add option to leave community.
 - Create decorated Badger Market / UW-Madison community.
 - Add lightweight community theme/config data.
-- Add more community editing controls to admin dashboard.
+- Add richer branding/theme controls to admin dashboard.
 
 ### Profile And Trust
 
@@ -525,3 +528,6 @@ Keep this guide aligned with:
 - Added a management-community switcher to `/admin/community` so admins with
   multiple active admin memberships can choose which community's invites and
   members they manage, with the selected community reflected in the URL.
+- Added admin-editable community details to `/admin/community` with a typed API
+  client helper and admin-only API route for updating name, type, access method,
+  email domain, and homepage rules/guidance.

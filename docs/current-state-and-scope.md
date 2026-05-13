@@ -66,9 +66,9 @@ Included:
 - Seller storefront-lite pages with trust signals.
 - Buyer contact, inbox threads, replies, notifications, and unread badges.
 - Basic reporting plus admin-only report review and explicit listing removal.
-- Admin-only community setup for invite codes and member role/status
-  management, with an explicit management-community switcher for admins who
-  operate more than one community.
+- Admin-only community setup for community details, invite codes, and member
+  role/status management, with an explicit management-community switcher for
+  admins who operate more than one community.
 - Dashboard profile/trust preview and seller readiness panel.
 - Vercel Web Analytics and Speed Insights mounted in the web root layout.
 - Media lifecycle cleanup for abandoned uploads, replaced/deleted listing
@@ -94,7 +94,8 @@ Included:
   `/communities/join` to join another community, refresh membership context,
   switch to the joined community, and continue to its homepage. Admins with
   multiple active admin memberships can switch the selected management
-  community on `/admin/community`.
+  community on `/admin/community` and edit basic community details, access
+  method, email domain, and member-facing rules/guidance.
 
 ## Deliberately Deferred
 
