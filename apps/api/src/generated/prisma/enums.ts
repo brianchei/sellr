@@ -76,6 +76,17 @@ export const ConversationType = {
 export type ConversationType = (typeof ConversationType)[keyof typeof ConversationType]
 
 
+export const ModerationActionType = {
+  admin_demoted: 'admin_demoted',
+  member_deactivated: 'member_deactivated',
+  member_suspended: 'member_suspended',
+  member_reactivated: 'member_reactivated',
+  admin_promoted: 'admin_promoted'
+} as const
+
+export type ModerationActionType = (typeof ModerationActionType)[keyof typeof ModerationActionType]
+
+
 export const ReportTargetType = {
   listing: 'listing',
   user: 'user',

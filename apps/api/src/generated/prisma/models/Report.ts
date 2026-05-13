@@ -223,6 +223,7 @@ export type ReportWhereInput = {
   resolvedAt?: Prisma.DateTimeNullableFilter<"Report"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Report"> | Date | string
   reporter?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  moderationActions?: Prisma.ModerationActionListRelationFilter
 }
 
 export type ReportOrderByWithRelationInput = {
@@ -237,6 +238,7 @@ export type ReportOrderByWithRelationInput = {
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   reporter?: Prisma.UserOrderByWithRelationInput
+  moderationActions?: Prisma.ModerationActionOrderByRelationAggregateInput
 }
 
 export type ReportWhereUniqueInput = Prisma.AtLeast<{
@@ -254,6 +256,7 @@ export type ReportWhereUniqueInput = Prisma.AtLeast<{
   resolvedAt?: Prisma.DateTimeNullableFilter<"Report"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Report"> | Date | string
   reporter?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  moderationActions?: Prisma.ModerationActionListRelationFilter
 }, "id">
 
 export type ReportOrderByWithAggregationInput = {
@@ -299,6 +302,7 @@ export type ReportCreateInput = {
   resolvedAt?: Date | string | null
   createdAt?: Date | string
   reporter: Prisma.UserCreateNestedOneWithoutReportsInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutReportInput
 }
 
 export type ReportUncheckedCreateInput = {
@@ -312,6 +316,7 @@ export type ReportUncheckedCreateInput = {
   moderatorId?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutReportInput
 }
 
 export type ReportUpdateInput = {
@@ -325,6 +330,7 @@ export type ReportUpdateInput = {
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reporter?: Prisma.UserUpdateOneRequiredWithoutReportsNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutReportNestedInput
 }
 
 export type ReportUncheckedUpdateInput = {
@@ -338,6 +344,7 @@ export type ReportUncheckedUpdateInput = {
   moderatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutReportNestedInput
 }
 
 export type ReportCreateManyInput = {
@@ -427,6 +434,11 @@ export type ReportMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
 }
 
+export type ReportNullableScalarRelationFilter = {
+  is?: Prisma.ReportWhereInput | null
+  isNot?: Prisma.ReportWhereInput | null
+}
+
 export type ReportCreateNestedManyWithoutReporterInput = {
   create?: Prisma.XOR<Prisma.ReportCreateWithoutReporterInput, Prisma.ReportUncheckedCreateWithoutReporterInput> | Prisma.ReportCreateWithoutReporterInput[] | Prisma.ReportUncheckedCreateWithoutReporterInput[]
   connectOrCreate?: Prisma.ReportCreateOrConnectWithoutReporterInput | Prisma.ReportCreateOrConnectWithoutReporterInput[]
@@ -477,6 +489,22 @@ export type EnumReportSeverityFieldUpdateOperationsInput = {
   set?: $Enums.ReportSeverity
 }
 
+export type ReportCreateNestedOneWithoutModerationActionsInput = {
+  create?: Prisma.XOR<Prisma.ReportCreateWithoutModerationActionsInput, Prisma.ReportUncheckedCreateWithoutModerationActionsInput>
+  connectOrCreate?: Prisma.ReportCreateOrConnectWithoutModerationActionsInput
+  connect?: Prisma.ReportWhereUniqueInput
+}
+
+export type ReportUpdateOneWithoutModerationActionsNestedInput = {
+  create?: Prisma.XOR<Prisma.ReportCreateWithoutModerationActionsInput, Prisma.ReportUncheckedCreateWithoutModerationActionsInput>
+  connectOrCreate?: Prisma.ReportCreateOrConnectWithoutModerationActionsInput
+  upsert?: Prisma.ReportUpsertWithoutModerationActionsInput
+  disconnect?: Prisma.ReportWhereInput | boolean
+  delete?: Prisma.ReportWhereInput | boolean
+  connect?: Prisma.ReportWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReportUpdateToOneWithWhereWithoutModerationActionsInput, Prisma.ReportUpdateWithoutModerationActionsInput>, Prisma.ReportUncheckedUpdateWithoutModerationActionsInput>
+}
+
 export type ReportCreateWithoutReporterInput = {
   id?: string
   targetId: string
@@ -487,6 +515,7 @@ export type ReportCreateWithoutReporterInput = {
   moderatorId?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutReportInput
 }
 
 export type ReportUncheckedCreateWithoutReporterInput = {
@@ -499,6 +528,7 @@ export type ReportUncheckedCreateWithoutReporterInput = {
   moderatorId?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutReportInput
 }
 
 export type ReportCreateOrConnectWithoutReporterInput = {
@@ -543,6 +573,74 @@ export type ReportScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Report"> | Date | string
 }
 
+export type ReportCreateWithoutModerationActionsInput = {
+  id?: string
+  targetId: string
+  targetType: $Enums.ReportTargetType
+  reason: string
+  severity: $Enums.ReportSeverity
+  status?: string
+  moderatorId?: string | null
+  resolvedAt?: Date | string | null
+  createdAt?: Date | string
+  reporter: Prisma.UserCreateNestedOneWithoutReportsInput
+}
+
+export type ReportUncheckedCreateWithoutModerationActionsInput = {
+  id?: string
+  reporterId: string
+  targetId: string
+  targetType: $Enums.ReportTargetType
+  reason: string
+  severity: $Enums.ReportSeverity
+  status?: string
+  moderatorId?: string | null
+  resolvedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type ReportCreateOrConnectWithoutModerationActionsInput = {
+  where: Prisma.ReportWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReportCreateWithoutModerationActionsInput, Prisma.ReportUncheckedCreateWithoutModerationActionsInput>
+}
+
+export type ReportUpsertWithoutModerationActionsInput = {
+  update: Prisma.XOR<Prisma.ReportUpdateWithoutModerationActionsInput, Prisma.ReportUncheckedUpdateWithoutModerationActionsInput>
+  create: Prisma.XOR<Prisma.ReportCreateWithoutModerationActionsInput, Prisma.ReportUncheckedCreateWithoutModerationActionsInput>
+  where?: Prisma.ReportWhereInput
+}
+
+export type ReportUpdateToOneWithWhereWithoutModerationActionsInput = {
+  where?: Prisma.ReportWhereInput
+  data: Prisma.XOR<Prisma.ReportUpdateWithoutModerationActionsInput, Prisma.ReportUncheckedUpdateWithoutModerationActionsInput>
+}
+
+export type ReportUpdateWithoutModerationActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  targetId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumReportTargetTypeFieldUpdateOperationsInput | $Enums.ReportTargetType
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.EnumReportSeverityFieldUpdateOperationsInput | $Enums.ReportSeverity
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  moderatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reporter?: Prisma.UserUpdateOneRequiredWithoutReportsNestedInput
+}
+
+export type ReportUncheckedUpdateWithoutModerationActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  reporterId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetId?: Prisma.StringFieldUpdateOperationsInput | string
+  targetType?: Prisma.EnumReportTargetTypeFieldUpdateOperationsInput | $Enums.ReportTargetType
+  reason?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.EnumReportSeverityFieldUpdateOperationsInput | $Enums.ReportSeverity
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  moderatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ReportCreateManyReporterInput = {
   id?: string
   targetId: string
@@ -565,6 +663,7 @@ export type ReportUpdateWithoutReporterInput = {
   moderatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutReportNestedInput
 }
 
 export type ReportUncheckedUpdateWithoutReporterInput = {
@@ -577,6 +676,7 @@ export type ReportUncheckedUpdateWithoutReporterInput = {
   moderatorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutReportNestedInput
 }
 
 export type ReportUncheckedUpdateManyWithoutReporterInput = {
@@ -592,6 +692,35 @@ export type ReportUncheckedUpdateManyWithoutReporterInput = {
 }
 
 
+/**
+ * Count Type ReportCountOutputType
+ */
+
+export type ReportCountOutputType = {
+  moderationActions: number
+}
+
+export type ReportCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  moderationActions?: boolean | ReportCountOutputTypeCountModerationActionsArgs
+}
+
+/**
+ * ReportCountOutputType without action
+ */
+export type ReportCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReportCountOutputType
+   */
+  select?: Prisma.ReportCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ReportCountOutputType without action
+ */
+export type ReportCountOutputTypeCountModerationActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModerationActionWhereInput
+}
+
 
 export type ReportSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -605,6 +734,8 @@ export type ReportSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   resolvedAt?: boolean
   createdAt?: boolean
   reporter?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  moderationActions?: boolean | Prisma.Report$moderationActionsArgs<ExtArgs>
+  _count?: boolean | Prisma.ReportCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["report"]>
 
 export type ReportSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -651,6 +782,8 @@ export type ReportSelectScalar = {
 export type ReportOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "reporterId" | "targetId" | "targetType" | "reason" | "severity" | "status" | "moderatorId" | "resolvedAt" | "createdAt", ExtArgs["result"]["report"]>
 export type ReportInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reporter?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  moderationActions?: boolean | Prisma.Report$moderationActionsArgs<ExtArgs>
+  _count?: boolean | Prisma.ReportCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ReportIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reporter?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -663,6 +796,7 @@ export type $ReportPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Report"
   objects: {
     reporter: Prisma.$UserPayload<ExtArgs>
+    moderationActions: Prisma.$ModerationActionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1070,6 +1204,7 @@ readonly fields: ReportFieldRefs;
 export interface Prisma__ReportClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   reporter<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  moderationActions<T extends Prisma.Report$moderationActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Report$moderationActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1507,6 +1642,30 @@ export type ReportDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Reports to delete.
    */
   limit?: number
+}
+
+/**
+ * Report.moderationActions
+ */
+export type Report$moderationActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModerationAction
+   */
+  select?: Prisma.ModerationActionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModerationAction
+   */
+  omit?: Prisma.ModerationActionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModerationActionInclude<ExtArgs> | null
+  where?: Prisma.ModerationActionWhereInput
+  orderBy?: Prisma.ModerationActionOrderByWithRelationInput | Prisma.ModerationActionOrderByWithRelationInput[]
+  cursor?: Prisma.ModerationActionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModerationActionScalarFieldEnum | Prisma.ModerationActionScalarFieldEnum[]
 }
 
 /**

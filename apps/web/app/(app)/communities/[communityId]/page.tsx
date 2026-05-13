@@ -251,6 +251,32 @@ export default function CommunityHomePage() {
               ))}
             </div>
           </div>
+          {presentation.bannerImageUrl || presentation.logoImageUrl ? (
+            <div
+              className="min-h-36 overflow-hidden rounded-3xl border border-white/70 bg-white/65 shadow-[var(--shadow-app-card)] lg:w-72"
+              style={
+                presentation.bannerImageUrl
+                  ? {
+                      backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.22)), url("${presentation.bannerImageUrl}")`,
+                      backgroundPosition: 'center',
+                      backgroundSize: 'cover',
+                    }
+                  : undefined
+              }
+              aria-hidden="true"
+            >
+              {presentation.logoImageUrl ? (
+                <div className="flex h-full min-h-36 items-center justify-center p-5">
+                  <span
+                    className="block h-20 w-20 rounded-3xl border border-white/80 bg-white bg-center bg-contain bg-no-repeat shadow-sm"
+                    style={{
+                      backgroundImage: `url("${presentation.logoImageUrl}")`,
+                    }}
+                  />
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
             <button
               type="button"
@@ -486,6 +512,14 @@ export default function CommunityHomePage() {
                 <span
                   key={area}
                   className="rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] px-3 py-1 text-xs font-semibold text-[var(--text-primary)]"
+                  style={
+                    presentation.accentColor
+                      ? {
+                          borderColor: `${presentation.accentColor}66`,
+                          backgroundColor: `${presentation.accentColor}18`,
+                        }
+                      : undefined
+                  }
                 >
                   {area}
                 </span>

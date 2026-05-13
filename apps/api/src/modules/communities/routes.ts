@@ -113,6 +113,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
               accessMethod: true,
               emailDomain: true,
               rules: true,
+              presentation: true,
               status: true,
               createdAt: true,
             },
@@ -160,6 +161,8 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           membership: {
             role: membership.role,
             status: membership.status,
+            accessStatusReason: membership.accessStatusReason,
+            accessSuspendedUntil: membership.accessSuspendedUntil,
             joinedAt: membership.joinedAt,
           },
           stats: {
@@ -461,6 +464,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
               ? { emailDomain: null }
               : {}),
           ...(body.rules !== undefined ? { rules: body.rules } : {}),
+          ...(body.presentation !== undefined
+            ? { presentation: body.presentation }
+            : {}),
         },
         include: adminCommunityInclude,
       });
@@ -577,6 +583,32 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         }
       }
 
+      const memberUpdateData: Prisma.CommunityMemberUpdateInput = {
+        ...(body.role ? { role: body.role } : {}),
+        ...(body.status ? { status: body.status } : {}),
+      };
+      if (body.accessStatusReason !== undefined) {
+        memberUpdateData.accessStatusReason = body.accessStatusReason;
+      } else if (body.status === 'inactive') {
+        memberUpdateData.accessStatusReason = 'admin_deactivated';
+      } else if (body.status === 'active') {
+        memberUpdateData.accessStatusReason = null;
+      }
+
+      if (body.accessStatusNote !== undefined) {
+        memberUpdateData.accessStatusNote = body.accessStatusNote;
+      } else if (body.status === 'active') {
+        memberUpdateData.accessStatusNote = null;
+      }
+
+      if (body.accessSuspendedUntil !== undefined) {
+        memberUpdateData.accessSuspendedUntil = body.accessSuspendedUntil
+          ? new Date(body.accessSuspendedUntil)
+          : null;
+      } else if (body.status === 'active') {
+        memberUpdateData.accessSuspendedUntil = null;
+      }
+
       const updated = await prisma.communityMember.update({
         where: {
           userId_communityId: {
@@ -584,10 +616,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
             communityId,
           },
         },
-        data: {
-          ...(body.role ? { role: body.role } : {}),
-          ...(body.status ? { status: body.status } : {}),
-        },
+        data: memberUpdateData,
         include: {
           user: {
             select: {

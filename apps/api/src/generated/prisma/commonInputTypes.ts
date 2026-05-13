@@ -487,6 +487,23 @@ export type EnumReportSeverityWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumReportSeverityFilter<$PrismaModel>
 }
 
+export type EnumModerationActionTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ModerationActionType | Prisma.EnumModerationActionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ModerationActionType[] | Prisma.ListEnumModerationActionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ModerationActionType[] | Prisma.ListEnumModerationActionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumModerationActionTypeFilter<$PrismaModel> | $Enums.ModerationActionType
+}
+
+export type EnumModerationActionTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ModerationActionType | Prisma.EnumModerationActionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ModerationActionType[] | Prisma.ListEnumModerationActionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ModerationActionType[] | Prisma.ListEnumModerationActionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumModerationActionTypeWithAggregatesFilter<$PrismaModel> | $Enums.ModerationActionType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumModerationActionTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumModerationActionTypeFilter<$PrismaModel>
+}
+
 export type EnumUserFlagTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.UserFlagType | Prisma.EnumUserFlagTypeFieldRefInput<$PrismaModel>
   in?: $Enums.UserFlagType[] | Prisma.ListEnumUserFlagTypeFieldRefInput<$PrismaModel>
@@ -974,6 +991,23 @@ export type NestedEnumReportSeverityWithAggregatesFilter<$PrismaModel = never> =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumReportSeverityFilter<$PrismaModel>
   _max?: Prisma.NestedEnumReportSeverityFilter<$PrismaModel>
+}
+
+export type NestedEnumModerationActionTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ModerationActionType | Prisma.EnumModerationActionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ModerationActionType[] | Prisma.ListEnumModerationActionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ModerationActionType[] | Prisma.ListEnumModerationActionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumModerationActionTypeFilter<$PrismaModel> | $Enums.ModerationActionType
+}
+
+export type NestedEnumModerationActionTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ModerationActionType | Prisma.EnumModerationActionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ModerationActionType[] | Prisma.ListEnumModerationActionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ModerationActionType[] | Prisma.ListEnumModerationActionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumModerationActionTypeWithAggregatesFilter<$PrismaModel> | $Enums.ModerationActionType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumModerationActionTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumModerationActionTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumUserFlagTypeFilter<$PrismaModel = never> = {

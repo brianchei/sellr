@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.UpdateCommunityDetailsSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.LeaveCommunitySchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.PROFILE_AVATAR_MIME_TYPES = exports.LISTING_IMAGE_MIME_TYPES = exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX = exports.PROFILE_AVATAR_MAX_BYTES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.ReportMemberActionSchema = exports.UpdateCommunityMemberSchema = exports.UpdateCommunityDetailsSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.CommunityPresentationSchema = exports.CommunityThemeKeySchema = exports.LeaveCommunitySchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.PROFILE_AVATAR_MIME_TYPES = exports.LISTING_IMAGE_MIME_TYPES = exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX = exports.PROFILE_AVATAR_MAX_BYTES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
 exports.hasRealDisplayName = hasRealDisplayName;
 exports.hasVerifiedContact = hasVerifiedContact;
 exports.getProfileCompletionIssues = getProfileCompletionIssues;
@@ -125,6 +125,54 @@ exports.JoinCommunitySchema = zod_1.z
 exports.LeaveCommunitySchema = zod_1.z.object({
     removeListings: zod_1.z.boolean().optional().default(false),
 });
+exports.CommunityThemeKeySchema = zod_1.z.enum([
+    'default',
+    'badger',
+    'campus',
+    'neighborhood',
+]);
+function isCommunityImageUrl(value) {
+    if (value.startsWith('/')) {
+        return /^\/[a-zA-Z0-9/_-]+\.(jpg|jpeg|png|webp)$/i.test(value);
+    }
+    try {
+        const url = new URL(value);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    }
+    catch {
+        return false;
+    }
+}
+exports.CommunityPresentationSchema = zod_1.z.object({
+    shortDescription: zod_1.z.string().trim().max(240).nullable().optional(),
+    themeKey: exports.CommunityThemeKeySchema.nullable().optional(),
+    accentColor: zod_1.z
+        .string()
+        .trim()
+        .regex(/^#[0-9a-fA-F]{6}$/, 'Use a 6-digit hex color such as #C5050C')
+        .nullable()
+        .optional(),
+    bannerImageUrl: zod_1.z
+        .string()
+        .trim()
+        .max(2048)
+        .refine(isCommunityImageUrl, {
+        error: 'Banner image must be a site-local or http(s) image URL',
+    })
+        .nullable()
+        .optional(),
+    logoImageUrl: zod_1.z
+        .string()
+        .trim()
+        .max(2048)
+        .refine(isCommunityImageUrl, {
+        error: 'Logo image must be a site-local or http(s) image URL',
+    })
+        .nullable()
+        .optional(),
+    pickupGuidance: zod_1.z.string().trim().max(240).nullable().optional(),
+    localAreas: zod_1.z.array(zod_1.z.string().trim().min(2).max(60)).max(8).optional(),
+});
 exports.CommunityAdminParamsSchema = zod_1.z.object({
     communityId: zod_1.z.uuid(),
 });
@@ -156,12 +204,14 @@ exports.UpdateCommunityDetailsSchema = zod_1.z
     accessMethod: zod_1.z.enum(['invite_code', 'email_domain']).optional(),
     emailDomain: CommunityEmailDomainSchema.nullable().optional(),
     rules: zod_1.z.array(zod_1.z.string().trim().min(2).max(240)).max(8).optional(),
+    presentation: exports.CommunityPresentationSchema.optional(),
 })
     .refine((data) => data.name !== undefined ||
     data.type !== undefined ||
     data.accessMethod !== undefined ||
     data.emailDomain !== undefined ||
-    data.rules !== undefined, { error: 'At least one community detail field is required' })
+    data.rules !== undefined ||
+    data.presentation !== undefined, { error: 'At least one community detail field is required' })
     .refine((data) => data.accessMethod !== 'email_domain' ||
     (data.emailDomain !== undefined && data.emailDomain !== null), { error: 'Email-domain communities require an email domain' })
     .refine((data) => data.emailDomain !== null || data.accessMethod === 'invite_code', {
@@ -171,9 +221,28 @@ exports.UpdateCommunityMemberSchema = zod_1.z
     .object({
     role: zod_1.z.enum(['member', 'admin']).optional(),
     status: zod_1.z.enum(['active', 'inactive']).optional(),
+    accessStatusReason: zod_1.z
+        .enum([
+        'admin_deactivated',
+        'report_deactivated',
+        'report_suspension',
+        'reactivated',
+    ])
+        .nullable()
+        .optional(),
+    accessStatusNote: zod_1.z.string().trim().max(300).nullable().optional(),
+    accessSuspendedUntil: zod_1.z.iso.datetime().nullable().optional(),
 })
-    .refine((data) => data.role !== undefined || data.status !== undefined, {
-    error: 'Role or status is required',
+    .refine((data) => data.role !== undefined ||
+    data.status !== undefined ||
+    data.accessStatusReason !== undefined ||
+    data.accessStatusNote !== undefined ||
+    data.accessSuspendedUntil !== undefined, {
+    error: 'Role, status, or access metadata is required',
+});
+exports.ReportMemberActionSchema = zod_1.z.object({
+    action: zod_1.z.enum(['demote_admin', 'deactivate_member', 'suspend_member']),
+    note: zod_1.z.string().trim().max(500).optional(),
 });
 // Listings
 exports.AvailabilityWindowSchema = zod_1.z.object({

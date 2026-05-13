@@ -35,6 +35,8 @@ model User {
   flags            UserFlag[]
   notifications    Notification[]
   mediaAssets      MediaAsset[]
+  moderationActionsTaken    ModerationAction[] @relation("ModerationActionModerator")
+  moderationActionsReceived ModerationAction[] @relation("ModerationActionTarget")
 
   @@map("users")
 }
@@ -48,13 +50,15 @@ model Community {
   accessMethod CommunityAccessMethod @map("access_method")
   emailDomain  String?               @map("email_domain") @db.VarChar(100)
   rules        Json                  @default("[]")
+  presentation Json                  @default("{}")
   status       String                @default("active")
   createdAt    DateTime              @default(now()) @map("created_at")
 
-  members       CommunityMember[]
-  listings      Listing[]
-  inviteCodes   InviteCode[]
-  savedSearches SavedSearch[]
+  members           CommunityMember[]
+  listings          Listing[]
+  inviteCodes       InviteCode[]
+  savedSearches     SavedSearch[]
+  moderationActions ModerationAction[]
 
   @@map("communities")
 }
@@ -75,6 +79,9 @@ model CommunityMember {
   communityId String   @map("community_id") @db.Uuid
   role        String   @default("member")
   status      String   @default("active")
+  accessStatusReason   String?   @map("access_status_reason") @db.VarChar(40)
+  accessStatusNote     String?   @map("access_status_note") @db.VarChar(300)
+  accessSuspendedUntil DateTime? @map("access_suspended_until")
   joinedAt    DateTime @default(now()) @map("joined_at")
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -344,9 +351,46 @@ model Report {
   createdAt   DateTime         @default(now()) @map("created_at")
 
   reporter User @relation(fields: [reporterId], references: [id])
+  moderationActions ModerationAction[]
 
   @@index([status, severity])
   @@map("reports")
+}
+
+model ModerationAction {
+  id             String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reportId       String?              @map("report_id") @db.Uuid
+  communityId    String               @map("community_id") @db.Uuid
+  targetUserId   String               @map("target_user_id") @db.Uuid
+  moderatorId    String               @map("moderator_id") @db.Uuid
+  actionType     ModerationActionType @map("action_type")
+  previousRole   String?              @map("previous_role") @db.VarChar(20)
+  nextRole       String?              @map("next_role") @db.VarChar(20)
+  previousStatus String?              @map("previous_status") @db.VarChar(20)
+  nextStatus     String?              @map("next_status") @db.VarChar(20)
+  previousAccessStatusReason String?  @map("previous_access_status_reason") @db.VarChar(40)
+  nextAccessStatusReason     String?  @map("next_access_status_reason") @db.VarChar(40)
+  note           String?              @db.VarChar(500)
+  createdAt      DateTime             @default(now()) @map("created_at")
+
+  report     Report?   @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  community  Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  targetUser User      @relation("ModerationActionTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  moderator  User      @relation("ModerationActionModerator", fields: [moderatorId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@index([communityId, createdAt])
+  @@index([targetUserId, createdAt])
+  @@index([moderatorId, createdAt])
+  @@map("moderation_actions")
+}
+
+enum ModerationActionType {
+  admin_demoted
+  member_deactivated
+  member_suspended
+  member_reactivated
+  admin_promoted
 }
 
 enum ReportTargetType {

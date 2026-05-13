@@ -47,6 +47,7 @@ exports.createReport = createReport;
 exports.fetchReports = fetchReports;
 exports.updateReportStatus = updateReportStatus;
 exports.removeReportedListing = removeReportedListing;
+exports.runReportMemberAction = runReportMemberAction;
 const fetch_1 = require("./fetch");
 function sendOtp(phoneE164) {
     return (0, fetch_1.apiFetch)('/auth/otp/send', {
@@ -334,4 +335,10 @@ function updateReportStatus(reportId, status) {
 }
 function removeReportedListing(reportId) {
     return (0, fetch_1.apiFetch)(`/reports/${reportId}/remove-listing`, { method: 'POST' });
+}
+function runReportMemberAction(reportId, body) {
+    return (0, fetch_1.apiFetch)(`/reports/${reportId}/member-action`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+    });
 }

@@ -12,6 +12,8 @@ import type {
   ApiCommunityAdminMember,
   ApiCommunityMemberRole,
   ApiCommunityMemberStatus,
+  ApiCommunityPresentation,
+  ApiCommunityThemeKey,
 } from '@sellr/api-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -219,6 +221,52 @@ function parseRulesInput(value: string): string[] {
     .filter(Boolean);
 }
 
+function communityPresentation(value: unknown): ApiCommunityPresentation {
+  if (!isRecord(value)) return {};
+  return {
+    shortDescription:
+      typeof value.shortDescription === 'string'
+        ? value.shortDescription
+        : null,
+    themeKey:
+      value.themeKey === 'badger' ||
+      value.themeKey === 'campus' ||
+      value.themeKey === 'neighborhood' ||
+      value.themeKey === 'default'
+        ? value.themeKey
+        : 'default',
+    accentColor:
+      typeof value.accentColor === 'string' ? value.accentColor : null,
+    bannerImageUrl:
+      typeof value.bannerImageUrl === 'string' ? value.bannerImageUrl : null,
+    logoImageUrl:
+      typeof value.logoImageUrl === 'string' ? value.logoImageUrl : null,
+    pickupGuidance:
+      typeof value.pickupGuidance === 'string' ? value.pickupGuidance : null,
+    localAreas: Array.isArray(value.localAreas)
+      ? value.localAreas.filter(
+          (area): area is string => typeof area === 'string' && area.length > 0,
+        )
+      : [],
+  };
+}
+
+function parseLineInput(value: string): string[] {
+  return value
+    .split('\n')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function accessRestrictionLabel(
+  reason: ApiCommunityAdminMember['accessStatusReason'],
+): string | null {
+  if (reason === 'report_suspension') return 'Suspended from report';
+  if (reason === 'report_deactivated') return 'Deactivated from report';
+  if (reason === 'admin_deactivated') return 'Deactivated by admin';
+  return null;
+}
+
 function AdminRestricted() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -263,6 +311,28 @@ function CommunityDetailsForm({
   >(community.accessMethod);
   const [emailDomain, setEmailDomain] = useState(community.emailDomain ?? '');
   const [rulesText, setRulesText] = useState(rulesToTextareaValue(community.rules));
+  const initialPresentation = communityPresentation(community.presentation);
+  const [shortDescription, setShortDescription] = useState(
+    initialPresentation.shortDescription ?? '',
+  );
+  const [themeKey, setThemeKey] = useState<ApiCommunityThemeKey>(
+    initialPresentation.themeKey ?? 'default',
+  );
+  const [accentColor, setAccentColor] = useState(
+    initialPresentation.accentColor ?? '',
+  );
+  const [bannerImageUrl, setBannerImageUrl] = useState(
+    initialPresentation.bannerImageUrl ?? '',
+  );
+  const [logoImageUrl, setLogoImageUrl] = useState(
+    initialPresentation.logoImageUrl ?? '',
+  );
+  const [pickupGuidance, setPickupGuidance] = useState(
+    initialPresentation.pickupGuidance ?? '',
+  );
+  const [localAreasText, setLocalAreasText] = useState(
+    (initialPresentation.localAreas ?? []).join('\n'),
+  );
   const [detailsMessage, setDetailsMessage] = useState<string | null>(null);
   const [detailsError, setDetailsError] = useState<string | null>(null);
 
@@ -284,6 +354,15 @@ function CommunityDetailsForm({
         emailDomain:
           accessMethod === 'email_domain' ? normalizedEmailDomain : null,
         rules: parseRulesInput(rulesText),
+        presentation: {
+          shortDescription: shortDescription.trim() || null,
+          themeKey,
+          accentColor: accentColor.trim() || null,
+          bannerImageUrl: bannerImageUrl.trim() || null,
+          logoImageUrl: logoImageUrl.trim() || null,
+          pickupGuidance: pickupGuidance.trim() || null,
+          localAreas: parseLineInput(localAreasText),
+        },
       });
     },
     onSuccess: async () => {
@@ -383,6 +462,89 @@ function CommunityDetailsForm({
             </span>
           </label>
         </div>
+
+        <label className="text-sm font-medium text-[var(--text-primary)]">
+          Short community description
+          <textarea
+            value={shortDescription}
+            onChange={(event) => setShortDescription(event.target.value)}
+            rows={2}
+            maxLength={240}
+            placeholder="A short member-facing description for this community homepage."
+            className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+          />
+        </label>
+
+        <div className="grid gap-3 md:grid-cols-[200px_180px_minmax(0,1fr)]">
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Theme
+            <select
+              value={themeKey}
+              onChange={(event) =>
+                setThemeKey(event.target.value as ApiCommunityThemeKey)
+              }
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            >
+              <option value="default">Default</option>
+              <option value="badger">Badger</option>
+              <option value="campus">Campus</option>
+              <option value="neighborhood">Neighborhood</option>
+            </select>
+          </label>
+
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Accent color
+            <input
+              value={accentColor}
+              onChange={(event) => setAccentColor(event.target.value)}
+              placeholder="#C5050C"
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            />
+          </label>
+
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Pickup guidance
+            <input
+              value={pickupGuidance}
+              onChange={(event) => setPickupGuidance(event.target.value)}
+              maxLength={240}
+              placeholder="Meet in familiar public spots when possible."
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            />
+          </label>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Banner image URL
+            <input
+              value={bannerImageUrl}
+              onChange={(event) => setBannerImageUrl(event.target.value)}
+              placeholder="/community/banner.webp or https://..."
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            />
+          </label>
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Logo image URL
+            <input
+              value={logoImageUrl}
+              onChange={(event) => setLogoImageUrl(event.target.value)}
+              placeholder="/community/logo.png or https://..."
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            />
+          </label>
+        </div>
+
+        <label className="text-sm font-medium text-[var(--text-primary)]">
+          Local areas
+          <textarea
+            value={localAreasText}
+            onChange={(event) => setLocalAreasText(event.target.value)}
+            rows={3}
+            placeholder="One pickup area per line."
+            className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+          />
+        </label>
 
         <label className="text-sm font-medium text-[var(--text-primary)]">
           Community guidance and rules
@@ -558,6 +720,9 @@ export default function AdminCommunityPage() {
       body: {
         role?: ApiCommunityMemberRole;
         status?: ApiCommunityMemberStatus;
+        accessStatusReason?: ApiCommunityAdminMember['accessStatusReason'];
+        accessStatusNote?: string | null;
+        accessSuspendedUntil?: string | null;
       };
     }) => updateCommunityMember(communityId, member.userId, body),
     onSuccess: async () => {
@@ -654,6 +819,9 @@ export default function AdminCommunityPage() {
     body: {
       role?: ApiCommunityMemberRole;
       status?: ApiCommunityMemberStatus;
+      accessStatusReason?: ApiCommunityAdminMember['accessStatusReason'];
+      accessStatusNote?: string | null;
+      accessSuspendedUntil?: string | null;
     },
   ) => {
     if (!selectedCommunity) return;
@@ -1080,6 +1248,14 @@ export default function AdminCommunityPage() {
                       <p className="mt-1 text-xs text-[var(--text-tertiary)]">
                         Joined {formatDate(member.joinedAt)}
                       </p>
+                      {accessRestrictionLabel(member.accessStatusReason) ? (
+                        <p className="mt-1 text-xs font-semibold text-[var(--color-brand-warm-strong)]">
+                          {accessRestrictionLabel(member.accessStatusReason)}
+                          {member.accessStatusNote
+                            ? ` · ${member.accessStatusNote}`
+                            : ''}
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">

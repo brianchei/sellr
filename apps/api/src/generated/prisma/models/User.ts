@@ -243,6 +243,8 @@ export type UserWhereInput = {
   flags?: Prisma.UserFlagListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   mediaAssets?: Prisma.MediaAssetListRelationFilter
+  moderationActionsTaken?: Prisma.ModerationActionListRelationFilter
+  moderationActionsReceived?: Prisma.ModerationActionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -270,6 +272,8 @@ export type UserOrderByWithRelationInput = {
   flags?: Prisma.UserFlagOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   mediaAssets?: Prisma.MediaAssetOrderByRelationAggregateInput
+  moderationActionsTaken?: Prisma.ModerationActionOrderByRelationAggregateInput
+  moderationActionsReceived?: Prisma.ModerationActionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -300,6 +304,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   flags?: Prisma.UserFlagListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   mediaAssets?: Prisma.MediaAssetListRelationFilter
+  moderationActionsTaken?: Prisma.ModerationActionListRelationFilter
+  moderationActionsReceived?: Prisma.ModerationActionListRelationFilter
 }, "id" | "phoneE164" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -361,6 +367,8 @@ export type UserCreateInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -388,6 +396,8 @@ export type UserUncheckedCreateInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUpdateInput = {
@@ -415,6 +425,8 @@ export type UserUpdateInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -442,6 +454,8 @@ export type UserUncheckedUpdateInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -710,6 +724,34 @@ export type UserUpdateOneRequiredWithoutReportsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReportsInput, Prisma.UserUpdateWithoutReportsInput>, Prisma.UserUncheckedUpdateWithoutReportsInput>
 }
 
+export type UserCreateNestedOneWithoutModerationActionsReceivedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutModerationActionsReceivedInput, Prisma.UserUncheckedCreateWithoutModerationActionsReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutModerationActionsReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutModerationActionsTakenInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutModerationActionsTakenInput, Prisma.UserUncheckedCreateWithoutModerationActionsTakenInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutModerationActionsTakenInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutModerationActionsReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutModerationActionsReceivedInput, Prisma.UserUncheckedCreateWithoutModerationActionsReceivedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutModerationActionsReceivedInput
+  upsert?: Prisma.UserUpsertWithoutModerationActionsReceivedInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutModerationActionsReceivedInput, Prisma.UserUpdateWithoutModerationActionsReceivedInput>, Prisma.UserUncheckedUpdateWithoutModerationActionsReceivedInput>
+}
+
+export type UserUpdateOneRequiredWithoutModerationActionsTakenNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutModerationActionsTakenInput, Prisma.UserUncheckedCreateWithoutModerationActionsTakenInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutModerationActionsTakenInput
+  upsert?: Prisma.UserUpsertWithoutModerationActionsTakenInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutModerationActionsTakenInput, Prisma.UserUpdateWithoutModerationActionsTakenInput>, Prisma.UserUncheckedUpdateWithoutModerationActionsTakenInput>
+}
+
 export type UserCreateNestedOneWithoutFlagsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutFlagsInput, Prisma.UserUncheckedCreateWithoutFlagsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutFlagsInput
@@ -762,6 +804,8 @@ export type UserCreateWithoutCommunityMembersInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutCommunityMembersInput = {
@@ -788,6 +832,8 @@ export type UserUncheckedCreateWithoutCommunityMembersInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutCommunityMembersInput = {
@@ -830,6 +876,8 @@ export type UserUpdateWithoutCommunityMembersInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommunityMembersInput = {
@@ -856,6 +904,8 @@ export type UserUncheckedUpdateWithoutCommunityMembersInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutListingsInput = {
@@ -882,6 +932,8 @@ export type UserCreateWithoutListingsInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutListingsInput = {
@@ -908,6 +960,8 @@ export type UserUncheckedCreateWithoutListingsInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutListingsInput = {
@@ -950,6 +1004,8 @@ export type UserUpdateWithoutListingsInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutListingsInput = {
@@ -976,6 +1032,8 @@ export type UserUncheckedUpdateWithoutListingsInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutMediaAssetsInput = {
@@ -1002,6 +1060,8 @@ export type UserCreateWithoutMediaAssetsInput = {
   reputation?: Prisma.UserReputationCreateNestedOneWithoutUserInput
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutMediaAssetsInput = {
@@ -1028,6 +1088,8 @@ export type UserUncheckedCreateWithoutMediaAssetsInput = {
   reputation?: Prisma.UserReputationUncheckedCreateNestedOneWithoutUserInput
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutMediaAssetsInput = {
@@ -1070,6 +1132,8 @@ export type UserUpdateWithoutMediaAssetsInput = {
   reputation?: Prisma.UserReputationUpdateOneWithoutUserNestedInput
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMediaAssetsInput = {
@@ -1096,6 +1160,8 @@ export type UserUncheckedUpdateWithoutMediaAssetsInput = {
   reputation?: Prisma.UserReputationUncheckedUpdateOneWithoutUserNestedInput
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutBuyerOffersInput = {
@@ -1122,6 +1188,8 @@ export type UserCreateWithoutBuyerOffersInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutBuyerOffersInput = {
@@ -1148,6 +1216,8 @@ export type UserUncheckedCreateWithoutBuyerOffersInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutBuyerOffersInput = {
@@ -1179,6 +1249,8 @@ export type UserCreateWithoutSellerOffersInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutSellerOffersInput = {
@@ -1205,6 +1277,8 @@ export type UserUncheckedCreateWithoutSellerOffersInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutSellerOffersInput = {
@@ -1247,6 +1321,8 @@ export type UserUpdateWithoutBuyerOffersInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBuyerOffersInput = {
@@ -1273,6 +1349,8 @@ export type UserUncheckedUpdateWithoutBuyerOffersInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUpsertWithoutSellerOffersInput = {
@@ -1310,6 +1388,8 @@ export type UserUpdateWithoutSellerOffersInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSellerOffersInput = {
@@ -1336,6 +1416,8 @@ export type UserUncheckedUpdateWithoutSellerOffersInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutRatingsGivenInput = {
@@ -1362,6 +1444,8 @@ export type UserCreateWithoutRatingsGivenInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutRatingsGivenInput = {
@@ -1388,6 +1472,8 @@ export type UserUncheckedCreateWithoutRatingsGivenInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutRatingsGivenInput = {
@@ -1419,6 +1505,8 @@ export type UserCreateWithoutRatingsReceivedInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutRatingsReceivedInput = {
@@ -1445,6 +1533,8 @@ export type UserUncheckedCreateWithoutRatingsReceivedInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutRatingsReceivedInput = {
@@ -1487,6 +1577,8 @@ export type UserUpdateWithoutRatingsGivenInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRatingsGivenInput = {
@@ -1513,6 +1605,8 @@ export type UserUncheckedUpdateWithoutRatingsGivenInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUpsertWithoutRatingsReceivedInput = {
@@ -1550,6 +1644,8 @@ export type UserUpdateWithoutRatingsReceivedInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRatingsReceivedInput = {
@@ -1576,6 +1672,8 @@ export type UserUncheckedUpdateWithoutRatingsReceivedInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutReputationInput = {
@@ -1602,6 +1700,8 @@ export type UserCreateWithoutReputationInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutReputationInput = {
@@ -1628,6 +1728,8 @@ export type UserUncheckedCreateWithoutReputationInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutReputationInput = {
@@ -1670,6 +1772,8 @@ export type UserUpdateWithoutReputationInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReputationInput = {
@@ -1696,6 +1800,8 @@ export type UserUncheckedUpdateWithoutReputationInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutMessagesInput = {
@@ -1722,6 +1828,8 @@ export type UserCreateWithoutMessagesInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutMessagesInput = {
@@ -1748,6 +1856,8 @@ export type UserUncheckedCreateWithoutMessagesInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutMessagesInput = {
@@ -1790,6 +1900,8 @@ export type UserUpdateWithoutMessagesInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -1816,6 +1928,8 @@ export type UserUncheckedUpdateWithoutMessagesInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutSavedSearchesInput = {
@@ -1842,6 +1956,8 @@ export type UserCreateWithoutSavedSearchesInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutSavedSearchesInput = {
@@ -1868,6 +1984,8 @@ export type UserUncheckedCreateWithoutSavedSearchesInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutSavedSearchesInput = {
@@ -1910,6 +2028,8 @@ export type UserUpdateWithoutSavedSearchesInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSavedSearchesInput = {
@@ -1936,6 +2056,8 @@ export type UserUncheckedUpdateWithoutSavedSearchesInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutReportsInput = {
@@ -1962,6 +2084,8 @@ export type UserCreateWithoutReportsInput = {
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutReportsInput = {
@@ -1988,6 +2112,8 @@ export type UserUncheckedCreateWithoutReportsInput = {
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutReportsInput = {
@@ -2030,6 +2156,8 @@ export type UserUpdateWithoutReportsInput = {
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportsInput = {
@@ -2056,6 +2184,264 @@ export type UserUncheckedUpdateWithoutReportsInput = {
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
+}
+
+export type UserCreateWithoutModerationActionsReceivedInput = {
+  id?: string
+  phoneE164?: string | null
+  email?: string | null
+  emailVerifiedAt?: Date | string | null
+  displayName: string
+  avatarUrl?: string | null
+  verifiedAt?: Date | string | null
+  deviceFingerprint?: string | null
+  expoPushToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  communityMembers?: Prisma.CommunityMemberCreateNestedManyWithoutUserInput
+  listings?: Prisma.ListingCreateNestedManyWithoutSellerInput
+  buyerOffers?: Prisma.OfferCreateNestedManyWithoutBuyerInput
+  sellerOffers?: Prisma.OfferCreateNestedManyWithoutSellerInput
+  ratingsGiven?: Prisma.RatingCreateNestedManyWithoutRaterInput
+  ratingsReceived?: Prisma.RatingCreateNestedManyWithoutRateeInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  savedSearches?: Prisma.SavedSearchCreateNestedManyWithoutUserInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reputation?: Prisma.UserReputationCreateNestedOneWithoutUserInput
+  flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+}
+
+export type UserUncheckedCreateWithoutModerationActionsReceivedInput = {
+  id?: string
+  phoneE164?: string | null
+  email?: string | null
+  emailVerifiedAt?: Date | string | null
+  displayName: string
+  avatarUrl?: string | null
+  verifiedAt?: Date | string | null
+  deviceFingerprint?: string | null
+  expoPushToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  communityMembers?: Prisma.CommunityMemberUncheckedCreateNestedManyWithoutUserInput
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutSellerInput
+  buyerOffers?: Prisma.OfferUncheckedCreateNestedManyWithoutBuyerInput
+  sellerOffers?: Prisma.OfferUncheckedCreateNestedManyWithoutSellerInput
+  ratingsGiven?: Prisma.RatingUncheckedCreateNestedManyWithoutRaterInput
+  ratingsReceived?: Prisma.RatingUncheckedCreateNestedManyWithoutRateeInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  savedSearches?: Prisma.SavedSearchUncheckedCreateNestedManyWithoutUserInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reputation?: Prisma.UserReputationUncheckedCreateNestedOneWithoutUserInput
+  flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+}
+
+export type UserCreateOrConnectWithoutModerationActionsReceivedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutModerationActionsReceivedInput, Prisma.UserUncheckedCreateWithoutModerationActionsReceivedInput>
+}
+
+export type UserCreateWithoutModerationActionsTakenInput = {
+  id?: string
+  phoneE164?: string | null
+  email?: string | null
+  emailVerifiedAt?: Date | string | null
+  displayName: string
+  avatarUrl?: string | null
+  verifiedAt?: Date | string | null
+  deviceFingerprint?: string | null
+  expoPushToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  communityMembers?: Prisma.CommunityMemberCreateNestedManyWithoutUserInput
+  listings?: Prisma.ListingCreateNestedManyWithoutSellerInput
+  buyerOffers?: Prisma.OfferCreateNestedManyWithoutBuyerInput
+  sellerOffers?: Prisma.OfferCreateNestedManyWithoutSellerInput
+  ratingsGiven?: Prisma.RatingCreateNestedManyWithoutRaterInput
+  ratingsReceived?: Prisma.RatingCreateNestedManyWithoutRateeInput
+  messages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  savedSearches?: Prisma.SavedSearchCreateNestedManyWithoutUserInput
+  reports?: Prisma.ReportCreateNestedManyWithoutReporterInput
+  reputation?: Prisma.UserReputationCreateNestedOneWithoutUserInput
+  flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
+}
+
+export type UserUncheckedCreateWithoutModerationActionsTakenInput = {
+  id?: string
+  phoneE164?: string | null
+  email?: string | null
+  emailVerifiedAt?: Date | string | null
+  displayName: string
+  avatarUrl?: string | null
+  verifiedAt?: Date | string | null
+  deviceFingerprint?: string | null
+  expoPushToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  communityMembers?: Prisma.CommunityMemberUncheckedCreateNestedManyWithoutUserInput
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutSellerInput
+  buyerOffers?: Prisma.OfferUncheckedCreateNestedManyWithoutBuyerInput
+  sellerOffers?: Prisma.OfferUncheckedCreateNestedManyWithoutSellerInput
+  ratingsGiven?: Prisma.RatingUncheckedCreateNestedManyWithoutRaterInput
+  ratingsReceived?: Prisma.RatingUncheckedCreateNestedManyWithoutRateeInput
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  savedSearches?: Prisma.SavedSearchUncheckedCreateNestedManyWithoutUserInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutReporterInput
+  reputation?: Prisma.UserReputationUncheckedCreateNestedOneWithoutUserInput
+  flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
+}
+
+export type UserCreateOrConnectWithoutModerationActionsTakenInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutModerationActionsTakenInput, Prisma.UserUncheckedCreateWithoutModerationActionsTakenInput>
+}
+
+export type UserUpsertWithoutModerationActionsReceivedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutModerationActionsReceivedInput, Prisma.UserUncheckedUpdateWithoutModerationActionsReceivedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutModerationActionsReceivedInput, Prisma.UserUncheckedCreateWithoutModerationActionsReceivedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutModerationActionsReceivedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutModerationActionsReceivedInput, Prisma.UserUncheckedUpdateWithoutModerationActionsReceivedInput>
+}
+
+export type UserUpdateWithoutModerationActionsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deviceFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expoPushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  communityMembers?: Prisma.CommunityMemberUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUpdateManyWithoutSellerNestedInput
+  buyerOffers?: Prisma.OfferUpdateManyWithoutBuyerNestedInput
+  sellerOffers?: Prisma.OfferUpdateManyWithoutSellerNestedInput
+  ratingsGiven?: Prisma.RatingUpdateManyWithoutRaterNestedInput
+  ratingsReceived?: Prisma.RatingUpdateManyWithoutRateeNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  savedSearches?: Prisma.SavedSearchUpdateManyWithoutUserNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reputation?: Prisma.UserReputationUpdateOneWithoutUserNestedInput
+  flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutModerationActionsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deviceFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expoPushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  communityMembers?: Prisma.CommunityMemberUncheckedUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutSellerNestedInput
+  buyerOffers?: Prisma.OfferUncheckedUpdateManyWithoutBuyerNestedInput
+  sellerOffers?: Prisma.OfferUncheckedUpdateManyWithoutSellerNestedInput
+  ratingsGiven?: Prisma.RatingUncheckedUpdateManyWithoutRaterNestedInput
+  ratingsReceived?: Prisma.RatingUncheckedUpdateManyWithoutRateeNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  savedSearches?: Prisma.SavedSearchUncheckedUpdateManyWithoutUserNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reputation?: Prisma.UserReputationUncheckedUpdateOneWithoutUserNestedInput
+  flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+}
+
+export type UserUpsertWithoutModerationActionsTakenInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutModerationActionsTakenInput, Prisma.UserUncheckedUpdateWithoutModerationActionsTakenInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutModerationActionsTakenInput, Prisma.UserUncheckedCreateWithoutModerationActionsTakenInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutModerationActionsTakenInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutModerationActionsTakenInput, Prisma.UserUncheckedUpdateWithoutModerationActionsTakenInput>
+}
+
+export type UserUpdateWithoutModerationActionsTakenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deviceFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expoPushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  communityMembers?: Prisma.CommunityMemberUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUpdateManyWithoutSellerNestedInput
+  buyerOffers?: Prisma.OfferUpdateManyWithoutBuyerNestedInput
+  sellerOffers?: Prisma.OfferUpdateManyWithoutSellerNestedInput
+  ratingsGiven?: Prisma.RatingUpdateManyWithoutRaterNestedInput
+  ratingsReceived?: Prisma.RatingUpdateManyWithoutRateeNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  savedSearches?: Prisma.SavedSearchUpdateManyWithoutUserNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutReporterNestedInput
+  reputation?: Prisma.UserReputationUpdateOneWithoutUserNestedInput
+  flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutModerationActionsTakenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deviceFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  expoPushToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  communityMembers?: Prisma.CommunityMemberUncheckedUpdateManyWithoutUserNestedInput
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutSellerNestedInput
+  buyerOffers?: Prisma.OfferUncheckedUpdateManyWithoutBuyerNestedInput
+  sellerOffers?: Prisma.OfferUncheckedUpdateManyWithoutSellerNestedInput
+  ratingsGiven?: Prisma.RatingUncheckedUpdateManyWithoutRaterNestedInput
+  ratingsReceived?: Prisma.RatingUncheckedUpdateManyWithoutRateeNestedInput
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  savedSearches?: Prisma.SavedSearchUncheckedUpdateManyWithoutUserNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutReporterNestedInput
+  reputation?: Prisma.UserReputationUncheckedUpdateOneWithoutUserNestedInput
+  flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutFlagsInput = {
@@ -2082,6 +2468,8 @@ export type UserCreateWithoutFlagsInput = {
   reputation?: Prisma.UserReputationCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutFlagsInput = {
@@ -2108,6 +2496,8 @@ export type UserUncheckedCreateWithoutFlagsInput = {
   reputation?: Prisma.UserReputationUncheckedCreateNestedOneWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutFlagsInput = {
@@ -2150,6 +2540,8 @@ export type UserUpdateWithoutFlagsInput = {
   reputation?: Prisma.UserReputationUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFlagsInput = {
@@ -2176,6 +2568,8 @@ export type UserUncheckedUpdateWithoutFlagsInput = {
   reputation?: Prisma.UserReputationUncheckedUpdateOneWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -2202,6 +2596,8 @@ export type UserCreateWithoutNotificationsInput = {
   reputation?: Prisma.UserReputationCreateNestedOneWithoutUserInput
   flags?: Prisma.UserFlagCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -2228,6 +2624,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   reputation?: Prisma.UserReputationUncheckedCreateNestedOneWithoutUserInput
   flags?: Prisma.UserFlagUncheckedCreateNestedManyWithoutUserInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutOwnerInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutModeratorInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutTargetUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -2270,6 +2668,8 @@ export type UserUpdateWithoutNotificationsInput = {
   reputation?: Prisma.UserReputationUpdateOneWithoutUserNestedInput
   flags?: Prisma.UserFlagUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUpdateManyWithoutTargetUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -2296,6 +2696,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   reputation?: Prisma.UserReputationUncheckedUpdateOneWithoutUserNestedInput
   flags?: Prisma.UserFlagUncheckedUpdateManyWithoutUserNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  moderationActionsTaken?: Prisma.ModerationActionUncheckedUpdateManyWithoutModeratorNestedInput
+  moderationActionsReceived?: Prisma.ModerationActionUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
 
@@ -2316,6 +2718,8 @@ export type UserCountOutputType = {
   flags: number
   notifications: number
   mediaAssets: number
+  moderationActionsTaken: number
+  moderationActionsReceived: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2331,6 +2735,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   flags?: boolean | UserCountOutputTypeCountFlagsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   mediaAssets?: boolean | UserCountOutputTypeCountMediaAssetsArgs
+  moderationActionsTaken?: boolean | UserCountOutputTypeCountModerationActionsTakenArgs
+  moderationActionsReceived?: boolean | UserCountOutputTypeCountModerationActionsReceivedArgs
 }
 
 /**
@@ -2427,6 +2833,20 @@ export type UserCountOutputTypeCountMediaAssetsArgs<ExtArgs extends runtime.Type
   where?: Prisma.MediaAssetWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountModerationActionsTakenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModerationActionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountModerationActionsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModerationActionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2453,6 +2873,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   flags?: boolean | Prisma.User$flagsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   mediaAssets?: boolean | Prisma.User$mediaAssetsArgs<ExtArgs>
+  moderationActionsTaken?: boolean | Prisma.User$moderationActionsTakenArgs<ExtArgs>
+  moderationActionsReceived?: boolean | Prisma.User$moderationActionsReceivedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2513,6 +2935,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   flags?: boolean | Prisma.User$flagsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   mediaAssets?: boolean | Prisma.User$mediaAssetsArgs<ExtArgs>
+  moderationActionsTaken?: boolean | Prisma.User$moderationActionsTakenArgs<ExtArgs>
+  moderationActionsReceived?: boolean | Prisma.User$moderationActionsReceivedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2534,6 +2958,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     flags: Prisma.$UserFlagPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     mediaAssets: Prisma.$MediaAssetPayload<ExtArgs>[]
+    moderationActionsTaken: Prisma.$ModerationActionPayload<ExtArgs>[]
+    moderationActionsReceived: Prisma.$ModerationActionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2954,6 +3380,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   flags<T extends Prisma.User$flagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$flagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserFlagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mediaAssets<T extends Prisma.User$mediaAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$mediaAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  moderationActionsTaken<T extends Prisma.User$moderationActionsTakenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$moderationActionsTakenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  moderationActionsReceived<T extends Prisma.User$moderationActionsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$moderationActionsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3691,6 +4119,54 @@ export type User$mediaAssetsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.MediaAssetScalarFieldEnum | Prisma.MediaAssetScalarFieldEnum[]
+}
+
+/**
+ * User.moderationActionsTaken
+ */
+export type User$moderationActionsTakenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModerationAction
+   */
+  select?: Prisma.ModerationActionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModerationAction
+   */
+  omit?: Prisma.ModerationActionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModerationActionInclude<ExtArgs> | null
+  where?: Prisma.ModerationActionWhereInput
+  orderBy?: Prisma.ModerationActionOrderByWithRelationInput | Prisma.ModerationActionOrderByWithRelationInput[]
+  cursor?: Prisma.ModerationActionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModerationActionScalarFieldEnum | Prisma.ModerationActionScalarFieldEnum[]
+}
+
+/**
+ * User.moderationActionsReceived
+ */
+export type User$moderationActionsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModerationAction
+   */
+  select?: Prisma.ModerationActionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModerationAction
+   */
+  omit?: Prisma.ModerationActionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModerationActionInclude<ExtArgs> | null
+  where?: Prisma.ModerationActionWhereInput
+  orderBy?: Prisma.ModerationActionOrderByWithRelationInput | Prisma.ModerationActionOrderByWithRelationInput[]
+  cursor?: Prisma.ModerationActionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModerationActionScalarFieldEnum | Prisma.ModerationActionScalarFieldEnum[]
 }
 
 /**

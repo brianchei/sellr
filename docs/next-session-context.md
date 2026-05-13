@@ -53,12 +53,15 @@ The current web SLC includes:
   a community from its homepage after unpublishing active listings, or confirm
   removal of their active/draft listings while leaving. Admins can also switch
   which active admin community they are managing on `/admin/community` and edit
-  basic community details, access method, email domain, and member-facing
-  rules/guidance. Admin member management includes search, role/status filters,
-  clearer access action labels, and no-results states. Report cards surface
-  target member context, link into the relevant community/member management
-  view, and support scoped report-linked demote/deactivate actions while keeping
-  report status review separate.
+  basic community details, access method, email domain, member-facing
+  rules/guidance, and lightweight presentation config for descriptions, accent
+  color, local areas, pickup guidance, and optional approved imagery URLs. Admin
+  member management includes search, role/status filters, clearer access action
+  labels, inactive-access reason context, and no-results states. Report cards
+  surface target member context, link into the relevant community/member
+  management view, support scoped report-linked demote/deactivate/suspend
+  actions, and show moderation history while keeping report status review
+  separate.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -291,10 +294,10 @@ docs/design-language.md, and docs/next-session-context.md. Continue Phase 3:
 community product surface. The app-shell community switcher, member community
 homepage, post-login join-another-community flow, community leave flow,
 admin management-community switcher, admin-editable community details, and
-improved member management, plus lightweight Badger Market/campus presentation
-cues, are already implemented. Report-to-member management links and scoped
-demote/deactivate actions are also wired from the reports dashboard. Next,
-choose the smallest useful community-facing slice, such as richer community
-theme/config or audit-friendly moderation history, and keep the scope inside the
-web SLC.
+improved member management, richer lightweight community presentation config,
+plus Badger Market/campus presentation cues, are already implemented.
+Report-to-member management links, scoped demote/deactivate/suspend actions,
+and moderation history are also wired from the reports dashboard. Next, switch
+to launch operations or choose a Phase 4 listing/browse improvement; keep any
+new work inside the web SLC.
 ```

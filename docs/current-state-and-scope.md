@@ -99,13 +99,16 @@ Included:
   after unpublishing active listings, or confirm removal of their active/draft
   listings as part of the leave flow. Admins with multiple active admin
   memberships can switch the selected management community on `/admin/community`
-  and edit basic community details, access method, email domain, and
-  member-facing rules/guidance. The admin member list supports search, role and
-  status filters, clearer access action labels, and empty states for larger
+  and edit basic community details, access method, email domain, member-facing
+  rules/guidance, and lightweight presentation config for descriptions, accent
+  color, local areas, pickup guidance, and optional approved imagery URLs. The
+  admin member list supports search, role/status filters, clearer access action
+  labels, inactive-access reason context, and empty states for larger
   communities. The reports dashboard now surfaces target member context, links
-  admins into the relevant community/member management view, and lets admins
-  demote reported admins or deactivate member access from report cards while
-  keeping report status review separate.
+  admins into the relevant community/member management view, lets admins demote
+  reported admins or deactivate/suspend member access from report cards, and
+  records audit-friendly moderation history while keeping report status review
+  separate.
 
 ## Deliberately Deferred
 
