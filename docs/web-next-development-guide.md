@@ -175,7 +175,7 @@ Acceptance notes:
 Goal: make identity reliable enough to support trust, posting, and contact
 requirements.
 
-Status: started.
+Status: shipped.
 
 Shipped:
 
@@ -200,11 +200,9 @@ Shipped:
 - The dashboard profile section now mirrors the same high-intent readiness rules
   and points users to `/profile`, while profile saves refresh buyer-facing seller
   cards, listing detail, storefront, and inbox caches.
-
-Remaining work items:
-
-- Run a focused visual smoke pass for `/profile`, `/dashboard`, `/listings`,
-  `/sell`, and listing detail before considering Phase 2 complete.
+- Dashboard profile readiness, `/profile`, high-intent CTAs, and seller-owned
+  identity previews now provide profile-completion guidance across the useful
+  Phase 2 surfaces.
 
 Acceptance notes:
 

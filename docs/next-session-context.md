@@ -28,17 +28,17 @@ The current web SLC includes:
   metadata/icons, interactive app preview, warm gradient app shell, elevated app
   panels, high-contrast actions, and updated marketplace/listing/messaging/admin
   visual surfaces.
-- Phase 2 identity hardening has started: web auth retries session hydration
-  through refresh-cookie rotation, phone fallback sign-in normalizes US numbers
-  to E.164 `+1`, and listing post/contact seller actions now require a real
-  display name, verified contact, and active community membership.
-- Same-origin web API calls retry once through refresh-cookie rotation after a
-  `401`, and `/profile` now provides display name editing, profile photo upload,
-  verified contact display, storefront access, and readiness guidance using
-  existing app panel/form styling. Account navigation, high-intent
-  profile-completion CTAs, dashboard readiness guidance, seller-owned listing
-  identity previews, and buyer-facing seller-card cache refreshes now point
-  users toward that profile surface.
+- Phase 2 identity hardening has shipped: web auth retries session hydration and
+  same-origin API calls through refresh-cookie rotation, phone fallback sign-in
+  normalizes US numbers to E.164 `+1`, and listing post/contact seller actions
+  require a real display name, verified contact, and active community
+  membership.
+- `/profile` now provides display name editing, profile photo upload, verified
+  contact display, storefront access, and readiness guidance using existing app
+  panel/form styling. Account navigation, high-intent profile-completion CTAs,
+  dashboard readiness guidance, seller-owned listing identity previews, and
+  buyer-facing seller-card cache refreshes now point users toward that profile
+  surface.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -263,14 +263,12 @@ verify admin/community access, run media health checks, watch Railway/Resend
 logs, and record any launch notes. Do not add new product scope.
 ```
 
-If continuing product development, continue Phase 2 profile and auth hardening:
+If continuing product development, start Phase 3 community product surface work:
 
 ```text
 Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
-docs/design-language.md, and docs/next-session-context.md. Continue with Phase 2:
-profile and auth hardening. The first slice already shipped refresh-cookie retry,
-US phone normalization, and profile-completion gates for posting/contacting.
-Next focus: run a focused visual smoke pass across `/profile`, `/dashboard`,
-`/listings`, `/sell`, and listing detail before considering Phase 2 complete. Do
-not expand marketplace scope beyond the web SLC.
+docs/design-language.md, and docs/next-session-context.md. Begin Phase 3:
+community product surface. Start with the smallest useful community-facing slice,
+such as a quiet app-shell community switcher or community homepage, and keep the
+scope inside the web SLC.
 ```
