@@ -52,7 +52,7 @@ function defaultDisplayNameForEmail(email: string): string {
 }
 
 async function findMeProfile(userId: string, communityIds: string[]) {
-  const [user, membership, listingCount] = await Promise.all([
+  const [user, memberships, listingCount] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -67,16 +67,29 @@ async function findMeProfile(userId: string, communityIds: string[]) {
       },
     }),
     communityIds.length > 0
-      ? prisma.communityMember.findFirst({
+      ? prisma.communityMember.findMany({
           where: {
             userId,
             communityId: { in: communityIds },
             status: 'active',
+            community: { status: 'active' },
           },
           orderBy: { joinedAt: 'asc' },
-          select: { joinedAt: true },
+          select: {
+            communityId: true,
+            role: true,
+            joinedAt: true,
+            community: {
+              select: {
+                id: true,
+                name: true,
+                type: true,
+                status: true,
+              },
+            },
+          },
         })
-      : null,
+      : [],
     communityIds.length > 0
       ? prisma.listing.count({
           where: {
@@ -94,9 +107,16 @@ async function findMeProfile(userId: string, communityIds: string[]) {
 
   return {
     ...user,
-    memberSince: membership?.joinedAt ?? null,
+    memberSince: memberships[0]?.joinedAt ?? null,
     listingCount,
-    communityMember: Boolean(membership),
+    communityMember: memberships.length > 0,
+    communities: memberships.map((membership) => ({
+      id: membership.community.id,
+      name: membership.community.name,
+      type: membership.community.type,
+      role: membership.role,
+      joinedAt: membership.joinedAt,
+    })),
   };
 }
 
@@ -405,6 +425,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       ok({
         user,
         communityIds: request.user.communityIds,
+        communities: user.communities,
       }),
     );
   });
@@ -458,6 +479,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         ok({
           user,
           communityIds: request.user.communityIds,
+          communities: user.communities,
         }),
       );
     },

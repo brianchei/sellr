@@ -13,16 +13,22 @@ import {
   fetchMe,
   logout as logoutApi,
   setAccessToken,
+  type ApiCommunitySummary,
 } from '@sellr/api-client';
+
+const SELECTED_COMMUNITY_STORAGE_KEY = 'sellr:selected-community-id';
 
 type AuthContextValue = {
   hydrated: boolean;
   isAuthenticated: boolean;
   userId: string | null;
   communityIds: string[] | null;
+  communities: ApiCommunitySummary[] | null;
   primaryCommunityId: string | null;
+  primaryCommunity: ApiCommunitySummary | null;
   /** After OTP verify: pass `userId` (web uses httpOnly cookies; no tokens in JS). */
   setSession: (userId: string) => void;
+  setPrimaryCommunityId: (communityId: string) => void;
   refreshSession: () => Promise<{
     userId: string;
     communityIds: string[];
@@ -37,6 +43,8 @@ type AuthState = {
   hasToken: boolean;
   userId: string | null;
   communityIds: string[] | null;
+  communities: ApiCommunitySummary[] | null;
+  selectedCommunityId: string | null;
 };
 
 const initialAuthState: AuthState = {
@@ -44,7 +52,42 @@ const initialAuthState: AuthState = {
   hasToken: false,
   userId: null,
   communityIds: null,
+  communities: null,
+  selectedCommunityId: null,
 };
+
+function readStoredCommunityId(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.localStorage.getItem(SELECTED_COMMUNITY_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredCommunityId(communityId: string | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (communityId) {
+      window.localStorage.setItem(SELECTED_COMMUNITY_STORAGE_KEY, communityId);
+    } else {
+      window.localStorage.removeItem(SELECTED_COMMUNITY_STORAGE_KEY);
+    }
+  } catch {
+    /* Local storage can be unavailable in restrictive browser modes. */
+  }
+}
+
+function chooseCommunityId(
+  communityIds: string[],
+  preferredCommunityId: string | null,
+): string | null {
+  if (communityIds.length === 0) return null;
+  if (preferredCommunityId && communityIds.includes(preferredCommunityId)) {
+    return preferredCommunityId;
+  }
+  return communityIds[0] ?? null;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(initialAuthState);
@@ -52,11 +95,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshSession = useCallback(async () => {
     try {
       const me = await fetchMe();
+      const communities = me.communities ?? me.user.communities ?? [];
+      const selectedCommunityId = chooseCommunityId(
+        me.communityIds,
+        readStoredCommunityId(),
+      );
+      writeStoredCommunityId(selectedCommunityId);
       setState({
         hydrated: true,
         hasToken: true,
         userId: me.user.id,
         communityIds: me.communityIds,
+        communities,
+        selectedCommunityId,
       });
       setAccessToken(null);
       return {
@@ -69,7 +120,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasToken: false,
         userId: null,
         communityIds: [],
+        communities: [],
+        selectedCommunityId: null,
       });
+      writeStoredCommunityId(null);
       setAccessToken(null);
       return null;
     }
@@ -88,7 +142,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       hasToken: true,
       userId,
       communityIds: null,
+      communities: null,
+      selectedCommunityId: null,
     }));
+  }, []);
+
+  const setPrimaryCommunityId = useCallback((communityId: string) => {
+    setState((prev) => {
+      if (!prev.communityIds?.includes(communityId)) {
+        return prev;
+      }
+      writeStoredCommunityId(communityId);
+      return {
+        ...prev,
+        selectedCommunityId: communityId,
+      };
+    });
   }, []);
 
   const logout = useCallback(() => {
@@ -104,9 +173,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasToken: false,
         userId: null,
         communityIds: [],
+        communities: [],
+        selectedCommunityId: null,
       }));
+      writeStoredCommunityId(null);
     })();
   }, []);
+
+  const primaryCommunity =
+    state.communities?.find(
+      (community) => community.id === state.selectedCommunityId,
+    ) ??
+    state.communities?.[0] ??
+    null;
+  const primaryCommunityId =
+    primaryCommunity?.id ??
+    state.selectedCommunityId ??
+    state.communityIds?.[0] ??
+    null;
 
   const value = useMemo(
     () =>
@@ -115,8 +199,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: state.hasToken,
         userId: state.userId,
         communityIds: state.communityIds,
-        primaryCommunityId: state.communityIds?.[0] ?? null,
+        communities: state.communities,
+        primaryCommunityId,
+        primaryCommunity,
         setSession,
+        setPrimaryCommunityId,
         refreshSession,
         logout,
       }) satisfies AuthContextValue,
@@ -125,7 +212,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       state.hasToken,
       state.userId,
       state.communityIds,
+      state.communities,
+      primaryCommunity,
+      primaryCommunityId,
       setSession,
+      setPrimaryCommunityId,
       refreshSession,
       logout,
     ],

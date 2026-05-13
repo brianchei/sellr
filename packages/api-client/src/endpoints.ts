@@ -14,6 +14,14 @@ export type ApiUserTrustProfile = {
   communityMember: boolean;
 };
 
+export type ApiCommunitySummary = {
+  id: string;
+  name: string;
+  type: 'campus' | 'coworking' | 'residential';
+  role: string;
+  joinedAt: string;
+};
+
 export type ApiListing = {
   id: string;
   communityId: string;
@@ -260,8 +268,10 @@ export function fetchMe() {
       phoneE164: string | null;
       email: string | null;
       emailVerifiedAt: string | null;
+      communities: ApiCommunitySummary[];
     };
     communityIds: string[];
+    communities: ApiCommunitySummary[];
   }>('/auth/me');
 }
 
@@ -272,8 +282,10 @@ export function updateProfile(body: UpdateProfileInput) {
       phoneE164: string | null;
       email: string | null;
       emailVerifiedAt: string | null;
+      communities: ApiCommunitySummary[];
     };
     communityIds: string[];
+    communities: ApiCommunitySummary[];
   }>('/auth/me', {
     method: 'PUT',
     body: JSON.stringify(body),

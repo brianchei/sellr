@@ -215,9 +215,16 @@ Acceptance notes:
 
 Goal: make communities feel like first-class places, not just access gates.
 
+Status: started.
+
+Shipped:
+
+- `/auth/me` now returns active community summaries for the signed-in user.
+- The authenticated app shell now shows the active community quietly; users with
+  multiple active memberships can switch context from the header.
+
 Work items:
 
-- Add global but quiet community switcher in the authenticated app shell.
 - Add community homepage.
 - Add option to leave a community.
 - Add lightweight community theme/config data.

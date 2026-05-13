@@ -83,6 +83,9 @@ Included:
   high-intent profile-completion CTAs, dashboard readiness guidance,
   seller-owned listing identity previews, and buyer-facing seller-card cache
   refreshes now connect into this profile surface.
+- Phase 3 community product work has started with a quiet authenticated app-shell
+  community indicator/switcher backed by active community summaries from
+  `/auth/me`.
 
 ## Deliberately Deferred
 
