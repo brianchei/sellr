@@ -31,8 +31,9 @@ React Query, and typed helpers from `@sellr/api-client`.
   and report listing.
 - `/sellers/[sellerId]`: seller storefront-lite with trust signals, active
   listings, report seller action, and contact-through-listing guidance.
-- `/sell`: structured listing creation with file image upload, durable
-  production media delivery, and buyer preview.
+- `/sell`: structured listing creation with listing-strength guidance,
+  JPG/PNG/WebP plus browser-converted iPhone HEIC image upload, durable
+  production media delivery, mile-based pickup radius labels, and buyer preview.
 - `/listings`: seller inventory management, status filters, publish/unpublish,
   delete, mark sold, and seller identity preview.
 - `/listings/[listingId]/edit`: owner-only listing edit flow.

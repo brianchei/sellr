@@ -290,14 +290,12 @@ If continuing product development, continue Phase 3 community product surface wo
 
 ```text
 Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
-docs/design-language.md, and docs/next-session-context.md. Continue Phase 3:
-community product surface. The app-shell community switcher, member community
-homepage, post-login join-another-community flow, community leave flow,
-admin management-community switcher, admin-editable community details, and
-improved member management, richer lightweight community presentation config,
-plus Badger Market/campus presentation cues, are already implemented.
-Report-to-member management links, scoped demote/deactivate/suspend actions,
-and moderation history are also wired from the reports dashboard. Next, switch
-to launch operations or choose a Phase 4 listing/browse improvement; keep any
-new work inside the web SLC.
+docs/design-language.md, and docs/next-session-context.md. Phase 3 community
+product surface is complete for the SLC. Phase 4 has started with listing
+creation quality polish: the sell/edit form now has a listing-strength
+checklist, browser-converted iPhone HEIC upload support where available, clearer
+photo feedback, and mile-based pickup radius labels while keeping the existing
+meter-based API contract. Next, continue Phase 4 with marketplace browse/card
+scanability or seller trust cues on listing surfaces; keep new work inside the
+web SLC.
 ```

@@ -61,7 +61,9 @@ Included:
 - Email-first OTP login through Resend, with Twilio phone fallback.
 - Verified community onboarding through `wisc.edu` email domain or invite code.
 - Marketplace browse/search/filter and listing detail pages.
-- Structured listing creation with durable R2-backed photo upload.
+- Structured listing creation with durable R2-backed photo upload, listing
+  strength guidance, browser-converted iPhone HEIC upload support where
+  available, and mile-based pickup radius labels.
 - Listing edit, publish/unpublish, delete, and sold lifecycle.
 - Seller storefront-lite pages with trust signals.
 - Buyer contact, inbox threads, replies, notifications, and unread badges.

@@ -276,15 +276,23 @@ Acceptance notes:
 
 Goal: improve the core buyer/seller loop without adding broad marketplace scope.
 
+Implemented:
+
+- Listing creation and edit now include an inline listing-strength checklist for
+  photos, title clarity, useful details, and pickup readiness.
+- The listing image picker accepts iPhone HEIC/HEIF files and converts them to
+  JPG before upload when the browser can decode them, with fallback guidance
+  when conversion is unavailable.
+- Pickup radius labels and listing display formatting now use miles while
+  preserving the existing meter-based API contract.
+
 Work items:
 
-- Streamline the listing creation experience.
-- Simplify listing form UI and reduce unnecessary friction.
+- Continue streamlining the listing creation experience.
+- Continue simplifying listing form UI and reducing unnecessary friction.
 - Keep listing quality high through helper text, preview, validation, and photo
   guidance.
-- Support iPhone HEIF/HEIC image uploads or convert them before upload.
 - Add seller info to listings where appropriate.
-- Use approximate radius in miles instead of kilometers.
 - Simplify listing date/time display.
 - Add more browse filters and sorting:
   - Category.
