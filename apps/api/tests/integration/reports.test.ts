@@ -243,6 +243,65 @@ describe.skipIf(!integrationDbAvailable)('reports integration', () => {
     });
   });
 
+  describe('GET /api/v1/reports', () => {
+    it('includes member-management context for report targets', async () => {
+      const seller = await createUser({ displayName: 'Reported Seller' });
+      const reporter = await createUser();
+      const admin = await createUser({ displayName: 'Mod' });
+      const community = await createCommunity();
+      await addMember(seller.id, community.id);
+      await addMember(reporter.id, community.id);
+      await addMember(admin.id, community.id, 'admin');
+      const listing = await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        status: 'active',
+      });
+      await prisma.report.create({
+        data: {
+          reporterId: reporter.id,
+          targetId: listing.id,
+          targetType: 'listing',
+          reason: 'Seller should be reviewed by an admin.',
+          severity: 'safety',
+          status: 'open',
+        },
+      });
+
+      const res = await app.inject({
+        method: 'GET',
+        url: '/api/v1/reports',
+        headers: { cookie: await accessCookieFor(app, admin.id) },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = res.json<{
+        data: {
+          reports: Array<{
+            target: {
+              memberManagement: {
+                userId: string;
+                communityId: string;
+                displayName: string;
+                role: string;
+                status: string;
+              } | null;
+            } | null;
+          }>;
+        };
+      }>();
+      expect(body.data.reports[0]?.target?.memberManagement).toEqual(
+        expect.objectContaining({
+          userId: seller.id,
+          communityId: community.id,
+          displayName: 'Reported Seller',
+          role: 'member',
+          status: 'active',
+        }),
+      );
+    });
+  });
+
   describe('POST /api/v1/reports/:reportId/remove-listing', () => {
     it('lets an admin explicitly remove a reported listing and queue media cleanup', async () => {
       const originalCdnUrl = process.env.CLOUDFLARE_CDN_URL;

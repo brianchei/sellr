@@ -40,8 +40,8 @@ React Query, and typed helpers from `@sellr/api-client`.
   message thread, reply composer, and report message.
 - `/notifications`: activity center with unread/listing/message filters and
   mark-read actions.
-- `/admin/reports`: admin-only report review, status updates, and explicit
-  listing removal for listing reports.
+- `/admin/reports`: admin-only report review, status updates, target member
+  management links, and explicit listing removal for listing reports.
 
 ## Local Development
 
