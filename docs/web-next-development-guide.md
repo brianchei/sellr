@@ -197,10 +197,14 @@ Shipped:
   where appropriate, while community membership gaps still route to onboarding.
 - Seller-owned listings now include the existing seller identity/trust card so
   sellers can preview how buyers see them.
+- The dashboard profile section now mirrors the same high-intent readiness rules
+  and points users to `/profile`, while profile saves refresh buyer-facing seller
+  cards, listing detail, storefront, and inbox caches.
 
 Remaining work items:
 
-- Expand profile completion UI beyond the dashboard prompt where useful.
+- Run a focused visual smoke pass for `/profile`, `/dashboard`, `/listings`,
+  `/sell`, and listing detail before considering Phase 2 complete.
 
 Acceptance notes:
 
@@ -474,3 +478,6 @@ Keep this guide aligned with:
   display, public storefront access, and readiness guidance.
 - Added an account-menu profile link and seller identity preview card to owned
   listings using existing app components.
+- Added dashboard profile-readiness guidance and widened profile-save cache
+  invalidation so avatar/display-name changes propagate to seller cards,
+  storefronts, listing detail, and inbox surfaces.

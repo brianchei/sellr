@@ -28,6 +28,10 @@ import {
   type ListedFreshness,
 } from '@/lib/listing-format';
 import { ACTIVITY_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
+import {
+  PROFILE_COMPLETION_COPY,
+  profileCompletionIssues,
+} from '@/lib/profile-readiness';
 
 type MeData = Awaited<ReturnType<typeof fetchMe>>;
 
@@ -939,9 +943,45 @@ function ProfileSection({
           {error instanceof Error ? error.message : 'Could not load profile'}
         </p>
       ) : data ? (
-        <ProfileEditor data={data} userId={userId} />
+        <>
+          <ProfileReadinessSummary data={data} />
+          <ProfileEditor data={data} userId={userId} />
+        </>
       ) : null}
     </section>
+  );
+}
+
+function ProfileReadinessSummary({ data }: { data: MeData }) {
+  const issues = profileCompletionIssues(data);
+  const blockingIssue = issues[0];
+  const ready = issues.length === 0;
+  const copy = blockingIssue ? PROFILE_COMPLETION_COPY[blockingIssue] : null;
+
+  return (
+    <div className="mt-4 rounded-2xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-[var(--text-primary)]">
+            {ready ? 'Profile ready for high-intent actions' : copy?.title}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+            {ready
+              ? 'Your display name, verified contact, and community access are ready for posting and seller contact.'
+              : copy?.body}
+          </p>
+        </div>
+        <span className="rounded-full bg-white/80 px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
+          {ready ? 'Ready' : `${issues.length} left`}
+        </span>
+      </div>
+      <Link
+        href="/profile"
+        className="mt-3 inline-flex text-xs font-semibold text-[var(--color-brand-contrast)] no-underline hover:underline"
+      >
+        {ready ? 'Review profile' : copy?.action}
+      </Link>
+    </div>
   );
 }
 
@@ -965,6 +1005,12 @@ function ProfileEditor({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['me', userId] }),
         queryClient.invalidateQueries({ queryKey: ['conversations'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard-conversations'] }),
+        queryClient.invalidateQueries({ queryKey: ['listing'] }),
+        queryClient.invalidateQueries({ queryKey: ['community-listings'] }),
+        queryClient.invalidateQueries({ queryKey: ['my-listings'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard-listings'] }),
+        queryClient.invalidateQueries({ queryKey: ['seller-storefront'] }),
       ]);
     },
   });

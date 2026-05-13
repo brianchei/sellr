@@ -36,7 +36,8 @@ The current web SLC includes:
   `401`, and `/profile` now provides display name editing, profile photo upload,
   verified contact display, storefront access, and readiness guidance using
   existing app panel/form styling. Account navigation, high-intent
-  profile-completion CTAs, and seller-owned listing identity previews now point
+  profile-completion CTAs, dashboard readiness guidance, seller-owned listing
+  identity previews, and buyer-facing seller-card cache refreshes now point
   users toward that profile surface.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
@@ -269,6 +270,7 @@ Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope
 docs/design-language.md, and docs/next-session-context.md. Continue with Phase 2:
 profile and auth hardening. The first slice already shipped refresh-cookie retry,
 US phone normalization, and profile-completion gates for posting/contacting.
-Next focus: continue Phase 2 trust/profile progress polish only where it improves
-core seller/buyer workflows. Do not expand marketplace scope beyond the web SLC.
+Next focus: run a focused visual smoke pass across `/profile`, `/dashboard`,
+`/listings`, `/sell`, and listing detail before considering Phase 2 complete. Do
+not expand marketplace scope beyond the web SLC.
 ```

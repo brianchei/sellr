@@ -432,7 +432,7 @@ function SelfStorefrontCard({ hasListings }: { hasListings: boolean }) {
           Sell another item
         </Link>
         <Link
-          href="/dashboard"
+          href="/profile"
           className="app-action-secondary justify-center px-4 py-2 text-sm"
         >
           Edit profile
