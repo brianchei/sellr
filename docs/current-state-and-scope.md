@@ -72,16 +72,17 @@ Included:
   images, and explicit admin listing removals.
 - Refreshed public landing page and app-wide visual system for the Phase 1 web
   polish pass.
-- Phase 2 identity hardening has started: web sessions rotate the refresh cookie
-  when the short-lived access cookie expires, phone fallback login uses
-  US-default `+1` normalization, and listing post/contact seller actions require
-  a real display name, verified contact method, and active community membership.
-- Phase 2 now includes same-origin web API refresh retry and a dedicated
-  `/profile` surface using existing app panel/form styling for display name,
-  profile photo upload, verified contact display, storefront access, and
-  readiness guidance. Account navigation, high-intent profile-completion CTAs,
-  dashboard readiness guidance, seller-owned listing identity previews, and
-  buyer-facing seller-card cache refreshes now connect into this profile surface.
+- Phase 2 identity hardening has shipped: web sessions rotate the refresh cookie
+  when the short-lived access cookie expires, same-origin web API calls retry
+  once after refresh-cookie rotation, phone fallback login uses US-default `+1`
+  normalization, and listing post/contact seller actions require a real display
+  name, verified contact method, and active community membership.
+- Phase 2 also includes a dedicated `/profile` surface using existing app
+  panel/form styling for display name, profile photo upload, verified contact
+  display, storefront access, and readiness guidance. Account navigation,
+  high-intent profile-completion CTAs, dashboard readiness guidance,
+  seller-owned listing identity previews, and buyer-facing seller-card cache
+  refreshes now connect into this profile surface.
 
 ## Deliberately Deferred
 
