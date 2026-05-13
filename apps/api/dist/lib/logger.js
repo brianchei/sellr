@@ -21,5 +21,10 @@ exports.logger = (0, pino_1.default)({
         res: pino_1.default.stdSerializers.res,
         err: pino_1.default.stdSerializers.err,
     },
-    redact: ['req.headers.authorization', 'body.phoneE164', 'body.code'],
+    redact: [
+        'req.headers.authorization',
+        'body.phoneE164',
+        'body.email',
+        'body.code',
+    ],
 });

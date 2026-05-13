@@ -32,6 +32,8 @@ function communityHomeHref(communityId: string): string {
   return `/communities/${communityId}`;
 }
 
+const JOIN_COMMUNITY_HREF = '/communities/join';
+
 export function AppHeader() {
   const {
     communities,
@@ -177,6 +179,14 @@ export function AppHeader() {
                       Open community home
                     </Link>
                   ) : null}
+                  <Link
+                    href={JOIN_COMMUNITY_HREF}
+                    role="menuitem"
+                    onClick={() => setCommunityOpen(false)}
+                    className="mx-1 mb-1 block rounded-xl px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] no-underline hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
+                  >
+                    Join another community
+                  </Link>
                   {communities?.map((community) => {
                     const active = community.id === primaryCommunityId;
                     return (
@@ -355,6 +365,14 @@ export function AppHeader() {
                     </Link>
                   ) : null}
                   <Link
+                    href={JOIN_COMMUNITY_HREF}
+                    role="menuitem"
+                    onClick={() => setAccountOpen(false)}
+                    className="mx-2 block rounded-xl px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
+                  >
+                    Join another community
+                  </Link>
+                  <Link
                     href="/dashboard"
                     role="menuitem"
                     onClick={() => setAccountOpen(false)}
@@ -429,6 +447,13 @@ export function AppHeader() {
                       Open community home
                     </Link>
                   ) : null}
+                  <Link
+                    href={JOIN_COMMUNITY_HREF}
+                    onClick={() => setDrawerOpen(false)}
+                    className="ml-3 mt-3 inline-flex text-xs font-semibold text-[var(--color-brand-contrast)] no-underline hover:underline"
+                  >
+                    Join another community
+                  </Link>
                   {canSwitchCommunity ? (
                     <div className="mt-3 grid gap-1">
                       {communities?.map((community) => {

@@ -14,8 +14,10 @@ import type {
 } from '@sellr/api-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
+
+const COMMUNITY_QUERY_PARAM = 'communityId';
 
 function formatDate(value: string | null) {
   if (!value) return 'No expiration';
@@ -45,6 +47,39 @@ function toIsoFromLocalDateTime(value: string): string | null {
 
 function memberContact(member: ApiCommunityAdminMember): string {
   return member.user.email ?? member.user.phoneE164 ?? 'No contact on file';
+}
+
+function communityTypeLabel(type: ApiCommunityAdminCommunity['type']): string {
+  if (type === 'coworking') return 'Coworking';
+  if (type === 'residential') return 'Residential';
+  return 'Campus';
+}
+
+function accessMethodLabel(community: ApiCommunityAdminCommunity): string {
+  if (community.accessMethod === 'email_domain' && community.emailDomain) {
+    return `${community.emailDomain} email`;
+  }
+  if (community.accessMethod === 'email_domain') return 'Verified email';
+  return 'Invite code';
+}
+
+function activeMemberCount(community: ApiCommunityAdminCommunity): number {
+  return community.members.filter((member) => member.status === 'active')
+    .length;
+}
+
+function readRequestedCommunityId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return new URLSearchParams(window.location.search).get(
+    COMMUNITY_QUERY_PARAM,
+  );
+}
+
+function writeSelectedCommunityUrl(communityId: string): void {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  url.searchParams.set(COMMUNITY_QUERY_PARAM, communityId);
+  window.history.replaceState(null, '', `${url.pathname}${url.search}`);
 }
 
 function inviteState(
@@ -154,9 +189,10 @@ function SetupSkeleton() {
 
 export default function AdminCommunityPage() {
   const queryClient = useQueryClient();
-  const { refreshSession, userId } = useAuth();
+  const { primaryCommunityId, refreshSession, setPrimaryCommunityId, userId } =
+    useAuth();
   const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
-    null,
+    () => readRequestedCommunityId(),
   );
   const [inviteCode, setInviteCode] = useState('');
   const [maxUses, setMaxUses] = useState('');
@@ -170,11 +206,26 @@ export default function AdminCommunityPage() {
     queryFn: fetchCommunityAdmin,
   });
 
-  const communities = adminQuery.data?.communities ?? [];
+  const communities = useMemo(
+    () => adminQuery.data?.communities ?? [],
+    [adminQuery.data?.communities],
+  );
+  const adminCommunityIds = useMemo(
+    () => new Set(communities.map((community) => community.id)),
+    [communities],
+  );
   const selectedCommunity =
     communities.find((community) => community.id === selectedCommunityId) ??
+    communities.find((community) => community.id === primaryCommunityId) ??
     communities[0] ??
     null;
+  const selectedManagementCommunityId = selectedCommunity?.id ?? null;
+
+  useEffect(() => {
+    if (selectedManagementCommunityId) {
+      writeSelectedCommunityUrl(selectedManagementCommunityId);
+    }
+  }, [selectedManagementCommunityId]);
 
   const activeAdminCount = useMemo(() => {
     if (!selectedCommunity) return 0;
@@ -290,12 +341,21 @@ export default function AdminCommunityPage() {
   }
 
   const memberCount = selectedCommunity.members.length;
-  const activeMemberCount = selectedCommunity.members.filter(
-    (member) => member.status === 'active',
-  ).length;
+  const selectedActiveMemberCount = activeMemberCount(selectedCommunity);
   const activeInviteCount = selectedCommunity.inviteCodes.filter(
     (invite) => inviteState(invite) === 'active',
   ).length;
+  const canSwitchManagementCommunity = communities.length > 1;
+
+  const selectManagementCommunity = (communityId: string) => {
+    if (!adminCommunityIds.has(communityId)) return;
+    setSelectedCommunityId(communityId);
+    setPrimaryCommunityId(communityId);
+    writeSelectedCommunityUrl(communityId);
+    setFormError(null);
+    setFormMessage(null);
+    setMemberError(null);
+  };
 
   const runMemberUpdate = (
     member: ApiCommunityAdminMember,
@@ -372,31 +432,101 @@ export default function AdminCommunityPage() {
         </div>
       </header>
 
-      <section className="mt-5">
-        <label className="block text-sm font-medium text-[var(--text-primary)]">
-          Community
-          <select
-            value={selectedCommunity.id}
-            onChange={(event) => {
-              setSelectedCommunityId(event.target.value);
-              setFormError(null);
-              setFormMessage(null);
-              setMemberError(null);
-            }}
-            className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)] sm:max-w-md"
+      <section className="app-panel mt-5 p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+              Management community
+            </p>
+            <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">
+              {selectedCommunity.name}
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+              {canSwitchManagementCommunity
+                ? 'Switch which community you are managing. The selected community controls the invites and members below.'
+                : 'You are currently an active admin for one community.'}
+            </p>
+          </div>
+          <Link
+            href={`/communities/${selectedCommunity.id}`}
+            className="app-action-secondary w-full px-4 py-2 text-sm sm:w-auto"
           >
-            {communities.map((community) => (
-              <option key={community.id} value={community.id}>
-                {community.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            Open community home
+          </Link>
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <label className="block text-sm font-medium text-[var(--text-primary)]">
+            Switch management community
+            <select
+              value={selectedCommunity.id}
+              disabled={!canSwitchManagementCommunity}
+              onChange={(event) =>
+                selectManagementCommunity(event.target.value)
+              }
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)] disabled:cursor-not-allowed disabled:bg-[var(--bg-secondary)] disabled:text-[var(--text-tertiary)]"
+            >
+              {communities.map((community) => (
+                <option key={community.id} value={community.id}>
+                  {community.name}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1.5 block text-xs text-[var(--text-tertiary)]">
+              Showing {communities.length}{' '}
+              {communities.length === 1
+                ? 'admin community'
+                : 'admin communities'}
+              .
+            </span>
+          </label>
+
+          <div
+            className="grid gap-2 sm:grid-cols-2"
+            aria-label="Admin community shortcuts"
+          >
+            {communities.map((community) => {
+              const active = community.id === selectedCommunity.id;
+              return (
+                <button
+                  key={community.id}
+                  type="button"
+                  onClick={() => selectManagementCommunity(community.id)}
+                  aria-pressed={active}
+                  className={`rounded-2xl border px-3 py-3 text-left transition ${
+                    active
+                      ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)]'
+                      : 'border-black/10 bg-white/80 hover:bg-[var(--color-brand-primary-soft)]'
+                  }`}
+                >
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                      {community.name}
+                    </span>
+                    {active ? (
+                      <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--color-brand-accent-strong)]">
+                        Managing
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="mt-1 block text-xs text-[var(--text-secondary)]">
+                    {communityTypeLabel(community.type)} ·{' '}
+                    {accessMethodLabel(community)}
+                  </span>
+                  <span className="mt-1 block text-xs text-[var(--text-tertiary)]">
+                    {activeMemberCount(community)} active members ·{' '}
+                    {community.inviteCodes.length} invite codes
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </section>
 
       <section className="mt-5 grid gap-3 sm:grid-cols-3">
         <MetricCard label="Members" value={String(memberCount)}>
-          {activeMemberCount} active
+          {selectedActiveMemberCount} active
         </MetricCard>
         <MetricCard label="Admins" value={String(activeAdminCount)}>
           Last-admin protection enabled

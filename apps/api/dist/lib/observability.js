@@ -34,6 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.phoneLogContext = phoneLogContext;
+exports.emailLogContext = emailLogContext;
 exports.captureOperationalError = captureOperationalError;
 const node_crypto_1 = require("node:crypto");
 const Sentry = __importStar(require("@sentry/node"));
@@ -44,6 +45,16 @@ function phoneLogContext(phoneE164) {
             .digest('hex')
             .slice(0, 12),
         phoneLast4: phoneE164.slice(-4),
+    };
+}
+function emailLogContext(email) {
+    const normalized = email.trim().toLowerCase();
+    return {
+        emailHash: (0, node_crypto_1.createHash)('sha256')
+            .update(normalized)
+            .digest('hex')
+            .slice(0, 12),
+        emailDomain: normalized.split('@')[1] ?? null,
     };
 }
 function captureOperationalError(error, { component, operation, tags, extra, userId, }) {

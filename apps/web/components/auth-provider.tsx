@@ -29,7 +29,7 @@ type AuthContextValue = {
   /** After OTP verify: pass `userId` (web uses httpOnly cookies; no tokens in JS). */
   setSession: (userId: string) => void;
   setPrimaryCommunityId: (communityId: string) => void;
-  refreshSession: () => Promise<{
+  refreshSession: (preferredCommunityId?: string) => Promise<{
     userId: string;
     communityIds: string[];
   } | null>;
@@ -92,13 +92,13 @@ function chooseCommunityId(
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(initialAuthState);
 
-  const refreshSession = useCallback(async () => {
+  const refreshSession = useCallback(async (preferredCommunityId?: string) => {
     try {
       const me = await fetchMe();
       const communities = me.communities ?? me.user.communities ?? [];
       const selectedCommunityId = chooseCommunityId(
         me.communityIds,
-        readStoredCommunityId(),
+        preferredCommunityId ?? readStoredCommunityId(),
       );
       writeStoredCommunityId(selectedCommunityId);
       setState({

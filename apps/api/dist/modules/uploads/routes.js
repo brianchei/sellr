@@ -16,6 +16,7 @@ async function defaultMediaTracker() {
 }
 const plugin = (fastify, opts, done) => {
     const storage = opts.storage ?? (0, listingImageStorage_1.createListingImageStorage)();
+    const profileStorage = opts.profileStorage ?? (0, listingImageStorage_1.createProfileAvatarStorage)();
     fastify.post('/listing-images', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
         const file = await request.file({
             throwFileSizeLimit: false,
@@ -88,6 +89,37 @@ const plugin = (fastify, opts, done) => {
         }
         return reply.code(201).send((0, response_1.ok)({ url: storedImage.url }));
     });
+    fastify.post('/profile-avatars', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
+        const file = await request.file({
+            throwFileSizeLimit: false,
+            limits: {
+                fileSize: shared_1.PROFILE_AVATAR_MAX_BYTES,
+                files: 1,
+            },
+        });
+        if (!file) {
+            return reply.code(400).send({ error: 'Choose an image to upload' });
+        }
+        if (!(0, listingImageStorage_1.isListingImageMimeType)(file.mimetype)) {
+            return reply.code(400).send({
+                error: 'Upload a JPG, PNG, or WebP image',
+            });
+        }
+        const buffer = await file.toBuffer();
+        if (file.file.truncated) {
+            return reply.code(413).send({ error: 'Keep this image under 3 MB' });
+        }
+        try {
+            const storedImage = await profileStorage.store(buffer, file.mimetype);
+            return await reply.code(201).send((0, response_1.ok)({ url: storedImage.url }));
+        }
+        catch (error) {
+            request.log.error({ err: error }, 'profile avatar upload failed');
+            return reply
+                .code(502)
+                .send({ error: 'Could not upload this image. Try again.' });
+        }
+    });
     // Listing photos are served publicly so the Next.js Image Optimizer (which
     // fetches server-side without the user's session cookie) can pull them, and
     // so any community member can render them without an extra auth round-trip.
@@ -98,6 +130,26 @@ const plugin = (fastify, opts, done) => {
     fastify.get('/listing-images/:filename', { config: { rateLimit: false } }, async (request, reply) => {
         const { filename } = request.params;
         const filePath = (0, listingImageStorage_1.listingImagePath)(filename);
+        if (!filePath) {
+            return await reply.code(404).send({ error: 'Image not found' });
+        }
+        try {
+            const imageStat = await (0, promises_1.stat)(filePath);
+            if (!imageStat.isFile()) {
+                return await reply.code(404).send({ error: 'Image not found' });
+            }
+        }
+        catch {
+            return reply.code(404).send({ error: 'Image not found' });
+        }
+        return reply
+            .type((0, listingImageStorage_1.listingImageMimeTypeForFilename)(filename))
+            .header('Cache-Control', listingImageStorage_1.LISTING_IMAGE_CACHE_CONTROL)
+            .send((0, node_fs_1.createReadStream)(filePath));
+    });
+    fastify.get('/profile-avatars/:filename', { config: { rateLimit: false } }, async (request, reply) => {
+        const { filename } = request.params;
+        const filePath = (0, listingImageStorage_1.profileAvatarPath)(filename);
         if (!filePath) {
             return await reply.code(404).send({ error: 'Image not found' });
         }

@@ -7,6 +7,7 @@ const response_1 = require("../../lib/response");
 const authTokens_1 = require("../../lib/authTokens");
 const authCookies_1 = require("../../lib/authCookies");
 const auth_1 = require("../../middleware/auth");
+const otp_1 = require("../../lib/otp");
 const INACTIVE_MEMBERSHIP_ERROR = 'Membership is inactive. Ask a community admin to reactivate access.';
 function normalizeInviteCode(code) {
     return code.trim().toUpperCase();
@@ -46,6 +47,73 @@ async function adminCommunityIdsFor(userId) {
     return memberships.map((membership) => membership.communityId);
 }
 const plugin = (fastify, _opts, done) => {
+    fastify.get('/:communityId', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
+        const { communityId } = shared_1.CommunityAdminParamsSchema.parse(request.params);
+        const membership = await prisma_1.prisma.communityMember.findUnique({
+            where: {
+                userId_communityId: {
+                    userId: request.user.sub,
+                    communityId,
+                },
+            },
+            include: {
+                community: {
+                    select: {
+                        id: true,
+                        name: true,
+                        type: true,
+                        accessMethod: true,
+                        emailDomain: true,
+                        rules: true,
+                        status: true,
+                        createdAt: true,
+                    },
+                },
+            },
+        });
+        if (!membership ||
+            membership.status !== 'active' ||
+            membership.community.status !== 'active') {
+            return reply
+                .code(403)
+                .send({ error: 'Not a member of this community' });
+        }
+        const [memberCount, activeListingCount, activeSellers] = await Promise.all([
+            prisma_1.prisma.communityMember.count({
+                where: {
+                    communityId,
+                    status: 'active',
+                },
+            }),
+            prisma_1.prisma.listing.count({
+                where: {
+                    communityId,
+                    status: 'active',
+                },
+            }),
+            prisma_1.prisma.listing.findMany({
+                where: {
+                    communityId,
+                    status: 'active',
+                },
+                distinct: ['sellerId'],
+                select: { sellerId: true },
+            }),
+        ]);
+        return reply.send((0, response_1.ok)({
+            community: membership.community,
+            membership: {
+                role: membership.role,
+                status: membership.status,
+                joinedAt: membership.joinedAt,
+            },
+            stats: {
+                activeMemberCount: memberCount,
+                activeListingCount,
+                activeSellerCount: activeSellers.length,
+            },
+        }));
+    });
     fastify.post('/join', {
         preHandler: auth_1.verifyJWT,
         schema: { body: shared_1.JoinCommunitySchema },
@@ -74,7 +142,19 @@ const plugin = (fastify, _opts, done) => {
             inviteUseLimit = { maxUses: inv.maxUses, useCount: inv.useCount };
         }
         else if (body.institutionalEmail) {
-            const domain = body.institutionalEmail.split('@')[1];
+            const requestedEmail = (0, otp_1.normalizeEmail)(body.institutionalEmail);
+            const user = await prisma_1.prisma.user.findUnique({
+                where: { id: request.user.sub },
+                select: { email: true, emailVerifiedAt: true },
+            });
+            if (!user?.email ||
+                !user.emailVerifiedAt ||
+                (0, otp_1.normalizeEmail)(user.email) !== requestedEmail) {
+                return reply.code(403).send({
+                    error: 'Verify this email before joining by email domain',
+                });
+            }
+            const domain = requestedEmail.split('@')[1];
             if (!domain) {
                 return reply.code(400).send({ error: 'Invalid email' });
             }
@@ -155,6 +235,8 @@ const plugin = (fastify, _opts, done) => {
                             select: {
                                 id: true,
                                 phoneE164: true,
+                                email: true,
+                                emailVerifiedAt: true,
                                 displayName: true,
                                 avatarUrl: true,
                                 verifiedAt: true,
@@ -227,6 +309,8 @@ const plugin = (fastify, _opts, done) => {
                     select: {
                         id: true,
                         phoneE164: true,
+                        email: true,
+                        emailVerifiedAt: true,
                         displayName: true,
                         avatarUrl: true,
                         verifiedAt: true,
@@ -266,6 +350,8 @@ const plugin = (fastify, _opts, done) => {
                     select: {
                         id: true,
                         phoneE164: true,
+                        email: true,
+                        emailVerifiedAt: true,
                         displayName: true,
                         avatarUrl: true,
                         verifiedAt: true,

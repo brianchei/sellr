@@ -6,6 +6,7 @@ const shared_1 = require("@sellr/shared");
 const prisma_1 = require("../../lib/prisma");
 const response_1 = require("../../lib/response");
 const auth_1 = require("../../middleware/auth");
+const profileRequirements_1 = require("../../lib/profileRequirements");
 const repository_1 = require("./repository");
 const queues_1 = require("../../lib/queues");
 const notifyUser_1 = require("../../lib/notifyUser");
@@ -244,6 +245,9 @@ const plugin = (fastify, _opts, done) => {
                 .code(403)
                 .send({ error: 'Not a member of this community' });
         }
+        if (!(await (0, profileRequirements_1.requireHighIntentProfile)(request, reply))) {
+            return;
+        }
         const listing = await prisma_1.prisma.$transaction(async (tx) => {
             const created = await tx.listing.create({
                 data: {
@@ -293,6 +297,9 @@ const plugin = (fastify, _opts, done) => {
             return reply
                 .code(403)
                 .send({ error: 'Not a member of this community' });
+        }
+        if (!(await (0, profileRequirements_1.requireHighIntentProfile)(request, reply))) {
+            return;
         }
         if (listing.status === 'sold') {
             return reply.code(400).send({
