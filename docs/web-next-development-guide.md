@@ -188,14 +188,19 @@ Shipped:
   email or phone, and active community membership before high-intent actions.
 - Posting listings and contacting sellers are blocked on the API and reflected
   in web UI with profile-completion calls to action.
+- Same-origin web API calls now retry once through refresh-cookie rotation after
+  a `401`, so normal app requests can recover from expired access cookies.
+- Added a dedicated `/profile` page using existing app panel, form, action, and
+  trust-card patterns, with profile photo file upload backed by profile-avatar
+  storage.
+- Account navigation and profile-completion CTAs now route users to `/profile`
+  where appropriate, while community membership gaps still route to onboarding.
+- Seller-owned listings now include the existing seller identity/trust card so
+  sellers can preview how buyers see them.
 
 Remaining work items:
 
-- Add or refine the profile page.
-- Add profile photo upload and basic profile customization.
-- Add profile completion state and trust/profile progress UI.
 - Expand profile completion UI beyond the dashboard prompt where useful.
-- Show seller identity info on user listings where it improves trust.
 
 Acceptance notes:
 
@@ -459,6 +464,13 @@ Keep this guide aligned with:
 - Updated phone fallback login to accept local US phone input and normalize to
   E.164 `+1` before OTP send/verify calls.
 - Enforced profile completion before listing creation/publish and seller contact
-  in the API, with matching web UI blocks that route users to `/dashboard#profile`
-  or onboarding.
+  in the API, with matching web UI blocks that route users to `/profile` or
+  onboarding.
 - Added focused shared and API tests for profile completion behavior.
+- Added same-origin refresh retry support in the API client so most
+  authenticated calls recover once from an expired access cookie.
+- Added `/profile` as a dedicated profile management surface using existing app
+  panel/form styles, including profile photo file upload, verified contact
+  display, public storefront access, and readiness guidance.
+- Added an account-menu profile link and seller identity preview card to owned
+  listings using existing app components.

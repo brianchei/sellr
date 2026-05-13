@@ -76,6 +76,12 @@ Included:
   when the short-lived access cookie expires, phone fallback login uses
   US-default `+1` normalization, and listing post/contact seller actions require
   a real display name, verified contact method, and active community membership.
+- Phase 2 now includes same-origin web API refresh retry and a dedicated
+  `/profile` surface using existing app panel/form styling for display name,
+  profile photo upload, verified contact display, storefront access, and
+  readiness guidance. Account navigation, high-intent profile-completion CTAs,
+  and seller-owned listing identity previews now connect into this profile
+  surface.
 
 ## Deliberately Deferred
 

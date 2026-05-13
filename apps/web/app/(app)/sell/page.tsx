@@ -144,7 +144,7 @@ export default function SellPage() {
             href={
               blockingIssue === 'community_membership'
                 ? '/onboarding'
-                : '/dashboard#profile'
+                : '/profile'
             }
             className="app-action-primary mt-5 px-4 py-2 text-sm"
           >

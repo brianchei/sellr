@@ -204,6 +204,14 @@ export function AppHeader() {
                   >
                     Account
                   </Link>
+                  <Link
+                    href="/profile"
+                    role="menuitem"
+                    onClick={() => setAccountOpen(false)}
+                    className="mx-2 block rounded-xl px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
+                  >
+                    Profile
+                  </Link>
                   {userId ? (
                     <Link
                       href={`/sellers/${userId}`}

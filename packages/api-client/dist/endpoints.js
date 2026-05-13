@@ -26,6 +26,7 @@ exports.unpublishListing = unpublishListing;
 exports.markListingSold = markListingSold;
 exports.deleteListing = deleteListing;
 exports.uploadListingImage = uploadListingImage;
+exports.uploadProfileAvatar = uploadProfileAvatar;
 exports.searchListings = searchListings;
 exports.createOffer = createOffer;
 exports.fetchOffer = fetchOffer;
@@ -198,6 +199,14 @@ function uploadListingImage(file) {
     const formData = new FormData();
     formData.append('file', file);
     return (0, fetch_1.apiFetch)('/uploads/listing-images', {
+        method: 'POST',
+        body: formData,
+    });
+}
+function uploadProfileAvatar(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return (0, fetch_1.apiFetch)('/uploads/profile-avatars', {
         method: 'POST',
         body: formData,
     });

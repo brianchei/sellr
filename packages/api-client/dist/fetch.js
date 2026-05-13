@@ -31,7 +31,39 @@ function setAccessToken(token) {
 function isRecord(value) {
     return typeof value === 'object' && value !== null;
 }
-async function apiFetch(path, options = {}) {
+function shouldRefreshWebSession(path) {
+    return (typeof window !== 'undefined' &&
+        useSameOriginApi &&
+        path !== '/auth/refresh' &&
+        path !== '/auth/logout');
+}
+async function refreshWebSession(base) {
+    const res = await fetch(`${base}/api/v1/auth/refresh`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Sellr-Client': 'web',
+        },
+        body: JSON.stringify({}),
+        credentials: 'include',
+    });
+    return res.ok;
+}
+async function parseApiResponse(res) {
+    if (!res.ok) {
+        const body = (await res.json().catch(() => null));
+        const fallback = res.status >= 500
+            ? 'Sellr API is unavailable. Make sure the API server is running and try again.'
+            : res.statusText || 'Request failed';
+        throw new ApiError(res.status, body?.error ?? fallback);
+    }
+    const json = await res.json();
+    if (isRecord(json) && 'data' in json) {
+        return json.data;
+    }
+    return json;
+}
+async function apiFetch(path, options = {}, retryAfterRefresh = true) {
     const base = getApiBaseUrl();
     const headers = {
         ...options.headers,
@@ -52,16 +84,13 @@ async function apiFetch(path, options = {}) {
         headers,
         credentials: 'include',
     });
-    if (!res.ok) {
-        const body = (await res.json().catch(() => null));
-        const fallback = res.status >= 500
-            ? 'Sellr API is unavailable. Make sure the API server is running and try again.'
-            : res.statusText || 'Request failed';
-        throw new ApiError(res.status, body?.error ?? fallback);
+    if (res.status === 401 &&
+        retryAfterRefresh &&
+        shouldRefreshWebSession(path)) {
+        const refreshed = await refreshWebSession(base);
+        if (refreshed) {
+            return apiFetch(path, options, false);
+        }
     }
-    const json = await res.json();
-    if (isRecord(json) && 'data' in json) {
-        return json.data;
-    }
-    return json;
+    return parseApiResponse(res);
 }

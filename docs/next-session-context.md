@@ -32,6 +32,12 @@ The current web SLC includes:
   through refresh-cookie rotation, phone fallback sign-in normalizes US numbers
   to E.164 `+1`, and listing post/contact seller actions now require a real
   display name, verified contact, and active community membership.
+- Same-origin web API calls retry once through refresh-cookie rotation after a
+  `401`, and `/profile` now provides display name editing, profile photo upload,
+  verified contact display, storefront access, and readiness guidance using
+  existing app panel/form styling. Account navigation, high-intent
+  profile-completion CTAs, and seller-owned listing identity previews now point
+  users toward that profile surface.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -263,7 +269,6 @@ Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope
 docs/design-language.md, and docs/next-session-context.md. Continue with Phase 2:
 profile and auth hardening. The first slice already shipped refresh-cookie retry,
 US phone normalization, and profile-completion gates for posting/contacting.
-Next focus: profile page/refinement, profile photo upload/customization, and
-clearer trust/profile progress UI. Do not expand marketplace scope beyond the web
-SLC.
+Next focus: continue Phase 2 trust/profile progress polish only where it improves
+core seller/buyer workflows. Do not expand marketplace scope beyond the web SLC.
 ```

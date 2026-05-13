@@ -14,8 +14,12 @@ export declare function getProfileCompletionIssues(profile: ProfileCompletionInp
 export declare const LISTING_IMAGE_MAX_BYTES: number;
 export declare const LISTING_IMAGE_MAX_COUNT = 8;
 export declare const LISTING_IMAGE_UPLOAD_PATH_PREFIX = "/api/v1/uploads/listing-images/";
+export declare const PROFILE_AVATAR_MAX_BYTES: number;
+export declare const PROFILE_AVATAR_UPLOAD_PATH_PREFIX = "/api/v1/uploads/profile-avatars/";
 export declare const LISTING_IMAGE_MIME_TYPES: readonly ["image/jpeg", "image/png", "image/webp"];
+export declare const PROFILE_AVATAR_MIME_TYPES: readonly ["image/jpeg", "image/png", "image/webp"];
 export declare function isListingPhotoUrl(value: string): boolean;
+export declare function isProfileAvatarUrl(value: string): boolean;
 export declare const SendOTPSchema: z.ZodObject<{
     phoneE164: z.ZodString;
 }, z.core.$strip>;
@@ -41,7 +45,7 @@ export declare const RegisterPushTokenSchema: z.ZodObject<{
 }, z.core.$strip>;
 export declare const UpdateProfileSchema: z.ZodObject<{
     displayName: z.ZodString;
-    avatarUrl: z.ZodOptional<z.ZodNullable<z.ZodURL>>;
+    avatarUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
 }, z.core.$strip>;
 export declare const JoinCommunitySchema: z.ZodObject<{
     inviteCode: z.ZodOptional<z.ZodString>;

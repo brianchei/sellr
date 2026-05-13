@@ -63,6 +63,7 @@ function multipartImagePayload({
 async function buildUploadApp(
   storage: ListingImageStorage,
   recordPendingUpload = vi.fn(() => Promise.resolve()),
+  profileStorage = storage,
 ): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
   await app.register(cookiesPlugin);
@@ -71,6 +72,7 @@ async function buildUploadApp(
   await app.register(uploadRoutes, {
     prefix: '/api/v1/uploads',
     storage,
+    profileStorage,
     mediaTracker: {
       recordPendingUpload,
     },
@@ -176,6 +178,48 @@ describe('listing image upload route', () => {
     expect(res.json()).toEqual({
       error: 'Could not upload this image. Try again.',
     });
+    await app.close();
+  });
+});
+
+describe('profile avatar upload route', () => {
+  it('stores supported images without creating listing media tracking', async () => {
+    const listingStore = vi.fn();
+    const profileStore = vi.fn(() =>
+      Promise.resolve({
+        filename: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.jpg',
+        key: 'profile-avatars/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.jpg',
+        url: 'https://cdn.sellr-ai.com/profile-avatars/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.jpg',
+        storageProvider: 'r2' as const,
+      }),
+    );
+    const recordPendingUpload = vi.fn(() => Promise.resolve());
+    const app = await buildUploadApp(
+      { store: listingStore },
+      recordPendingUpload,
+      { store: profileStore },
+    );
+    const payload = multipartImagePayload();
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/v1/uploads/profile-avatars',
+      headers: {
+        ...authHeader(app),
+        'content-type': payload.contentType,
+      },
+      payload: payload.body,
+    });
+
+    expect(res.statusCode).toBe(201);
+    expect(res.json()).toEqual({
+      data: {
+        url: 'https://cdn.sellr-ai.com/profile-avatars/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb.jpg',
+      },
+    });
+    expect(profileStore).toHaveBeenCalledWith(expect.any(Buffer), 'image/jpeg');
+    expect(listingStore).not.toHaveBeenCalled();
+    expect(recordPendingUpload).not.toHaveBeenCalled();
     await app.close();
   });
 });
