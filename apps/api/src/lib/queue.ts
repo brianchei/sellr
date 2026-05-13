@@ -6,6 +6,7 @@ import { notificationWorker } from '../jobs/notifications';
 import { savedSearchWorker } from '../jobs/savedSearch';
 import { quickReplyWorker } from '../jobs/quickReply';
 import { mediaCleanupWorker } from '../jobs/mediaCleanup';
+import { logger } from './logger';
 
 export function initBullMQ(): void {
   new Worker('ai', imageForensicsWorker, {
@@ -33,5 +34,5 @@ export function initBullMQ(): void {
     concurrency: 3,
   });
 
-  console.log('BullMQ workers initialized');
+  logger.info('BullMQ workers initialized');
 }

@@ -55,14 +55,6 @@ export function AppHeader() {
     unreadNotificationsQuery.data?.notifications.length ?? 0;
   const unreadLabel = unreadCount > 9 ? '9+' : String(unreadCount);
 
-  const [trackedPathname, setTrackedPathname] = useState(pathname);
-  if (pathname !== trackedPathname) {
-    setTrackedPathname(pathname);
-    if (drawerOpen) setDrawerOpen(false);
-    if (accountOpen) setAccountOpen(false);
-    if (communityOpen) setCommunityOpen(false);
-  }
-
   useEffect(() => {
     if (!drawerOpen && !accountOpen && !communityOpen) return;
     const handler = (event: KeyboardEvent) => {
