@@ -14,6 +14,9 @@ React Query, and typed helpers from `@sellr/api-client`.
   invite code.
 - `/dashboard`: profile editor, trust preview, seller readiness panel, and next
   best action.
+- `/profile`: dedicated profile management with display name editing, profile
+  photo upload, verified contact display, storefront access, and readiness
+  guidance.
 - `/marketplace`: community-scoped browse, search, filters, and listing cards.
 - `/marketplace/[listingId]`: listing detail, seller trust card, contact seller,
   and report listing.
@@ -22,7 +25,7 @@ React Query, and typed helpers from `@sellr/api-client`.
 - `/sell`: structured listing creation with file image upload, durable
   production media delivery, and buyer preview.
 - `/listings`: seller inventory management, status filters, publish/unpublish,
-  delete, and mark sold.
+  delete, mark sold, and seller identity preview.
 - `/listings/[listingId]/edit`: owner-only listing edit flow.
 - `/inbox` and `/inbox/[conversationId]`: buyer/seller conversation list,
   message thread, reply composer, and report message.

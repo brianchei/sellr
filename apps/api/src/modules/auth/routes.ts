@@ -33,6 +33,10 @@ import {
   emailLogContext,
   phoneLogContext,
 } from '../../lib/observability';
+import {
+  deleteListingImageObject,
+  profileAvatarStorageReferenceFromUrl,
+} from '../../lib/listingImageStorage';
 import { verifyJWT } from '../../middleware/auth';
 
 function defaultDisplayNameForEmail(email: string): string {
@@ -94,6 +98,30 @@ async function findMeProfile(userId: string, communityIds: string[]) {
     listingCount,
     communityMember: Boolean(membership),
   };
+}
+
+async function cleanupReplacedProfileAvatar(
+  avatarUrl: string | null,
+  userId: string,
+): Promise<void> {
+  if (!avatarUrl) return;
+
+  const storageReference = profileAvatarStorageReferenceFromUrl(avatarUrl);
+  if (!storageReference) return;
+
+  try {
+    await deleteListingImageObject(storageReference);
+  } catch (error) {
+    captureOperationalError(error, {
+      component: 'profile_avatar',
+      operation: 'delete_replaced_avatar',
+      extra: {
+        storageKey: storageReference.storageKey,
+        storageProvider: storageReference.storageProvider,
+      },
+      userId,
+    });
+  }
 }
 
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
@@ -389,6 +417,15 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
     },
     async (request, reply) => {
       const body = UpdateProfileSchema.parse(request.body);
+      const existingUser = await prisma.user.findUnique({
+        where: { id: request.user.sub },
+        select: { avatarUrl: true },
+      });
+
+      if (!existingUser) {
+        return reply.code(404).send({ error: 'User not found' });
+      }
+
       await prisma.user.update({
         where: { id: request.user.sub },
         data: {
@@ -398,6 +435,16 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
             : {}),
         },
       });
+
+      if (
+        body.avatarUrl !== undefined &&
+        existingUser.avatarUrl !== body.avatarUrl
+      ) {
+        await cleanupReplacedProfileAvatar(
+          existingUser.avatarUrl,
+          request.user.sub,
+        );
+      }
 
       const user = await findMeProfile(
         request.user.sub,

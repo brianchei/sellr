@@ -34,9 +34,52 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
+function shouldRefreshWebSession(path: string): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    useSameOriginApi &&
+    path !== '/auth/refresh' &&
+    path !== '/auth/logout'
+  );
+}
+
+async function refreshWebSession(base: string): Promise<boolean> {
+  const res = await fetch(`${base}/api/v1/auth/refresh`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Sellr-Client': 'web',
+    },
+    body: JSON.stringify({}),
+    credentials: 'include',
+  });
+
+  return res.ok;
+}
+
+async function parseApiResponse<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    const fallback =
+      res.status >= 500
+        ? 'Sellr API is unavailable. Make sure the API server is running and try again.'
+        : res.statusText || 'Request failed';
+    throw new ApiError(res.status, body?.error ?? fallback);
+  }
+
+  const json: unknown = await res.json();
+  if (isRecord(json) && 'data' in json) {
+    return json.data as T;
+  }
+  return json as T;
+}
+
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
+  retryAfterRefresh = true,
 ): Promise<T> {
   const base = getApiBaseUrl();
   const headers: Record<string, string> = {
@@ -65,22 +108,18 @@ export async function apiFetch<T>(
     credentials: 'include',
   });
 
-  if (!res.ok) {
-    const body = (await res.json().catch(() => null)) as {
-      error?: string;
-    } | null;
-    const fallback =
-      res.status >= 500
-        ? 'Sellr API is unavailable. Make sure the API server is running and try again.'
-        : res.statusText || 'Request failed';
-    throw new ApiError(res.status, body?.error ?? fallback);
+  if (
+    res.status === 401 &&
+    retryAfterRefresh &&
+    shouldRefreshWebSession(path)
+  ) {
+    const refreshed = await refreshWebSession(base);
+    if (refreshed) {
+      return apiFetch<T>(path, options, false);
+    }
   }
 
-  const json: unknown = await res.json();
-  if (isRecord(json) && 'data' in json) {
-    return json.data as T;
-  }
-  return json as T;
+  return parseApiResponse<T>(res);
 }
 
 export { ApiError };

@@ -52,16 +52,36 @@ export const LISTING_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
 export const LISTING_IMAGE_MAX_COUNT = 8;
 export const LISTING_IMAGE_UPLOAD_PATH_PREFIX =
   '/api/v1/uploads/listing-images/';
+export const PROFILE_AVATAR_MAX_BYTES = LISTING_IMAGE_MAX_BYTES;
+export const PROFILE_AVATAR_UPLOAD_PATH_PREFIX =
+  '/api/v1/uploads/profile-avatars/';
 export const LISTING_IMAGE_MIME_TYPES = [
   'image/jpeg',
   'image/png',
   'image/webp',
 ] as const;
+export const PROFILE_AVATAR_MIME_TYPES = LISTING_IMAGE_MIME_TYPES;
 
 export function isListingPhotoUrl(value: string): boolean {
   if (value.startsWith(LISTING_IMAGE_UPLOAD_PATH_PREFIX)) {
     return new RegExp(
       `^${LISTING_IMAGE_UPLOAD_PATH_PREFIX}[a-f0-9-]+\\.(jpg|png|webp)$`,
+      'i',
+    ).test(value);
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export function isProfileAvatarUrl(value: string): boolean {
+  if (value.startsWith(PROFILE_AVATAR_UPLOAD_PATH_PREFIX)) {
+    return new RegExp(
+      `^${PROFILE_AVATAR_UPLOAD_PATH_PREFIX}[a-f0-9-]+\\.(jpg|png|webp)$`,
       'i',
     ).test(value);
   }
@@ -116,7 +136,14 @@ export const UpdateProfileSchema = z.object({
   displayName: z.string().trim().min(2).max(60).refine(hasRealDisplayName, {
     error: 'Use your real name or a recognizable display name.',
   }),
-  avatarUrl: z.url().max(2048).nullable().optional(),
+  avatarUrl: z
+    .string()
+    .max(2048)
+    .refine(isProfileAvatarUrl, {
+      error: 'Profile photo must be an uploaded image or an http(s) image URL',
+    })
+    .nullable()
+    .optional(),
 });
 
 export const JoinCommunitySchema = z

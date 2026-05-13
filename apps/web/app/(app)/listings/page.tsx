@@ -6,6 +6,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   deleteListing,
+  fetchMe,
   fetchMyListings,
   markListingSold,
   publishListing,
@@ -13,6 +14,7 @@ import {
   type ApiListing,
 } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
+import { SellerProfileCard } from '@/components/seller-profile-card';
 import {
   formatCondition,
   formatPostedDate,
@@ -121,7 +123,7 @@ function MyListingsContent() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
-  const { primaryCommunityId } = useAuth();
+  const { primaryCommunityId, userId } = useAuth();
   const [statusFilter, setStatusFilter] =
     useState<(typeof STATUS_FILTERS)[number]['value']>('all');
   const [notice, setNotice] = useState<string | null>(() =>
@@ -147,6 +149,12 @@ function MyListingsContent() {
     },
     enabled: Boolean(primaryCommunityId),
     refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
+  });
+
+  const meQuery = useQuery({
+    queryKey: ['me', userId],
+    queryFn: fetchMe,
+    enabled: Boolean(userId),
   });
 
   const listings = useMemo(
@@ -380,6 +388,20 @@ function MyListingsContent() {
             </div>
           ))}
         </section>
+      ) : null}
+
+      {listings.length > 0 && meQuery.data ? (
+        <div className="mt-6">
+          <SellerProfileCard
+            profile={meQuery.data.user}
+            heading="Seller identity"
+            contextLabel="This is how buyers see you on your listings and in pickup coordination."
+            profileHref={userId ? `/sellers/${userId}` : undefined}
+            profileLabel="View storefront"
+            editableHref="/profile"
+            editableLabel="Edit profile"
+          />
+        </div>
       ) : null}
 
       {listingsQuery.isError ? (

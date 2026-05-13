@@ -3,7 +3,9 @@ import {
   CreateListingSchema,
   ListingPhotoUrlSchema,
   isListingPhotoUrl,
+  isProfileAvatarUrl,
   LISTING_IMAGE_UPLOAD_PATH_PREFIX,
+  PROFILE_AVATAR_UPLOAD_PATH_PREFIX,
   getProfileCompletionIssues,
   hasRealDisplayName,
 } from './schemas';
@@ -59,6 +61,32 @@ describe('ListingPhotoUrlSchema', () => {
 
   it('rejects javascript: and other unsupported sources', () => {
     expect(() => ListingPhotoUrlSchema.parse('javascript:alert(1)')).toThrow();
+  });
+});
+
+describe('isProfileAvatarUrl', () => {
+  it('accepts uploaded profile avatar paths with allowed extensions', () => {
+    const filename = '11111111-2222-3333-4444-555555555555';
+    expect(
+      isProfileAvatarUrl(`${PROFILE_AVATAR_UPLOAD_PATH_PREFIX}${filename}.jpg`),
+    ).toBe(true);
+    expect(
+      isProfileAvatarUrl(`${PROFILE_AVATAR_UPLOAD_PATH_PREFIX}${filename}.png`),
+    ).toBe(true);
+    expect(
+      isProfileAvatarUrl(
+        `${PROFILE_AVATAR_UPLOAD_PATH_PREFIX}${filename}.webp`,
+      ),
+    ).toBe(true);
+  });
+
+  it('rejects malformed uploaded profile avatar paths', () => {
+    expect(
+      isProfileAvatarUrl(`${PROFILE_AVATAR_UPLOAD_PATH_PREFIX}abc.gif`),
+    ).toBe(false);
+    expect(
+      isProfileAvatarUrl(`${PROFILE_AVATAR_UPLOAD_PATH_PREFIX}../etc/passwd`),
+    ).toBe(false);
   });
 });
 

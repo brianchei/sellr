@@ -301,6 +301,9 @@ export declare function deleteListing(listingId: string): Promise<{
 export declare function uploadListingImage(file: File): Promise<{
     url: string;
 }>;
+export declare function uploadProfileAvatar(file: File): Promise<{
+    url: string;
+}>;
 export declare function searchListings(params: {
     communityId: string;
     q?: string;

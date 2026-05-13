@@ -454,6 +454,15 @@ export function uploadListingImage(file: File) {
   });
 }
 
+export function uploadProfileAvatar(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return apiFetch<{ url: string }>('/uploads/profile-avatars', {
+    method: 'POST',
+    body: formData,
+  });
+}
+
 export function searchListings(params: {
   communityId: string;
   q?: string;

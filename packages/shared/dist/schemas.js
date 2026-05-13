@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.LISTING_IMAGE_MIME_TYPES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.PROFILE_AVATAR_MIME_TYPES = exports.LISTING_IMAGE_MIME_TYPES = exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX = exports.PROFILE_AVATAR_MAX_BYTES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
 exports.hasRealDisplayName = hasRealDisplayName;
 exports.hasVerifiedContact = hasVerifiedContact;
 exports.getProfileCompletionIssues = getProfileCompletionIssues;
 exports.isListingPhotoUrl = isListingPhotoUrl;
+exports.isProfileAvatarUrl = isProfileAvatarUrl;
 const zod_1 = require("zod");
 const enums_1 = require("./enums");
 function hasRealDisplayName(displayName) {
@@ -36,14 +37,29 @@ function getProfileCompletionIssues(profile) {
 exports.LISTING_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
 exports.LISTING_IMAGE_MAX_COUNT = 8;
 exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = '/api/v1/uploads/listing-images/';
+exports.PROFILE_AVATAR_MAX_BYTES = exports.LISTING_IMAGE_MAX_BYTES;
+exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX = '/api/v1/uploads/profile-avatars/';
 exports.LISTING_IMAGE_MIME_TYPES = [
     'image/jpeg',
     'image/png',
     'image/webp',
 ];
+exports.PROFILE_AVATAR_MIME_TYPES = exports.LISTING_IMAGE_MIME_TYPES;
 function isListingPhotoUrl(value) {
     if (value.startsWith(exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX)) {
         return new RegExp(`^${exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX}[a-f0-9-]+\\.(jpg|png|webp)$`, 'i').test(value);
+    }
+    try {
+        const url = new URL(value);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    }
+    catch {
+        return false;
+    }
+}
+function isProfileAvatarUrl(value) {
+    if (value.startsWith(exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX)) {
+        return new RegExp(`^${exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX}[a-f0-9-]+\\.(jpg|png|webp)$`, 'i').test(value);
     }
     try {
         const url = new URL(value);
@@ -86,15 +102,17 @@ exports.RegisterPushTokenSchema = zod_1.z.object({
     expoPushToken: zod_1.z.string().min(1).max(500),
 });
 exports.UpdateProfileSchema = zod_1.z.object({
-    displayName: zod_1.z
-        .string()
-        .trim()
-        .min(2)
-        .max(60)
-        .refine(hasRealDisplayName, {
+    displayName: zod_1.z.string().trim().min(2).max(60).refine(hasRealDisplayName, {
         error: 'Use your real name or a recognizable display name.',
     }),
-    avatarUrl: zod_1.z.url().max(2048).nullable().optional(),
+    avatarUrl: zod_1.z
+        .string()
+        .max(2048)
+        .refine(isProfileAvatarUrl, {
+        error: 'Profile photo must be an uploaded image or an http(s) image URL',
+    })
+        .nullable()
+        .optional(),
 });
 exports.JoinCommunitySchema = zod_1.z
     .object({

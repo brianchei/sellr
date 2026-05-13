@@ -652,7 +652,7 @@ function ContactCard({
             href={
               profileIssue === 'community_membership'
                 ? '/onboarding'
-                : '/dashboard#profile'
+                : '/profile'
             }
             className="app-action-primary mt-4 px-4 py-2 text-sm"
           >

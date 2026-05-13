@@ -1,14 +1,19 @@
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import type { FastifyPluginCallback } from 'fastify';
-import { LISTING_IMAGE_MAX_BYTES } from '@sellr/shared';
+import {
+  LISTING_IMAGE_MAX_BYTES,
+  PROFILE_AVATAR_MAX_BYTES,
+} from '@sellr/shared';
 import {
   createListingImageStorage,
+  createProfileAvatarStorage,
   deleteListingImageObject,
   isListingImageMimeType,
   LISTING_IMAGE_CACHE_CONTROL,
   listingImageMimeTypeForFilename,
   listingImagePath,
+  profileAvatarPath,
   type ListingImageStorage,
   type StoredListingImage,
 } from '../../lib/listingImageStorage';
@@ -25,6 +30,7 @@ type MediaTracker = {
 
 type UploadRoutesOptions = {
   storage?: ListingImageStorage;
+  profileStorage?: ListingImageStorage;
   mediaTracker?: MediaTracker;
 };
 
@@ -42,6 +48,7 @@ const plugin: FastifyPluginCallback<UploadRoutesOptions> = (
   done,
 ) => {
   const storage = opts.storage ?? createListingImageStorage();
+  const profileStorage = opts.profileStorage ?? createProfileAvatarStorage();
 
   fastify.post(
     '/listing-images',
@@ -126,6 +133,45 @@ const plugin: FastifyPluginCallback<UploadRoutesOptions> = (
     },
   );
 
+  fastify.post(
+    '/profile-avatars',
+    { preHandler: verifyJWT },
+    async (request, reply) => {
+      const file = await request.file({
+        throwFileSizeLimit: false,
+        limits: {
+          fileSize: PROFILE_AVATAR_MAX_BYTES,
+          files: 1,
+        },
+      });
+
+      if (!file) {
+        return reply.code(400).send({ error: 'Choose an image to upload' });
+      }
+
+      if (!isListingImageMimeType(file.mimetype)) {
+        return reply.code(400).send({
+          error: 'Upload a JPG, PNG, or WebP image',
+        });
+      }
+
+      const buffer = await file.toBuffer();
+      if (file.file.truncated) {
+        return reply.code(413).send({ error: 'Keep this image under 3 MB' });
+      }
+
+      try {
+        const storedImage = await profileStorage.store(buffer, file.mimetype);
+        return await reply.code(201).send(ok({ url: storedImage.url }));
+      } catch (error) {
+        request.log.error({ err: error }, 'profile avatar upload failed');
+        return reply
+          .code(502)
+          .send({ error: 'Could not upload this image. Try again.' });
+      }
+    },
+  );
+
   // Listing photos are served publicly so the Next.js Image Optimizer (which
   // fetches server-side without the user's session cookie) can pull them, and
   // so any community member can render them without an extra auth round-trip.
@@ -139,6 +185,32 @@ const plugin: FastifyPluginCallback<UploadRoutesOptions> = (
     async (request, reply) => {
       const { filename } = request.params as { filename: string };
       const filePath = listingImagePath(filename);
+      if (!filePath) {
+        return await reply.code(404).send({ error: 'Image not found' });
+      }
+
+      try {
+        const imageStat = await stat(filePath);
+        if (!imageStat.isFile()) {
+          return await reply.code(404).send({ error: 'Image not found' });
+        }
+      } catch {
+        return reply.code(404).send({ error: 'Image not found' });
+      }
+
+      return reply
+        .type(listingImageMimeTypeForFilename(filename))
+        .header('Cache-Control', LISTING_IMAGE_CACHE_CONTROL)
+        .send(createReadStream(filePath));
+    },
+  );
+
+  fastify.get(
+    '/profile-avatars/:filename',
+    { config: { rateLimit: false } },
+    async (request, reply) => {
+      const { filename } = request.params as { filename: string };
+      const filePath = profileAvatarPath(filename);
       if (!filePath) {
         return await reply.code(404).send({ error: 'Image not found' });
       }
