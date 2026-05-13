@@ -18,8 +18,8 @@ React Query, and typed helpers from `@sellr/api-client`.
   photo upload, verified contact display, storefront access, and readiness
   guidance.
 - `/communities/[communityId]`: member-only community homepage with membership
-  context, marketplace stats, recent listing previews, guidance, and scoped
-  browse/sell actions.
+  context, marketplace stats, recent listing previews, lightweight Badger/campus
+  presentation cues, guidance, and scoped browse/sell actions.
 - `/communities/join`: post-login flow for joining another community with an
   invite code or verified email-domain match.
 - `/admin/community`: admin invite/member management with a

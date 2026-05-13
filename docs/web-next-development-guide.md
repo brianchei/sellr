@@ -226,6 +226,9 @@ Shipped:
   `GET /communities/:communityId`, with community details, membership context,
   active member/listing/seller stats, recent listing previews, guidance, and
   browse/sell CTAs scoped to that community.
+- Added lightweight Badger Market/campus presentation cues on the community
+  homepage, including UW-style copy, trust highlights, local-area chips, and
+  fallback pickup guidance without a full generic theming system.
 - Added a signed-in `/communities/join` flow so existing members can join
   another community with an invite code or verified email-domain match, refresh
   their membership context, switch to the new community, and land on its
@@ -238,8 +241,9 @@ Shipped:
 Work items:
 
 - Add option to leave a community.
-- Add lightweight community theme/config data.
-- Create a decorated Badger Market community experience.
+- Add richer lightweight community theme/config data.
+- Expand the decorated Badger Market experience with approved imagery or
+  admin-editable fields when available.
 - Expand admin community editing controls.
 - Let admins edit community name, description, rules, branding/theme config, and
   invite code settings.
@@ -369,14 +373,16 @@ Completed in Phase 3:
 
 - Add global but quiet community switcher.
 - Add member community homepage.
+- Add lightweight Badger Market / campus presentation cues.
 - Add post-login join-another-community flow.
 - Add admin management-community switcher.
 
 Remaining:
 
 - Add option to leave community.
-- Create decorated Badger Market / UW-Madison community.
-- Add lightweight community theme/config data.
+- Expand Badger Market / UW-Madison decoration with approved imagery or
+  admin-editable fields.
+- Add richer lightweight community theme/config data.
 - Add more community editing controls to admin dashboard.
 
 ### Profile And Trust
@@ -519,6 +525,9 @@ Keep this guide aligned with:
 - Added a member-only community homepage at `/communities/[communityId]` with a
   community detail API, membership context, active marketplace stats, recent
   listing previews, community guidance, and scoped browse/sell actions.
+- Added a lightweight community presentation helper so Badger Market and
+  `wisc.edu` campus communities get UW-style homepage copy, local pickup cues,
+  trust highlights, and campus-specific guidance without new schema fields.
 - Added `/communities/join` for existing members to join another community,
   refresh their auth/community context, switch to the newly joined community,
   and continue to its community homepage.

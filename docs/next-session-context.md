@@ -45,11 +45,11 @@ The current web SLC includes:
   `/auth/me` and a quiet authenticated app-shell community indicator/switcher for
   multi-community users. A member-only `/communities/[communityId]` homepage now
   gives members community details, membership context, stats, guidance, recent
-  listings, and browse/sell actions scoped to that community. Existing members
-  can use `/communities/join` to join another community by invite code or
-  verified email-domain match, then switch into that community context. Admins
-  can also switch which active admin community they are managing on
-  `/admin/community`.
+  listings, browse/sell actions, and lightweight Badger Market/campus
+  presentation cues scoped to that community. Existing members can use
+  `/communities/join` to join another community by invite code or verified
+  email-domain match, then switch into that community context. Admins can also
+  switch which active admin community they are managing on `/admin/community`.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -281,8 +281,9 @@ Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope
 docs/design-language.md, and docs/next-session-context.md. Continue Phase 3:
 community product surface. The app-shell community switcher, member community
 homepage, post-login join-another-community flow, and admin management-community
-switcher are already implemented. Next, choose the smallest useful
-community-facing slice, such as lightweight community theme/config, community
-leave behavior, or admin-editable community details, and keep the scope inside
+switcher are already implemented. The community homepage also has lightweight
+Badger Market/campus presentation cues. Next, choose the smallest useful
+community-facing slice, such as community leave behavior, admin-editable
+community details, or richer community theme/config, and keep the scope inside
 the web SLC.
 ```
