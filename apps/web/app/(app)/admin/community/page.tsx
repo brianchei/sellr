@@ -20,6 +20,16 @@ import { useAuth } from '@/components/auth-provider';
 
 const COMMUNITY_QUERY_PARAM = 'communityId';
 
+type MemberFilter = 'all' | 'active' | 'inactive' | 'admins' | 'members';
+
+const MEMBER_FILTER_OPTIONS: Array<{ id: MemberFilter; label: string }> = [
+  { id: 'all', label: 'All' },
+  { id: 'active', label: 'Active' },
+  { id: 'inactive', label: 'Inactive' },
+  { id: 'admins', label: 'Admins' },
+  { id: 'members', label: 'Members' },
+];
+
 function formatDate(value: string | null) {
   if (!value) return 'No expiration';
   return new Intl.DateTimeFormat(undefined, {
@@ -48,6 +58,30 @@ function toIsoFromLocalDateTime(value: string): string | null {
 
 function memberContact(member: ApiCommunityAdminMember): string {
   return member.user.email ?? member.user.phoneE164 ?? 'No contact on file';
+}
+
+function memberSearchText(member: ApiCommunityAdminMember): string {
+  return [
+    member.user.displayName,
+    member.user.email,
+    member.user.phoneE164,
+    member.role,
+    member.status,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+function memberMatchesFilter(
+  member: ApiCommunityAdminMember,
+  filter: MemberFilter,
+): boolean {
+  if (filter === 'active') return member.status === 'active';
+  if (filter === 'inactive') return member.status === 'inactive';
+  if (filter === 'admins') return member.role === 'admin';
+  if (filter === 'members') return member.role === 'member';
+  return true;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -422,6 +456,8 @@ export default function AdminCommunityPage() {
   const [formMessage, setFormMessage] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [memberError, setMemberError] = useState<string | null>(null);
+  const [memberSearch, setMemberSearch] = useState('');
+  const [memberFilter, setMemberFilter] = useState<MemberFilter>('all');
 
   const adminQuery = useQuery({
     queryKey: ['community-admin'],
@@ -568,6 +604,26 @@ export default function AdminCommunityPage() {
     (invite) => inviteState(invite) === 'active',
   ).length;
   const canSwitchManagementCommunity = communities.length > 1;
+  const memberSearchValue = memberSearch.trim().toLowerCase();
+  const visibleMembers = selectedCommunity.members.filter(
+    (member) =>
+      memberMatchesFilter(member, memberFilter) &&
+      (!memberSearchValue || memberSearchText(member).includes(memberSearchValue)),
+  );
+  const memberFilterCounts: Record<MemberFilter, number> = {
+    all: selectedCommunity.members.length,
+    active: selectedCommunity.members.filter(
+      (member) => member.status === 'active',
+    ).length,
+    inactive: selectedCommunity.members.filter(
+      (member) => member.status === 'inactive',
+    ).length,
+    admins: selectedCommunity.members.filter((member) => member.role === 'admin')
+      .length,
+    members: selectedCommunity.members.filter(
+      (member) => member.role === 'member',
+    ).length,
+  };
 
   const selectManagementCommunity = (communityId: string) => {
     if (!adminCommunityIds.has(communityId)) return;
@@ -577,6 +633,8 @@ export default function AdminCommunityPage() {
     setFormError(null);
     setFormMessage(null);
     setMemberError(null);
+    setMemberSearch('');
+    setMemberFilter('all');
   };
 
   const runMemberUpdate = (
@@ -891,13 +949,54 @@ export default function AdminCommunityPage() {
         </div>
 
         <div className="app-panel p-5">
-          <div>
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-              Members
-            </h2>
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">
-              Promote admins, deactivate access, or reactivate members.
-            </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                Members
+              </h2>
+              <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                Search, filter, promote admins, or update member access.
+              </p>
+            </div>
+            <span className="rounded-full bg-[var(--bg-secondary)] px-3 py-1 text-xs font-semibold text-[var(--text-secondary)]">
+              Showing {visibleMembers.length} of {memberCount}
+            </span>
+          </div>
+
+          <div className="mt-4 grid gap-3">
+            <label className="text-sm font-medium text-[var(--text-primary)]">
+              Search members
+              <input
+                value={memberSearch}
+                onChange={(event) => setMemberSearch(event.target.value)}
+                placeholder="Name, email, phone, role, or status"
+                className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              />
+            </label>
+
+            <div className="flex flex-wrap gap-2" aria-label="Member filters">
+              {MEMBER_FILTER_OPTIONS.map((option) => {
+                const active = memberFilter === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setMemberFilter(option.id)}
+                    aria-pressed={active}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                      active
+                        ? 'border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] text-[var(--color-brand-contrast)]'
+                        : 'border-black/10 bg-white/80 text-[var(--text-secondary)] hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {option.label}{' '}
+                    <span className="font-mono">
+                      {memberFilterCounts[option.id]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {memberError ? (
@@ -910,7 +1009,28 @@ export default function AdminCommunityPage() {
           ) : null}
 
           <div className="mt-4 space-y-3">
-            {selectedCommunity.members.map((member) => {
+            {visibleMembers.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] px-4 py-6 text-center">
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+                  No members match these filters
+                </h3>
+                <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                  Try a different search term or filter to find community
+                  members.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMemberSearch('');
+                    setMemberFilter('all');
+                  }}
+                  className="mt-3 text-sm font-semibold text-[var(--color-brand-contrast)] hover:underline"
+                >
+                  Clear filters
+                </button>
+              </div>
+            ) : (
+              visibleMembers.map((member) => {
               const isPending =
                 memberMutation.isPending && pendingUserId === member.userId;
               const memberIsLastActiveAdmin =
@@ -960,7 +1080,7 @@ export default function AdminCommunityPage() {
                           }
                           className="flex-1 rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm hover:bg-white hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                         >
-                          Demote
+                          Demote to member
                         </button>
                       ) : (
                         <button
@@ -971,7 +1091,7 @@ export default function AdminCommunityPage() {
                           }
                           className="flex-1 rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                         >
-                          Promote
+                          Promote to admin
                         </button>
                       )}
 
@@ -984,7 +1104,7 @@ export default function AdminCommunityPage() {
                           }
                           className="flex-1 rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-xs font-semibold text-[var(--color-brand-warm-strong)] shadow-sm hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                         >
-                          Deactivate
+                          Deactivate access
                         </button>
                       ) : (
                         <button
@@ -995,7 +1115,7 @@ export default function AdminCommunityPage() {
                           }
                           className="flex-1 rounded-full bg-[#111111] px-3 py-2 text-xs font-semibold text-[var(--color-brand-primary)] shadow-sm hover:bg-black disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                         >
-                          Reactivate
+                          Reactivate access
                         </button>
                       )}
                     </div>
@@ -1007,7 +1127,8 @@ export default function AdminCommunityPage() {
                   ) : null}
                 </article>
               );
-            })}
+              })
+            )}
           </div>
         </div>
       </section>

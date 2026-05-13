@@ -100,7 +100,9 @@ Included:
   listings as part of the leave flow. Admins with multiple active admin
   memberships can switch the selected management community on `/admin/community`
   and edit basic community details, access method, email domain, and
-  member-facing rules/guidance.
+  member-facing rules/guidance. The admin member list supports search, role and
+  status filters, clearer access action labels, and empty states for larger
+  communities.
 
 ## Deliberately Deferred
 
