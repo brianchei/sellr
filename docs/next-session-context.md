@@ -46,12 +46,13 @@ The current web SLC includes:
   `/auth/me` and a quiet authenticated app-shell community indicator/switcher for
   multi-community users. A member-only `/communities/[communityId]` homepage now
   gives members community details, membership context, stats, guidance, recent
-  listings, and browse/sell actions scoped to that community. Existing members
-  can use `/communities/join` to join another community by invite code or
-  verified email-domain match, then switch into that community context. Admins
-  can also switch which active admin community they are managing on
-  `/admin/community` and edit basic community details, access method, email
-  domain, and member-facing rules/guidance.
+  listings, browse/sell actions, and lightweight Badger Market/campus
+  presentation cues scoped to that community. Existing members can use
+  `/communities/join` to join another community by invite code or verified
+  email-domain match, then switch into that community context. Admins can also
+  switch which active admin community they are managing on `/admin/community`
+  and edit basic community details, access method, email domain, and
+  member-facing rules/guidance.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -283,8 +284,8 @@ Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope
 docs/design-language.md, and docs/next-session-context.md. Continue Phase 3:
 community product surface. The app-shell community switcher, member community
 homepage, post-login join-another-community flow, and admin management-community
-switcher, and admin-editable community details are already implemented. Next,
-choose the smallest useful community-facing slice, such as lightweight community
-theme/config, decorated Badger Market content, or community leave behavior, and
-keep the scope inside the web SLC.
+switcher, admin-editable community details, and lightweight Badger Market/campus
+presentation cues are already implemented. Next, choose the smallest useful
+community-facing slice, such as community leave behavior or richer community
+theme/config, and keep the scope inside the web SLC.
 ```

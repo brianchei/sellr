@@ -12,6 +12,7 @@ import {
 import { ListingCard } from '@/components/listing-card';
 import { useAuth } from '@/components/auth-provider';
 import { ACTIVITY_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
+import { getCommunityPresentation } from '@/lib/community-presentation';
 
 function stringParam(value: string | string[] | undefined): string | null {
   if (Array.isArray(value)) return value[0] ?? null;
@@ -20,10 +21,6 @@ function stringParam(value: string | string[] | undefined): string | null {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
-}
-
-function communityTypeLabel(type: ApiCommunityDetail['type']): string {
-  return type.replaceAll('_', ' ');
 }
 
 function accessLabel(community: ApiCommunityDetail): string {
@@ -139,25 +136,28 @@ export default function CommunityHomePage() {
   const { community, membership, stats } = detailQuery.data;
   const listings = listingsQuery.data?.listings ?? [];
   const isActiveContext = primaryCommunityId === community.id;
+  const presentation = getCommunityPresentation(community);
+  const guidanceItems = rules.length > 0 ? rules : presentation.guidanceFallback;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
       <header
         className="app-panel-soft overflow-hidden p-5 sm:p-7"
-        style={{
-          background:
-            community.type === 'campus'
-              ? 'linear-gradient(135deg, var(--color-brand-primary-soft) 0%, rgba(255,255,255,0.96) 50%, var(--color-brand-contrast-soft) 100%)'
-              : 'linear-gradient(135deg, rgba(255,255,255,0.96) 0%, var(--color-brand-accent-soft) 46%, var(--color-brand-primary-soft) 100%)',
-        }}
+        style={{ background: presentation.heroBackground }}
       >
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)] shadow-sm">
-                {communityTypeLabel(community.type)} community
+                {presentation.eyebrow}
               </span>
-              <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-3 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  presentation.accessBadgeTone === 'contrast'
+                    ? 'bg-[var(--color-brand-contrast-soft)] text-[var(--color-brand-contrast)]'
+                    : 'bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]'
+                }`}
+              >
                 {accessLabel(community)}
               </span>
             </div>
@@ -165,10 +165,18 @@ export default function CommunityHomePage() {
               {community.name}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-              A verified local marketplace for members to browse nearby
-              listings, understand community context, and coordinate pickup
-              with clearer trust signals.
+              {presentation.description}
             </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {presentation.trustHighlights.map((highlight) => (
+                <span
+                  key={highlight}
+                  className="rounded-full border border-white/70 bg-white/70 px-3 py-1 text-xs font-semibold text-[var(--text-secondary)] shadow-sm"
+                >
+                  {highlight}
+                </span>
+              ))}
+            </div>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
             <button
@@ -217,13 +225,13 @@ export default function CommunityHomePage() {
         <CommunityStat
           label="Active listings"
           value={stats.activeListingCount}
-          helper="Ready for local pickup"
+          helper={presentation.listingHelper}
           tone="primary"
         />
         <CommunityStat
           label="Active sellers"
           value={stats.activeSellerCount}
-          helper="Members with live listings"
+          helper={presentation.sellerHelper}
           tone="contrast"
         />
       </section>
@@ -306,24 +314,36 @@ export default function CommunityHomePage() {
             <h2 className="text-base font-semibold text-[var(--text-primary)]">
               Community guidance
             </h2>
-            {rules.length > 0 ? (
-              <ul className="mt-4 space-y-3">
-                {rules.slice(0, 5).map((rule) => (
-                  <li
-                    key={rule}
-                    className="rounded-2xl border border-black/10 bg-white/80 p-3 text-sm leading-6 text-[var(--text-secondary)]"
-                  >
-                    {rule}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="mt-4 space-y-3">
-                <GuidanceItem text="Keep pickup coordination inside Sellr until details are clear." />
-                <GuidanceItem text="Use a recognizable profile and accurate listing photos." />
-                <GuidanceItem text="Choose familiar public pickup areas when possible." />
-              </div>
-            )}
+            <ul className="mt-4 space-y-3">
+              {guidanceItems.slice(0, 5).map((rule) => (
+                <li
+                  key={rule}
+                  className="rounded-2xl border border-black/10 bg-white/80 p-3 text-sm leading-6 text-[var(--text-secondary)]"
+                >
+                  {rule}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="app-panel p-5">
+            <h2 className="text-base font-semibold text-[var(--text-primary)]">
+              Local pickup cues
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              Use familiar, public, easy-to-describe areas when arranging
+              pickup.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {presentation.localAreas.map((area) => (
+                <span
+                  key={area}
+                  className="rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] px-3 py-1 text-xs font-semibold text-[var(--text-primary)]"
+                >
+                  {area}
+                </span>
+              ))}
+            </div>
           </section>
         </aside>
       </div>
@@ -408,18 +428,6 @@ function CommunityFact({
       >
         {value}
       </dd>
-    </div>
-  );
-}
-
-function GuidanceItem({ text }: { text: string }) {
-  return (
-    <div className="flex gap-3 rounded-2xl border border-black/10 bg-white/80 p-3">
-      <span
-        aria-hidden="true"
-        className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--color-brand-accent)]"
-      />
-      <p className="text-sm leading-6 text-[var(--text-secondary)]">{text}</p>
     </div>
   );
 }

@@ -90,12 +90,15 @@ Included:
   community indicator/switcher backed by active community summaries from
   `/auth/me`, plus a member-only `/communities/[communityId]` homepage for
   community details, membership context, stats, guidance, recent listings, and
-  browse/sell actions scoped to that community. Existing members can also use
-  `/communities/join` to join another community, refresh membership context,
-  switch to the joined community, and continue to its homepage. Admins with
-  multiple active admin memberships can switch the selected management
-  community on `/admin/community` and edit basic community details, access
-  method, email domain, and member-facing rules/guidance.
+  browse/sell actions scoped to that community. The homepage now applies
+  lightweight Badger Market/campus presentation cues for UW-style copy, pickup
+  guidance, local-area chips, and trust highlights without adding a full
+  theming system. Existing members can also use `/communities/join` to join
+  another community, refresh membership context, switch to the joined community,
+  and continue to its homepage. Admins with multiple active admin memberships
+  can switch the selected management community on `/admin/community` and edit
+  basic community details, access method, email domain, and member-facing
+  rules/guidance.
 
 ## Deliberately Deferred
 
