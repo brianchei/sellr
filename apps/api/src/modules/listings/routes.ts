@@ -12,6 +12,7 @@ import {
 import { prisma } from '../../lib/prisma';
 import { ok } from '../../lib/response';
 import { verifyJWT } from '../../middleware/auth';
+import { requireHighIntentProfile } from '../../lib/profileRequirements';
 import { findListingsNearby, setListingLocationGeom } from './repository';
 import { searchSyncQueue } from '../../lib/queues';
 import { notifyUser } from '../../lib/notifyUser';
@@ -386,6 +387,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           .code(403)
           .send({ error: 'Not a member of this community' });
       }
+      if (!(await requireHighIntentProfile(request, reply))) {
+        return;
+      }
 
       const listing = await prisma.$transaction(async (tx) => {
         const created = await tx.listing.create({
@@ -445,6 +449,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         return reply
           .code(403)
           .send({ error: 'Not a member of this community' });
+      }
+      if (!(await requireHighIntentProfile(request, reply))) {
+        return;
       }
       if (listing.status === 'sold') {
         return reply.code(400).send({

@@ -1,6 +1,6 @@
 # Sellr Current State And Scope
 
-Last updated: May 11, 2026.
+Last updated: May 12, 2026.
 
 ## Product Scope
 
@@ -12,6 +12,13 @@ basic safety primitives.
 The initial launch community is `Badger Market` for UW-Madison students, but
 Sellr itself remains a general community marketplace. UW-specific behavior is
 scoped to the launch community gate and contextual onboarding guidance.
+
+The Phase 1 web polish pass has shipped. The public landing page and
+authenticated app now share the same refreshed Sellr design language: production
+brand assets, metadata/icons, community-first landing copy, interactive product
+preview, warm gradient shells, rounded elevated app panels, high-contrast
+actions, and refreshed marketplace, listing, messaging, seller, admin, login,
+and onboarding surfaces.
 
 ## Production State
 
@@ -63,6 +70,12 @@ Included:
 - Vercel Web Analytics and Speed Insights mounted in the web root layout.
 - Media lifecycle cleanup for abandoned uploads, replaced/deleted listing
   images, and explicit admin listing removals.
+- Refreshed public landing page and app-wide visual system for the Phase 1 web
+  polish pass.
+- Phase 2 identity hardening has started: web sessions rotate the refresh cookie
+  when the short-lived access cookie expires, phone fallback login uses
+  US-default `+1` normalization, and listing post/contact seller actions require
+  a real display name, verified contact method, and active community membership.
 
 ## Deliberately Deferred
 
@@ -78,8 +91,13 @@ Do not add these before launch unless explicitly requested:
 ## Immediate Launch Priorities
 
 - Seed 25-40 high-quality active listings for the initial campus launch.
+- Run a production visual smoke pass after the Phase 1 design refresh is
+  deployed to `https://sellr-ai.com`.
 - Confirm launch admin can access `/admin/community` and `/admin/reports`.
 - Watch Railway logs and Resend logs during the first real-user wave.
 - Run `pnpm --filter @sellr/api media:health` after early listing activity.
 - Keep `sellr-web.vercel.app` and the Railway backing API URL available for
   diagnostics until the custom domain stack has had enough production traffic.
+- Collect real launch proof, testimonials, approved member/seller photos,
+  campus imagery, and seed-listing imagery before adding them to the public
+  landing page.

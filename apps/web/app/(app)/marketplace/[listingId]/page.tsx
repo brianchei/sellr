@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createConversation,
   fetchListing,
+  fetchMe,
   sendMessage,
   type ApiListing,
 } from '@sellr/api-client';
@@ -28,6 +29,11 @@ import {
   ACTIVITY_REFETCH_INTERVAL_MS,
   invalidateConversationActivity,
 } from '@/lib/query-refresh';
+import {
+  PROFILE_COMPLETION_COPY,
+  profileCompletionIssues,
+} from '@/lib/profile-readiness';
+import type { ProfileCompletionIssue } from '@sellr/shared';
 
 const DEFAULT_MESSAGE =
   'Hi, is this still available? I can pick up locally this week.';
@@ -135,6 +141,11 @@ export default function ListingDetailPage() {
     enabled: Boolean(listingId),
     refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
   });
+  const meQuery = useQuery({
+    queryKey: ['me', userId],
+    queryFn: fetchMe,
+    enabled: Boolean(userId),
+  });
 
   const contactMutation = useMutation({
     mutationFn: async (content: string) => {
@@ -158,6 +169,8 @@ export default function ListingDetailPage() {
   const windows = availabilityWindows(listing?.availabilityWindows);
   const isOwnListing = listing ? listing.sellerId === userId : false;
   const isAvailable = listing?.status === 'active';
+  const profileIssues = profileCompletionIssues(meQuery.data);
+  const blockingProfileIssue = isOwnListing ? undefined : profileIssues[0];
   const status = listing ? statusDisplay(listing.status) : null;
   const freshness = useMemo(
     () => (listing ? formatRelativeListedDate(listing.createdAt) : null),
@@ -183,6 +196,10 @@ export default function ListingDetailPage() {
     setMessageError(null);
 
     const trimmed = message.trim();
+    if (blockingProfileIssue) {
+      setMessageError('Complete your profile before contacting a seller.');
+      return;
+    }
     if (trimmed.length < 10) {
       setMessageError('Write a little more so the seller knows what you need.');
       return;
@@ -494,6 +511,8 @@ export default function ListingDetailPage() {
             isAvailable={isAvailable}
             sent={sent}
             sentConversationId={sentConversationId}
+            profileIssue={blockingProfileIssue}
+            profileLoading={!isOwnListing && meQuery.isLoading}
             message={message}
             messageError={messageError}
             activeQuickReply={activeQuickReply}
@@ -533,6 +552,8 @@ function ContactCard({
   isAvailable,
   sent,
   sentConversationId,
+  profileIssue,
+  profileLoading,
   message,
   messageError,
   activeQuickReply,
@@ -549,6 +570,8 @@ function ContactCard({
   isAvailable: boolean;
   sent: boolean;
   sentConversationId: string | null;
+  profileIssue: ProfileCompletionIssue | undefined;
+  profileLoading: boolean;
   message: string;
   messageError: string | null;
   activeQuickReply: string;
@@ -607,6 +630,34 @@ function ContactCard({
               View seller storefront →
             </Link>
           ) : null}
+        </div>
+      ) : profileLoading ? (
+        <div className="mt-3 rounded-2xl border border-black/10 bg-white/80 p-4">
+          <p className="text-sm font-medium text-[var(--text-primary)]">
+            Checking your profile
+          </p>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+            Sellr verifies your profile before opening seller contact.
+          </p>
+        </div>
+      ) : profileIssue ? (
+        <div className="mt-3 rounded-2xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+          <p className="text-sm font-semibold text-[var(--text-primary)]">
+            {PROFILE_COMPLETION_COPY[profileIssue].title}
+          </p>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+            {PROFILE_COMPLETION_COPY[profileIssue].body}
+          </p>
+          <Link
+            href={
+              profileIssue === 'community_membership'
+                ? '/onboarding'
+                : '/dashboard#profile'
+            }
+            className="app-action-primary mt-4 px-4 py-2 text-sm"
+          >
+            {PROFILE_COMPLETION_COPY[profileIssue].action}
+          </Link>
         </div>
       ) : sent ? (
         <div className="mt-3 rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-4">

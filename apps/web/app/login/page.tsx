@@ -35,6 +35,22 @@ function isWiscEmail(value: string): boolean {
   return value.trim().toLowerCase().endsWith('@wisc.edu');
 }
 
+function normalizeUsPhoneToE164(value: string): string | null {
+  const trimmed = value.trim();
+  const digits = trimmed.replace(/\D/g, '');
+
+  if (trimmed.startsWith('+')) {
+    return /^\+[1-9]\d{1,14}$/.test(trimmed) ? trimmed : null;
+  }
+  if (digits.length === 10) {
+    return `+1${digits}`;
+  }
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+${digits}`;
+  }
+  return null;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const {
@@ -46,7 +62,7 @@ export default function LoginPage() {
   } = useAuth();
   const [step, setStep] = useState<LoginStep>('email');
   const [email, setEmail] = useState('');
-  const [phoneE164, setPhoneE164] = useState('+1');
+  const [phoneInput, setPhoneInput] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +73,10 @@ export default function LoginPage() {
 
   const isEmailFlow = step === 'email' || step === 'email-code';
   const isCodeStep = step === 'email-code' || step === 'phone-code';
-  const destination = isEmailFlow ? email.trim().toLowerCase() : phoneE164;
+  const normalizedPhone = normalizeUsPhoneToE164(phoneInput);
+  const destination = isEmailFlow
+    ? email.trim().toLowerCase()
+    : (normalizedPhone ?? phoneInput.trim());
 
   useEffect(() => {
     if (hydrated && isAuthenticated && communityIds !== null) {
@@ -119,10 +138,15 @@ export default function LoginPage() {
   };
 
   const onSendPhoneOtp = async () => {
+    if (!normalizedPhone) {
+      setError('Enter a valid US phone number.');
+      return;
+    }
+
     setError(null);
     setLoading(true);
     try {
-      await sendOtp(phoneE164.trim());
+      await sendOtp(normalizedPhone);
       setCode('');
       setStep('phone-code');
       setResendIn(RESEND_COOLDOWN_SECONDS);
@@ -161,7 +185,7 @@ export default function LoginPage() {
               code: trimmedCode,
             })
           : await verifyOtp({
-              phoneE164: phoneE164.trim(),
+              phoneE164: normalizedPhone ?? phoneInput.trim(),
               code: trimmedCode,
             });
       await finishAuth(res);
@@ -180,7 +204,7 @@ export default function LoginPage() {
 
   const handlePhoneSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (loading || phoneE164.trim().length < 8) return;
+    if (loading || !normalizedPhone) return;
     void onSendPhoneOtp();
   };
 
@@ -296,11 +320,14 @@ export default function LoginPage() {
               Phone number
               <input
                 ref={phoneInputRef}
-                value={phoneE164}
-                onChange={(e) => setPhoneE164(e.target.value)}
+                value={phoneInput}
+                onChange={(e) => {
+                  setPhoneInput(e.target.value);
+                  setError(null);
+                }}
                 type="tel"
                 autoComplete="tel"
-                placeholder="+15551234567"
+                placeholder="(555) 123-4567"
                 inputMode="tel"
                 aria-describedby="login-phone-help"
                 className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
@@ -310,11 +337,12 @@ export default function LoginPage() {
               id="login-phone-help"
               className="mt-1.5 text-xs text-[var(--text-tertiary)]"
             >
-              Use this path only if you are joining with an invite code.
+              US numbers are normalized to +1 format before verification. Use
+              this path only if you are joining with an invite code.
             </p>
             <button
               type="submit"
-              disabled={loading || phoneE164.trim().length < 8}
+              disabled={loading || !normalizedPhone}
               className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Sending code...' : 'Send code'}

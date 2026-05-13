@@ -4,6 +4,8 @@ import {
   ListingPhotoUrlSchema,
   isListingPhotoUrl,
   LISTING_IMAGE_UPLOAD_PATH_PREFIX,
+  getProfileCompletionIssues,
+  hasRealDisplayName,
 } from './schemas';
 
 describe('isListingPhotoUrl', () => {
@@ -98,5 +100,30 @@ describe('CreateListingSchema photoUrls', () => {
       photoUrls: ['javascript:alert(1)'],
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('profile completion helpers', () => {
+  it('rejects placeholder display names', () => {
+    expect(hasRealDisplayName('Member 1234')).toBe(false);
+    expect(hasRealDisplayName('Sellr member')).toBe(false);
+    expect(hasRealDisplayName('Maya Chen')).toBe(true);
+  });
+
+  it('requires a real display name, verified contact, and community membership', () => {
+    expect(
+      getProfileCompletionIssues({
+        displayName: 'Member 1234',
+        communityIds: [],
+      }),
+    ).toEqual(['display_name', 'verified_contact', 'community_membership']);
+
+    expect(
+      getProfileCompletionIssues({
+        displayName: 'Maya Chen',
+        emailVerifiedAt: new Date(),
+        communityIds: ['community-1'],
+      }),
+    ).toEqual([]);
   });
 });

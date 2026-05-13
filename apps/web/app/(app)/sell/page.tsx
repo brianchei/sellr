@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { createListing, publishListing } from '@sellr/api-client';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { createListing, fetchMe, publishListing } from '@sellr/api-client';
 import { ListingForm } from '@/components/listing-form';
 import { useAuth } from '@/components/auth-provider';
 import {
@@ -16,11 +16,20 @@ import {
   invalidateListingActivity,
   writeListingToCaches,
 } from '@/lib/query-refresh';
+import {
+  PROFILE_COMPLETION_COPY,
+  profileCompletionIssues,
+} from '@/lib/profile-readiness';
 
 export default function SellPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { primaryCommunityId } = useAuth();
+  const { primaryCommunityId, userId } = useAuth();
+  const meQuery = useQuery({
+    queryKey: ['me', userId],
+    queryFn: fetchMe,
+    enabled: Boolean(userId),
+  });
   const [values, setValues] = useState<ListingFormValues>(
     DEFAULT_LISTING_FORM_VALUES,
   );
@@ -33,6 +42,12 @@ export default function SellPage() {
 
     if (!primaryCommunityId) {
       setError('Join a community before listing an item.');
+      return;
+    }
+
+    const issues = profileCompletionIssues(meQuery.data);
+    if (issues.length > 0) {
+      setError('Complete your profile before publishing a listing.');
       return;
     }
 
@@ -91,6 +106,49 @@ export default function SellPage() {
             className="app-action-primary mt-5 px-4 py-2 text-sm"
           >
             Join community
+          </Link>
+        </section>
+      </main>
+    );
+  }
+
+  const issues = profileCompletionIssues(meQuery.data);
+  const blockingIssue = issues[0];
+
+  if (meQuery.isLoading) {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-10">
+        <section className="app-panel p-6">
+          <h1 className="text-2xl font-semibold">Checking your profile</h1>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+            Sellr verifies your community and profile before publishing.
+          </p>
+        </section>
+      </main>
+    );
+  }
+
+  if (blockingIssue) {
+    const copy = PROFILE_COMPLETION_COPY[blockingIssue];
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-10">
+        <section className="app-panel p-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
+            Profile required
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold">{copy.title}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+            {copy.body}
+          </p>
+          <Link
+            href={
+              blockingIssue === 'community_membership'
+                ? '/onboarding'
+                : '/dashboard#profile'
+            }
+            className="app-action-primary mt-5 px-4 py-2 text-sm"
+          >
+            {copy.action}
           </Link>
         </section>
       </main>

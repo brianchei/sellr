@@ -9,6 +9,7 @@ import { notifyUser } from '../../lib/notifyUser';
 import { ok } from '../../lib/response';
 import { emitToUsers } from '../../lib/socket';
 import { verifyJWT } from '../../middleware/auth';
+import { requireHighIntentProfile } from '../../lib/profileRequirements';
 
 type UserTrustProfile = {
   id: string;
@@ -366,6 +367,9 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         return reply
           .code(403)
           .send({ error: 'Not a member of this community' });
+      }
+      if (!(await requireHighIntentProfile(request, reply))) {
+        return;
       }
       const buyerId = request.user.sub;
       const sellerId = listing.sellerId;

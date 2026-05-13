@@ -24,6 +24,14 @@ The current web SLC includes:
 - Admin-only community setup for invite codes and member role/status management.
 - Dashboard profile/trust preview and seller readiness panel.
 - Vercel Web Analytics and Speed Insights in the web app root layout.
+- Phase 1 web polish: refreshed public landing page, production brand assets,
+  metadata/icons, interactive app preview, warm gradient app shell, elevated app
+  panels, high-contrast actions, and updated marketplace/listing/messaging/admin
+  visual surfaces.
+- Phase 2 identity hardening has started: web auth retries session hydration
+  through refresh-cookie rotation, phone fallback sign-in normalizes US numbers
+  to E.164 `+1`, and listing post/contact seller actions now require a real
+  display name, verified contact, and active community membership.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -229,16 +237,33 @@ Without it, local DB integration suites are skipped by the repo safety guard.
   blocker for the SLC.
 - Watch Railway, Resend, and media health during the first real-user wave.
 - Seed enough high-quality active listings for the initial UW-Madison launch.
+- Run a production visual smoke pass after the Phase 1 design refresh is live on
+  `https://sellr-ai.com`.
+- Add real landing-page proof, testimonials, statistics, and approved
+  campus/member/listing imagery only after those assets are available and
+  approved.
 - Consider converting the API to a true ESM production build later, replacing
   the current `tsx src/index.ts` production start workaround.
 
 ## Suggested Next Request
 
-Ask the next session to help with launch operations:
+If staying in launch mode, ask the next session to help with launch operations:
 
 ```text
 Read AGENTS.md, docs/current-state-and-scope.md, and docs/next-session-context.md.
 Help operate the initial Sellr campus launch: seed or review launch listings,
 verify admin/community access, run media health checks, watch Railway/Resend
 logs, and record any launch notes. Do not add new product scope.
+```
+
+If continuing product development, continue Phase 2 profile and auth hardening:
+
+```text
+Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
+docs/design-language.md, and docs/next-session-context.md. Continue with Phase 2:
+profile and auth hardening. The first slice already shipped refresh-cookie retry,
+US phone normalization, and profile-completion gates for posting/contacting.
+Next focus: profile page/refinement, profile photo upload/customization, and
+clearer trust/profile progress UI. Do not expand marketplace scope beyond the web
+SLC.
 ```

@@ -140,7 +140,8 @@ export async function createUser(
               overrides.emailVerified === false ? null : new Date(),
           }
         : {}),
-      displayName: overrides.displayName ?? `Member ${contactLabel.slice(-4)}`,
+      displayName:
+        overrides.displayName ?? `Test Member ${contactLabel.slice(-4)}`,
       verifiedAt: overrides.verified === false ? null : new Date(),
     },
   });
