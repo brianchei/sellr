@@ -64,6 +64,86 @@ async function adminCommunityIdsFor(userId: string): Promise<string[]> {
 }
 
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
+  fastify.get(
+    '/:communityId',
+    { preHandler: verifyJWT },
+    async (request, reply) => {
+      const { communityId } = CommunityAdminParamsSchema.parse(request.params);
+      const membership = await prisma.communityMember.findUnique({
+        where: {
+          userId_communityId: {
+            userId: request.user.sub,
+            communityId,
+          },
+        },
+        include: {
+          community: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+              accessMethod: true,
+              emailDomain: true,
+              rules: true,
+              status: true,
+              createdAt: true,
+            },
+          },
+        },
+      });
+
+      if (
+        !membership ||
+        membership.status !== 'active' ||
+        membership.community.status !== 'active'
+      ) {
+        return reply
+          .code(403)
+          .send({ error: 'Not a member of this community' });
+      }
+
+      const [memberCount, activeListingCount, activeSellers] =
+        await Promise.all([
+          prisma.communityMember.count({
+            where: {
+              communityId,
+              status: 'active',
+            },
+          }),
+          prisma.listing.count({
+            where: {
+              communityId,
+              status: 'active',
+            },
+          }),
+          prisma.listing.findMany({
+            where: {
+              communityId,
+              status: 'active',
+            },
+            distinct: ['sellerId'],
+            select: { sellerId: true },
+          }),
+        ]);
+
+      return reply.send(
+        ok({
+          community: membership.community,
+          membership: {
+            role: membership.role,
+            status: membership.status,
+            joinedAt: membership.joinedAt,
+          },
+          stats: {
+            activeMemberCount: memberCount,
+            activeListingCount,
+            activeSellerCount: activeSellers.length,
+          },
+        }),
+      );
+    },
+  );
+
   fastify.post(
     '/join',
     {

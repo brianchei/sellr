@@ -7,6 +7,7 @@ import {
   addMember,
   buildTestApp,
   createCommunity,
+  createListing,
   createUser,
   prisma,
   truncateAll,
@@ -26,6 +27,73 @@ describe.skipIf(!integrationDbAvailable)('communities integration', () => {
 
   beforeEach(async () => {
     await truncateAll();
+  });
+
+  describe('GET /api/v1/communities/:communityId', () => {
+    it('returns member-visible community details and stats', async () => {
+      const member = await createUser();
+      const seller = await createUser({ displayName: 'Seller User' });
+      const community = await createCommunity({ name: 'Launch Community' });
+      await addMember(member.id, community.id, 'member');
+      await addMember(seller.id, community.id, 'member');
+      await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        title: 'Desk lamp',
+      });
+      await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        title: 'Draft item',
+        status: 'draft',
+      });
+
+      const res = await app.inject({
+        method: 'GET',
+        url: `/api/v1/communities/${community.id}`,
+        headers: { cookie: await accessCookieFor(app, member.id) },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = res.json<{
+        data: {
+          community: { id: string; name: string };
+          membership: { role: string; status: string };
+          stats: {
+            activeMemberCount: number;
+            activeListingCount: number;
+            activeSellerCount: number;
+          };
+        };
+      }>();
+      expect(body.data.community).toEqual(
+        expect.objectContaining({
+          id: community.id,
+          name: 'Launch Community',
+        }),
+      );
+      expect(body.data.membership).toEqual(
+        expect.objectContaining({ role: 'member', status: 'active' }),
+      );
+      expect(body.data.stats).toEqual({
+        activeMemberCount: 2,
+        activeListingCount: 1,
+        activeSellerCount: 1,
+      });
+    });
+
+    it('rejects users outside the community', async () => {
+      const user = await createUser();
+      const community = await createCommunity();
+
+      const res = await app.inject({
+        method: 'GET',
+        url: `/api/v1/communities/${community.id}`,
+        headers: { cookie: await accessCookieFor(app, user.id) },
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
   });
 
   describe('GET /api/v1/communities/admin', () => {

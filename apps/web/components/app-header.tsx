@@ -28,6 +28,10 @@ function isActive(pathname: string, href: string): boolean {
   return pathname.startsWith(href + '/');
 }
 
+function communityHomeHref(communityId: string): string {
+  return `/communities/${communityId}`;
+}
+
 export function AppHeader() {
   const {
     communities,
@@ -125,12 +129,14 @@ export function AppHeader() {
                 if (canSwitchCommunity) {
                   setCommunityOpen((value) => !value);
                   setAccountOpen(false);
+                } else if (primaryCommunityId) {
+                  router.push(communityHomeHref(primaryCommunityId));
                 }
               }}
               aria-label={
                 canSwitchCommunity
                   ? 'Switch active community'
-                  : 'Current community'
+                  : 'Open current community'
               }
               aria-expanded={canSwitchCommunity ? communityOpen : undefined}
               className="inline-flex max-w-[190px] items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
@@ -161,6 +167,16 @@ export function AppHeader() {
                   <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
                     Active community
                   </p>
+                  {primaryCommunityId ? (
+                    <Link
+                      href={communityHomeHref(primaryCommunityId)}
+                      role="menuitem"
+                      onClick={() => setCommunityOpen(false)}
+                      className="mx-1 mb-1 block rounded-xl bg-[var(--color-brand-primary-soft)] px-3 py-2 text-sm font-semibold text-[var(--color-brand-primary-strong)] no-underline hover:bg-[var(--color-brand-primary-muted)]"
+                    >
+                      Open community home
+                    </Link>
+                  ) : null}
                   {communities?.map((community) => {
                     const active = community.id === primaryCommunityId;
                     return (
@@ -328,6 +344,16 @@ export function AppHeader() {
                       />
                     </>
                   ) : null}
+                  {primaryCommunityId ? (
+                    <Link
+                      href={communityHomeHref(primaryCommunityId)}
+                      role="menuitem"
+                      onClick={() => setAccountOpen(false)}
+                      className="mx-2 block rounded-xl px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
+                    >
+                      Community home
+                    </Link>
+                  ) : null}
                   <Link
                     href="/dashboard"
                     role="menuitem"
@@ -394,6 +420,15 @@ export function AppHeader() {
                   <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
                     {primaryCommunity.name}
                   </p>
+                  {primaryCommunityId ? (
+                    <Link
+                      href={communityHomeHref(primaryCommunityId)}
+                      onClick={() => setDrawerOpen(false)}
+                      className="mt-3 inline-flex text-xs font-semibold text-[var(--color-brand-contrast)] no-underline hover:underline"
+                    >
+                      Open community home
+                    </Link>
+                  ) : null}
                   {canSwitchCommunity ? (
                     <div className="mt-3 grid gap-1">
                       {communities?.map((community) => {

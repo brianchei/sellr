@@ -17,6 +17,9 @@ React Query, and typed helpers from `@sellr/api-client`.
 - `/profile`: dedicated profile management with display name editing, profile
   photo upload, verified contact display, storefront access, and readiness
   guidance.
+- `/communities/[communityId]`: member-only community homepage with membership
+  context, marketplace stats, recent listing previews, guidance, and scoped
+  browse/sell actions.
 - `/marketplace`: community-scoped browse, search, filters, and listing cards.
 - `/marketplace/[listingId]`: listing detail, seller trust card, contact seller,
   and report listing.

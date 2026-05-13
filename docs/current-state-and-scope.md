@@ -85,7 +85,9 @@ Included:
   refreshes now connect into this profile surface.
 - Phase 3 community product work has started with a quiet authenticated app-shell
   community indicator/switcher backed by active community summaries from
-  `/auth/me`.
+  `/auth/me`, plus a member-only `/communities/[communityId]` homepage for
+  community details, membership context, stats, guidance, recent listings, and
+  browse/sell actions scoped to that community.
 
 ## Deliberately Deferred
 

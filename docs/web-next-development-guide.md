@@ -222,10 +222,13 @@ Shipped:
 - `/auth/me` now returns active community summaries for the signed-in user.
 - The authenticated app shell now shows the active community quietly; users with
   multiple active memberships can switch context from the header.
+- Added a member-only `/communities/[communityId]` homepage backed by
+  `GET /communities/:communityId`, with community details, membership context,
+  active member/listing/seller stats, recent listing previews, guidance, and
+  browse/sell CTAs scoped to that community.
 
 Work items:
 
-- Add community homepage.
 - Add option to leave a community.
 - Add lightweight community theme/config data.
 - Create a decorated Badger Market community experience.
@@ -486,3 +489,11 @@ Keep this guide aligned with:
 - Added dashboard profile-readiness guidance and widened profile-save cache
   invalidation so avatar/display-name changes propagate to seller cards,
   storefronts, listing detail, and inbox surfaces.
+
+### Phase 3 Start
+
+- Added active community summaries to the signed-in auth context and a quiet
+  app-shell community indicator/switcher.
+- Added a member-only community homepage at `/communities/[communityId]` with a
+  community detail API, membership context, active marketplace stats, recent
+  listing previews, community guidance, and scoped browse/sell actions.
