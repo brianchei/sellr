@@ -102,8 +102,10 @@ Included:
   and edit basic community details, access method, email domain, and
   member-facing rules/guidance. The admin member list supports search, role and
   status filters, clearer access action labels, and empty states for larger
-  communities. The reports dashboard now surfaces target member context and
-  links admins into the relevant community/member management view.
+  communities. The reports dashboard now surfaces target member context, links
+  admins into the relevant community/member management view, and lets admins
+  demote reported admins or deactivate member access from report cards while
+  keeping report status review separate.
 
 ## Deliberately Deferred
 

@@ -250,13 +250,17 @@ Shipped:
 - Connected `/admin/reports` to member management by adding target member
   context and a `Manage member` CTA that opens `/admin/community` with the
   relevant community and member search context.
+- Added scoped report-linked moderation actions on `/admin/reports` so admins
+  can demote reported admins or deactivate member access from the report card
+  while keeping report status review separate.
 
 Work items:
 
 - Add richer community branding/theme config and optional imagery.
 - Expand the decorated Badger Market experience with approved imagery or
   additional admin-editable fields when available.
-- Add deeper report-linked moderation actions beyond navigation.
+- Add audit-friendly moderation history or richer suspension semantics if the
+  launch workflow needs them.
 
 Acceptance notes:
 
@@ -389,13 +393,15 @@ Completed in Phase 3:
 - Add admin-editable community details and rules/guidance.
 - Improve member management in the admin dashboard.
 - Connect reports to member management.
+- Add scoped report-linked demote/deactivate actions.
 
 Remaining:
 
 - Expand Badger Market / UW-Madison decoration with approved imagery or
   additional admin-editable fields.
 - Add richer branding/theme controls to admin dashboard.
-- Add deeper report-linked moderation actions beyond navigation.
+- Add audit-friendly moderation history or richer suspension semantics if the
+  launch workflow needs them.
 
 ### Profile And Trust
 
@@ -440,9 +446,10 @@ Remaining:
 
 ### Admin And Safety
 
-- Allow admin to disable or suspend member from reports.
-- Add report-linked suspension or deactivation controls.
-- Expand admin community controls.
+- Add audit history for report-linked member actions if needed.
+- Consider richer suspension semantics beyond the current inactive-member
+  access control.
+- Expand admin community controls only when they directly support launch ops.
 
 ### AI
 
@@ -556,3 +563,6 @@ Keep this guide aligned with:
   labels, and empty states to `/admin/community`.
 - Added target member context and `Manage member` links to `/admin/reports` so
   admins can move from a report to the relevant `/admin/community` member view.
+- Added report-linked member actions to `/admin/reports` so admins can demote a
+  reported admin or deactivate member access from a report card, with explicit
+  confirmation copy and separate report status review.
