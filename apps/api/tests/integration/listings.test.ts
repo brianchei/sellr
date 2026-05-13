@@ -89,6 +89,24 @@ describe.skipIf(!integrationDbAvailable)('listings integration', () => {
       expect(count).toBe(0);
     });
 
+    it('requires profile completion before creating a listing', async () => {
+      const seller = await createUser({ displayName: 'Member 1234' });
+      const community = await createCommunity();
+      await addMember(seller.id, community.id);
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/v1/listings',
+        headers: { cookie: await accessCookieFor(app, seller.id) },
+        payload: validListingPayload(community.id),
+      });
+
+      expect(res.statusCode).toBe(403);
+      const body = res.json<{ code: string; issues: string[] }>();
+      expect(body.code).toBe('PROFILE_COMPLETION_REQUIRED');
+      expect(body.issues).toContain('display_name');
+    });
+
     it('returns 401 without an access cookie', async () => {
       const community = await createCommunity();
       const res = await app.inject({

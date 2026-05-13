@@ -1,6 +1,6 @@
 # Sellr Web Next Development Guide
 
-Last updated: May 11, 2026.
+Last updated: May 12, 2026.
 
 Use this as the living guide for the next wave of Sellr web work after the
 current SLC/MVP. Update it as implementation progresses, decisions change, or
@@ -19,6 +19,11 @@ The next product direction is not broad marketplace expansion. It is focused on
 making Sellr feel more polished, community-native, trustworthy, and recognizably
 designed for the first campus launch while preserving the ability to support
 future communities.
+
+The Phase 1 brand, landing, and app-wide visual polish pass has now shipped in
+the web app. The remaining Phase 1 work is not new product functionality: it is
+production visual smoke testing after deploy and adding real launch proof,
+testimonials, statistics, and approved imagery once those assets exist.
 
 ## Product Theme
 
@@ -128,7 +133,9 @@ reputation scoring before the product supports those claims.
 Goal: make the current product feel intentional and launch-ready without
 changing core backend contracts.
 
-Work items:
+Status: shipped, with content-proof follow-ups remaining.
+
+Shipped:
 
 - Remake the landing page around the community marketplace value proposition.
 - Add favicon and verify app metadata/icons.
@@ -139,9 +146,17 @@ Work items:
 - Fix the dashboard mobile issue where the welcome-back element stretches text
   vertically.
 - Review loading, empty, and error states for brand consistency.
+
+Remaining Phase 1 follow-ups:
+
+- Run a production visual smoke pass after the merged design refresh is deployed.
 - Add real social proof, usage statistics, testimonials, and student/seller
   photos once they are available from launch usage or approved community
   sources.
+- Replace illustrative landing preview/listing imagery with approved real
+  product, campus, seed-listing, or member imagery where it improves trust.
+- Keep checking loading, empty, and error states for consistency as Phase 2+
+  surfaces are added.
 
 Acceptance notes:
 
@@ -160,21 +175,32 @@ Acceptance notes:
 Goal: make identity reliable enough to support trust, posting, and contact
 requirements.
 
-Work items:
+Status: started.
 
-- Ensure login persists across refreshes and normal device/browser sessions.
+Shipped:
+
+- Web auth hydration now retries `/auth/me` through `/auth/refresh` when the
+  short-lived access cookie expires but the httpOnly refresh cookie is still
+  valid.
+- Phone sign-in now uses US-default input and normalizes valid US numbers to
+  E.164 `+1` format before OTP API calls.
+- Shared profile completion rules now require a real display name, verified
+  email or phone, and active community membership before high-intent actions.
+- Posting listings and contacting sellers are blocked on the API and reflected
+  in web UI with profile-completion calls to action.
+
+Remaining work items:
+
 - Add or refine the profile page.
 - Add profile photo upload and basic profile customization.
 - Add profile completion state and trust/profile progress UI.
-- Hard-require full name or real display name before posting/contacting.
-- Keep verified email or verified phone as an essential trust requirement.
-- Change phone number input UX to assume US numbers by default.
-- Normalize US phone input to E.164 `+1` format before API calls.
+- Expand profile completion UI beyond the dashboard prompt where useful.
 - Show seller identity info on user listings where it improves trust.
 
 Acceptance notes:
 
-- Users should not be surprised by being signed out after a refresh.
+- Users should not be surprised by being signed out after a refresh while a
+  refresh cookie is still valid.
 - Phone entry should feel local and simple, while stored data remains normalized.
 - Profile completion should guide users instead of blocking them everywhere.
 
@@ -280,15 +306,23 @@ Acceptance notes:
 
 ### UI/UX And Branding
 
-- Upgrade and revamp UI/UX.
-- Remake landing page.
-- Integrate logo and branding more into the app.
-- Make logo and branding more prevalent.
-- Add favicon.
-- Make design community-first and campus-aware.
-- Keep UI simple, opinionated, and recognizable.
-- Fix mobile landing page hero cutoff.
-- Fix mobile dashboard welcome-back layout issue.
+Completed in Phase 1:
+
+- Upgraded and revamped the web UI/UX around the refreshed Sellr design
+  language.
+- Remade the landing page around community-first marketplace positioning.
+- Integrated logo, favicon, Apple touch icon, metadata, and production brand
+  assets across public and authenticated web surfaces.
+- Made the design more community-first, campus-aware, simple, opinionated, and
+  recognizable.
+- Fixed the mobile landing hero cutoff and mobile dashboard greeting layout
+  issue.
+- Added a warm gradient app shell, modern rounded panels, high-contrast
+  black/yellow action styling, and refreshed cards/forms/inbox/listing/admin
+  surfaces.
+
+Remaining Phase 1 content follow-ups:
+
 - Collect and add real landing-page proof later:
   - verified launch member count.
   - active listing count.
@@ -326,9 +360,14 @@ Acceptance notes:
 
 ### Auth And Identity
 
+Started in Phase 2:
+
 - Improve login persistence across refresh and device sessions.
 - Change phone input to US-default phone number entry.
 - Normalize phone numbers to `+1` E.164 internally.
+
+Remaining:
+
 - Keep email-first auth as primary web path.
 - Keep phone auth as fallback and identity completion path.
 
@@ -395,3 +434,31 @@ Keep this guide aligned with:
   final CTA.
 - Kept testimonials and pricing honest for launch by using trust commitments
   and simple launch access instead of fake quotes or paid tiers.
+- Refined the landing hero headline to `Buy and sell locally in your community`.
+- Replaced generic product mockups with an interactive Sellr app preview showing
+  marketplace, listing detail, inbox, seller context, contact CTA, and pickup
+  radius controls.
+- Removed internal/developer-facing landing copy and kept future proof,
+  testimonials, statistics, and image needs in this guide instead.
+- Applied the refreshed design language across the authenticated app shell,
+  login/onboarding, dashboard, marketplace, listing detail, listing form,
+  seller inventory, inbox, notifications, seller storefront, reports, community
+  admin, shared cards, dialogs, and form surfaces.
+- Added reusable app-surface utilities for the warm gradient shell, rounded
+  elevated panels, soft panels, chips, and high-contrast primary/secondary app
+  actions.
+- Verification reported for this Phase 1 pass: `pnpm --filter @sellr/web lint`,
+  `pnpm --filter @sellr/web typecheck`, `pnpm --filter @sellr/web build`, and
+  desktop/mobile browser checks for landing and key app entry points.
+
+### Phase 2 Start
+
+- Added shared profile completion helpers for high-intent actions.
+- Updated web auth hydration to rotate the httpOnly refresh cookie and retry
+  session loading when the access cookie expires.
+- Updated phone fallback login to accept local US phone input and normalize to
+  E.164 `+1` before OTP send/verify calls.
+- Enforced profile completion before listing creation/publish and seller contact
+  in the API, with matching web UI blocks that route users to `/dashboard#profile`
+  or onboarding.
+- Added focused shared and API tests for profile completion behavior.

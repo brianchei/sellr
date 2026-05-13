@@ -10,8 +10,10 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  ApiError,
   fetchMe,
   logout as logoutApi,
+  refreshTokens,
   setAccessToken,
 } from '@sellr/api-client';
 
@@ -51,7 +53,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshSession = useCallback(async () => {
     try {
-      const me = await fetchMe();
+      let me: Awaited<ReturnType<typeof fetchMe>>;
+      try {
+        me = await fetchMe();
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.status !== 401) {
+          throw error;
+        }
+        // The web app stores the long-lived refresh token in an httpOnly cookie.
+        // If the short-lived access cookie expired, rotate it and retry /me once.
+        await refreshTokens();
+        me = await fetchMe();
+      }
       setState({
         hydrated: true,
         hasToken: true,
@@ -77,7 +90,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Cookie-backed auth needs one client-side hydration check on app load.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshSession();
   }, [refreshSession]);
 

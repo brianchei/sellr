@@ -6,6 +6,9 @@ React Query, and typed helpers from `@sellr/api-client`.
 
 ## Current SLC Routes
 
+- `/`: refreshed public landing page with community-first positioning,
+  production brand assets, interactive Sellr app preview, launch access copy,
+  trust commitments, FAQ, and final CTA.
 - `/login`: email OTP sign-in for web cookie sessions, with phone OTP fallback.
 - `/onboarding`: join a verified community with a verified email domain or an
   invite code.
@@ -78,6 +81,22 @@ the matching dashboard-side Vercel features for the project if metrics are not
 appearing.
 
 See `../../docs/deployment.md` for the full deployment notes.
+
+## Web Design System
+
+The Phase 1 web polish pass is reflected in `app/globals.css` and shared
+components:
+
+- Public landing uses the community marketplace story, Figma-inspired visual
+  rhythm, gradients, and `components/landing-app-preview.tsx`.
+- Authenticated surfaces use `app-shell-bg`, `app-panel`, `app-panel-soft`,
+  `app-chip`, `app-action-primary`, and `app-action-secondary`.
+- App surfaces should preserve the refreshed modern marketplace language while
+  staying task-focused: clear hierarchy, honest trust cues, compact metadata,
+  and no decorative controls that do not work.
+
+See `../../docs/design-language.md` and
+`../../docs/web-next-development-guide.md` before adding new web surfaces.
 
 ## Verification
 

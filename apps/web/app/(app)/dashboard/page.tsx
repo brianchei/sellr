@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { hasRealDisplayName } from '@sellr/shared';
 import {
   fetchConversations,
   fetchMe,
@@ -909,7 +910,7 @@ function ProfileSection({
   const { data, isLoading, isError, error } = meQuery;
 
   return (
-    <section className="app-panel mt-8 p-5">
+    <section id="profile" className="app-panel mt-8 scroll-mt-24 p-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
@@ -972,8 +973,8 @@ function ProfileEditor({
     event.preventDefault();
     const trimmed = displayName.trim();
 
-    if (trimmed.length < 2) {
-      setFormError('Use at least 2 characters for your display name.');
+    if (!hasRealDisplayName(trimmed)) {
+      setFormError('Use your real name or a recognizable display name.');
       return;
     }
     if (trimmed.length > 60) {

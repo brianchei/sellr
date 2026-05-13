@@ -149,6 +149,31 @@ describe.skipIf(!integrationDbAvailable)('conversations integration', () => {
       expect(res.statusCode).toBe(400);
     });
 
+    it('requires profile completion before contacting a seller', async () => {
+      const seller = await createUser({ displayName: 'Sam Seller' });
+      const buyer = await createUser({ displayName: 'Member 1234' });
+      const community = await createCommunity();
+      await addMember(seller.id, community.id);
+      await addMember(buyer.id, community.id);
+      const listing = await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        status: 'active',
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/v1/conversations',
+        headers: { cookie: await accessCookieFor(app, buyer.id) },
+        payload: { listingId: listing.id },
+      });
+
+      expect(res.statusCode).toBe(403);
+      const body = res.json<{ code: string; issues: string[] }>();
+      expect(body.code).toBe('PROFILE_COMPLETION_REQUIRED');
+      expect(body.issues).toContain('display_name');
+    });
+
     it('rejects contact across community boundaries', async () => {
       const seller = await createUser();
       const outsider = await createUser();

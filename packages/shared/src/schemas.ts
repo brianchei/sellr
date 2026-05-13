@@ -1,6 +1,53 @@
 import { z } from 'zod';
 import { ListingCondition, ListingStatus } from './enums';
 
+export type ProfileCompletionIssue =
+  | 'display_name'
+  | 'verified_contact'
+  | 'community_membership';
+
+export type ProfileCompletionInput = {
+  displayName?: string | null;
+  emailVerifiedAt?: Date | string | null;
+  phoneE164?: string | null;
+  verifiedAt?: Date | string | null;
+  communityIds?: readonly string[] | null;
+};
+
+export function hasRealDisplayName(displayName: string | null | undefined) {
+  const value = displayName?.trim() ?? '';
+  if (value.length < 2) return false;
+  if (/^member\s+\d{4}$/i.test(value)) return false;
+  if (/^sellr\s+member$/i.test(value)) return false;
+  return true;
+}
+
+export function hasVerifiedContact(profile: ProfileCompletionInput) {
+  return Boolean(
+    profile.emailVerifiedAt || (profile.phoneE164 && profile.verifiedAt),
+  );
+}
+
+export function getProfileCompletionIssues(
+  profile: ProfileCompletionInput,
+): ProfileCompletionIssue[] {
+  const issues: ProfileCompletionIssue[] = [];
+
+  if (!hasRealDisplayName(profile.displayName)) {
+    issues.push('display_name');
+  }
+
+  if (!hasVerifiedContact(profile)) {
+    issues.push('verified_contact');
+  }
+
+  if (profile.communityIds && profile.communityIds.length === 0) {
+    issues.push('community_membership');
+  }
+
+  return issues;
+}
+
 export const LISTING_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
 export const LISTING_IMAGE_MAX_COUNT = 8;
 export const LISTING_IMAGE_UPLOAD_PATH_PREFIX =
@@ -66,7 +113,14 @@ export const RegisterPushTokenSchema = z.object({
 });
 
 export const UpdateProfileSchema = z.object({
-  displayName: z.string().trim().min(2).max(60),
+  displayName: z
+    .string()
+    .trim()
+    .min(2)
+    .max(60)
+    .refine(hasRealDisplayName, {
+      error: 'Use your real name or a recognizable display name.',
+    }),
   avatarUrl: z.url().max(2048).nullable().optional(),
 });
 

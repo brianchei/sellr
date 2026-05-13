@@ -1,5 +1,7 @@
 # Sellr Design Language
 
+Last updated: May 12, 2026.
+
 Sellr is a trust-native local marketplace for high-trust, peer-to-peer commerce. The product should feel structured, local, approachable, and safer than a generic listing board. It should be bright enough to feel memorable, but calm enough that buyers and sellers can scan listings, make decisions, and complete tasks quickly.
 
 ## Product Feel
@@ -24,7 +26,10 @@ The visual language should support confidence: clean hierarchy, obvious actions,
 
 ## Color System
 
-The Sellr logo uses mustard and white. Mustard is the primary brand color for the app, while dusty grape provides contrast, structure, and accessible action states where mustard would be too light.
+The Sellr logo uses mustard and white. Mustard is the primary brand color and
+highlight color. The refreshed web app pairs mustard with ink/black surfaces for
+high-contrast primary actions, while dusty grape, mint, and warm coral support
+focus, trust-positive, and warning/destructive states.
 
 ## Brand Assets
 
@@ -78,12 +83,18 @@ over recreating the mark in CSS or inline SVG.
 
 ### Usage Rules
 
-- Use mustard as the primary app color, but pair it with dark text, not white text.
+- Use mustard as the recognizable brand signal, but pair it with dark text or
+  dark surfaces rather than white text.
+- In the refreshed web app, primary task actions may use an ink/black background
+  with mustard text when that improves contrast and makes the action feel
+  decisive.
 - Use dusty grape when white text is required on a colored background.
 - Use tropical mint for trust-positive cues such as verified, local, available, or pickup-friendly states.
 - Use coral sparingly for destructive or high-attention states.
 - Use soft periwinkle for quiet secondary UI, not as the dominant page color.
-- Avoid full-page rainbow gradients. The provided gradients may be used only for rare brand moments, marketing artwork, or small decorative treatments.
+- Use warm brand gradients intentionally. The current web app uses a soft
+  mustard/off-white/periwinkle app shell and stronger marketing gradients on the
+  landing page; avoid introducing unrelated rainbow gradients.
 - Do not make the interface feel one-note purple. Mustard should remain the recognizable brand signal, supported by grape and mint.
 
 ### Accessibility Notes
@@ -115,6 +126,7 @@ Sellr should use a **hybrid marketplace shell**.
 The app should combine a focused product shell with a consumer-friendly marketplace browsing experience:
 
 - Compact top navigation for authenticated web flows.
+- Warm gradient authenticated app shell with glassy/elevated panels.
 - Responsive marketplace grid with clear image, price, condition, and location hierarchy.
 - Seller forms that feel structured and guided, not like a generic blank form.
 - Dashboard and account areas that are denser and more operational.
@@ -131,22 +143,30 @@ The app should combine a focused product shell with a consumer-friendly marketpl
 
 ## Shape, Spacing, and Elevation
 
-Sellr should feel polished and sturdy rather than bubbly.
+Sellr should feel polished, modern, and sturdy rather than bubbly. The refreshed
+web app uses larger rounded panels for warmth, while keeping controls and dense
+marketplace content compact enough to scan.
 
-- Default radius: `8px`.
-- Compact controls: `6px` to `8px`.
+- Default utility/control radius: `8px` to `12px`.
+- Refreshed app panels: `24px`.
+- Soft marketing and preview cards: `20px` to `32px` depending on scale.
+- Compact controls: `8px` to `12px`.
 - Badges and pills: fully rounded.
-- Listing cards: `8px`.
-- Modals and larger panels: `10px` to `12px` when extra softness helps.
-- Shadows should be subtle and used for layering, not decoration.
-- Borders should do most of the structural work.
+- Listing cards: generally `20px` to `24px` in the refreshed web app.
+- Modals and larger panels: `20px` to `24px` when extra softness helps.
+- Shadows should be soft and used for layering, not decoration.
+- Borders should still do most of the structural work.
 
 ## Components
 
 ### Buttons
 
-- Primary buttons should use mustard background with ink text.
-- Secondary buttons should use white or canvas surfaces with border and grape text.
+- Primary web app actions should use the refreshed `app-action-primary` pattern:
+  ink/black background, mustard text, pill radius, and a small lift on hover.
+- Legacy or marketing primary buttons may still use mustard background with ink
+  text when that fits the surrounding section.
+- Secondary buttons should use white or canvas surfaces with borders and ink or
+  grape text.
 - High-contrast alternate buttons may use dusty grape background with white text.
 - Destructive buttons should use coral or a standard red token with clear copy.
 - Buttons should include icons where they improve recognition, especially for navigation and tool-like actions.
@@ -163,6 +183,22 @@ Listing cards should prioritize:
 6. Seller/trust signal where available.
 
 Cards should avoid decorative clutter. Badges should clarify trust, condition, availability, or community context.
+
+### App Surfaces
+
+The refreshed web app uses reusable surface utilities:
+
+- `app-shell-bg`: warm gradient canvas with subtle grid texture for authenticated
+  surfaces and standalone auth pages.
+- `app-panel`: elevated white panel for primary cards, forms, empty states, and
+  admin surfaces.
+- `app-panel-soft`: warmer panel treatment for hero/dashboard/preview surfaces.
+- `app-chip`: compact pill for metadata and quiet status cues.
+- `app-action-primary` and `app-action-secondary`: primary and secondary app
+  action patterns.
+
+Prefer these utilities for new web surfaces before introducing one-off panel or
+button styles.
 
 ### Forms
 
@@ -195,6 +231,8 @@ Motion should be minimal and functional:
 - Gentle loading skeletons.
 - Short transitions for menus, filters, and form feedback.
 - No decorative ambient motion in core marketplace flows.
+- Interactive marketing elements are acceptable when they demonstrate the actual
+  product, such as the landing page app preview tabs and pickup-radius control.
 
 ## Content Voice
 
@@ -248,3 +286,5 @@ Avoid:
 - Keep Inter unless there is a later brand reason to revisit typography.
 - Prefer completing the marketplace, seller listing, listing detail, and contact flows before investing in decorative brand moments.
 - Use the design language as a product filter: bright, local, trustworthy, complete.
+- Keep `docs/web-next-development-guide.md` as the source of truth for phase
+  status and remaining product direction.

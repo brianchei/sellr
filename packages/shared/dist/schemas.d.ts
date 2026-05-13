@@ -1,5 +1,16 @@
 import { z } from 'zod';
 import { ListingCondition, ListingStatus } from './enums';
+export type ProfileCompletionIssue = 'display_name' | 'verified_contact' | 'community_membership';
+export type ProfileCompletionInput = {
+    displayName?: string | null;
+    emailVerifiedAt?: Date | string | null;
+    phoneE164?: string | null;
+    verifiedAt?: Date | string | null;
+    communityIds?: readonly string[] | null;
+};
+export declare function hasRealDisplayName(displayName: string | null | undefined): boolean;
+export declare function hasVerifiedContact(profile: ProfileCompletionInput): boolean;
+export declare function getProfileCompletionIssues(profile: ProfileCompletionInput): ProfileCompletionIssue[];
 export declare const LISTING_IMAGE_MAX_BYTES: number;
 export declare const LISTING_IMAGE_MAX_COUNT = 8;
 export declare const LISTING_IMAGE_UPLOAD_PATH_PREFIX = "/api/v1/uploads/listing-images/";
