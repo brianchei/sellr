@@ -344,6 +344,22 @@ export function joinCommunity(body: {
   });
 }
 
+export function leaveCommunity(
+  communityId: string,
+  body: { removeListings?: boolean },
+) {
+  return apiFetch<{
+    communityId: string;
+    communityIds: string[];
+    removedListingCount: number;
+    accessToken?: string;
+    refreshToken?: string;
+  }>(`/communities/${communityId}/leave`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
 export function fetchCommunityAdmin() {
   return apiFetch<{ communities: ApiCommunityAdminCommunity[] }>(
     '/communities/admin',

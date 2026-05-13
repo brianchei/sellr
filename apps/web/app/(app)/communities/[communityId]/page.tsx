@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchCommunityDetail,
   fetchCommunityListings,
+  fetchMyListings,
+  leaveCommunity,
   type ApiCommunityDetail,
 } from '@sellr/api-client';
 import { ListingCard } from '@/components/listing-card';
@@ -67,8 +69,11 @@ function communityRules(rules: unknown): string[] {
 export default function CommunityHomePage() {
   const params = useParams<{ communityId?: string | string[] }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const communityId = stringParam(params.communityId);
-  const { primaryCommunityId, setPrimaryCommunityId } = useAuth();
+  const { primaryCommunityId, refreshSession, setPrimaryCommunityId } =
+    useAuth();
+  const [leaveError, setLeaveError] = useState<string | null>(null);
 
   const detailQuery = useQuery({
     queryKey: ['community-detail', communityId],
@@ -87,6 +92,46 @@ export default function CommunityHomePage() {
     },
     enabled: Boolean(communityId) && detailQuery.isSuccess,
     refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
+  });
+
+  const myListingsQuery = useQuery({
+    queryKey: ['my-listings', communityId, 'leave-summary'],
+    queryFn: () => {
+      if (!communityId) throw new Error('Community not found.');
+      return fetchMyListings({ communityId, limit: 100 });
+    },
+    enabled: Boolean(communityId) && detailQuery.isSuccess,
+  });
+
+  const leaveMutation = useMutation({
+    mutationFn: ({ removeListings }: { removeListings: boolean }) => {
+      if (!communityId) throw new Error('Community not found.');
+      return leaveCommunity(communityId, { removeListings });
+    },
+    onSuccess: async (result) => {
+      setLeaveError(null);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['me'] }),
+        queryClient.invalidateQueries({ queryKey: ['community-detail'] }),
+        queryClient.invalidateQueries({ queryKey: ['community-home-listings'] }),
+        queryClient.invalidateQueries({ queryKey: ['my-listings'] }),
+      ]);
+      const session = await refreshSession();
+      const nextCommunityId =
+        session?.communityIds.find((id) => id !== result.communityId) ??
+        result.communityIds.find((id) => id !== result.communityId) ??
+        null;
+      router.replace(
+        nextCommunityId ? `/communities/${nextCommunityId}` : '/onboarding',
+      );
+    },
+    onError: (error) => {
+      setLeaveError(
+        error instanceof Error
+          ? error.message
+          : 'Could not leave this community. Try again.',
+      );
+    },
   });
 
   const rules = useMemo(
@@ -138,6 +183,34 @@ export default function CommunityHomePage() {
   const isActiveContext = primaryCommunityId === community.id;
   const presentation = getCommunityPresentation(community);
   const guidanceItems = rules.length > 0 ? rules : presentation.guidanceFallback;
+  const ownedListings = myListingsQuery.data?.listings ?? [];
+  const activeOwnedListingCount = ownedListings.filter(
+    (listing) => listing.status === 'active',
+  ).length;
+  const removableOwnedListingCount = ownedListings.filter((listing) =>
+    ['active', 'draft', 'pending_review'].includes(listing.status),
+  ).length;
+
+  const startLeave = (removeListings: boolean) => {
+    setLeaveError(null);
+    if (activeOwnedListingCount > 0 && !removeListings) {
+      setLeaveError(
+        'Unpublish active listings or choose to remove your listings before leaving.',
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      removeListings
+        ? `Remove ${removableOwnedListingCount.toLocaleString()} listing${
+            removableOwnedListingCount === 1 ? '' : 's'
+          } from ${community.name} and leave this community? This removes them from the marketplace and cannot be undone from this flow.`
+        : `Leave ${community.name}? You will lose access to this community's marketplace, listings, and member context.`,
+    );
+    if (!confirmed) return;
+
+    leaveMutation.mutate({ removeListings });
+  };
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
@@ -308,6 +381,80 @@ export default function CommunityHomePage() {
                 value={formatDate(membership.joinedAt)}
               />
             </dl>
+
+            <div className="mt-5 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4">
+              <h3 className="text-sm font-semibold text-[var(--color-brand-warm-strong)]">
+                Leave community
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-brand-warm-strong)]">
+                Leaving removes your community access. Active listings must be
+                unpublished or removed from the marketplace first.
+              </p>
+
+              {myListingsQuery.isLoading ? (
+                <p className="mt-3 text-xs font-medium text-[var(--color-brand-warm-strong)]">
+                  Checking your listings...
+                </p>
+              ) : activeOwnedListingCount > 0 ? (
+                <p className="mt-3 text-xs font-semibold text-[var(--color-brand-warm-strong)]">
+                  You have {activeOwnedListingCount.toLocaleString()} active{' '}
+                  {activeOwnedListingCount === 1 ? 'listing' : 'listings'} in
+                  this community.
+                </p>
+              ) : (
+                <p className="mt-3 text-xs font-medium text-[var(--color-brand-warm-strong)]">
+                  You have no active marketplace listings blocking leave.
+                </p>
+              )}
+
+              {leaveError ? (
+                <p className="mt-3 rounded-xl bg-white/70 px-3 py-2 text-xs font-semibold text-[var(--color-brand-warm-strong)]">
+                  {leaveError}
+                </p>
+              ) : null}
+
+              <div className="mt-4 grid gap-2">
+                {activeOwnedListingCount > 0 ? (
+                  <Link
+                    href="/listings"
+                    onClick={() => setPrimaryCommunityId(community.id)}
+                    className="app-action-secondary justify-center px-3 py-2 text-xs"
+                  >
+                    Review and unpublish listings
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => startLeave(false)}
+                    disabled={
+                      leaveMutation.isPending || myListingsQuery.isLoading
+                    }
+                    className="rounded-full bg-[var(--color-brand-warm)] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[var(--color-brand-warm-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {leaveMutation.isPending
+                      ? 'Leaving...'
+                      : 'Leave community'}
+                  </button>
+                )}
+
+                {removableOwnedListingCount > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => startLeave(true)}
+                    disabled={
+                      leaveMutation.isPending || myListingsQuery.isLoading
+                    }
+                    className="rounded-full border border-[var(--color-brand-warm)] bg-white/80 px-3 py-2 text-xs font-semibold text-[var(--color-brand-warm-strong)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {leaveMutation.isPending
+                      ? 'Removing...'
+                      : `Remove ${removableOwnedListingCount.toLocaleString()} listing${
+                          removableOwnedListingCount === 1 ? '' : 's'
+                        } and leave`}
+                  </button>
+                ) : null}
+              </div>
+            </div>
           </section>
 
           <section className="app-panel p-5">

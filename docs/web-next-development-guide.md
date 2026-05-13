@@ -229,6 +229,10 @@ Shipped:
 - Added lightweight Badger Market/campus presentation cues on the community
   homepage, including UW-style copy, trust highlights, local-area chips, and
   fallback pickup guidance without a full generic theming system.
+- Added a member community leave flow on `/communities/[communityId]` backed by
+  `POST /communities/:communityId/leave`, with last-admin protection, active
+  listing guards, and a confirmed option to remove the seller's active/draft
+  listings while leaving.
 - Added a signed-in `/communities/join` flow so existing members can join
   another community with an invite code or verified email-domain match, refresh
   their membership context, switch to the new community, and land on its
@@ -244,7 +248,6 @@ Shipped:
 
 Work items:
 
-- Add option to leave a community.
 - Add richer community branding/theme config and optional imagery.
 - Expand the decorated Badger Market experience with approved imagery or
   additional admin-editable fields when available.
@@ -375,13 +378,13 @@ Completed in Phase 3:
 - Add global but quiet community switcher.
 - Add member community homepage.
 - Add lightweight Badger Market / campus presentation cues.
+- Add option to leave community.
 - Add post-login join-another-community flow.
 - Add admin management-community switcher.
 - Add admin-editable community details and rules/guidance.
 
 Remaining:
 
-- Add option to leave community.
 - Expand Badger Market / UW-Madison decoration with approved imagery or
   additional admin-editable fields.
 - Add richer branding/theme controls to admin dashboard.
@@ -529,6 +532,9 @@ Keep this guide aligned with:
 - Added a lightweight community presentation helper so Badger Market and
   `wisc.edu` campus communities get UW-style homepage copy, local pickup cues,
   trust highlights, and campus-specific guidance without new schema fields.
+- Added a community leave flow with active-listing protection, optional
+  confirmed listing removal, session refresh, and fallback routing to another
+  community or onboarding.
 - Added `/communities/join` for existing members to join another community,
   refresh their auth/community context, switch to the newly joined community,
   and continue to its community homepage.

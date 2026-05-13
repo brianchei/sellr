@@ -419,4 +419,115 @@ describe.skipIf(!integrationDbAvailable)('communities integration', () => {
       expect(res.json<{ error: string }>().error).toMatch(/inactive/i);
     });
   });
+
+  describe('POST /api/v1/communities/:communityId/leave', () => {
+    it('lets a member leave after active listings are unpublished', async () => {
+      const member = await createUser();
+      const community = await createCommunity();
+      await addMember(member.id, community.id, 'member');
+      await createListing({
+        sellerId: member.id,
+        communityId: community.id,
+        status: 'draft',
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: `/api/v1/communities/${community.id}/leave`,
+        headers: { cookie: await accessCookieFor(app, member.id) },
+        payload: {},
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(
+        res.json<{
+          data: { communityIds: string[]; removedListingCount: number };
+        }>().data,
+      ).toEqual({ communityIds: [], removedListingCount: 0 });
+      const membership = await prisma.communityMember.findUnique({
+        where: {
+          userId_communityId: {
+            userId: member.id,
+            communityId: community.id,
+          },
+        },
+      });
+      expect(membership).toBeNull();
+    });
+
+    it('requires active listings to be removed before leaving', async () => {
+      const member = await createUser();
+      const community = await createCommunity();
+      await addMember(member.id, community.id, 'member');
+      await createListing({
+        sellerId: member.id,
+        communityId: community.id,
+        status: 'active',
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: `/api/v1/communities/${community.id}/leave`,
+        headers: { cookie: await accessCookieFor(app, member.id) },
+        payload: {},
+      });
+
+      expect(res.statusCode).toBe(409);
+      expect(res.json<{ error: string }>().error).toMatch(/listings/i);
+    });
+
+    it('can remove seller listings while leaving', async () => {
+      const member = await createUser();
+      const community = await createCommunity();
+      await addMember(member.id, community.id, 'member');
+      const activeListing = await createListing({
+        sellerId: member.id,
+        communityId: community.id,
+        status: 'active',
+      });
+      const draftListing = await createListing({
+        sellerId: member.id,
+        communityId: community.id,
+        status: 'draft',
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: `/api/v1/communities/${community.id}/leave`,
+        headers: { cookie: await accessCookieFor(app, member.id) },
+        payload: { removeListings: true },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(
+        res.json<{ data: { removedListingCount: number } }>().data
+          .removedListingCount,
+      ).toBe(2);
+      const listings = await prisma.listing.findMany({
+        where: { id: { in: [activeListing.id, draftListing.id] } },
+        select: { status: true },
+        orderBy: { id: 'asc' },
+      });
+      expect(listings.map((listing) => listing.status)).toEqual([
+        'expired',
+        'expired',
+      ]);
+    });
+
+    it('does not let the last active admin leave', async () => {
+      const admin = await createUser();
+      const community = await createCommunity();
+      await addMember(admin.id, community.id, 'admin');
+
+      const res = await app.inject({
+        method: 'POST',
+        url: `/api/v1/communities/${community.id}/leave`,
+        headers: { cookie: await accessCookieFor(app, admin.id) },
+        payload: {},
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.json<{ error: string }>().error).toMatch(/active admin/i);
+    });
+  });
 });

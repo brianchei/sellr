@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.UpdateCommunityDetailsSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.PROFILE_AVATAR_MIME_TYPES = exports.LISTING_IMAGE_MIME_TYPES = exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX = exports.PROFILE_AVATAR_MAX_BYTES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
+exports.SearchQuerySchema = exports.CreateRatingSchema = exports.RespondToOfferSchema = exports.CreateOfferSchema = exports.SearchListingsQuerySchema = exports.NearbyListingsQuerySchema = exports.ListNotificationsQuerySchema = exports.UpdateReportStatusSchema = exports.ListReportsQuerySchema = exports.CreateReportSchema = exports.CreateMessageSchema = exports.ListConversationsQuerySchema = exports.CreateConversationSchema = exports.SellerStorefrontQuerySchema = exports.SellerStorefrontParamsSchema = exports.ListSellerListingsQuerySchema = exports.ListListingsQuerySchema = exports.UpdateListingSchema = exports.CreateListingSchema = exports.ListingPhotoUrlSchema = exports.AvailabilityWindowSchema = exports.UpdateCommunityMemberSchema = exports.UpdateCommunityDetailsSchema = exports.CreateCommunityInviteCodeSchema = exports.CommunityMemberAdminParamsSchema = exports.CommunityAdminParamsSchema = exports.LeaveCommunitySchema = exports.JoinCommunitySchema = exports.UpdateProfileSchema = exports.RegisterPushTokenSchema = exports.RefreshTokenSchema = exports.VerifyEmailOTPSchema = exports.SendEmailOTPSchema = exports.VerifyOTPSchema = exports.SendOTPSchema = exports.PROFILE_AVATAR_MIME_TYPES = exports.LISTING_IMAGE_MIME_TYPES = exports.PROFILE_AVATAR_UPLOAD_PATH_PREFIX = exports.PROFILE_AVATAR_MAX_BYTES = exports.LISTING_IMAGE_UPLOAD_PATH_PREFIX = exports.LISTING_IMAGE_MAX_COUNT = exports.LISTING_IMAGE_MAX_BYTES = void 0;
 exports.hasRealDisplayName = hasRealDisplayName;
 exports.hasVerifiedContact = hasVerifiedContact;
 exports.getProfileCompletionIssues = getProfileCompletionIssues;
@@ -121,6 +121,9 @@ exports.JoinCommunitySchema = zod_1.z
 })
     .refine((data) => data.inviteCode || data.institutionalEmail, {
     error: 'Either inviteCode or institutionalEmail is required',
+});
+exports.LeaveCommunitySchema = zod_1.z.object({
+    removeListings: zod_1.z.boolean().optional().default(false),
 });
 exports.CommunityAdminParamsSchema = zod_1.z.object({
     communityId: zod_1.z.uuid(),

@@ -4,6 +4,7 @@ import {
   CommunityMemberAdminParamsSchema,
   CreateCommunityInviteCodeSchema,
   JoinCommunitySchema,
+  LeaveCommunitySchema,
   UpdateCommunityDetailsSchema,
   UpdateCommunityMemberSchema,
 } from '@sellr/shared';
@@ -14,6 +15,8 @@ import { issueTokenPair } from '../../lib/authTokens';
 import { isWebClient, setAuthCookies } from '../../lib/authCookies';
 import { verifyJWT } from '../../middleware/auth';
 import { normalizeEmail } from '../../lib/otp';
+import { buildUserJwtPayload } from '../../lib/memberships';
+import { searchSyncQueue } from '../../lib/queues';
 
 const INACTIVE_MEMBERSHIP_ERROR =
   'Membership is inactive. Ask a community admin to reactivate access.';
@@ -286,6 +289,126 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       return reply.send(
         ok({
           communityId,
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        }),
+      );
+    },
+  );
+
+  fastify.post(
+    '/:communityId/leave',
+    {
+      preHandler: verifyJWT,
+      schema: { body: LeaveCommunitySchema },
+    },
+    async (request, reply) => {
+      const { communityId } = CommunityAdminParamsSchema.parse(request.params);
+      const body = LeaveCommunitySchema.parse(request.body ?? {});
+
+      const membership = await prisma.communityMember.findUnique({
+        where: {
+          userId_communityId: {
+            userId: request.user.sub,
+            communityId,
+          },
+        },
+        include: { community: { select: { status: true } } },
+      });
+      if (
+        !membership ||
+        membership.status !== 'active' ||
+        membership.community.status !== 'active'
+      ) {
+        return reply
+          .code(403)
+          .send({ error: 'Not an active member of this community' });
+      }
+
+      if (membership.role === 'admin') {
+        const count = await activeAdminCount(communityId);
+        if (count <= 1) {
+          return reply
+            .code(400)
+            .send({ error: 'A community must have at least one active admin' });
+        }
+      }
+
+      const [activeListingCount, listingsToRemove] = await Promise.all([
+        prisma.listing.count({
+          where: {
+            communityId,
+            sellerId: request.user.sub,
+            status: 'active',
+          },
+        }),
+        body.removeListings
+          ? prisma.listing.findMany({
+              where: {
+                communityId,
+                sellerId: request.user.sub,
+                status: { in: ['draft', 'pending_review', 'active'] },
+              },
+              select: { id: true },
+            })
+          : Promise.resolve([]),
+      ]);
+
+      if (activeListingCount > 0 && !body.removeListings) {
+        return reply.code(409).send({
+          error:
+            'Unpublish active listings or choose to remove your listings before leaving this community.',
+          activeListingCount,
+        });
+      }
+
+      await prisma.$transaction(async (tx) => {
+        if (body.removeListings && listingsToRemove.length > 0) {
+          await tx.listing.updateMany({
+            where: {
+              id: { in: listingsToRemove.map((listing) => listing.id) },
+            },
+            data: { status: 'expired' },
+          });
+        }
+
+        await tx.communityMember.delete({
+          where: {
+            userId_communityId: {
+              userId: request.user.sub,
+              communityId,
+            },
+          },
+        });
+      });
+
+      await Promise.all(
+        listingsToRemove.map((listing) =>
+          searchSyncQueue.add('sync', {
+            listingId: listing.id,
+            action: 'delete',
+          }),
+        ),
+      );
+
+      const tokens = await issueTokenPair(fastify, request.user.sub);
+      const payload = await buildUserJwtPayload(request.user.sub);
+      if (isWebClient(request.headers)) {
+        setAuthCookies(reply, tokens);
+        return reply.send(
+          ok({
+            communityId,
+            communityIds: payload.communityIds,
+            removedListingCount: listingsToRemove.length,
+          }),
+        );
+      }
+
+      return reply.send(
+        ok({
+          communityId,
+          communityIds: payload.communityIds,
+          removedListingCount: listingsToRemove.length,
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
         }),
