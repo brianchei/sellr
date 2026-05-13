@@ -5,6 +5,7 @@ import {
   fetchReports,
   removeReportedListing,
   updateReportStatus,
+  updateCommunityMember,
 } from '@sellr/api-client';
 import type { ApiReport, ApiReportStatus } from '@sellr/api-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -14,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react';
 type StatusFilter = ApiReportStatus | 'all';
 type SeverityFilter = 'safety' | 'quality' | 'all';
 type TargetTypeFilter = 'listing' | 'user' | 'message' | 'all';
+type MemberModerationAction = 'deactivate' | 'demote';
 
 const STATUS_FILTERS: Array<{ value: StatusFilter; label: string }> = [
   { value: 'open', label: 'Open' },
@@ -185,13 +187,30 @@ function actionsForStatus(status: ApiReportStatus): {
   };
 }
 
+function memberModerationConfirmMessage(
+  report: ApiReport,
+  action: MemberModerationAction,
+): string {
+  const member = report.target?.memberManagement;
+  const name = member?.displayName ?? 'this member';
+  if (action === 'deactivate') {
+    return `Deactivate ${name}'s access to this community? They will lose community access, but this does not remove existing listings or resolve the report automatically. Remove reported listings separately when needed.`;
+  }
+
+  return `Demote ${name} from admin to member in this community? They will keep member access, but lose admin controls. This does not resolve the report automatically.`;
+}
+
 function ReportCard({
   report,
   onStatusChange,
   onRemoveListing,
+  onMemberModeration,
   isUpdating,
   isRemoving,
+  isModeratingMember,
   pendingStatus,
+  pendingMemberAction,
+  memberModerationError,
   selected,
   onSelectChange,
   bulkBusy,
@@ -199,9 +218,13 @@ function ReportCard({
   report: ApiReport;
   onStatusChange: (status: ApiReportStatus) => void;
   onRemoveListing: () => void;
+  onMemberModeration: (action: MemberModerationAction) => void;
   isUpdating: boolean;
   isRemoving: boolean;
+  isModeratingMember: boolean;
   pendingStatus: ApiReportStatus | null;
+  pendingMemberAction: MemberModerationAction | null;
+  memberModerationError: string | null;
   selected: boolean;
   onSelectChange: (next: boolean) => void;
   bulkBusy: boolean;
@@ -211,6 +234,9 @@ function ReportCard({
   const severityStyle = severityToneStyle(report.severity);
   const manageMemberHref = memberManagementHref(report);
   const memberManagement = report.target?.memberManagement ?? null;
+  const canDemoteMember = memberManagement?.role === 'admin';
+  const canDeactivateMember = memberManagement?.status === 'active';
+  const hasMemberModerationActions = canDemoteMember || canDeactivateMember;
 
   return (
     <article className="rounded-3xl border border-black/10 bg-white/90 p-5 shadow-[var(--shadow-app-card)] backdrop-blur">
@@ -302,6 +328,52 @@ function ReportCard({
         </div>
       ) : null}
 
+      {memberManagement && hasMemberModerationActions ? (
+        <div className="mt-3 rounded-2xl border border-black/10 bg-white/80 p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+            Report-linked actions
+          </p>
+          <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+            These update this member in the reported community only. Report
+            status stays separate for review notes and follow-up.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {canDemoteMember ? (
+              <button
+                type="button"
+                disabled={isModeratingMember}
+                onClick={() => onMemberModeration('demote')}
+                className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isModeratingMember && pendingMemberAction === 'demote'
+                  ? 'Demoting...'
+                  : 'Demote to member'}
+              </button>
+            ) : null}
+            {canDeactivateMember ? (
+              <button
+                type="button"
+                disabled={isModeratingMember}
+                onClick={() => onMemberModeration('deactivate')}
+                className="rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-xs font-semibold text-[var(--color-brand-warm-strong)] shadow-sm transition hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isModeratingMember && pendingMemberAction === 'deactivate'
+                  ? 'Deactivating...'
+                  : 'Deactivate access'}
+              </button>
+            ) : null}
+          </div>
+          {memberModerationError ? (
+            <p
+              className="mt-3 rounded-xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-xs leading-5 text-[var(--color-brand-warm-strong)]"
+              role="alert"
+            >
+              {memberModerationError}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {primary ? (
           <button
@@ -382,6 +454,10 @@ export default function AdminReportsPage() {
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkPending, setBulkPending] = useState<ApiReportStatus | null>(null);
+  const [memberModerationError, setMemberModerationError] = useState<{
+    reportId: string;
+    message: string;
+  } | null>(null);
   const queryClient = useQueryClient();
 
   const reportsQuery = useQuery({
@@ -407,6 +483,41 @@ export default function AdminReportsPage() {
       removeReportedListing(reportId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['admin-reports'] });
+    },
+  });
+
+  const memberModerationMutation = useMutation({
+    mutationFn: ({
+      report,
+      action,
+    }: {
+      report: ApiReport;
+      action: MemberModerationAction;
+    }) => {
+      const member = report.target?.memberManagement;
+      if (!member) {
+        throw new Error('Member context is no longer available.');
+      }
+      return updateCommunityMember(member.communityId, member.userId, {
+        ...(action === 'demote' ? { role: 'member' as const } : {}),
+        ...(action === 'deactivate' ? { status: 'inactive' as const } : {}),
+      });
+    },
+    onSuccess: async () => {
+      setMemberModerationError(null);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['admin-reports'] }),
+        queryClient.invalidateQueries({ queryKey: ['community-admin'] }),
+      ]);
+    },
+    onError: (error, variables) => {
+      setMemberModerationError({
+        reportId: variables.report.id,
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Could not update member access.',
+      });
     },
   });
 
@@ -542,6 +653,18 @@ export default function AdminReportsPage() {
       setSelectedIds(new Set());
       await queryClient.invalidateQueries({ queryKey: ['admin-reports'] });
     }
+  };
+
+  const runMemberModeration = (
+    report: ApiReport,
+    action: MemberModerationAction,
+  ) => {
+    if (!report.target?.memberManagement) return;
+    if (!window.confirm(memberModerationConfirmMessage(report, action))) {
+      return;
+    }
+    setMemberModerationError(null);
+    memberModerationMutation.mutate({ report, action });
   };
 
   const selectedCount = selectedIds.size;
@@ -829,7 +952,21 @@ export default function AdminReportsPage() {
                 removeListingMutation.isPending &&
                 removeListingMutation.variables?.reportId === report.id
               }
+              isModeratingMember={
+                memberModerationMutation.isPending &&
+                memberModerationMutation.variables?.report.id === report.id
+              }
               pendingStatus={pendingStatusForId(report.id)}
+              pendingMemberAction={
+                memberModerationMutation.variables?.report.id === report.id
+                  ? (memberModerationMutation.variables.action ?? null)
+                  : null
+              }
+              memberModerationError={
+                memberModerationError?.reportId === report.id
+                  ? memberModerationError.message
+                  : null
+              }
               onStatusChange={(nextStatus) =>
                 updateMutation.mutate({ reportId: report.id, nextStatus })
               }
@@ -842,6 +979,9 @@ export default function AdminReportsPage() {
                   removeListingMutation.mutate({ reportId: report.id });
                 }
               }}
+              onMemberModeration={(action) =>
+                runMemberModeration(report, action)
+              }
               selected={selectedIds.has(report.id)}
               onSelectChange={(next) => toggleSelected(report.id, next)}
               bulkBusy={isBulkBusy}
