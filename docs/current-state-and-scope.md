@@ -80,8 +80,8 @@ Included:
   `/profile` surface using existing app panel/form styling for display name,
   profile photo upload, verified contact display, storefront access, and
   readiness guidance. Account navigation, high-intent profile-completion CTAs,
-  and seller-owned listing identity previews now connect into this profile
-  surface.
+  dashboard readiness guidance, seller-owned listing identity previews, and
+  buyer-facing seller-card cache refreshes now connect into this profile surface.
 
 ## Deliberately Deferred
 

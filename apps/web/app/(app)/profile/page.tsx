@@ -99,23 +99,39 @@ function ProfileContent({ me, userId }: { me: MeData; userId: string | null }) {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
-            Profile
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
-            Manage how members see you
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-            Keep your identity, photo, and readiness signals clear before
-            posting listings or coordinating pickup.
-          </p>
+      <header
+        className="app-panel-soft mb-6 overflow-hidden p-5 sm:p-7"
+        style={{
+          background:
+            'radial-gradient(circle at 12% 20%, rgba(255, 227, 71, 0.55), transparent 30%), linear-gradient(135deg, var(--color-brand-primary-soft) 0%, var(--bg-elevated) 46%, var(--color-brand-contrast-soft) 100%)',
+        }}
+      >
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="inline-flex rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)] shadow-sm">
+              Profile
+            </span>
+            <h1 className="mt-3 text-2xl font-semibold text-[var(--text-primary)] sm:text-3xl">
+              Manage how members see you
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+              Keep your identity, photo, and readiness signals clear before
+              posting listings or coordinating pickup.
+            </p>
+          </div>
+          <div className="grid gap-2 text-xs sm:min-w-[220px]">
+            <span className="rounded-2xl border border-[var(--color-brand-primary-muted)] bg-white/80 px-3 py-2 font-semibold text-[var(--text-primary)] shadow-sm">
+              Community-visible identity
+            </span>
+            <span className="rounded-2xl border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] px-3 py-2 font-semibold text-[var(--color-brand-contrast-strong)]">
+              Pickup trust signals
+            </span>
+          </div>
         </div>
         {userId ? (
           <Link
             href={`/sellers/${userId}`}
-            className="text-sm font-medium text-[var(--color-brand-contrast)] no-underline hover:underline"
+            className="app-action-secondary mt-5 px-4 py-2 text-sm"
           >
             View public storefront
           </Link>
@@ -143,11 +159,17 @@ function ProfileSummary({
   issues: ProfileCompletionIssue[];
 }) {
   return (
-    <section className="app-panel p-5">
+    <section
+      className="app-panel overflow-hidden p-5"
+      style={{
+        background:
+          'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,249,215,0.82) 100%)',
+      }}
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div
           aria-label={`${me.user.displayName} avatar`}
-          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-xl font-bold text-[var(--text-primary)] shadow-md ring-4 ring-[var(--color-brand-primary-soft)]"
+          className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white bg-[var(--color-brand-primary)] bg-cover bg-center text-2xl font-bold text-[var(--text-primary)] shadow-[var(--shadow-app-card)] ring-4 ring-[var(--color-brand-primary-muted)]"
           style={
             me.user.avatarUrl
               ? { backgroundImage: `url("${me.user.avatarUrl}")` }
@@ -157,6 +179,9 @@ function ProfileSummary({
           {me.user.avatarUrl ? null : profileInitials(me.user.displayName)}
         </div>
         <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
+            Public trust card
+          </p>
           <h2 className="break-words text-xl font-semibold text-[var(--text-primary)]">
             {me.user.displayName}
           </h2>
@@ -180,7 +205,11 @@ function ProfileSummary({
       </div>
 
       <dl className="mt-5 grid gap-3 border-t border-black/10 pt-5 text-sm sm:grid-cols-3">
-        <ProfileFact label="Verified contact" value={contactLabel(me)} />
+        <ProfileFact
+          label="Verified contact"
+          value={contactLabel(me)}
+          tone="accent"
+        />
         <ProfileFact
           label="Communities"
           value={
@@ -188,19 +217,42 @@ function ProfileSummary({
               ? 'None yet'
               : `${me.communityIds.length} joined`
           }
+          tone="primary"
         />
         <ProfileFact
           label="Active listings"
           value={String(me.user.listingCount ?? 0)}
+          tone="contrast"
         />
       </dl>
     </section>
   );
 }
 
-function ProfileFact({ label, value }: { label: string; value: string }) {
+function ProfileFact({
+  label,
+  value,
+  tone = 'plain',
+}: {
+  label: string;
+  value: string;
+  tone?: 'plain' | 'primary' | 'contrast' | 'accent';
+}) {
+  const toneClass =
+    tone === 'primary'
+      ? 'border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)]'
+      : tone === 'contrast'
+        ? 'border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)]'
+        : tone === 'accent'
+          ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)]'
+          : '';
+
   return (
-    <div>
+    <div
+      className={`rounded-2xl border p-3 ${
+        tone === 'plain' ? 'border-transparent p-0' : toneClass
+      }`}
+    >
       <dt className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
         {label}
       </dt>
@@ -224,7 +276,11 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['me', userId] }),
       queryClient.invalidateQueries({ queryKey: ['conversations'] }),
+      queryClient.invalidateQueries({ queryKey: ['dashboard-conversations'] }),
       queryClient.invalidateQueries({ queryKey: ['listing'] }),
+      queryClient.invalidateQueries({ queryKey: ['community-listings'] }),
+      queryClient.invalidateQueries({ queryKey: ['my-listings'] }),
+      queryClient.invalidateQueries({ queryKey: ['dashboard-listings'] }),
       queryClient.invalidateQueries({ queryKey: ['seller-storefront'] }),
     ]);
   };
@@ -305,18 +361,23 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
 
   return (
     <section id="profile-details" className="app-panel scroll-mt-24 p-5">
-      <header>
-        <h2 className="text-base font-semibold text-[var(--text-primary)]">
-          Profile details
-        </h2>
-        <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-          These details appear in conversations, storefronts, and trust cards.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold text-[var(--text-primary)]">
+            Profile details
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+            These details appear in conversations, storefronts, and trust cards.
+          </p>
+        </div>
+        <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
+          Editable
+        </span>
       </header>
 
-      <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-black/10 bg-white/70 p-4 sm:flex-row sm:items-center">
+      <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-4 sm:flex-row sm:items-center">
         <div
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-base font-bold text-[var(--text-primary)]"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-white bg-[var(--color-brand-primary)] bg-cover bg-center text-base font-bold text-[var(--text-primary)] shadow-sm"
           style={
             avatarUrl ? { backgroundImage: `url("${avatarUrl}")` } : undefined
           }
@@ -461,57 +522,93 @@ function ProfileReadinessPanel({
 
   return (
     <aside className="space-y-5">
-      <section className="app-panel p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-base font-semibold text-[var(--text-primary)]">
-              Profile readiness
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-              Requirements for posting listings and contacting sellers.
-            </p>
+      <section className="app-panel overflow-hidden p-0">
+        <div className="bg-[var(--color-brand-primary-soft)] p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-base font-semibold text-[var(--text-primary)]">
+                Profile readiness
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+                Requirements for posting listings and contacting sellers.
+              </p>
+            </div>
+            <span className="rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)] shadow-sm">
+              {ready ? 'Ready' : `${issues.length} left`}
+            </span>
           </div>
-          <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
-            {ready ? 'Ready' : `${issues.length} left`}
-          </span>
         </div>
 
-        <div className="mt-4 space-y-3">
+        <div className="space-y-3 p-5">
           {checks.map((check) => {
             const copy = PROFILE_COMPLETION_COPY[check.issue];
             return (
               <div
                 key={check.issue}
-                className="rounded-2xl border border-black/10 bg-white/75 p-4"
+                className={`rounded-2xl border p-4 ${
+                  check.complete
+                    ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)]'
+                    : 'border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)]'
+                }`}
               >
-                <p className="text-sm font-semibold text-[var(--text-primary)]">
-                  {check.complete ? check.completeLabel : copy.title}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-                  {check.complete ? 'Complete.' : copy.body}
-                </p>
-                {!check.complete ? (
-                  <Link
-                    href={issueHref(check.issue)}
-                    className="mt-2 inline-flex text-xs font-semibold text-[var(--color-brand-contrast)] no-underline hover:underline"
+                <div className="flex items-start gap-3">
+                  <span
+                    className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                      check.complete
+                        ? 'bg-white text-[var(--color-brand-accent-strong)]'
+                        : 'bg-white text-[var(--color-brand-primary-strong)]'
+                    }`}
+                    aria-hidden="true"
                   >
-                    {copy.action}
-                  </Link>
-                ) : null}
+                    {check.complete ? 'OK' : '!'}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">
+                      {check.complete ? check.completeLabel : copy.title}
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+                      {check.complete ? 'Complete.' : copy.body}
+                    </p>
+                    {!check.complete ? (
+                      <Link
+                        href={issueHref(check.issue)}
+                        className="mt-2 inline-flex text-xs font-semibold text-[var(--color-brand-contrast)] no-underline hover:underline"
+                      >
+                        {copy.action}
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             );
           })}
         </div>
       </section>
 
-      <section className="app-panel p-5">
-        <h2 className="text-base font-semibold text-[var(--text-primary)]">
-          Trust tips
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-          A recognizable name and photo make pickup coordination easier and help
-          buyers understand who they are meeting.
-        </p>
+      <section
+        className="app-panel p-5"
+        style={{
+          background:
+            'linear-gradient(135deg, var(--color-brand-contrast-soft), rgba(255,255,255,0.95))',
+        }}
+      >
+        <div className="flex items-start gap-3">
+          <span
+            aria-hidden="true"
+            className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-contrast)] text-xs font-bold text-white"
+          >
+            i
+          </span>
+          <div>
+            <h2 className="text-base font-semibold text-[var(--text-primary)]">
+              Trust tips
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+              A recognizable name and photo make pickup coordination easier and
+              help buyers understand who they are meeting.
+            </p>
+          </div>
+        </div>
       </section>
     </aside>
   );
