@@ -156,6 +156,64 @@ describe.skipIf(!integrationDbAvailable)('communities integration', () => {
     });
   });
 
+  describe('PATCH /api/v1/communities/:communityId', () => {
+    it('updates community details for an active admin', async () => {
+      const admin = await createUser();
+      const community = await createCommunity({ name: 'Before Community' });
+      await addMember(admin.id, community.id, 'admin');
+
+      const res = await app.inject({
+        method: 'PATCH',
+        url: `/api/v1/communities/${community.id}`,
+        headers: { cookie: await accessCookieFor(app, admin.id) },
+        payload: {
+          name: 'After Community',
+          type: 'campus',
+          accessMethod: 'email_domain',
+          emailDomain: 'wisc.edu',
+          rules: ['Meet in public campus locations.', 'Use clear photos.'],
+        },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = res.json<{
+        data: {
+          community: {
+            name: string;
+            type: string;
+            accessMethod: string;
+            emailDomain: string | null;
+            rules: unknown;
+          };
+        };
+      }>();
+      expect(body.data.community).toEqual(
+        expect.objectContaining({
+          name: 'After Community',
+          type: 'campus',
+          accessMethod: 'email_domain',
+          emailDomain: 'wisc.edu',
+          rules: ['Meet in public campus locations.', 'Use clear photos.'],
+        }),
+      );
+    });
+
+    it('rejects community detail updates from non-admin members', async () => {
+      const member = await createUser();
+      const community = await createCommunity();
+      await addMember(member.id, community.id, 'member');
+
+      const res = await app.inject({
+        method: 'PATCH',
+        url: `/api/v1/communities/${community.id}`,
+        headers: { cookie: await accessCookieFor(app, member.id) },
+        payload: { name: 'Unauthorized Rename' },
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
+  });
+
   describe('POST /api/v1/communities/:communityId/invites', () => {
     it('creates an uppercase invite code for an admin community', async () => {
       const admin = await createUser();

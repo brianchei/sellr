@@ -14,6 +14,7 @@ exports.joinCommunity = joinCommunity;
 exports.fetchCommunityAdmin = fetchCommunityAdmin;
 exports.fetchCommunityDetail = fetchCommunityDetail;
 exports.createCommunityInviteCode = createCommunityInviteCode;
+exports.updateCommunityDetails = updateCommunityDetails;
 exports.updateCommunityMember = updateCommunityMember;
 exports.fetchListingsNearby = fetchListingsNearby;
 exports.fetchCommunityListings = fetchCommunityListings;
@@ -120,6 +121,12 @@ function fetchCommunityDetail(communityId) {
 function createCommunityInviteCode(communityId, body) {
     return (0, fetch_1.apiFetch)(`/communities/${communityId}/invites`, {
         method: 'POST',
+        body: JSON.stringify(body),
+    });
+}
+function updateCommunityDetails(communityId, body) {
+    return (0, fetch_1.apiFetch)(`/communities/${communityId}`, {
+        method: 'PATCH',
         body: JSON.stringify(body),
     });
 }

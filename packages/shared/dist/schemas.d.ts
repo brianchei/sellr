@@ -63,6 +63,20 @@ export declare const CreateCommunityInviteCodeSchema: z.ZodObject<{
     maxUses: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     expiresAt: z.ZodOptional<z.ZodNullable<z.ZodISODateTime>>;
 }, z.core.$strip>;
+export declare const UpdateCommunityDetailsSchema: z.ZodObject<{
+    name: z.ZodOptional<z.ZodString>;
+    type: z.ZodOptional<z.ZodEnum<{
+        campus: "campus";
+        coworking: "coworking";
+        residential: "residential";
+    }>>;
+    accessMethod: z.ZodOptional<z.ZodEnum<{
+        invite_code: "invite_code";
+        email_domain: "email_domain";
+    }>>;
+    emailDomain: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    rules: z.ZodOptional<z.ZodArray<z.ZodString>>;
+}, z.core.$strip>;
 export declare const UpdateCommunityMemberSchema: z.ZodObject<{
     role: z.ZodOptional<z.ZodEnum<{
         member: "member";

@@ -175,6 +175,48 @@ export const CreateCommunityInviteCodeSchema = z.object({
   expiresAt: z.iso.datetime().nullable().optional(),
 });
 
+const CommunityEmailDomainSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(3)
+  .max(100)
+  .regex(
+    /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/,
+    'Enter a valid email domain such as wisc.edu',
+  );
+
+export const UpdateCommunityDetailsSchema = z
+  .object({
+    name: z.string().trim().min(3).max(100).optional(),
+    type: z.enum(['campus', 'coworking', 'residential']).optional(),
+    accessMethod: z.enum(['invite_code', 'email_domain']).optional(),
+    emailDomain: CommunityEmailDomainSchema.nullable().optional(),
+    rules: z.array(z.string().trim().min(2).max(240)).max(8).optional(),
+  })
+  .refine(
+    (data) =>
+      data.name !== undefined ||
+      data.type !== undefined ||
+      data.accessMethod !== undefined ||
+      data.emailDomain !== undefined ||
+      data.rules !== undefined,
+    { error: 'At least one community detail field is required' },
+  )
+  .refine(
+    (data) =>
+      data.accessMethod !== 'email_domain' ||
+      (data.emailDomain !== undefined && data.emailDomain !== null),
+    { error: 'Email-domain communities require an email domain' },
+  )
+  .refine(
+    (data) => data.emailDomain !== null || data.accessMethod === 'invite_code',
+    {
+      error:
+        'Switch the community to invite-code access before clearing the email domain',
+    },
+  );
+
 export const UpdateCommunityMemberSchema = z
   .object({
     role: z.enum(['member', 'admin']).optional(),

@@ -237,16 +237,17 @@ Shipped:
   with multiple active admin memberships can choose which community's invites
   and members they are managing, with the selected community reflected in the
   URL.
+- Added admin-editable community details on `/admin/community` backed by
+  `PATCH /communities/:communityId`, covering name, type, access method, email
+  domain, and member-facing rules/guidance stored in the existing community
+  fields.
 
 Work items:
 
 - Add option to leave a community.
-- Add richer lightweight community theme/config data.
+- Add richer community branding/theme config and optional imagery.
 - Expand the decorated Badger Market experience with approved imagery or
-  admin-editable fields when available.
-- Expand admin community editing controls.
-- Let admins edit community name, description, rules, branding/theme config, and
-  invite code settings.
+  additional admin-editable fields when available.
 - Improve member management in the admin dashboard.
 
 Acceptance notes:
@@ -376,14 +377,14 @@ Completed in Phase 3:
 - Add lightweight Badger Market / campus presentation cues.
 - Add post-login join-another-community flow.
 - Add admin management-community switcher.
+- Add admin-editable community details and rules/guidance.
 
 Remaining:
 
 - Add option to leave community.
 - Expand Badger Market / UW-Madison decoration with approved imagery or
-  admin-editable fields.
-- Add richer lightweight community theme/config data.
-- Add more community editing controls to admin dashboard.
+  additional admin-editable fields.
+- Add richer branding/theme controls to admin dashboard.
 
 ### Profile And Trust
 
@@ -534,3 +535,6 @@ Keep this guide aligned with:
 - Added a management-community switcher to `/admin/community` so admins with
   multiple active admin memberships can choose which community's invites and
   members they manage, with the selected community reflected in the URL.
+- Added admin-editable community details to `/admin/community` with a typed API
+  client helper and admin-only API route for updating name, type, access method,
+  email domain, and homepage rules/guidance.

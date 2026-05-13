@@ -21,9 +21,10 @@ The current web SLC includes:
 - Seller storefront-lite pages.
 - Buyer contact, inbox threads, replies, notifications, and unread badges.
 - Basic reporting plus admin-only report review and explicit listing removal.
-- Admin-only community setup for invite codes and member role/status
-  management, including an explicit `/admin/community` management-community
-  switcher for admins with multiple active admin memberships.
+- Admin-only community setup for community details, invite codes, and member
+  role/status management, including an explicit `/admin/community`
+  management-community switcher for admins with multiple active admin
+  memberships.
 - Dashboard profile/trust preview and seller readiness panel.
 - Vercel Web Analytics and Speed Insights in the web app root layout.
 - Phase 1 web polish: refreshed public landing page, production brand assets,
@@ -49,7 +50,9 @@ The current web SLC includes:
   presentation cues scoped to that community. Existing members can use
   `/communities/join` to join another community by invite code or verified
   email-domain match, then switch into that community context. Admins can also
-  switch which active admin community they are managing on `/admin/community`.
+  switch which active admin community they are managing on `/admin/community`
+  and edit basic community details, access method, email domain, and
+  member-facing rules/guidance.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -281,9 +284,8 @@ Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope
 docs/design-language.md, and docs/next-session-context.md. Continue Phase 3:
 community product surface. The app-shell community switcher, member community
 homepage, post-login join-another-community flow, and admin management-community
-switcher are already implemented. The community homepage also has lightweight
-Badger Market/campus presentation cues. Next, choose the smallest useful
-community-facing slice, such as community leave behavior, admin-editable
-community details, or richer community theme/config, and keep the scope inside
-the web SLC.
+switcher, admin-editable community details, and lightweight Badger Market/campus
+presentation cues are already implemented. Next, choose the smallest useful
+community-facing slice, such as community leave behavior or richer community
+theme/config, and keep the scope inside the web SLC.
 ```

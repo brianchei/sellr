@@ -22,8 +22,9 @@ React Query, and typed helpers from `@sellr/api-client`.
   presentation cues, guidance, and scoped browse/sell actions.
 - `/communities/join`: post-login flow for joining another community with an
   invite code or verified email-domain match.
-- `/admin/community`: admin invite/member management with a
-  management-community switcher for admins who operate multiple communities.
+- `/admin/community`: admin community detail editing, invite/member management,
+  and a management-community switcher for admins who operate multiple
+  communities.
 - `/marketplace`: community-scoped browse, search, filters, and listing cards.
 - `/marketplace/[listingId]`: listing detail, seller trust card, contact seller,
   and report listing.
