@@ -63,10 +63,8 @@ export function formatPrice(price: ApiListing['price']): string {
 }
 
 export function formatRadius(radiusM: number): string {
-  if (radiusM >= 1000) {
-    return `${Number.parseFloat((radiusM / 1000).toFixed(1))} km`;
-  }
-  return `${radiusM} m`;
+  const miles = radiusM / 1609.344;
+  return `${Number.parseFloat(miles.toFixed(1))} mi`;
 }
 
 export function formatAvailabilityWindow(window: AvailabilityWindow): string {

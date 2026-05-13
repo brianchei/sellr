@@ -259,7 +259,7 @@ export function getListingFormErrors(
     parsedRadius < 100 ||
     parsedRadius > 5000
   ) {
-    errors.locationRadiusM = 'Pickup radius must be between 100 and 5000 m.';
+    errors.locationRadiusM = 'Pickup radius must be between 0.1 and 3 miles.';
   }
 
   if (parsedEnd <= parsedStart) {

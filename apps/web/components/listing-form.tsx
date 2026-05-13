@@ -5,12 +5,17 @@ import { uploadListingImage } from '@sellr/api-client';
 import {
   LISTING_IMAGE_MAX_BYTES,
   LISTING_IMAGE_MAX_COUNT,
-  LISTING_IMAGE_MIME_TYPES,
 } from '@sellr/shared';
 import {
   ListingBuyerPreview,
   type ListingImageStatus,
 } from '@/components/listing-buyer-preview';
+import {
+  LISTING_IMAGE_ACCEPT,
+  isHeicImageFile,
+  listingImageFileIssue,
+  prepareListingImageFile,
+} from '@/lib/listing-image-files';
 import {
   CATEGORIES,
   CONDITIONS,
@@ -32,6 +37,11 @@ type ListingFormProps = {
 
 type FieldName = keyof ListingFormValues;
 type TouchedFields = Partial<Record<FieldName, true>>;
+type ListingQualityItem = {
+  label: string;
+  detail: string;
+  complete: boolean;
+};
 
 function fieldClassName(hasError: boolean): string {
   return `mt-2 w-full rounded-2xl border bg-white/90 px-3 py-2.5 text-sm shadow-xs outline-none transition focus:ring-2 ${
@@ -56,6 +66,42 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
+function hasUsablePickupWindow(values: ListingFormValues): boolean {
+  const start = Number.parseInt(values.startHour, 10);
+  const end = Number.parseInt(values.endHour, 10);
+  return (
+    Boolean(values.locationNeighborhood.trim()) &&
+    Number.isInteger(start) &&
+    Number.isInteger(end) &&
+    end > start
+  );
+}
+
+function listingQualityItems(values: ListingFormValues): ListingQualityItem[] {
+  return [
+    {
+      label: 'Photo ready',
+      detail: 'Add a real item photo before publishing.',
+      complete: values.photoUrls.length > 0,
+    },
+    {
+      label: 'Easy title',
+      detail: 'Name the item plus model, finish, or size.',
+      complete: values.title.trim().length >= 12,
+    },
+    {
+      label: 'Useful details',
+      detail: 'Mention dimensions, inclusions, flaws, or age.',
+      complete: values.description.trim().length >= 40,
+    },
+    {
+      label: 'Pickup ready',
+      detail: 'Set an approximate area and availability window.',
+      complete: hasUsablePickupWindow(values),
+    },
+  ];
+}
+
 export function ListingForm({
   values,
   onChange,
@@ -70,9 +116,14 @@ export function ListingForm({
   const [loadedImageUrl, setLoadedImageUrl] = useState<string | null>(null);
   const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const [imageUploadNotice, setImageUploadNotice] = useState<string | null>(
+    null,
+  );
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const latestValuesRef = useRef(values);
   const fieldErrors = getListingFormErrors(values);
+  const qualityItems = listingQualityItems(values);
+  const completedQualityItems = qualityItems.filter((item) => item.complete);
   const cleanPhotoUrl = values.photoUrls[0]?.trim() ?? '';
   const canPreviewImage = cleanPhotoUrl.length > 0 && !fieldErrors.photoUrls;
   const imageStatus: ListingImageStatus = !canPreviewImage
@@ -151,6 +202,7 @@ export function ListingForm({
 
   const removePhotoUrl = (photoUrl: string) => {
     setImageUploadError(null);
+    setImageUploadNotice(null);
     markTouched('photoUrls');
     updatePhotoUrls(values.photoUrls.filter((url) => url !== photoUrl));
   };
@@ -158,6 +210,7 @@ export function ListingForm({
   const handleImageFiles = async (files: FileList | null) => {
     markTouched('photoUrls');
     setImageUploadError(null);
+    setImageUploadNotice(null);
 
     const selectedFiles = Array.from(files ?? []);
     if (selectedFiles.length === 0) {
@@ -171,45 +224,60 @@ export function ListingForm({
     }
 
     const filesToUpload = selectedFiles.slice(0, remainingSlots);
-    const unsupportedFile = filesToUpload.find(
-      (file) =>
-        !LISTING_IMAGE_MIME_TYPES.includes(
-          file.type as (typeof LISTING_IMAGE_MIME_TYPES)[number],
-        ),
-    );
-    if (unsupportedFile) {
-      setImageUploadError('Upload JPG, PNG, or WebP images.');
-      return;
-    }
-
-    const oversizedFile = filesToUpload.find(
-      (file) => file.size > LISTING_IMAGE_MAX_BYTES,
-    );
-    if (oversizedFile) {
-      setImageUploadError('Keep each image under 3 MB.');
+    const fileIssue = filesToUpload
+      .map((file) => listingImageFileIssue(file))
+      .find((issue): issue is string => Boolean(issue));
+    if (fileIssue) {
+      setImageUploadError(fileIssue);
       return;
     }
 
     setIsUploadingImage(true);
     try {
+      const preparedFiles = await Promise.all(
+        filesToUpload.map((file) => prepareListingImageFile(file)),
+      );
+      const oversizedFile = preparedFiles.find(
+        (file) => file.size > LISTING_IMAGE_MAX_BYTES,
+      );
+      if (oversizedFile) {
+        setImageUploadError('Keep each uploaded image under 3 MB.');
+        return;
+      }
+
       const uploaded = await Promise.all(
-        filesToUpload.map((file) => uploadListingImage(file)),
+        preparedFiles.map((file) => uploadListingImage(file)),
       );
       const currentPhotoUrls = latestValuesRef.current.photoUrls;
       updatePhotoUrls([
         ...currentPhotoUrls,
         ...uploaded.map((result) => result.url),
       ]);
+
+      const convertedCount = filesToUpload.filter(isHeicImageFile).length;
+      const notices: string[] = [];
+      if (convertedCount > 0) {
+        notices.push(
+          convertedCount === 1
+            ? 'Converted 1 iPhone HEIC photo to JPG before upload.'
+            : `Converted ${convertedCount} iPhone HEIC photos to JPG before upload.`,
+        );
+      }
       if (selectedFiles.length > filesToUpload.length) {
-        setImageUploadError(
+        notices.push(
           `Uploaded ${filesToUpload.length} photos. Remove a photo before adding more.`,
         );
       }
+      setImageUploadNotice(notices.length > 0 ? notices.join(' ') : null);
     } catch (uploadError) {
-      setImageUploadError(
+      const uploadMessage =
         uploadError instanceof Error
           ? uploadError.message
-          : 'Could not upload this image. Try another file.',
+          : 'Could not upload this image. Try another file.';
+      setImageUploadError(
+        filesToUpload.some(isHeicImageFile)
+          ? `${uploadMessage} If this browser cannot convert HEIC, choose JPG, PNG, or WebP.`
+          : uploadMessage,
       );
     } finally {
       setIsUploadingImage(false);
@@ -227,6 +295,43 @@ export function ListingForm({
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
             Keep it specific. Good listings answer obvious buyer questions.
           </p>
+        </div>
+
+        <div className="border-y border-black/10 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">
+              Listing strength
+            </h3>
+            <span className="shrink-0 rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
+              {completedQualityItems.length}/{qualityItems.length} ready
+            </span>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {qualityItems.map((item) => (
+              <div
+                key={item.label}
+                className="flex min-h-14 items-start gap-2 text-sm"
+              >
+                <span
+                  className={`mt-0.5 inline-flex h-5 min-w-12 items-center justify-center rounded-full px-2 text-[10px] font-semibold uppercase ${
+                    item.complete
+                      ? 'bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]'
+                      : 'bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]'
+                  }`}
+                >
+                  {item.complete ? 'Done' : 'Next'}
+                </span>
+                <span>
+                  <span className="block font-medium text-[var(--text-primary)]">
+                    {item.label}
+                  </span>
+                  <span className="block text-xs leading-5 text-[var(--text-secondary)]">
+                    {item.detail}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <label className="block text-sm font-medium text-[var(--text-primary)]">
@@ -382,7 +487,7 @@ export function ListingForm({
             Photos
             <input
               type="file"
-              accept={LISTING_IMAGE_MIME_TYPES.join(',')}
+              accept={LISTING_IMAGE_ACCEPT}
               multiple
               disabled={isUploadingImage}
               onChange={(event) => {
@@ -391,7 +496,7 @@ export function ListingForm({
               }}
               onBlur={() => markTouched('photoUrls')}
               aria-invalid={Boolean(photoUrlError)}
-              aria-describedby="listing-photo-url-error listing-photo-help"
+              aria-describedby="listing-photo-url-error listing-photo-help listing-photo-notice"
               className={fieldClassName(Boolean(photoUrlError))}
             />
           </label>
@@ -399,9 +504,19 @@ export function ListingForm({
             id="listing-photo-help"
             className="mt-1.5 text-xs text-[var(--text-tertiary)]"
           >
-            JPG, PNG, or WebP. Up to {LISTING_IMAGE_MAX_COUNT} photos.
+            JPG, PNG, WebP, or iPhone HEIC. Up to {LISTING_IMAGE_MAX_COUNT}{' '}
+            photos.
           </p>
           <FieldError id="listing-photo-url-error" message={photoUrlError} />
+          {imageUploadNotice ? (
+            <p
+              id="listing-photo-notice"
+              className="mt-1.5 text-xs font-medium text-[var(--color-brand-accent-strong)]"
+              role="status"
+            >
+              {imageUploadNotice}
+            </p>
+          ) : null}
 
           {values.photoUrls.length > 0 ? (
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -502,10 +617,10 @@ export function ListingForm({
                 Boolean(visibleError('locationRadiusM')),
               )}
             >
-              <option value="500">Within 500 m</option>
-              <option value="1000">Within 1 km</option>
-              <option value="2500">Within 2.5 km</option>
-              <option value="5000">Within 5 km</option>
+              <option value="500">About 0.3 miles</option>
+              <option value="1000">About 0.6 miles</option>
+              <option value="2500">About 1.6 miles</option>
+              <option value="5000">About 3.1 miles</option>
             </select>
             <FieldError
               id="listing-radius-error"
