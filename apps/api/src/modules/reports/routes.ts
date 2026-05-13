@@ -17,6 +17,14 @@ type TargetSummary = {
   detail: string;
   href: string | null;
   communityId: string | null;
+  memberManagement: {
+    userId: string;
+    communityId: string;
+    displayName: string;
+    role: string;
+    status: string;
+    contact: string;
+  } | null;
 };
 
 function adminCommunityIds(role: Record<string, string>): string[] {
@@ -161,8 +169,16 @@ async function canAdminReport(
   );
 }
 
+function memberContact(user: {
+  email: string | null;
+  phoneE164: string | null;
+}) {
+  return user.email ?? user.phoneE164 ?? 'No contact on file';
+}
+
 async function targetSummaries(
   reports: Array<{ targetId: string; targetType: ReportTargetType }>,
+  adminCommunityIds: string[],
 ) {
   const listingIds = reports
     .filter((report) => report.targetType === 'listing')
@@ -183,6 +199,14 @@ async function targetSummaries(
             title: true,
             communityId: true,
             status: true,
+            sellerId: true,
+            seller: {
+              select: {
+                displayName: true,
+                email: true,
+                phoneE164: true,
+              },
+            },
           },
         })
       : [],
@@ -192,6 +216,14 @@ async function targetSummaries(
           select: {
             id: true,
             content: true,
+            senderId: true,
+            sender: {
+              select: {
+                displayName: true,
+                email: true,
+                phoneE164: true,
+              },
+            },
             conversationId: true,
             conversation: {
               select: {
@@ -226,6 +258,103 @@ async function targetSummaries(
   const listingMap = new Map(listings.map((listing) => [listing.id, listing]));
   const messageMap = new Map(messages.map((message) => [message.id, message]));
   const userMap = new Map(users.map((user) => [user.id, user]));
+  const memberCandidates = reports
+    .map((report) => {
+      if (report.targetType === 'listing') {
+        const listing = listingMap.get(report.targetId);
+        return listing
+          ? {
+              reportKey: report.targetId,
+              userId: listing.sellerId,
+              communityId: listing.communityId,
+              displayName: listing.seller.displayName,
+              contact: memberContact(listing.seller),
+            }
+          : null;
+      }
+
+      if (report.targetType === 'message') {
+        const message = messageMap.get(report.targetId);
+        const listing =
+          message?.conversation.listing ?? message?.conversation.offer?.listing;
+        return message && listing?.communityId
+          ? {
+              reportKey: report.targetId,
+              userId: message.senderId,
+              communityId: listing.communityId,
+              displayName: message.sender.displayName,
+              contact: memberContact(message.sender),
+            }
+          : null;
+      }
+
+      const user = userMap.get(report.targetId);
+      return user
+        ? {
+            reportKey: report.targetId,
+            userId: user.id,
+            communityId: null,
+            displayName: user.displayName,
+            contact: memberContact(user),
+          }
+        : null;
+    })
+    .filter((candidate): candidate is NonNullable<typeof candidate> =>
+      Boolean(candidate),
+    );
+
+  const memberUserIds = Array.from(
+    new Set(memberCandidates.map((candidate) => candidate.userId)),
+  );
+  const memberships = memberUserIds.length
+    ? await prisma.communityMember.findMany({
+        where: {
+          userId: { in: memberUserIds },
+          communityId: { in: adminCommunityIds },
+        },
+        select: {
+          userId: true,
+          communityId: true,
+          role: true,
+          status: true,
+        },
+      })
+    : [];
+  const membershipsByKey = new Map(
+    memberships.map((membership) => [
+      `${membership.userId}:${membership.communityId}`,
+      membership,
+    ]),
+  );
+  const firstMembershipByUserId = new Map<
+    string,
+    (typeof memberships)[number]
+  >();
+  memberships.forEach((membership) => {
+    if (!firstMembershipByUserId.has(membership.userId)) {
+      firstMembershipByUserId.set(membership.userId, membership);
+    }
+  });
+  const memberCandidateByReportKey = new Map(
+    memberCandidates.map((candidate) => [candidate.reportKey, candidate]),
+  );
+
+  function memberManagementFor(reportKey: string) {
+    const candidate = memberCandidateByReportKey.get(reportKey);
+    if (!candidate) return null;
+    const membership = candidate.communityId
+      ? membershipsByKey.get(`${candidate.userId}:${candidate.communityId}`)
+      : firstMembershipByUserId.get(candidate.userId);
+    if (!membership) return null;
+    return {
+      userId: candidate.userId,
+      communityId: membership.communityId,
+      displayName: candidate.displayName,
+      role: membership.role,
+      status: membership.status,
+      contact: candidate.contact,
+    };
+  }
 
   const entries: Array<[string, TargetSummary | null]> = reports.map(
     (report) => {
@@ -239,6 +368,7 @@ async function targetSummaries(
                 detail: `Listing - ${listing.status}`,
                 href: `/marketplace/${listing.id}`,
                 communityId: listing.communityId,
+                memberManagement: memberManagementFor(report.targetId),
               }
             : null,
         ];
@@ -256,6 +386,7 @@ async function targetSummaries(
                 detail: `Message - ${preview(message.content)}`,
                 href: `/inbox/${message.conversationId}`,
                 communityId: listing?.communityId ?? null,
+                memberManagement: memberManagementFor(report.targetId),
               }
             : null,
         ];
@@ -269,7 +400,9 @@ async function targetSummaries(
               label: user.displayName,
               detail: `Member - ${user.email ?? user.phoneE164 ?? 'No contact on file'}`,
               href: null,
-              communityId: null,
+              communityId:
+                memberManagementFor(report.targetId)?.communityId ?? null,
+              memberManagement: memberManagementFor(report.targetId),
             }
           : null,
       ];
@@ -343,7 +476,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         },
       });
 
-      const summaries = await targetSummaries(reports);
+      const summaries = await targetSummaries(reports, adminIds);
       return reply.send(
         ok({
           reports: reports.map((report) => ({
@@ -445,7 +578,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           },
         },
       });
-      const summaries = await targetSummaries([updated]);
+      const summaries = await targetSummaries([updated], adminIds);
 
       return reply.send(
         ok({
@@ -539,7 +672,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         reason: 'moderation_listing_removed',
       });
 
-      const summaries = await targetSummaries([updated]);
+      const summaries = await targetSummaries([updated], adminIds);
       return reply.send(
         ok({
           report: {

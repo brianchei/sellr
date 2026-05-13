@@ -247,13 +247,16 @@ Shipped:
   fields.
 - Improved `/admin/community` member management with search, role/status
   filters, result counts, clearer access action labels, and no-results states.
+- Connected `/admin/reports` to member management by adding target member
+  context and a `Manage member` CTA that opens `/admin/community` with the
+  relevant community and member search context.
 
 Work items:
 
 - Add richer community branding/theme config and optional imagery.
 - Expand the decorated Badger Market experience with approved imagery or
   additional admin-editable fields when available.
-- Connect reports to member management for deeper moderation actions.
+- Add deeper report-linked moderation actions beyond navigation.
 
 Acceptance notes:
 
@@ -385,13 +388,14 @@ Completed in Phase 3:
 - Add admin management-community switcher.
 - Add admin-editable community details and rules/guidance.
 - Improve member management in the admin dashboard.
+- Connect reports to member management.
 
 Remaining:
 
 - Expand Badger Market / UW-Madison decoration with approved imagery or
   additional admin-editable fields.
 - Add richer branding/theme controls to admin dashboard.
-- Connect reports to member management for deeper moderation actions.
+- Add deeper report-linked moderation actions beyond navigation.
 
 ### Profile And Trust
 
@@ -437,7 +441,7 @@ Remaining:
 ### Admin And Safety
 
 - Allow admin to disable or suspend member from reports.
-- Improve admin report-to-member moderation flow.
+- Add report-linked suspension or deactivation controls.
 - Expand admin community controls.
 
 ### AI
@@ -550,3 +554,5 @@ Keep this guide aligned with:
   email domain, and homepage rules/guidance.
 - Added member search, role/status filters, result counts, clearer access action
   labels, and empty states to `/admin/community`.
+- Added target member context and `Manage member` links to `/admin/reports` so
+  admins can move from a report to the relevant `/admin/community` member view.

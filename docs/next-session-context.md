@@ -55,7 +55,9 @@ The current web SLC includes:
   which active admin community they are managing on `/admin/community` and edit
   basic community details, access method, email domain, and member-facing
   rules/guidance. Admin member management includes search, role/status filters,
-  clearer access action labels, and no-results states.
+  clearer access action labels, and no-results states. Report cards surface
+  target member context and link into the relevant community/member management
+  view.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -289,7 +291,8 @@ community product surface. The app-shell community switcher, member community
 homepage, post-login join-another-community flow, community leave flow,
 admin management-community switcher, admin-editable community details, and
 improved member management, plus lightweight Badger Market/campus presentation
-cues, are already implemented. Next, choose the smallest useful
-community-facing slice, such as richer community theme/config or report-to-member
-moderation controls, and keep the scope inside the web SLC.
+cues, are already implemented. Report-to-member management links are also wired
+from the reports dashboard. Next, choose the smallest useful community-facing
+slice, such as richer community theme/config or deeper moderation actions, and
+keep the scope inside the web SLC.
 ```

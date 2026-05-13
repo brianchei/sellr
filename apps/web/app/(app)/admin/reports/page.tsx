@@ -54,6 +54,19 @@ function reporterContact(report: ApiReport): string {
   return report.reporter.email ?? report.reporter.phoneE164 ?? 'No contact';
 }
 
+function memberManagementHref(report: ApiReport): string | null {
+  const member = report.target?.memberManagement;
+  if (!member) return null;
+  const params = new URLSearchParams({
+    communityId: member.communityId,
+    memberSearch:
+      member.contact === 'No contact on file'
+        ? member.displayName
+        : `${member.displayName} ${member.contact}`,
+  });
+  return `/admin/community?${params.toString()}`;
+}
+
 function statusToneStyle(status: ApiReportStatus): {
   background: string;
   color: string;
@@ -196,6 +209,8 @@ function ReportCard({
   const { primary, secondary } = actionsForStatus(report.status);
   const statusStyle = statusToneStyle(report.status);
   const severityStyle = severityToneStyle(report.severity);
+  const manageMemberHref = memberManagementHref(report);
+  const memberManagement = report.target?.memberManagement ?? null;
 
   return (
     <article className="rounded-3xl border border-black/10 bg-white/90 p-5 shadow-[var(--shadow-app-card)] backdrop-blur">
@@ -265,6 +280,28 @@ function ReportCard({
         <span>· Resolved {formatDate(report.resolvedAt)}</span>
       </p>
 
+      {memberManagement ? (
+        <div className="mt-4 rounded-2xl border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-brand-contrast)]">
+            Member context
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[var(--text-secondary)]">
+            <span className="font-semibold text-[var(--text-primary)]">
+              {memberManagement.displayName}
+            </span>
+            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-contrast)]">
+              {memberManagement.role}
+            </span>
+            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+              {memberManagement.status}
+            </span>
+            <span className="font-mono text-xs text-[var(--text-tertiary)]">
+              {memberManagement.contact}
+            </span>
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {primary ? (
           <button
@@ -300,6 +337,14 @@ function ReportCard({
           >
             {isRemoving ? 'Removing...' : 'Remove listing'}
           </button>
+        ) : null}
+        {manageMemberHref ? (
+          <Link
+            href={manageMemberHref}
+            className="rounded-full border border-[var(--color-brand-contrast-muted)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-brand-contrast)] shadow-sm transition hover:bg-[var(--color-brand-contrast-soft)]"
+          >
+            Manage member
+          </Link>
         ) : null}
         {report.target?.href ? (
           <Link
@@ -379,6 +424,18 @@ export default function AdminReportsPage() {
         return true;
       if (reporterContact(report).toLowerCase().includes(needle)) return true;
       if (report.target?.label.toLowerCase().includes(needle)) return true;
+      if (
+        report.target?.memberManagement?.displayName
+          .toLowerCase()
+          .includes(needle)
+      ) {
+        return true;
+      }
+      if (
+        report.target?.memberManagement?.contact.toLowerCase().includes(needle)
+      ) {
+        return true;
+      }
       return false;
     });
   }, [reports, search]);

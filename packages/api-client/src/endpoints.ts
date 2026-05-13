@@ -122,6 +122,14 @@ export type ApiReport = {
     detail: string;
     href: string | null;
     communityId: string | null;
+    memberManagement: {
+      userId: string;
+      communityId: string;
+      displayName: string;
+      role: ApiCommunityMemberRole;
+      status: ApiCommunityMemberStatus;
+      contact: string;
+    } | null;
   } | null;
 };
 

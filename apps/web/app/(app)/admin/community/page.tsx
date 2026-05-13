@@ -19,6 +19,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 
 const COMMUNITY_QUERY_PARAM = 'communityId';
+const MEMBER_SEARCH_QUERY_PARAM = 'memberSearch';
 
 type MemberFilter = 'all' | 'active' | 'inactive' | 'admins' | 'members';
 
@@ -111,6 +112,15 @@ function readRequestedCommunityId(): string | null {
   if (typeof window === 'undefined') return null;
   return new URLSearchParams(window.location.search).get(
     COMMUNITY_QUERY_PARAM,
+  );
+}
+
+function readRequestedMemberSearch(): string {
+  if (typeof window === 'undefined') return '';
+  return (
+    new URLSearchParams(window.location.search).get(
+      MEMBER_SEARCH_QUERY_PARAM,
+    ) ?? ''
   );
 }
 
@@ -456,7 +466,9 @@ export default function AdminCommunityPage() {
   const [formMessage, setFormMessage] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [memberError, setMemberError] = useState<string | null>(null);
-  const [memberSearch, setMemberSearch] = useState('');
+  const [memberSearch, setMemberSearch] = useState(
+    () => readRequestedMemberSearch(),
+  );
   const [memberFilter, setMemberFilter] = useState<MemberFilter>('all');
 
   const adminQuery = useQuery({
