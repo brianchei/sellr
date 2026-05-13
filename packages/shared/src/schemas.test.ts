@@ -116,11 +116,7 @@ describe('profile completion helpers', () => {
         displayName: 'Member 1234',
         communityIds: [],
       }),
-    ).toEqual([
-      'display_name',
-      'verified_contact',
-      'community_membership',
-    ]);
+    ).toEqual(['display_name', 'verified_contact', 'community_membership']);
 
     expect(
       getProfileCompletionIssues({

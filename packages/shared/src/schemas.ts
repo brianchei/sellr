@@ -113,14 +113,9 @@ export const RegisterPushTokenSchema = z.object({
 });
 
 export const UpdateProfileSchema = z.object({
-  displayName: z
-    .string()
-    .trim()
-    .min(2)
-    .max(60)
-    .refine(hasRealDisplayName, {
-      error: 'Use your real name or a recognizable display name.',
-    }),
+  displayName: z.string().trim().min(2).max(60).refine(hasRealDisplayName, {
+    error: 'Use your real name or a recognizable display name.',
+  }),
   avatarUrl: z.url().max(2048).nullable().optional(),
 });
 
