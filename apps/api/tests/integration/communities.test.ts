@@ -441,9 +441,17 @@ describe.skipIf(!integrationDbAvailable)('communities integration', () => {
       expect(res.statusCode).toBe(200);
       expect(
         res.json<{
-          data: { communityIds: string[]; removedListingCount: number };
+          data: {
+            communityId: string;
+            communityIds: string[];
+            removedListingCount: number;
+          };
         }>().data,
-      ).toEqual({ communityIds: [], removedListingCount: 0 });
+      ).toMatchObject({
+        communityId: community.id,
+        communityIds: [],
+        removedListingCount: 0,
+      });
       const membership = await prisma.communityMember.findUnique({
         where: {
           userId_communityId: {
