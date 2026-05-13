@@ -166,6 +166,14 @@ export type ApiCommunityAdminCommunity = {
   inviteCodes: ApiCommunityInviteCode[];
 };
 
+export type UpdateCommunityDetailsInput = {
+  name?: string;
+  type?: ApiCommunityAdminCommunity['type'];
+  accessMethod?: ApiCommunityAdminCommunity['accessMethod'];
+  emailDomain?: string | null;
+  rules?: string[];
+};
+
 export type ApiCommunityDetail = {
   id: string;
   name: string;
@@ -362,6 +370,19 @@ export function createCommunityInviteCode(
     `/communities/${communityId}/invites`,
     {
       method: 'POST',
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+export function updateCommunityDetails(
+  communityId: string,
+  body: UpdateCommunityDetailsInput,
+) {
+  return apiFetch<{ community: ApiCommunityAdminCommunity }>(
+    `/communities/${communityId}`,
+    {
+      method: 'PATCH',
       body: JSON.stringify(body),
     },
   );

@@ -4,8 +4,10 @@ import {
   CommunityMemberAdminParamsSchema,
   CreateCommunityInviteCodeSchema,
   JoinCommunitySchema,
+  UpdateCommunityDetailsSchema,
   UpdateCommunityMemberSchema,
 } from '@sellr/shared';
+import type { Prisma } from '../../generated/prisma/client';
 import { prisma } from '../../lib/prisma';
 import { ok } from '../../lib/response';
 import { issueTokenPair } from '../../lib/authTokens';
@@ -62,6 +64,29 @@ async function adminCommunityIdsFor(userId: string): Promise<string[]> {
   });
   return memberships.map((membership) => membership.communityId);
 }
+
+const adminCommunityInclude = {
+  members: {
+    orderBy: [{ status: 'asc' }, { role: 'asc' }, { joinedAt: 'desc' }],
+    include: {
+      user: {
+        select: {
+          id: true,
+          phoneE164: true,
+          email: true,
+          emailVerifiedAt: true,
+          displayName: true,
+          avatarUrl: true,
+          verifiedAt: true,
+          createdAt: true,
+        },
+      },
+    },
+  },
+  inviteCodes: {
+    orderBy: { code: 'asc' },
+  },
+} satisfies Prisma.CommunityInclude;
 
 const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
   fastify.get(
@@ -277,32 +302,49 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
     const communities = await prisma.community.findMany({
       where: { id: { in: adminCommunityIds } },
       orderBy: { name: 'asc' },
-      include: {
-        members: {
-          orderBy: [{ status: 'asc' }, { role: 'asc' }, { joinedAt: 'desc' }],
-          include: {
-            user: {
-              select: {
-                id: true,
-                phoneE164: true,
-                email: true,
-                emailVerifiedAt: true,
-                displayName: true,
-                avatarUrl: true,
-                verifiedAt: true,
-                createdAt: true,
-              },
-            },
-          },
-        },
-        inviteCodes: {
-          orderBy: { code: 'asc' },
-        },
-      },
+      include: adminCommunityInclude,
     });
 
     return reply.send(ok({ communities }));
   });
+
+  fastify.patch(
+    '/:communityId',
+    {
+      preHandler: verifyJWT,
+      schema: { body: UpdateCommunityDetailsSchema },
+    },
+    async (request, reply) => {
+      const { communityId } = CommunityAdminParamsSchema.parse(request.params);
+      const body = UpdateCommunityDetailsSchema.parse(request.body);
+      const isAdmin = await requireActiveCommunityAdmin(
+        request.user.sub,
+        communityId,
+      );
+      if (!isAdmin) {
+        return reply.code(403).send({ error: 'Admin access required' });
+      }
+
+      const accessMethod = body.accessMethod;
+      const community = await prisma.community.update({
+        where: { id: communityId },
+        data: {
+          ...(body.name !== undefined ? { name: body.name } : {}),
+          ...(body.type !== undefined ? { type: body.type } : {}),
+          ...(accessMethod !== undefined ? { accessMethod } : {}),
+          ...(body.emailDomain !== undefined
+            ? { emailDomain: body.emailDomain }
+            : accessMethod === 'invite_code'
+              ? { emailDomain: null }
+              : {}),
+          ...(body.rules !== undefined ? { rules: body.rules } : {}),
+        },
+        include: adminCommunityInclude,
+      });
+
+      return reply.send(ok({ community }));
+    },
+  );
 
   fastify.post(
     '/:communityId/invites',

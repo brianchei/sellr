@@ -148,6 +148,13 @@ export type ApiCommunityAdminCommunity = {
     members: ApiCommunityAdminMember[];
     inviteCodes: ApiCommunityInviteCode[];
 };
+export type UpdateCommunityDetailsInput = {
+    name?: string;
+    type?: ApiCommunityAdminCommunity['type'];
+    accessMethod?: ApiCommunityAdminCommunity['accessMethod'];
+    emailDomain?: string | null;
+    rules?: string[];
+};
 export type ApiCommunityDetail = {
     id: string;
     name: string;
@@ -278,6 +285,9 @@ export declare function createCommunityInviteCode(communityId: string, body: {
     expiresAt?: string | null;
 }): Promise<{
     inviteCode: ApiCommunityInviteCode;
+}>;
+export declare function updateCommunityDetails(communityId: string, body: UpdateCommunityDetailsInput): Promise<{
+    community: ApiCommunityAdminCommunity;
 }>;
 export declare function updateCommunityMember(communityId: string, userId: string, body: {
     role?: ApiCommunityMemberRole;

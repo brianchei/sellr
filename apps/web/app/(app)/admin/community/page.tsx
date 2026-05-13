@@ -4,6 +4,7 @@ import {
   ApiError,
   createCommunityInviteCode,
   fetchCommunityAdmin,
+  updateCommunityDetails,
   updateCommunityMember,
 } from '@sellr/api-client';
 import type {
@@ -47,6 +48,10 @@ function toIsoFromLocalDateTime(value: string): string | null {
 
 function memberContact(member: ApiCommunityAdminMember): string {
   return member.user.email ?? member.user.phoneE164 ?? 'No contact on file';
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }
 
 function communityTypeLabel(type: ApiCommunityAdminCommunity['type']): string {
@@ -139,6 +144,37 @@ function inviteTone(state: string) {
   };
 }
 
+function editableRuleText(rule: unknown): string | null {
+  if (typeof rule === 'string') return rule.trim() || null;
+  if (!isRecord(rule)) return null;
+
+  const title = typeof rule.title === 'string' ? rule.title.trim() : '';
+  const body =
+    typeof rule.body === 'string'
+      ? rule.body.trim()
+      : typeof rule.description === 'string'
+        ? rule.description.trim()
+        : '';
+
+  if (title && body) return `${title}: ${body}`;
+  return title || body || null;
+}
+
+function rulesToTextareaValue(rules: unknown): string {
+  if (!Array.isArray(rules)) return '';
+  return rules
+    .map(editableRuleText)
+    .filter((rule): rule is string => Boolean(rule))
+    .join('\n');
+}
+
+function parseRulesInput(value: string): string[] {
+  return value
+    .split('\n')
+    .map((rule) => rule.trim())
+    .filter(Boolean);
+}
+
 function AdminRestricted() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
@@ -164,6 +200,192 @@ function AdminRestricted() {
         </Link>
       </section>
     </main>
+  );
+}
+
+function CommunityDetailsForm({
+  community,
+  onSaved,
+}: {
+  community: ApiCommunityAdminCommunity;
+  onSaved: () => Promise<void>;
+}) {
+  const [name, setName] = useState(community.name);
+  const [type, setType] = useState<ApiCommunityAdminCommunity['type']>(
+    community.type,
+  );
+  const [accessMethod, setAccessMethod] = useState<
+    ApiCommunityAdminCommunity['accessMethod']
+  >(community.accessMethod);
+  const [emailDomain, setEmailDomain] = useState(community.emailDomain ?? '');
+  const [rulesText, setRulesText] = useState(rulesToTextareaValue(community.rules));
+  const [detailsMessage, setDetailsMessage] = useState<string | null>(null);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
+
+  const detailsMutation = useMutation({
+    mutationFn: () => {
+      const trimmedName = name.trim();
+      const normalizedEmailDomain = emailDomain.trim().toLowerCase();
+      if (trimmedName.length < 3) {
+        throw new Error('Community name must be at least 3 characters.');
+      }
+      if (accessMethod === 'email_domain' && !normalizedEmailDomain) {
+        throw new Error('Email-domain communities require an email domain.');
+      }
+
+      return updateCommunityDetails(community.id, {
+        name: trimmedName,
+        type,
+        accessMethod,
+        emailDomain:
+          accessMethod === 'email_domain' ? normalizedEmailDomain : null,
+        rules: parseRulesInput(rulesText),
+      });
+    },
+    onSuccess: async () => {
+      setDetailsError(null);
+      setDetailsMessage('Community details saved.');
+      await onSaved();
+    },
+    onError: (error) => {
+      setDetailsMessage(null);
+      setDetailsError(
+        error instanceof Error
+          ? error.message
+          : 'Could not save community details.',
+      );
+    },
+  });
+
+  return (
+    <section className="app-panel mt-5 p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+            Community details
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+            Edit the member-facing basics shown on the community homepage and in
+            app-wide community context.
+          </p>
+        </div>
+      </div>
+
+      <form
+        className="mt-4 grid gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          detailsMutation.mutate();
+        }}
+      >
+        <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Community name
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              maxLength={100}
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            />
+          </label>
+
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Community type
+            <select
+              value={type}
+              onChange={(event) =>
+                setType(
+                  event.target.value as ApiCommunityAdminCommunity['type'],
+                )
+              }
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            >
+              <option value="campus">Campus</option>
+              <option value="residential">Residential</option>
+              <option value="coworking">Coworking</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-[220px_minmax(0,1fr)]">
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Access method
+            <select
+              value={accessMethod}
+              onChange={(event) =>
+                setAccessMethod(
+                  event.target
+                    .value as ApiCommunityAdminCommunity['accessMethod'],
+                )
+              }
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            >
+              <option value="invite_code">Invite code</option>
+              <option value="email_domain">Verified email domain</option>
+            </select>
+          </label>
+
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Email domain
+            <input
+              value={emailDomain}
+              onChange={(event) => setEmailDomain(event.target.value)}
+              placeholder="wisc.edu"
+              disabled={accessMethod !== 'email_domain'}
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)] disabled:cursor-not-allowed disabled:bg-[var(--bg-secondary)] disabled:text-[var(--text-tertiary)]"
+            />
+            <span className="mt-1.5 block text-xs text-[var(--text-tertiary)]">
+              Only required when members join through a verified email domain.
+            </span>
+          </label>
+        </div>
+
+        <label className="text-sm font-medium text-[var(--text-primary)]">
+          Community guidance and rules
+          <textarea
+            value={rulesText}
+            onChange={(event) => setRulesText(event.target.value)}
+            rows={5}
+            placeholder="One guideline per line, such as pickup expectations or community-specific rules."
+            className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+          />
+          <span className="mt-1.5 block text-xs text-[var(--text-tertiary)]">
+            These appear on the community homepage. Keep each line short and
+            actionable.
+          </span>
+        </label>
+
+        {detailsError ? (
+          <p
+            className="rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+            role="alert"
+          >
+            {detailsError}
+          </p>
+        ) : null}
+        {detailsMessage ? (
+          <p
+            className="rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-3 py-2 text-sm text-[var(--color-brand-accent-strong)]"
+            role="status"
+          >
+            {detailsMessage}
+          </p>
+        ) : null}
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-[var(--text-tertiary)]">
+            Invite code creation and member roles remain managed below.
+          </p>
+          <button
+            type="submit"
+            disabled={detailsMutation.isPending}
+            className="app-action-primary w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          >
+            {detailsMutation.isPending ? 'Saving...' : 'Save details'}
+          </button>
+        </div>
+      </form>
+    </section>
   );
 }
 
@@ -523,6 +745,19 @@ export default function AdminCommunityPage() {
           </div>
         </div>
       </section>
+
+      <CommunityDetailsForm
+        key={selectedCommunity.id}
+        community={selectedCommunity}
+        onSaved={async () => {
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ['community-admin'] }),
+            queryClient.invalidateQueries({ queryKey: ['community-detail'] }),
+            queryClient.invalidateQueries({ queryKey: ['me'] }),
+            refreshSession(selectedCommunity.id),
+          ]);
+        }}
+      />
 
       <section className="mt-5 grid gap-3 sm:grid-cols-3">
         <MetricCard label="Members" value={String(memberCount)}>
