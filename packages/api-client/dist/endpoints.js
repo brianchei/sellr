@@ -12,6 +12,7 @@ exports.updateProfile = updateProfile;
 exports.registerPushToken = registerPushToken;
 exports.joinCommunity = joinCommunity;
 exports.fetchCommunityAdmin = fetchCommunityAdmin;
+exports.fetchCommunityDetail = fetchCommunityDetail;
 exports.createCommunityInviteCode = createCommunityInviteCode;
 exports.updateCommunityMember = updateCommunityMember;
 exports.fetchListingsNearby = fetchListingsNearby;
@@ -112,6 +113,9 @@ function joinCommunity(body) {
 }
 function fetchCommunityAdmin() {
     return (0, fetch_1.apiFetch)('/communities/admin');
+}
+function fetchCommunityDetail(communityId) {
+    return (0, fetch_1.apiFetch)(`/communities/${communityId}`);
 }
 function createCommunityInviteCode(communityId, body) {
     return (0, fetch_1.apiFetch)(`/communities/${communityId}/invites`, {

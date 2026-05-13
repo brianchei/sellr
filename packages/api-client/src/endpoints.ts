@@ -166,6 +166,29 @@ export type ApiCommunityAdminCommunity = {
   inviteCodes: ApiCommunityInviteCode[];
 };
 
+export type ApiCommunityDetail = {
+  id: string;
+  name: string;
+  type: 'campus' | 'coworking' | 'residential';
+  accessMethod: 'invite_code' | 'email_domain';
+  emailDomain: string | null;
+  rules: unknown;
+  status: string;
+  createdAt: string;
+};
+
+export type ApiCommunityMembership = {
+  role: string;
+  status: string;
+  joinedAt: string;
+};
+
+export type ApiCommunityStats = {
+  activeMemberCount: number;
+  activeListingCount: number;
+  activeSellerCount: number;
+};
+
 export type ApiConversationSummary = ApiConversation & {
   listing: {
     id: string;
@@ -317,6 +340,14 @@ export function fetchCommunityAdmin() {
   return apiFetch<{ communities: ApiCommunityAdminCommunity[] }>(
     '/communities/admin',
   );
+}
+
+export function fetchCommunityDetail(communityId: string) {
+  return apiFetch<{
+    community: ApiCommunityDetail;
+    membership: ApiCommunityMembership;
+    stats: ApiCommunityStats;
+  }>(`/communities/${communityId}`);
 }
 
 export function createCommunityInviteCode(
