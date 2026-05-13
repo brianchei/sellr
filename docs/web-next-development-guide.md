@@ -245,22 +245,26 @@ Shipped:
   `PATCH /communities/:communityId`, covering name, type, access method, email
   domain, and member-facing rules/guidance stored in the existing community
   fields.
+- Expanded admin-editable lightweight community presentation config for short
+  descriptions, theme keys, accent colors, pickup guidance, local areas, and
+  optional approved banner/logo image URLs.
 - Improved `/admin/community` member management with search, role/status
-  filters, result counts, clearer access action labels, and no-results states.
+  filters, result counts, clearer access action labels, inactive-access reason
+  context, and no-results states.
 - Connected `/admin/reports` to member management by adding target member
   context and a `Manage member` CTA that opens `/admin/community` with the
   relevant community and member search context.
 - Added scoped report-linked moderation actions on `/admin/reports` so admins
-  can demote reported admins or deactivate member access from the report card
-  while keeping report status review separate.
+  can demote reported admins or deactivate/suspend member access from the report
+  card while keeping report status review separate.
+- Added audit-friendly moderation history for report-linked member actions.
 
 Work items:
 
-- Add richer community branding/theme config and optional imagery.
-- Expand the decorated Badger Market experience with approved imagery or
-  additional admin-editable fields when available.
-- Add audit-friendly moderation history or richer suspension semantics if the
-  launch workflow needs them.
+- Add real approved Badger Market / UW-Madison imagery when it exists and has
+  permission to be used publicly.
+- Revisit richer suspension semantics only if launch operations need more than
+  the current inactive/suspended access reason model.
 
 Acceptance notes:
 
@@ -394,14 +398,16 @@ Completed in Phase 3:
 - Improve member management in the admin dashboard.
 - Connect reports to member management.
 - Add scoped report-linked demote/deactivate actions.
+- Add audit-friendly moderation history.
+- Add lightweight community branding/theme controls.
+- Add optional approved imagery URL support.
 
 Remaining:
 
-- Expand Badger Market / UW-Madison decoration with approved imagery or
-  additional admin-editable fields.
-- Add richer branding/theme controls to admin dashboard.
-- Add audit-friendly moderation history or richer suspension semantics if the
-  launch workflow needs them.
+- Add real approved Badger Market / UW-Madison imagery when it exists and has
+  permission to be used publicly.
+- Consider richer suspension semantics only if launch operations need more than
+  the current inactive/suspended access reason model.
 
 ### Profile And Trust
 
@@ -446,9 +452,8 @@ Remaining:
 
 ### Admin And Safety
 
-- Add audit history for report-linked member actions if needed.
-- Consider richer suspension semantics beyond the current inactive-member
-  access control.
+- Consider richer suspension semantics only if launch operations need more than
+  the current inactive/suspended access reason model.
 - Expand admin community controls only when they directly support launch ops.
 
 ### AI
@@ -566,3 +571,8 @@ Keep this guide aligned with:
 - Added report-linked member actions to `/admin/reports` so admins can demote a
   reported admin or deactivate member access from a report card, with explicit
   confirmation copy and separate report status review.
+- Added moderation action persistence for report-linked member actions and
+  surfaced recent moderation history on report cards.
+- Added community presentation config fields and homepage rendering for
+  descriptions, theme keys, accent color, pickup guidance, local areas, and
+  optional approved banner/logo image URLs.

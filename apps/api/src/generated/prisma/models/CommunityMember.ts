@@ -29,6 +29,9 @@ export type CommunityMemberMinAggregateOutputType = {
   communityId: string | null
   role: string | null
   status: string | null
+  accessStatusReason: string | null
+  accessStatusNote: string | null
+  accessSuspendedUntil: Date | null
   joinedAt: Date | null
 }
 
@@ -37,6 +40,9 @@ export type CommunityMemberMaxAggregateOutputType = {
   communityId: string | null
   role: string | null
   status: string | null
+  accessStatusReason: string | null
+  accessStatusNote: string | null
+  accessSuspendedUntil: Date | null
   joinedAt: Date | null
 }
 
@@ -45,6 +51,9 @@ export type CommunityMemberCountAggregateOutputType = {
   communityId: number
   role: number
   status: number
+  accessStatusReason: number
+  accessStatusNote: number
+  accessSuspendedUntil: number
   joinedAt: number
   _all: number
 }
@@ -55,6 +64,9 @@ export type CommunityMemberMinAggregateInputType = {
   communityId?: true
   role?: true
   status?: true
+  accessStatusReason?: true
+  accessStatusNote?: true
+  accessSuspendedUntil?: true
   joinedAt?: true
 }
 
@@ -63,6 +75,9 @@ export type CommunityMemberMaxAggregateInputType = {
   communityId?: true
   role?: true
   status?: true
+  accessStatusReason?: true
+  accessStatusNote?: true
+  accessSuspendedUntil?: true
   joinedAt?: true
 }
 
@@ -71,6 +86,9 @@ export type CommunityMemberCountAggregateInputType = {
   communityId?: true
   role?: true
   status?: true
+  accessStatusReason?: true
+  accessStatusNote?: true
+  accessSuspendedUntil?: true
   joinedAt?: true
   _all?: true
 }
@@ -152,6 +170,9 @@ export type CommunityMemberGroupByOutputType = {
   communityId: string
   role: string
   status: string
+  accessStatusReason: string | null
+  accessStatusNote: string | null
+  accessSuspendedUntil: Date | null
   joinedAt: Date
   _count: CommunityMemberCountAggregateOutputType | null
   _min: CommunityMemberMinAggregateOutputType | null
@@ -181,6 +202,9 @@ export type CommunityMemberWhereInput = {
   communityId?: Prisma.UuidFilter<"CommunityMember"> | string
   role?: Prisma.StringFilter<"CommunityMember"> | string
   status?: Prisma.StringFilter<"CommunityMember"> | string
+  accessStatusReason?: Prisma.StringNullableFilter<"CommunityMember"> | string | null
+  accessStatusNote?: Prisma.StringNullableFilter<"CommunityMember"> | string | null
+  accessSuspendedUntil?: Prisma.DateTimeNullableFilter<"CommunityMember"> | Date | string | null
   joinedAt?: Prisma.DateTimeFilter<"CommunityMember"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   community?: Prisma.XOR<Prisma.CommunityScalarRelationFilter, Prisma.CommunityWhereInput>
@@ -191,6 +215,9 @@ export type CommunityMemberOrderByWithRelationInput = {
   communityId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  accessStatusReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  accessStatusNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  accessSuspendedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   community?: Prisma.CommunityOrderByWithRelationInput
@@ -205,6 +232,9 @@ export type CommunityMemberWhereUniqueInput = Prisma.AtLeast<{
   communityId?: Prisma.UuidFilter<"CommunityMember"> | string
   role?: Prisma.StringFilter<"CommunityMember"> | string
   status?: Prisma.StringFilter<"CommunityMember"> | string
+  accessStatusReason?: Prisma.StringNullableFilter<"CommunityMember"> | string | null
+  accessStatusNote?: Prisma.StringNullableFilter<"CommunityMember"> | string | null
+  accessSuspendedUntil?: Prisma.DateTimeNullableFilter<"CommunityMember"> | Date | string | null
   joinedAt?: Prisma.DateTimeFilter<"CommunityMember"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   community?: Prisma.XOR<Prisma.CommunityScalarRelationFilter, Prisma.CommunityWhereInput>
@@ -215,6 +245,9 @@ export type CommunityMemberOrderByWithAggregationInput = {
   communityId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  accessStatusReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  accessStatusNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  accessSuspendedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
   _count?: Prisma.CommunityMemberCountOrderByAggregateInput
   _max?: Prisma.CommunityMemberMaxOrderByAggregateInput
@@ -229,12 +262,18 @@ export type CommunityMemberScalarWhereWithAggregatesInput = {
   communityId?: Prisma.UuidWithAggregatesFilter<"CommunityMember"> | string
   role?: Prisma.StringWithAggregatesFilter<"CommunityMember"> | string
   status?: Prisma.StringWithAggregatesFilter<"CommunityMember"> | string
+  accessStatusReason?: Prisma.StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
+  accessStatusNote?: Prisma.StringNullableWithAggregatesFilter<"CommunityMember"> | string | null
+  accessSuspendedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"CommunityMember"> | Date | string | null
   joinedAt?: Prisma.DateTimeWithAggregatesFilter<"CommunityMember"> | Date | string
 }
 
 export type CommunityMemberCreateInput = {
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutCommunityMembersInput
   community: Prisma.CommunityCreateNestedOneWithoutMembersInput
@@ -245,12 +284,18 @@ export type CommunityMemberUncheckedCreateInput = {
   communityId: string
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
 }
 
 export type CommunityMemberUpdateInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutCommunityMembersNestedInput
   community?: Prisma.CommunityUpdateOneRequiredWithoutMembersNestedInput
@@ -261,6 +306,9 @@ export type CommunityMemberUncheckedUpdateInput = {
   communityId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -269,12 +317,18 @@ export type CommunityMemberCreateManyInput = {
   communityId: string
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
 }
 
 export type CommunityMemberUpdateManyMutationInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -283,6 +337,9 @@ export type CommunityMemberUncheckedUpdateManyInput = {
   communityId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -306,6 +363,9 @@ export type CommunityMemberCountOrderByAggregateInput = {
   communityId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  accessStatusReason?: Prisma.SortOrder
+  accessStatusNote?: Prisma.SortOrder
+  accessSuspendedUntil?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
 }
 
@@ -314,6 +374,9 @@ export type CommunityMemberMaxOrderByAggregateInput = {
   communityId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  accessStatusReason?: Prisma.SortOrder
+  accessStatusNote?: Prisma.SortOrder
+  accessSuspendedUntil?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
 }
 
@@ -322,6 +385,9 @@ export type CommunityMemberMinOrderByAggregateInput = {
   communityId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  accessStatusReason?: Prisma.SortOrder
+  accessStatusNote?: Prisma.SortOrder
+  accessSuspendedUntil?: Prisma.SortOrder
   joinedAt?: Prisma.SortOrder
 }
 
@@ -412,6 +478,9 @@ export type CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput = {
 export type CommunityMemberCreateWithoutUserInput = {
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
   community: Prisma.CommunityCreateNestedOneWithoutMembersInput
 }
@@ -420,6 +489,9 @@ export type CommunityMemberUncheckedCreateWithoutUserInput = {
   communityId: string
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
 }
 
@@ -457,12 +529,18 @@ export type CommunityMemberScalarWhereInput = {
   communityId?: Prisma.UuidFilter<"CommunityMember"> | string
   role?: Prisma.StringFilter<"CommunityMember"> | string
   status?: Prisma.StringFilter<"CommunityMember"> | string
+  accessStatusReason?: Prisma.StringNullableFilter<"CommunityMember"> | string | null
+  accessStatusNote?: Prisma.StringNullableFilter<"CommunityMember"> | string | null
+  accessSuspendedUntil?: Prisma.DateTimeNullableFilter<"CommunityMember"> | Date | string | null
   joinedAt?: Prisma.DateTimeFilter<"CommunityMember"> | Date | string
 }
 
 export type CommunityMemberCreateWithoutCommunityInput = {
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutCommunityMembersInput
 }
@@ -471,6 +549,9 @@ export type CommunityMemberUncheckedCreateWithoutCommunityInput = {
   userId: string
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
 }
 
@@ -504,12 +585,18 @@ export type CommunityMemberCreateManyUserInput = {
   communityId: string
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
 }
 
 export type CommunityMemberUpdateWithoutUserInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   community?: Prisma.CommunityUpdateOneRequiredWithoutMembersNestedInput
 }
@@ -518,6 +605,9 @@ export type CommunityMemberUncheckedUpdateWithoutUserInput = {
   communityId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -525,6 +615,9 @@ export type CommunityMemberUncheckedUpdateManyWithoutUserInput = {
   communityId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -532,12 +625,18 @@ export type CommunityMemberCreateManyCommunityInput = {
   userId: string
   role?: string
   status?: string
+  accessStatusReason?: string | null
+  accessStatusNote?: string | null
+  accessSuspendedUntil?: Date | string | null
   joinedAt?: Date | string
 }
 
 export type CommunityMemberUpdateWithoutCommunityInput = {
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutCommunityMembersNestedInput
 }
@@ -546,6 +645,9 @@ export type CommunityMemberUncheckedUpdateWithoutCommunityInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -553,6 +655,9 @@ export type CommunityMemberUncheckedUpdateManyWithoutCommunityInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  accessStatusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessStatusNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessSuspendedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   joinedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -563,6 +668,9 @@ export type CommunityMemberSelect<ExtArgs extends runtime.Types.Extensions.Inter
   communityId?: boolean
   role?: boolean
   status?: boolean
+  accessStatusReason?: boolean
+  accessStatusNote?: boolean
+  accessSuspendedUntil?: boolean
   joinedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   community?: boolean | Prisma.CommunityDefaultArgs<ExtArgs>
@@ -573,6 +681,9 @@ export type CommunityMemberSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   communityId?: boolean
   role?: boolean
   status?: boolean
+  accessStatusReason?: boolean
+  accessStatusNote?: boolean
+  accessSuspendedUntil?: boolean
   joinedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   community?: boolean | Prisma.CommunityDefaultArgs<ExtArgs>
@@ -583,6 +694,9 @@ export type CommunityMemberSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   communityId?: boolean
   role?: boolean
   status?: boolean
+  accessStatusReason?: boolean
+  accessStatusNote?: boolean
+  accessSuspendedUntil?: boolean
   joinedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   community?: boolean | Prisma.CommunityDefaultArgs<ExtArgs>
@@ -593,10 +707,13 @@ export type CommunityMemberSelectScalar = {
   communityId?: boolean
   role?: boolean
   status?: boolean
+  accessStatusReason?: boolean
+  accessStatusNote?: boolean
+  accessSuspendedUntil?: boolean
   joinedAt?: boolean
 }
 
-export type CommunityMemberOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "communityId" | "role" | "status" | "joinedAt", ExtArgs["result"]["communityMember"]>
+export type CommunityMemberOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"userId" | "communityId" | "role" | "status" | "accessStatusReason" | "accessStatusNote" | "accessSuspendedUntil" | "joinedAt", ExtArgs["result"]["communityMember"]>
 export type CommunityMemberInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   community?: boolean | Prisma.CommunityDefaultArgs<ExtArgs>
@@ -621,6 +738,9 @@ export type $CommunityMemberPayload<ExtArgs extends runtime.Types.Extensions.Int
     communityId: string
     role: string
     status: string
+    accessStatusReason: string | null
+    accessStatusNote: string | null
+    accessSuspendedUntil: Date | null
     joinedAt: Date
   }, ExtArgs["result"]["communityMember"]>
   composites: {}
@@ -1051,6 +1171,9 @@ export interface CommunityMemberFieldRefs {
   readonly communityId: Prisma.FieldRef<"CommunityMember", 'String'>
   readonly role: Prisma.FieldRef<"CommunityMember", 'String'>
   readonly status: Prisma.FieldRef<"CommunityMember", 'String'>
+  readonly accessStatusReason: Prisma.FieldRef<"CommunityMember", 'String'>
+  readonly accessStatusNote: Prisma.FieldRef<"CommunityMember", 'String'>
+  readonly accessSuspendedUntil: Prisma.FieldRef<"CommunityMember", 'DateTime'>
   readonly joinedAt: Prisma.FieldRef<"CommunityMember", 'DateTime'>
 }
     

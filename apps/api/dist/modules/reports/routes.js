@@ -15,6 +15,74 @@ function adminCommunityIds(role) {
 function preview(value, length = 120) {
     return value.length > length ? `${value.slice(0, length - 3)}...` : value;
 }
+async function activeAdminCount(communityId) {
+    return prisma_1.prisma.communityMember.count({
+        where: {
+            communityId,
+            role: 'admin',
+            status: 'active',
+        },
+    });
+}
+function actionTypeFor(action) {
+    if (action === 'demote_admin')
+        return 'admin_demoted';
+    if (action === 'suspend_member')
+        return 'member_suspended';
+    return 'member_deactivated';
+}
+function accessStatusReasonFor(action) {
+    if (action === 'deactivate_member')
+        return 'report_deactivated';
+    if (action === 'suspend_member')
+        return 'report_suspension';
+    return null;
+}
+function moderationActionLabel(actionType) {
+    if (actionType === 'admin_demoted')
+        return 'Demoted admin';
+    if (actionType === 'member_suspended')
+        return 'Suspended access';
+    if (actionType === 'member_deactivated')
+        return 'Deactivated access';
+    if (actionType === 'member_reactivated')
+        return 'Reactivated access';
+    if (actionType === 'admin_promoted')
+        return 'Promoted admin';
+    return actionType.replaceAll('_', ' ');
+}
+async function moderationActionsByReportId(reportIds) {
+    if (reportIds.length === 0)
+        return new Map();
+    const actions = await prisma_1.prisma.moderationAction.findMany({
+        where: { reportId: { in: reportIds } },
+        orderBy: { createdAt: 'desc' },
+        include: {
+            moderator: { select: { id: true, displayName: true } },
+            targetUser: { select: { id: true, displayName: true } },
+        },
+    });
+    const grouped = new Map();
+    actions.forEach((action) => {
+        if (!action.reportId)
+            return;
+        const list = grouped.get(action.reportId) ?? [];
+        list.push(action);
+        grouped.set(action.reportId, list);
+    });
+    return grouped;
+}
+async function attachReportContext(reports, adminIds) {
+    const [summaries, moderationActions] = await Promise.all([
+        targetSummaries(reports, adminIds),
+        moderationActionsByReportId(reports.map((report) => report.id)),
+    ]);
+    return reports.map((report) => ({
+        ...report,
+        target: summaries.get(report.targetId) ?? null,
+        moderationActions: moderationActions.get(report.id) ?? [],
+    }));
+}
 async function getReportTargetAccess(targetId, targetType, reporterId, communityIds) {
     if (targetType === 'listing') {
         const listing = await prisma_1.prisma.listing.findUnique({
@@ -108,7 +176,7 @@ async function reportTargetCommunityIds(targetId, targetType) {
         return communityId ? [communityId] : [];
     }
     const memberships = await prisma_1.prisma.communityMember.findMany({
-        where: { userId: targetId, status: 'active' },
+        where: { userId: targetId },
         select: { communityId: true },
     });
     return memberships.map((membership) => membership.communityId);
@@ -117,7 +185,10 @@ async function canAdminReport(report, communityIds) {
     const targetCommunityIds = await reportTargetCommunityIds(report.targetId, report.targetType);
     return targetCommunityIds.some((communityId) => communityIds.includes(communityId));
 }
-async function targetSummaries(reports) {
+function memberContact(user) {
+    return user.email ?? user.phoneE164 ?? 'No contact on file';
+}
+async function targetSummaries(reports, adminCommunityIds) {
     const listingIds = reports
         .filter((report) => report.targetType === 'listing')
         .map((report) => report.targetId);
@@ -136,6 +207,14 @@ async function targetSummaries(reports) {
                     title: true,
                     communityId: true,
                     status: true,
+                    sellerId: true,
+                    seller: {
+                        select: {
+                            displayName: true,
+                            email: true,
+                            phoneE164: true,
+                        },
+                    },
                 },
             })
             : [],
@@ -145,6 +224,14 @@ async function targetSummaries(reports) {
                 select: {
                     id: true,
                     content: true,
+                    senderId: true,
+                    sender: {
+                        select: {
+                            displayName: true,
+                            email: true,
+                            phoneE164: true,
+                        },
+                    },
                     conversationId: true,
                     conversation: {
                         select: {
@@ -178,6 +265,93 @@ async function targetSummaries(reports) {
     const listingMap = new Map(listings.map((listing) => [listing.id, listing]));
     const messageMap = new Map(messages.map((message) => [message.id, message]));
     const userMap = new Map(users.map((user) => [user.id, user]));
+    const memberCandidates = reports
+        .map((report) => {
+        if (report.targetType === 'listing') {
+            const listing = listingMap.get(report.targetId);
+            return listing
+                ? {
+                    reportKey: report.targetId,
+                    userId: listing.sellerId,
+                    communityId: listing.communityId,
+                    displayName: listing.seller.displayName,
+                    contact: memberContact(listing.seller),
+                }
+                : null;
+        }
+        if (report.targetType === 'message') {
+            const message = messageMap.get(report.targetId);
+            const listing = message?.conversation.listing ?? message?.conversation.offer?.listing;
+            return message && listing?.communityId
+                ? {
+                    reportKey: report.targetId,
+                    userId: message.senderId,
+                    communityId: listing.communityId,
+                    displayName: message.sender.displayName,
+                    contact: memberContact(message.sender),
+                }
+                : null;
+        }
+        const user = userMap.get(report.targetId);
+        return user
+            ? {
+                reportKey: report.targetId,
+                userId: user.id,
+                communityId: null,
+                displayName: user.displayName,
+                contact: memberContact(user),
+            }
+            : null;
+    })
+        .filter((candidate) => Boolean(candidate));
+    const memberUserIds = Array.from(new Set(memberCandidates.map((candidate) => candidate.userId)));
+    const memberships = memberUserIds.length
+        ? await prisma_1.prisma.communityMember.findMany({
+            where: {
+                userId: { in: memberUserIds },
+                communityId: { in: adminCommunityIds },
+            },
+            select: {
+                userId: true,
+                communityId: true,
+                role: true,
+                status: true,
+                accessStatusReason: true,
+                accessSuspendedUntil: true,
+            },
+        })
+        : [];
+    const membershipsByKey = new Map(memberships.map((membership) => [
+        `${membership.userId}:${membership.communityId}`,
+        membership,
+    ]));
+    const firstMembershipByUserId = new Map();
+    memberships.forEach((membership) => {
+        if (!firstMembershipByUserId.has(membership.userId)) {
+            firstMembershipByUserId.set(membership.userId, membership);
+        }
+    });
+    const memberCandidateByReportKey = new Map(memberCandidates.map((candidate) => [candidate.reportKey, candidate]));
+    function memberManagementFor(reportKey) {
+        const candidate = memberCandidateByReportKey.get(reportKey);
+        if (!candidate)
+            return null;
+        const membership = candidate.communityId
+            ? membershipsByKey.get(`${candidate.userId}:${candidate.communityId}`)
+            : firstMembershipByUserId.get(candidate.userId);
+        if (!membership)
+            return null;
+        return {
+            userId: candidate.userId,
+            communityId: membership.communityId,
+            displayName: candidate.displayName,
+            role: membership.role,
+            status: membership.status,
+            accessStatusReason: membership.accessStatusReason,
+            accessSuspendedUntil: membership.accessSuspendedUntil,
+            contact: candidate.contact,
+        };
+    }
     const entries = reports.map((report) => {
         if (report.targetType === 'listing') {
             const listing = listingMap.get(report.targetId);
@@ -189,6 +363,7 @@ async function targetSummaries(reports) {
                         detail: `Listing - ${listing.status}`,
                         href: `/marketplace/${listing.id}`,
                         communityId: listing.communityId,
+                        memberManagement: memberManagementFor(report.targetId),
                     }
                     : null,
             ];
@@ -204,6 +379,7 @@ async function targetSummaries(reports) {
                         detail: `Message - ${preview(message.content)}`,
                         href: `/inbox/${message.conversationId}`,
                         communityId: listing?.communityId ?? null,
+                        memberManagement: memberManagementFor(report.targetId),
                     }
                     : null,
             ];
@@ -216,7 +392,8 @@ async function targetSummaries(reports) {
                     label: user.displayName,
                     detail: `Member - ${user.email ?? user.phoneE164 ?? 'No contact on file'}`,
                     href: null,
-                    communityId: null,
+                    communityId: memberManagementFor(report.targetId)?.communityId ?? null,
+                    memberManagement: memberManagementFor(report.targetId),
                 }
                 : null,
         ];
@@ -251,7 +428,7 @@ const plugin = (fastify, _opts, done) => {
         });
         const messageIds = messages.map((message) => message.id);
         const members = await prisma_1.prisma.communityMember.findMany({
-            where: { communityId: { in: adminIds }, status: 'active' },
+            where: { communityId: { in: adminIds } },
             select: { userId: true },
         });
         const memberIds = members.map((member) => member.userId);
@@ -280,12 +457,9 @@ const plugin = (fastify, _opts, done) => {
                 },
             },
         });
-        const summaries = await targetSummaries(reports);
+        const reportsWithContext = await attachReportContext(reports, adminIds);
         return reply.send((0, response_1.ok)({
-            reports: reports.map((report) => ({
-                ...report,
-                target: summaries.get(report.targetId) ?? null,
-            })),
+            reports: reportsWithContext,
             adminCommunityIds: adminIds,
         }));
     });
@@ -357,13 +531,131 @@ const plugin = (fastify, _opts, done) => {
                 },
             },
         });
-        const summaries = await targetSummaries([updated]);
+        const [reportWithContext] = await attachReportContext([updated], adminIds);
         return reply.send((0, response_1.ok)({
-            report: {
-                ...updated,
-                target: summaries.get(updated.targetId) ?? null,
-            },
+            report: reportWithContext,
         }));
+    });
+    fastify.post('/:reportId/member-action', {
+        preHandler: auth_1.verifyJWT,
+        schema: { body: shared_1.ReportMemberActionSchema },
+    }, async (request, reply) => {
+        const adminIds = adminCommunityIds(request.user.role);
+        if (adminIds.length === 0) {
+            return reply.code(403).send({ error: 'Admin access required' });
+        }
+        const { reportId } = request.params;
+        const body = shared_1.ReportMemberActionSchema.parse(request.body);
+        const report = await prisma_1.prisma.report.findUnique({
+            where: { id: reportId },
+            select: {
+                id: true,
+                targetId: true,
+                targetType: true,
+            },
+        });
+        if (!report) {
+            return reply.code(404).send({ error: 'Report not found' });
+        }
+        const allowed = await canAdminReport({ targetId: report.targetId, targetType: report.targetType }, adminIds);
+        if (!allowed) {
+            return reply.code(403).send({ error: 'Admin access required' });
+        }
+        const summaries = await targetSummaries([report], adminIds);
+        const member = summaries.get(report.targetId)?.memberManagement ?? null;
+        if (!member) {
+            return reply
+                .code(400)
+                .send({ error: 'Report target is not a manageable member' });
+        }
+        const membership = await prisma_1.prisma.communityMember.findUnique({
+            where: {
+                userId_communityId: {
+                    userId: member.userId,
+                    communityId: member.communityId,
+                },
+            },
+        });
+        if (!membership) {
+            return reply.code(404).send({ error: 'Member not found' });
+        }
+        const nextRole = body.action === 'demote_admin' ? 'member' : membership.role;
+        const nextStatus = body.action === 'demote_admin' ? membership.status : 'inactive';
+        const nextAccessStatusReason = accessStatusReasonFor(body.action);
+        if (body.action === 'demote_admin' && membership.role !== 'admin') {
+            return reply.code(400).send({ error: 'Member is not an admin' });
+        }
+        if ((body.action === 'deactivate_member' ||
+            body.action === 'suspend_member') &&
+            membership.status !== 'active') {
+            return reply
+                .code(400)
+                .send({ error: 'Member access is already inactive' });
+        }
+        const wasActiveAdmin = membership.role === 'admin' && membership.status === 'active';
+        const remainsActiveAdmin = nextRole === 'admin' && nextStatus === 'active';
+        if (wasActiveAdmin && !remainsActiveAdmin) {
+            const count = await activeAdminCount(member.communityId);
+            if (count <= 1) {
+                return reply
+                    .code(400)
+                    .send({ error: 'A community must have at least one active admin' });
+            }
+        }
+        await prisma_1.prisma.$transaction(async (tx) => {
+            await tx.communityMember.update({
+                where: {
+                    userId_communityId: {
+                        userId: member.userId,
+                        communityId: member.communityId,
+                    },
+                },
+                data: {
+                    role: nextRole,
+                    status: nextStatus,
+                    ...(body.action === 'demote_admin'
+                        ? {}
+                        : {
+                            accessStatusReason: nextAccessStatusReason,
+                            accessStatusNote: body.note ?? null,
+                            accessSuspendedUntil: null,
+                        }),
+                },
+            });
+            await tx.moderationAction.create({
+                data: {
+                    reportId: report.id,
+                    communityId: member.communityId,
+                    targetUserId: member.userId,
+                    moderatorId: request.user.sub,
+                    actionType: actionTypeFor(body.action),
+                    previousRole: membership.role,
+                    nextRole,
+                    previousStatus: membership.status,
+                    nextStatus,
+                    previousAccessStatusReason: membership.accessStatusReason,
+                    nextAccessStatusReason,
+                    note: body.note ??
+                        `${moderationActionLabel(actionTypeFor(body.action))} from report review.`,
+                },
+            });
+        });
+        const updated = await prisma_1.prisma.report.findUniqueOrThrow({
+            where: { id: report.id },
+            include: {
+                reporter: {
+                    select: {
+                        id: true,
+                        displayName: true,
+                        phoneE164: true,
+                        email: true,
+                        emailVerifiedAt: true,
+                    },
+                },
+            },
+        });
+        const [reportWithContext] = await attachReportContext([updated], adminIds);
+        return reply.send((0, response_1.ok)({ report: reportWithContext }));
     });
     fastify.post('/:reportId/remove-listing', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
         const adminIds = adminCommunityIds(request.user.role);
@@ -434,12 +726,9 @@ const plugin = (fastify, _opts, done) => {
             photoUrls: listing.photoUrls,
             reason: 'moderation_listing_removed',
         });
-        const summaries = await targetSummaries([updated]);
+        const [reportWithContext] = await attachReportContext([updated], adminIds);
         return reply.send((0, response_1.ok)({
-            report: {
-                ...updated,
-                target: summaries.get(updated.targetId) ?? null,
-            },
+            report: reportWithContext,
             listingRemoved: true,
         }));
     });

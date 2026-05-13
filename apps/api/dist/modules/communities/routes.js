@@ -8,6 +8,8 @@ const authTokens_1 = require("../../lib/authTokens");
 const authCookies_1 = require("../../lib/authCookies");
 const auth_1 = require("../../middleware/auth");
 const otp_1 = require("../../lib/otp");
+const memberships_1 = require("../../lib/memberships");
+const queues_1 = require("../../lib/queues");
 const INACTIVE_MEMBERSHIP_ERROR = 'Membership is inactive. Ask a community admin to reactivate access.';
 function normalizeInviteCode(code) {
     return code.trim().toUpperCase();
@@ -46,6 +48,28 @@ async function adminCommunityIdsFor(userId) {
     });
     return memberships.map((membership) => membership.communityId);
 }
+const adminCommunityInclude = {
+    members: {
+        orderBy: [{ status: 'asc' }, { role: 'asc' }, { joinedAt: 'desc' }],
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    phoneE164: true,
+                    email: true,
+                    emailVerifiedAt: true,
+                    displayName: true,
+                    avatarUrl: true,
+                    verifiedAt: true,
+                    createdAt: true,
+                },
+            },
+        },
+    },
+    inviteCodes: {
+        orderBy: { code: 'asc' },
+    },
+};
 const plugin = (fastify, _opts, done) => {
     fastify.get('/:communityId', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
         const { communityId } = shared_1.CommunityAdminParamsSchema.parse(request.params);
@@ -65,6 +89,7 @@ const plugin = (fastify, _opts, done) => {
                         accessMethod: true,
                         emailDomain: true,
                         rules: true,
+                        presentation: true,
                         status: true,
                         createdAt: true,
                     },
@@ -105,6 +130,8 @@ const plugin = (fastify, _opts, done) => {
             membership: {
                 role: membership.role,
                 status: membership.status,
+                accessStatusReason: membership.accessStatusReason,
+                accessSuspendedUntil: membership.accessSuspendedUntil,
                 joinedAt: membership.joinedAt,
             },
             stats: {
@@ -219,6 +246,101 @@ const plugin = (fastify, _opts, done) => {
             refreshToken: tokens.refreshToken,
         }));
     });
+    fastify.post('/:communityId/leave', {
+        preHandler: auth_1.verifyJWT,
+        schema: { body: shared_1.LeaveCommunitySchema },
+    }, async (request, reply) => {
+        const { communityId } = shared_1.CommunityAdminParamsSchema.parse(request.params);
+        const body = shared_1.LeaveCommunitySchema.parse(request.body ?? {});
+        const membership = await prisma_1.prisma.communityMember.findUnique({
+            where: {
+                userId_communityId: {
+                    userId: request.user.sub,
+                    communityId,
+                },
+            },
+            include: { community: { select: { status: true } } },
+        });
+        if (!membership ||
+            membership.status !== 'active' ||
+            membership.community.status !== 'active') {
+            return reply
+                .code(403)
+                .send({ error: 'Not an active member of this community' });
+        }
+        if (membership.role === 'admin') {
+            const count = await activeAdminCount(communityId);
+            if (count <= 1) {
+                return reply
+                    .code(400)
+                    .send({ error: 'A community must have at least one active admin' });
+            }
+        }
+        const [activeListingCount, listingsToRemove] = await Promise.all([
+            prisma_1.prisma.listing.count({
+                where: {
+                    communityId,
+                    sellerId: request.user.sub,
+                    status: 'active',
+                },
+            }),
+            body.removeListings
+                ? prisma_1.prisma.listing.findMany({
+                    where: {
+                        communityId,
+                        sellerId: request.user.sub,
+                        status: { in: ['draft', 'pending_review', 'active'] },
+                    },
+                    select: { id: true },
+                })
+                : Promise.resolve([]),
+        ]);
+        if (activeListingCount > 0 && !body.removeListings) {
+            return reply.code(409).send({
+                error: 'Unpublish active listings or choose to remove your listings before leaving this community.',
+                activeListingCount,
+            });
+        }
+        await prisma_1.prisma.$transaction(async (tx) => {
+            if (body.removeListings && listingsToRemove.length > 0) {
+                await tx.listing.updateMany({
+                    where: {
+                        id: { in: listingsToRemove.map((listing) => listing.id) },
+                    },
+                    data: { status: 'expired' },
+                });
+            }
+            await tx.communityMember.delete({
+                where: {
+                    userId_communityId: {
+                        userId: request.user.sub,
+                        communityId,
+                    },
+                },
+            });
+        });
+        await Promise.all(listingsToRemove.map((listing) => queues_1.searchSyncQueue.add('sync', {
+            listingId: listing.id,
+            action: 'delete',
+        })));
+        const tokens = await (0, authTokens_1.issueTokenPair)(fastify, request.user.sub);
+        const payload = await (0, memberships_1.buildUserJwtPayload)(request.user.sub);
+        if ((0, authCookies_1.isWebClient)(request.headers)) {
+            (0, authCookies_1.setAuthCookies)(reply, tokens);
+            return reply.send((0, response_1.ok)({
+                communityId,
+                communityIds: payload.communityIds,
+                removedListingCount: listingsToRemove.length,
+            }));
+        }
+        return reply.send((0, response_1.ok)({
+            communityId,
+            communityIds: payload.communityIds,
+            removedListingCount: listingsToRemove.length,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+        }));
+    });
     fastify.get('/admin', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
         const adminCommunityIds = await adminCommunityIdsFor(request.user.sub);
         if (adminCommunityIds.length === 0) {
@@ -227,30 +349,40 @@ const plugin = (fastify, _opts, done) => {
         const communities = await prisma_1.prisma.community.findMany({
             where: { id: { in: adminCommunityIds } },
             orderBy: { name: 'asc' },
-            include: {
-                members: {
-                    orderBy: [{ status: 'asc' }, { role: 'asc' }, { joinedAt: 'desc' }],
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                phoneE164: true,
-                                email: true,
-                                emailVerifiedAt: true,
-                                displayName: true,
-                                avatarUrl: true,
-                                verifiedAt: true,
-                                createdAt: true,
-                            },
-                        },
-                    },
-                },
-                inviteCodes: {
-                    orderBy: { code: 'asc' },
-                },
-            },
+            include: adminCommunityInclude,
         });
         return reply.send((0, response_1.ok)({ communities }));
+    });
+    fastify.patch('/:communityId', {
+        preHandler: auth_1.verifyJWT,
+        schema: { body: shared_1.UpdateCommunityDetailsSchema },
+    }, async (request, reply) => {
+        const { communityId } = shared_1.CommunityAdminParamsSchema.parse(request.params);
+        const body = shared_1.UpdateCommunityDetailsSchema.parse(request.body);
+        const isAdmin = await requireActiveCommunityAdmin(request.user.sub, communityId);
+        if (!isAdmin) {
+            return reply.code(403).send({ error: 'Admin access required' });
+        }
+        const accessMethod = body.accessMethod;
+        const community = await prisma_1.prisma.community.update({
+            where: { id: communityId },
+            data: {
+                ...(body.name !== undefined ? { name: body.name } : {}),
+                ...(body.type !== undefined ? { type: body.type } : {}),
+                ...(accessMethod !== undefined ? { accessMethod } : {}),
+                ...(body.emailDomain !== undefined
+                    ? { emailDomain: body.emailDomain }
+                    : accessMethod === 'invite_code'
+                        ? { emailDomain: null }
+                        : {}),
+                ...(body.rules !== undefined ? { rules: body.rules } : {}),
+                ...(body.presentation !== undefined
+                    ? { presentation: body.presentation }
+                    : {}),
+            },
+            include: adminCommunityInclude,
+        });
+        return reply.send((0, response_1.ok)({ community }));
     });
     fastify.post('/:communityId/invites', {
         preHandler: auth_1.verifyJWT,
@@ -334,6 +466,33 @@ const plugin = (fastify, _opts, done) => {
                     .send({ error: 'A community must have at least one active admin' });
             }
         }
+        const memberUpdateData = {
+            ...(body.role ? { role: body.role } : {}),
+            ...(body.status ? { status: body.status } : {}),
+        };
+        if (body.accessStatusReason !== undefined) {
+            memberUpdateData.accessStatusReason = body.accessStatusReason;
+        }
+        else if (body.status === 'inactive') {
+            memberUpdateData.accessStatusReason = 'admin_deactivated';
+        }
+        else if (body.status === 'active') {
+            memberUpdateData.accessStatusReason = null;
+        }
+        if (body.accessStatusNote !== undefined) {
+            memberUpdateData.accessStatusNote = body.accessStatusNote;
+        }
+        else if (body.status === 'active') {
+            memberUpdateData.accessStatusNote = null;
+        }
+        if (body.accessSuspendedUntil !== undefined) {
+            memberUpdateData.accessSuspendedUntil = body.accessSuspendedUntil
+                ? new Date(body.accessSuspendedUntil)
+                : null;
+        }
+        else if (body.status === 'active') {
+            memberUpdateData.accessSuspendedUntil = null;
+        }
         const updated = await prisma_1.prisma.communityMember.update({
             where: {
                 userId_communityId: {
@@ -341,10 +500,7 @@ const plugin = (fastify, _opts, done) => {
                     communityId,
                 },
             },
-            data: {
-                ...(body.role ? { role: body.role } : {}),
-                ...(body.status ? { status: body.status } : {}),
-            },
+            data: memberUpdateData,
             include: {
                 user: {
                     select: {

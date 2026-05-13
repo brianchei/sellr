@@ -2,6 +2,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import {
   CreateReportSchema,
   ListReportsQuerySchema,
+  ReportMemberActionSchema,
   UpdateReportStatusSchema,
 } from '@sellr/shared';
 import { prisma } from '../../lib/prisma';
@@ -12,6 +13,38 @@ import { verifyJWT } from '../../middleware/auth';
 
 type ReportTargetType = 'listing' | 'user' | 'message';
 type ReportStatus = 'open' | 'in_review' | 'resolved' | 'dismissed';
+type ReportMemberAction =
+  | 'demote_admin'
+  | 'deactivate_member'
+  | 'suspend_member';
+type ModerationActionType =
+  | 'admin_demoted'
+  | 'member_deactivated'
+  | 'member_suspended';
+type ModerationActionSummary = {
+  id: string;
+  reportId: string | null;
+  communityId: string;
+  targetUserId: string;
+  moderatorId: string;
+  actionType: string;
+  previousRole: string | null;
+  nextRole: string | null;
+  previousStatus: string | null;
+  nextStatus: string | null;
+  previousAccessStatusReason: string | null;
+  nextAccessStatusReason: string | null;
+  note: string | null;
+  createdAt: Date;
+  moderator: {
+    id: string;
+    displayName: string;
+  };
+  targetUser: {
+    id: string;
+    displayName: string;
+  };
+};
 type TargetSummary = {
   label: string;
   detail: string;
@@ -23,8 +56,17 @@ type TargetSummary = {
     displayName: string;
     role: string;
     status: string;
+    accessStatusReason: string | null;
+    accessSuspendedUntil: Date | null;
     contact: string;
   } | null;
+};
+
+type ReportWithModerationActions = {
+  id: string;
+  targetId: string;
+  targetType: ReportTargetType;
+  moderationActions?: ModerationActionSummary[];
 };
 
 function adminCommunityIds(role: Record<string, string>): string[] {
@@ -35,6 +77,76 @@ function adminCommunityIds(role: Record<string, string>): string[] {
 
 function preview(value: string, length = 120): string {
   return value.length > length ? `${value.slice(0, length - 3)}...` : value;
+}
+
+async function activeAdminCount(communityId: string): Promise<number> {
+  return prisma.communityMember.count({
+    where: {
+      communityId,
+      role: 'admin',
+      status: 'active',
+    },
+  });
+}
+
+function actionTypeFor(action: ReportMemberAction): ModerationActionType {
+  if (action === 'demote_admin') return 'admin_demoted';
+  if (action === 'suspend_member') return 'member_suspended';
+  return 'member_deactivated';
+}
+
+function accessStatusReasonFor(action: ReportMemberAction): string | null {
+  if (action === 'deactivate_member') return 'report_deactivated';
+  if (action === 'suspend_member') return 'report_suspension';
+  return null;
+}
+
+function moderationActionLabel(actionType: string): string {
+  if (actionType === 'admin_demoted') return 'Demoted admin';
+  if (actionType === 'member_suspended') return 'Suspended access';
+  if (actionType === 'member_deactivated') return 'Deactivated access';
+  if (actionType === 'member_reactivated') return 'Reactivated access';
+  if (actionType === 'admin_promoted') return 'Promoted admin';
+  return actionType.replaceAll('_', ' ');
+}
+
+async function moderationActionsByReportId(reportIds: string[]) {
+  if (reportIds.length === 0)
+    return new Map<string, ModerationActionSummary[]>();
+
+  const actions = await prisma.moderationAction.findMany({
+    where: { reportId: { in: reportIds } },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      moderator: { select: { id: true, displayName: true } },
+      targetUser: { select: { id: true, displayName: true } },
+    },
+  });
+
+  const grouped = new Map<string, ModerationActionSummary[]>();
+  actions.forEach((action) => {
+    if (!action.reportId) return;
+    const list = grouped.get(action.reportId) ?? [];
+    list.push(action);
+    grouped.set(action.reportId, list);
+  });
+  return grouped;
+}
+
+async function attachReportContext<T extends ReportWithModerationActions>(
+  reports: T[],
+  adminIds: string[],
+) {
+  const [summaries, moderationActions] = await Promise.all([
+    targetSummaries(reports, adminIds),
+    moderationActionsByReportId(reports.map((report) => report.id)),
+  ]);
+
+  return reports.map((report) => ({
+    ...report,
+    target: summaries.get(report.targetId) ?? null,
+    moderationActions: moderationActions.get(report.id) ?? [],
+  }));
 }
 
 async function getReportTargetAccess(
@@ -150,7 +262,7 @@ async function reportTargetCommunityIds(
   }
 
   const memberships = await prisma.communityMember.findMany({
-    where: { userId: targetId, status: 'active' },
+    where: { userId: targetId },
     select: { communityId: true },
   });
   return memberships.map((membership) => membership.communityId);
@@ -317,6 +429,8 @@ async function targetSummaries(
           communityId: true,
           role: true,
           status: true,
+          accessStatusReason: true,
+          accessSuspendedUntil: true,
         },
       })
     : [];
@@ -352,6 +466,8 @@ async function targetSummaries(
       displayName: candidate.displayName,
       role: membership.role,
       status: membership.status,
+      accessStatusReason: membership.accessStatusReason,
+      accessSuspendedUntil: membership.accessSuspendedUntil,
       contact: candidate.contact,
     };
   }
@@ -445,7 +561,7 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       });
       const messageIds = messages.map((message) => message.id);
       const members = await prisma.communityMember.findMany({
-        where: { communityId: { in: adminIds }, status: 'active' },
+        where: { communityId: { in: adminIds } },
         select: { userId: true },
       });
       const memberIds = members.map((member) => member.userId);
@@ -476,13 +592,10 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         },
       });
 
-      const summaries = await targetSummaries(reports, adminIds);
+      const reportsWithContext = await attachReportContext(reports, adminIds);
       return reply.send(
         ok({
-          reports: reports.map((report) => ({
-            ...report,
-            target: summaries.get(report.targetId) ?? null,
-          })),
+          reports: reportsWithContext,
           adminCommunityIds: adminIds,
         }),
       );
@@ -578,16 +691,166 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
           },
         },
       });
-      const summaries = await targetSummaries([updated], adminIds);
+      const [reportWithContext] = await attachReportContext(
+        [updated],
+        adminIds,
+      );
 
       return reply.send(
         ok({
-          report: {
-            ...updated,
-            target: summaries.get(updated.targetId) ?? null,
-          },
+          report: reportWithContext,
         }),
       );
+    },
+  );
+
+  fastify.post(
+    '/:reportId/member-action',
+    {
+      preHandler: verifyJWT,
+      schema: { body: ReportMemberActionSchema },
+    },
+    async (request, reply) => {
+      const adminIds = adminCommunityIds(request.user.role);
+      if (adminIds.length === 0) {
+        return reply.code(403).send({ error: 'Admin access required' });
+      }
+
+      const { reportId } = request.params as { reportId: string };
+      const body = ReportMemberActionSchema.parse(request.body);
+      const report = await prisma.report.findUnique({
+        where: { id: reportId },
+        select: {
+          id: true,
+          targetId: true,
+          targetType: true,
+        },
+      });
+      if (!report) {
+        return reply.code(404).send({ error: 'Report not found' });
+      }
+
+      const allowed = await canAdminReport(
+        { targetId: report.targetId, targetType: report.targetType },
+        adminIds,
+      );
+      if (!allowed) {
+        return reply.code(403).send({ error: 'Admin access required' });
+      }
+
+      const summaries = await targetSummaries([report], adminIds);
+      const member = summaries.get(report.targetId)?.memberManagement ?? null;
+      if (!member) {
+        return reply
+          .code(400)
+          .send({ error: 'Report target is not a manageable member' });
+      }
+
+      const membership = await prisma.communityMember.findUnique({
+        where: {
+          userId_communityId: {
+            userId: member.userId,
+            communityId: member.communityId,
+          },
+        },
+      });
+      if (!membership) {
+        return reply.code(404).send({ error: 'Member not found' });
+      }
+
+      const nextRole =
+        body.action === 'demote_admin' ? 'member' : membership.role;
+      const nextStatus =
+        body.action === 'demote_admin' ? membership.status : 'inactive';
+      const nextAccessStatusReason = accessStatusReasonFor(body.action);
+
+      if (body.action === 'demote_admin' && membership.role !== 'admin') {
+        return reply.code(400).send({ error: 'Member is not an admin' });
+      }
+      if (
+        (body.action === 'deactivate_member' ||
+          body.action === 'suspend_member') &&
+        membership.status !== 'active'
+      ) {
+        return reply
+          .code(400)
+          .send({ error: 'Member access is already inactive' });
+      }
+
+      const wasActiveAdmin =
+        membership.role === 'admin' && membership.status === 'active';
+      const remainsActiveAdmin =
+        nextRole === 'admin' && nextStatus === 'active';
+      if (wasActiveAdmin && !remainsActiveAdmin) {
+        const count = await activeAdminCount(member.communityId);
+        if (count <= 1) {
+          return reply
+            .code(400)
+            .send({ error: 'A community must have at least one active admin' });
+        }
+      }
+
+      await prisma.$transaction(async (tx) => {
+        await tx.communityMember.update({
+          where: {
+            userId_communityId: {
+              userId: member.userId,
+              communityId: member.communityId,
+            },
+          },
+          data: {
+            role: nextRole,
+            status: nextStatus,
+            ...(body.action === 'demote_admin'
+              ? {}
+              : {
+                  accessStatusReason: nextAccessStatusReason,
+                  accessStatusNote: body.note ?? null,
+                  accessSuspendedUntil: null,
+                }),
+          },
+        });
+
+        await tx.moderationAction.create({
+          data: {
+            reportId: report.id,
+            communityId: member.communityId,
+            targetUserId: member.userId,
+            moderatorId: request.user.sub,
+            actionType: actionTypeFor(body.action),
+            previousRole: membership.role,
+            nextRole,
+            previousStatus: membership.status,
+            nextStatus,
+            previousAccessStatusReason: membership.accessStatusReason,
+            nextAccessStatusReason,
+            note:
+              body.note ??
+              `${moderationActionLabel(actionTypeFor(body.action))} from report review.`,
+          },
+        });
+      });
+
+      const updated = await prisma.report.findUniqueOrThrow({
+        where: { id: report.id },
+        include: {
+          reporter: {
+            select: {
+              id: true,
+              displayName: true,
+              phoneE164: true,
+              email: true,
+              emailVerifiedAt: true,
+            },
+          },
+        },
+      });
+      const [reportWithContext] = await attachReportContext(
+        [updated],
+        adminIds,
+      );
+
+      return reply.send(ok({ report: reportWithContext }));
     },
   );
 
@@ -672,13 +935,13 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         reason: 'moderation_listing_removed',
       });
 
-      const summaries = await targetSummaries([updated], adminIds);
+      const [reportWithContext] = await attachReportContext(
+        [updated],
+        adminIds,
+      );
       return reply.send(
         ok({
-          report: {
-            ...updated,
-            target: summaries.get(updated.targetId) ?? null,
-          },
+          report: reportWithContext,
           listingRemoved: true,
         }),
       );

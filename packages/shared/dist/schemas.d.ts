@@ -54,6 +54,26 @@ export declare const JoinCommunitySchema: z.ZodObject<{
 export declare const LeaveCommunitySchema: z.ZodObject<{
     removeListings: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
 }, z.core.$strip>;
+export declare const CommunityThemeKeySchema: z.ZodEnum<{
+    campus: "campus";
+    default: "default";
+    badger: "badger";
+    neighborhood: "neighborhood";
+}>;
+export declare const CommunityPresentationSchema: z.ZodObject<{
+    shortDescription: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    themeKey: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+        campus: "campus";
+        default: "default";
+        badger: "badger";
+        neighborhood: "neighborhood";
+    }>>>;
+    accentColor: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    bannerImageUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    logoImageUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    pickupGuidance: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    localAreas: z.ZodOptional<z.ZodArray<z.ZodString>>;
+}, z.core.$strip>;
 export declare const CommunityAdminParamsSchema: z.ZodObject<{
     communityId: z.ZodUUID;
 }, z.core.$strip>;
@@ -79,6 +99,20 @@ export declare const UpdateCommunityDetailsSchema: z.ZodObject<{
     }>>;
     emailDomain: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     rules: z.ZodOptional<z.ZodArray<z.ZodString>>;
+    presentation: z.ZodOptional<z.ZodObject<{
+        shortDescription: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        themeKey: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+            campus: "campus";
+            default: "default";
+            badger: "badger";
+            neighborhood: "neighborhood";
+        }>>>;
+        accentColor: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        bannerImageUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        logoImageUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        pickupGuidance: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        localAreas: z.ZodOptional<z.ZodArray<z.ZodString>>;
+    }, z.core.$strip>>;
 }, z.core.$strip>;
 export declare const UpdateCommunityMemberSchema: z.ZodObject<{
     role: z.ZodOptional<z.ZodEnum<{
@@ -89,6 +123,22 @@ export declare const UpdateCommunityMemberSchema: z.ZodObject<{
         active: "active";
         inactive: "inactive";
     }>>;
+    accessStatusReason: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+        admin_deactivated: "admin_deactivated";
+        report_deactivated: "report_deactivated";
+        report_suspension: "report_suspension";
+        reactivated: "reactivated";
+    }>>>;
+    accessStatusNote: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    accessSuspendedUntil: z.ZodOptional<z.ZodNullable<z.ZodISODateTime>>;
+}, z.core.$strip>;
+export declare const ReportMemberActionSchema: z.ZodObject<{
+    action: z.ZodEnum<{
+        demote_admin: "demote_admin";
+        deactivate_member: "deactivate_member";
+        suspend_member: "suspend_member";
+    }>;
+    note: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 export declare const AvailabilityWindowSchema: z.ZodObject<{
     dayOfWeek: z.ZodNumber;

@@ -51,6 +51,7 @@ export type CommunityCountAggregateOutputType = {
   accessMethod: number
   emailDomain: number
   rules: number
+  presentation: number
   status: number
   createdAt: number
   _all: number
@@ -84,6 +85,7 @@ export type CommunityCountAggregateInputType = {
   accessMethod?: true
   emailDomain?: true
   rules?: true
+  presentation?: true
   status?: true
   createdAt?: true
   _all?: true
@@ -168,6 +170,7 @@ export type CommunityGroupByOutputType = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain: string | null
   rules: runtime.JsonValue
+  presentation: runtime.JsonValue
   status: string
   createdAt: Date
   _count: CommunityCountAggregateOutputType | null
@@ -200,12 +203,14 @@ export type CommunityWhereInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFilter<"Community"> | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.StringNullableFilter<"Community"> | string | null
   rules?: Prisma.JsonFilter<"Community">
+  presentation?: Prisma.JsonFilter<"Community">
   status?: Prisma.StringFilter<"Community"> | string
   createdAt?: Prisma.DateTimeFilter<"Community"> | Date | string
   members?: Prisma.CommunityMemberListRelationFilter
   listings?: Prisma.ListingListRelationFilter
   inviteCodes?: Prisma.InviteCodeListRelationFilter
   savedSearches?: Prisma.SavedSearchListRelationFilter
+  moderationActions?: Prisma.ModerationActionListRelationFilter
 }
 
 export type CommunityOrderByWithRelationInput = {
@@ -215,12 +220,14 @@ export type CommunityOrderByWithRelationInput = {
   accessMethod?: Prisma.SortOrder
   emailDomain?: Prisma.SortOrderInput | Prisma.SortOrder
   rules?: Prisma.SortOrder
+  presentation?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   members?: Prisma.CommunityMemberOrderByRelationAggregateInput
   listings?: Prisma.ListingOrderByRelationAggregateInput
   inviteCodes?: Prisma.InviteCodeOrderByRelationAggregateInput
   savedSearches?: Prisma.SavedSearchOrderByRelationAggregateInput
+  moderationActions?: Prisma.ModerationActionOrderByRelationAggregateInput
 }
 
 export type CommunityWhereUniqueInput = Prisma.AtLeast<{
@@ -233,12 +240,14 @@ export type CommunityWhereUniqueInput = Prisma.AtLeast<{
   accessMethod?: Prisma.EnumCommunityAccessMethodFilter<"Community"> | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.StringNullableFilter<"Community"> | string | null
   rules?: Prisma.JsonFilter<"Community">
+  presentation?: Prisma.JsonFilter<"Community">
   status?: Prisma.StringFilter<"Community"> | string
   createdAt?: Prisma.DateTimeFilter<"Community"> | Date | string
   members?: Prisma.CommunityMemberListRelationFilter
   listings?: Prisma.ListingListRelationFilter
   inviteCodes?: Prisma.InviteCodeListRelationFilter
   savedSearches?: Prisma.SavedSearchListRelationFilter
+  moderationActions?: Prisma.ModerationActionListRelationFilter
 }, "id">
 
 export type CommunityOrderByWithAggregationInput = {
@@ -248,6 +257,7 @@ export type CommunityOrderByWithAggregationInput = {
   accessMethod?: Prisma.SortOrder
   emailDomain?: Prisma.SortOrderInput | Prisma.SortOrder
   rules?: Prisma.SortOrder
+  presentation?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.CommunityCountOrderByAggregateInput
@@ -265,6 +275,7 @@ export type CommunityScalarWhereWithAggregatesInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodWithAggregatesFilter<"Community"> | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.StringNullableWithAggregatesFilter<"Community"> | string | null
   rules?: Prisma.JsonWithAggregatesFilter<"Community">
+  presentation?: Prisma.JsonWithAggregatesFilter<"Community">
   status?: Prisma.StringWithAggregatesFilter<"Community"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Community"> | Date | string
 }
@@ -276,12 +287,14 @@ export type CommunityCreateInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   members?: Prisma.CommunityMemberCreateNestedManyWithoutCommunityInput
   listings?: Prisma.ListingCreateNestedManyWithoutCommunityInput
   inviteCodes?: Prisma.InviteCodeCreateNestedManyWithoutCommunityInput
   savedSearches?: Prisma.SavedSearchCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityUncheckedCreateInput = {
@@ -291,12 +304,14 @@ export type CommunityUncheckedCreateInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   members?: Prisma.CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutCommunityInput
   inviteCodes?: Prisma.InviteCodeUncheckedCreateNestedManyWithoutCommunityInput
   savedSearches?: Prisma.SavedSearchUncheckedCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityUpdateInput = {
@@ -306,12 +321,14 @@ export type CommunityUpdateInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.CommunityMemberUpdateManyWithoutCommunityNestedInput
   listings?: Prisma.ListingUpdateManyWithoutCommunityNestedInput
   inviteCodes?: Prisma.InviteCodeUpdateManyWithoutCommunityNestedInput
   savedSearches?: Prisma.SavedSearchUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityUncheckedUpdateInput = {
@@ -321,12 +338,14 @@ export type CommunityUncheckedUpdateInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutCommunityNestedInput
   inviteCodes?: Prisma.InviteCodeUncheckedUpdateManyWithoutCommunityNestedInput
   savedSearches?: Prisma.SavedSearchUncheckedUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityCreateManyInput = {
@@ -336,6 +355,7 @@ export type CommunityCreateManyInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
 }
@@ -347,6 +367,7 @@ export type CommunityUpdateManyMutationInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -358,6 +379,7 @@ export type CommunityUncheckedUpdateManyInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -369,6 +391,7 @@ export type CommunityCountOrderByAggregateInput = {
   accessMethod?: Prisma.SortOrder
   emailDomain?: Prisma.SortOrder
   rules?: Prisma.SortOrder
+  presentation?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -462,6 +485,20 @@ export type CommunityUpdateOneRequiredWithoutSavedSearchesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CommunityUpdateToOneWithWhereWithoutSavedSearchesInput, Prisma.CommunityUpdateWithoutSavedSearchesInput>, Prisma.CommunityUncheckedUpdateWithoutSavedSearchesInput>
 }
 
+export type CommunityCreateNestedOneWithoutModerationActionsInput = {
+  create?: Prisma.XOR<Prisma.CommunityCreateWithoutModerationActionsInput, Prisma.CommunityUncheckedCreateWithoutModerationActionsInput>
+  connectOrCreate?: Prisma.CommunityCreateOrConnectWithoutModerationActionsInput
+  connect?: Prisma.CommunityWhereUniqueInput
+}
+
+export type CommunityUpdateOneRequiredWithoutModerationActionsNestedInput = {
+  create?: Prisma.XOR<Prisma.CommunityCreateWithoutModerationActionsInput, Prisma.CommunityUncheckedCreateWithoutModerationActionsInput>
+  connectOrCreate?: Prisma.CommunityCreateOrConnectWithoutModerationActionsInput
+  upsert?: Prisma.CommunityUpsertWithoutModerationActionsInput
+  connect?: Prisma.CommunityWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CommunityUpdateToOneWithWhereWithoutModerationActionsInput, Prisma.CommunityUpdateWithoutModerationActionsInput>, Prisma.CommunityUncheckedUpdateWithoutModerationActionsInput>
+}
+
 export type CommunityCreateWithoutMembersInput = {
   id?: string
   name: string
@@ -469,11 +506,13 @@ export type CommunityCreateWithoutMembersInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   listings?: Prisma.ListingCreateNestedManyWithoutCommunityInput
   inviteCodes?: Prisma.InviteCodeCreateNestedManyWithoutCommunityInput
   savedSearches?: Prisma.SavedSearchCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityUncheckedCreateWithoutMembersInput = {
@@ -483,11 +522,13 @@ export type CommunityUncheckedCreateWithoutMembersInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutCommunityInput
   inviteCodes?: Prisma.InviteCodeUncheckedCreateNestedManyWithoutCommunityInput
   savedSearches?: Prisma.SavedSearchUncheckedCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityCreateOrConnectWithoutMembersInput = {
@@ -513,11 +554,13 @@ export type CommunityUpdateWithoutMembersInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   listings?: Prisma.ListingUpdateManyWithoutCommunityNestedInput
   inviteCodes?: Prisma.InviteCodeUpdateManyWithoutCommunityNestedInput
   savedSearches?: Prisma.SavedSearchUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityUncheckedUpdateWithoutMembersInput = {
@@ -527,11 +570,13 @@ export type CommunityUncheckedUpdateWithoutMembersInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   listings?: Prisma.ListingUncheckedUpdateManyWithoutCommunityNestedInput
   inviteCodes?: Prisma.InviteCodeUncheckedUpdateManyWithoutCommunityNestedInput
   savedSearches?: Prisma.SavedSearchUncheckedUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityCreateWithoutInviteCodesInput = {
@@ -541,11 +586,13 @@ export type CommunityCreateWithoutInviteCodesInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   members?: Prisma.CommunityMemberCreateNestedManyWithoutCommunityInput
   listings?: Prisma.ListingCreateNestedManyWithoutCommunityInput
   savedSearches?: Prisma.SavedSearchCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityUncheckedCreateWithoutInviteCodesInput = {
@@ -555,11 +602,13 @@ export type CommunityUncheckedCreateWithoutInviteCodesInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   members?: Prisma.CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutCommunityInput
   savedSearches?: Prisma.SavedSearchUncheckedCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityCreateOrConnectWithoutInviteCodesInput = {
@@ -585,11 +634,13 @@ export type CommunityUpdateWithoutInviteCodesInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.CommunityMemberUpdateManyWithoutCommunityNestedInput
   listings?: Prisma.ListingUpdateManyWithoutCommunityNestedInput
   savedSearches?: Prisma.SavedSearchUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityUncheckedUpdateWithoutInviteCodesInput = {
@@ -599,11 +650,13 @@ export type CommunityUncheckedUpdateWithoutInviteCodesInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutCommunityNestedInput
   savedSearches?: Prisma.SavedSearchUncheckedUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityCreateWithoutListingsInput = {
@@ -613,11 +666,13 @@ export type CommunityCreateWithoutListingsInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   members?: Prisma.CommunityMemberCreateNestedManyWithoutCommunityInput
   inviteCodes?: Prisma.InviteCodeCreateNestedManyWithoutCommunityInput
   savedSearches?: Prisma.SavedSearchCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityUncheckedCreateWithoutListingsInput = {
@@ -627,11 +682,13 @@ export type CommunityUncheckedCreateWithoutListingsInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   members?: Prisma.CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
   inviteCodes?: Prisma.InviteCodeUncheckedCreateNestedManyWithoutCommunityInput
   savedSearches?: Prisma.SavedSearchUncheckedCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityCreateOrConnectWithoutListingsInput = {
@@ -657,11 +714,13 @@ export type CommunityUpdateWithoutListingsInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.CommunityMemberUpdateManyWithoutCommunityNestedInput
   inviteCodes?: Prisma.InviteCodeUpdateManyWithoutCommunityNestedInput
   savedSearches?: Prisma.SavedSearchUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityUncheckedUpdateWithoutListingsInput = {
@@ -671,11 +730,13 @@ export type CommunityUncheckedUpdateWithoutListingsInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
   inviteCodes?: Prisma.InviteCodeUncheckedUpdateManyWithoutCommunityNestedInput
   savedSearches?: Prisma.SavedSearchUncheckedUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityCreateWithoutSavedSearchesInput = {
@@ -685,11 +746,13 @@ export type CommunityCreateWithoutSavedSearchesInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   members?: Prisma.CommunityMemberCreateNestedManyWithoutCommunityInput
   listings?: Prisma.ListingCreateNestedManyWithoutCommunityInput
   inviteCodes?: Prisma.InviteCodeCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityUncheckedCreateWithoutSavedSearchesInput = {
@@ -699,11 +762,13 @@ export type CommunityUncheckedCreateWithoutSavedSearchesInput = {
   accessMethod: $Enums.CommunityAccessMethod
   emailDomain?: string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   createdAt?: Date | string
   members?: Prisma.CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
   listings?: Prisma.ListingUncheckedCreateNestedManyWithoutCommunityInput
   inviteCodes?: Prisma.InviteCodeUncheckedCreateNestedManyWithoutCommunityInput
+  moderationActions?: Prisma.ModerationActionUncheckedCreateNestedManyWithoutCommunityInput
 }
 
 export type CommunityCreateOrConnectWithoutSavedSearchesInput = {
@@ -729,11 +794,13 @@ export type CommunityUpdateWithoutSavedSearchesInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.CommunityMemberUpdateManyWithoutCommunityNestedInput
   listings?: Prisma.ListingUpdateManyWithoutCommunityNestedInput
   inviteCodes?: Prisma.InviteCodeUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUpdateManyWithoutCommunityNestedInput
 }
 
 export type CommunityUncheckedUpdateWithoutSavedSearchesInput = {
@@ -743,11 +810,93 @@ export type CommunityUncheckedUpdateWithoutSavedSearchesInput = {
   accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
   emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   members?: Prisma.CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
   listings?: Prisma.ListingUncheckedUpdateManyWithoutCommunityNestedInput
   inviteCodes?: Prisma.InviteCodeUncheckedUpdateManyWithoutCommunityNestedInput
+  moderationActions?: Prisma.ModerationActionUncheckedUpdateManyWithoutCommunityNestedInput
+}
+
+export type CommunityCreateWithoutModerationActionsInput = {
+  id?: string
+  name: string
+  type: $Enums.CommunityType
+  accessMethod: $Enums.CommunityAccessMethod
+  emailDomain?: string | null
+  rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: string
+  createdAt?: Date | string
+  members?: Prisma.CommunityMemberCreateNestedManyWithoutCommunityInput
+  listings?: Prisma.ListingCreateNestedManyWithoutCommunityInput
+  inviteCodes?: Prisma.InviteCodeCreateNestedManyWithoutCommunityInput
+  savedSearches?: Prisma.SavedSearchCreateNestedManyWithoutCommunityInput
+}
+
+export type CommunityUncheckedCreateWithoutModerationActionsInput = {
+  id?: string
+  name: string
+  type: $Enums.CommunityType
+  accessMethod: $Enums.CommunityAccessMethod
+  emailDomain?: string | null
+  rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: string
+  createdAt?: Date | string
+  members?: Prisma.CommunityMemberUncheckedCreateNestedManyWithoutCommunityInput
+  listings?: Prisma.ListingUncheckedCreateNestedManyWithoutCommunityInput
+  inviteCodes?: Prisma.InviteCodeUncheckedCreateNestedManyWithoutCommunityInput
+  savedSearches?: Prisma.SavedSearchUncheckedCreateNestedManyWithoutCommunityInput
+}
+
+export type CommunityCreateOrConnectWithoutModerationActionsInput = {
+  where: Prisma.CommunityWhereUniqueInput
+  create: Prisma.XOR<Prisma.CommunityCreateWithoutModerationActionsInput, Prisma.CommunityUncheckedCreateWithoutModerationActionsInput>
+}
+
+export type CommunityUpsertWithoutModerationActionsInput = {
+  update: Prisma.XOR<Prisma.CommunityUpdateWithoutModerationActionsInput, Prisma.CommunityUncheckedUpdateWithoutModerationActionsInput>
+  create: Prisma.XOR<Prisma.CommunityCreateWithoutModerationActionsInput, Prisma.CommunityUncheckedCreateWithoutModerationActionsInput>
+  where?: Prisma.CommunityWhereInput
+}
+
+export type CommunityUpdateToOneWithWhereWithoutModerationActionsInput = {
+  where?: Prisma.CommunityWhereInput
+  data: Prisma.XOR<Prisma.CommunityUpdateWithoutModerationActionsInput, Prisma.CommunityUncheckedUpdateWithoutModerationActionsInput>
+}
+
+export type CommunityUpdateWithoutModerationActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumCommunityTypeFieldUpdateOperationsInput | $Enums.CommunityType
+  accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
+  emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.CommunityMemberUpdateManyWithoutCommunityNestedInput
+  listings?: Prisma.ListingUpdateManyWithoutCommunityNestedInput
+  inviteCodes?: Prisma.InviteCodeUpdateManyWithoutCommunityNestedInput
+  savedSearches?: Prisma.SavedSearchUpdateManyWithoutCommunityNestedInput
+}
+
+export type CommunityUncheckedUpdateWithoutModerationActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumCommunityTypeFieldUpdateOperationsInput | $Enums.CommunityType
+  accessMethod?: Prisma.EnumCommunityAccessMethodFieldUpdateOperationsInput | $Enums.CommunityAccessMethod
+  emailDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rules?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  presentation?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.CommunityMemberUncheckedUpdateManyWithoutCommunityNestedInput
+  listings?: Prisma.ListingUncheckedUpdateManyWithoutCommunityNestedInput
+  inviteCodes?: Prisma.InviteCodeUncheckedUpdateManyWithoutCommunityNestedInput
+  savedSearches?: Prisma.SavedSearchUncheckedUpdateManyWithoutCommunityNestedInput
 }
 
 
@@ -760,6 +909,7 @@ export type CommunityCountOutputType = {
   listings: number
   inviteCodes: number
   savedSearches: number
+  moderationActions: number
 }
 
 export type CommunityCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -767,6 +917,7 @@ export type CommunityCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   listings?: boolean | CommunityCountOutputTypeCountListingsArgs
   inviteCodes?: boolean | CommunityCountOutputTypeCountInviteCodesArgs
   savedSearches?: boolean | CommunityCountOutputTypeCountSavedSearchesArgs
+  moderationActions?: boolean | CommunityCountOutputTypeCountModerationActionsArgs
 }
 
 /**
@@ -807,6 +958,13 @@ export type CommunityCountOutputTypeCountSavedSearchesArgs<ExtArgs extends runti
   where?: Prisma.SavedSearchWhereInput
 }
 
+/**
+ * CommunityCountOutputType without action
+ */
+export type CommunityCountOutputTypeCountModerationActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModerationActionWhereInput
+}
+
 
 export type CommunitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -815,12 +973,14 @@ export type CommunitySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   accessMethod?: boolean
   emailDomain?: boolean
   rules?: boolean
+  presentation?: boolean
   status?: boolean
   createdAt?: boolean
   members?: boolean | Prisma.Community$membersArgs<ExtArgs>
   listings?: boolean | Prisma.Community$listingsArgs<ExtArgs>
   inviteCodes?: boolean | Prisma.Community$inviteCodesArgs<ExtArgs>
   savedSearches?: boolean | Prisma.Community$savedSearchesArgs<ExtArgs>
+  moderationActions?: boolean | Prisma.Community$moderationActionsArgs<ExtArgs>
   _count?: boolean | Prisma.CommunityCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["community"]>
 
@@ -831,6 +991,7 @@ export type CommunitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   accessMethod?: boolean
   emailDomain?: boolean
   rules?: boolean
+  presentation?: boolean
   status?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["community"]>
@@ -842,6 +1003,7 @@ export type CommunitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   accessMethod?: boolean
   emailDomain?: boolean
   rules?: boolean
+  presentation?: boolean
   status?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["community"]>
@@ -853,16 +1015,18 @@ export type CommunitySelectScalar = {
   accessMethod?: boolean
   emailDomain?: boolean
   rules?: boolean
+  presentation?: boolean
   status?: boolean
   createdAt?: boolean
 }
 
-export type CommunityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "accessMethod" | "emailDomain" | "rules" | "status" | "createdAt", ExtArgs["result"]["community"]>
+export type CommunityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "accessMethod" | "emailDomain" | "rules" | "presentation" | "status" | "createdAt", ExtArgs["result"]["community"]>
 export type CommunityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   members?: boolean | Prisma.Community$membersArgs<ExtArgs>
   listings?: boolean | Prisma.Community$listingsArgs<ExtArgs>
   inviteCodes?: boolean | Prisma.Community$inviteCodesArgs<ExtArgs>
   savedSearches?: boolean | Prisma.Community$savedSearchesArgs<ExtArgs>
+  moderationActions?: boolean | Prisma.Community$moderationActionsArgs<ExtArgs>
   _count?: boolean | Prisma.CommunityCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CommunityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -875,6 +1039,7 @@ export type $CommunityPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     listings: Prisma.$ListingPayload<ExtArgs>[]
     inviteCodes: Prisma.$InviteCodePayload<ExtArgs>[]
     savedSearches: Prisma.$SavedSearchPayload<ExtArgs>[]
+    moderationActions: Prisma.$ModerationActionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -883,6 +1048,7 @@ export type $CommunityPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     accessMethod: $Enums.CommunityAccessMethod
     emailDomain: string | null
     rules: runtime.JsonValue
+    presentation: runtime.JsonValue
     status: string
     createdAt: Date
   }, ExtArgs["result"]["community"]>
@@ -1283,6 +1449,7 @@ export interface Prisma__CommunityClient<T, Null = never, ExtArgs extends runtim
   listings<T extends Prisma.Community$listingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Community$listingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inviteCodes<T extends Prisma.Community$inviteCodesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Community$inviteCodesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InviteCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedSearches<T extends Prisma.Community$savedSearchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Community$savedSearchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedSearchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  moderationActions<T extends Prisma.Community$moderationActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Community$moderationActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModerationActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1318,6 +1485,7 @@ export interface CommunityFieldRefs {
   readonly accessMethod: Prisma.FieldRef<"Community", 'CommunityAccessMethod'>
   readonly emailDomain: Prisma.FieldRef<"Community", 'String'>
   readonly rules: Prisma.FieldRef<"Community", 'Json'>
+  readonly presentation: Prisma.FieldRef<"Community", 'Json'>
   readonly status: Prisma.FieldRef<"Community", 'String'>
   readonly createdAt: Prisma.FieldRef<"Community", 'DateTime'>
 }
@@ -1806,6 +1974,30 @@ export type Community$savedSearchesArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.SavedSearchScalarFieldEnum | Prisma.SavedSearchScalarFieldEnum[]
+}
+
+/**
+ * Community.moderationActions
+ */
+export type Community$moderationActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModerationAction
+   */
+  select?: Prisma.ModerationActionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModerationAction
+   */
+  omit?: Prisma.ModerationActionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModerationActionInclude<ExtArgs> | null
+  where?: Prisma.ModerationActionWhereInput
+  orderBy?: Prisma.ModerationActionOrderByWithRelationInput | Prisma.ModerationActionOrderByWithRelationInput[]
+  cursor?: Prisma.ModerationActionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModerationActionScalarFieldEnum | Prisma.ModerationActionScalarFieldEnum[]
 }
 
 /**

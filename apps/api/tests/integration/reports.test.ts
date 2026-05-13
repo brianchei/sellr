@@ -302,6 +302,99 @@ describe.skipIf(!integrationDbAvailable)('reports integration', () => {
     });
   });
 
+  describe('POST /api/v1/reports/:reportId/member-action', () => {
+    it('deactivates a reported member and records moderation history', async () => {
+      const seller = await createUser({ displayName: 'Reported Seller' });
+      const reporter = await createUser();
+      const admin = await createUser({ displayName: 'Mod' });
+      const community = await createCommunity();
+      await addMember(seller.id, community.id);
+      await addMember(reporter.id, community.id);
+      await addMember(admin.id, community.id, 'admin');
+      const listing = await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        status: 'active',
+      });
+      const report = await prisma.report.create({
+        data: {
+          reporterId: reporter.id,
+          targetId: listing.id,
+          targetType: 'listing',
+          reason: 'Seller should lose access pending review.',
+          severity: 'safety',
+          status: 'open',
+        },
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: `/api/v1/reports/${report.id}/member-action`,
+        headers: { cookie: await accessCookieFor(app, admin.id) },
+        payload: {
+          action: 'deactivate_member',
+          note: 'Confirmed from report review.',
+        },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = res.json<{
+        data: {
+          report: {
+            moderationActions: Array<{
+              actionType: string;
+              moderatorId: string;
+              targetUserId: string;
+              previousStatus: string | null;
+              nextStatus: string | null;
+              nextAccessStatusReason: string | null;
+              note: string | null;
+            }>;
+            target: {
+              memberManagement: {
+                status: string;
+                accessStatusReason: string | null;
+              } | null;
+            } | null;
+          };
+        };
+      }>();
+      expect(body.data.report.target?.memberManagement).toEqual(
+        expect.objectContaining({
+          status: 'inactive',
+          accessStatusReason: 'report_deactivated',
+        }),
+      );
+      expect(body.data.report.moderationActions[0]).toEqual(
+        expect.objectContaining({
+          actionType: 'member_deactivated',
+          moderatorId: admin.id,
+          targetUserId: seller.id,
+          previousStatus: 'active',
+          nextStatus: 'inactive',
+          nextAccessStatusReason: 'report_deactivated',
+          note: 'Confirmed from report review.',
+        }),
+      );
+
+      const membership = await prisma.communityMember.findUnique({
+        where: {
+          userId_communityId: {
+            userId: seller.id,
+            communityId: community.id,
+          },
+        },
+      });
+      expect(membership?.status).toBe('inactive');
+      expect(membership?.accessStatusReason).toBe('report_deactivated');
+
+      const audit = await prisma.moderationAction.findFirst({
+        where: { reportId: report.id, targetUserId: seller.id },
+      });
+      expect(audit?.actionType).toBe('member_deactivated');
+    });
+  });
+
   describe('POST /api/v1/reports/:reportId/remove-listing', () => {
     it('lets an admin explicitly remove a reported listing and queue media cleanup', async () => {
       const originalCdnUrl = process.env.CLOUDFLARE_CDN_URL;

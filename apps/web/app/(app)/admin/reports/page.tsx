@@ -4,8 +4,8 @@ import {
   ApiError,
   fetchReports,
   removeReportedListing,
+  runReportMemberAction,
   updateReportStatus,
-  updateCommunityMember,
 } from '@sellr/api-client';
 import type { ApiReport, ApiReportStatus } from '@sellr/api-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -15,7 +15,10 @@ import { useEffect, useMemo, useState } from 'react';
 type StatusFilter = ApiReportStatus | 'all';
 type SeverityFilter = 'safety' | 'quality' | 'all';
 type TargetTypeFilter = 'listing' | 'user' | 'message' | 'all';
-type MemberModerationAction = 'deactivate' | 'demote';
+type MemberModerationAction =
+  | 'deactivate_member'
+  | 'demote_admin'
+  | 'suspend_member';
 
 const STATUS_FILTERS: Array<{ value: StatusFilter; label: string }> = [
   { value: 'open', label: 'Open' },
@@ -193,11 +196,30 @@ function memberModerationConfirmMessage(
 ): string {
   const member = report.target?.memberManagement;
   const name = member?.displayName ?? 'this member';
-  if (action === 'deactivate') {
+  if (action === 'deactivate_member') {
     return `Deactivate ${name}'s access to this community? They will lose community access, but this does not remove existing listings or resolve the report automatically. Remove reported listings separately when needed.`;
+  }
+  if (action === 'suspend_member') {
+    return `Suspend ${name}'s access from this community? They will lose community access until an admin reactivates them. This does not remove listings or resolve the report automatically.`;
   }
 
   return `Demote ${name} from admin to member in this community? They will keep member access, but lose admin controls. This does not resolve the report automatically.`;
+}
+
+function accessRestrictionLabel(reason: string | null): string | null {
+  if (reason === 'report_suspension') return 'suspended';
+  if (reason === 'report_deactivated') return 'report deactivated';
+  if (reason === 'admin_deactivated') return 'admin deactivated';
+  return null;
+}
+
+function moderationActionLabel(actionType: string): string {
+  if (actionType === 'admin_demoted') return 'Demoted admin';
+  if (actionType === 'member_suspended') return 'Suspended access';
+  if (actionType === 'member_deactivated') return 'Deactivated access';
+  if (actionType === 'member_reactivated') return 'Reactivated access';
+  if (actionType === 'admin_promoted') return 'Promoted admin';
+  return actionType.replaceAll('_', ' ');
 }
 
 function ReportCard({
@@ -236,7 +258,11 @@ function ReportCard({
   const memberManagement = report.target?.memberManagement ?? null;
   const canDemoteMember = memberManagement?.role === 'admin';
   const canDeactivateMember = memberManagement?.status === 'active';
+  const canSuspendMember = memberManagement?.status === 'active';
   const hasMemberModerationActions = canDemoteMember || canDeactivateMember;
+  const restrictionLabel = accessRestrictionLabel(
+    memberManagement?.accessStatusReason ?? null,
+  );
 
   return (
     <article className="rounded-3xl border border-black/10 bg-white/90 p-5 shadow-[var(--shadow-app-card)] backdrop-blur">
@@ -324,6 +350,11 @@ function ReportCard({
             <span className="font-mono text-xs text-[var(--text-tertiary)]">
               {memberManagement.contact}
             </span>
+            {restrictionLabel ? (
+              <span className="rounded-full bg-[var(--color-brand-warm-soft)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-warm-strong)]">
+                {restrictionLabel}
+              </span>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -342,22 +373,35 @@ function ReportCard({
               <button
                 type="button"
                 disabled={isModeratingMember}
-                onClick={() => onMemberModeration('demote')}
+                onClick={() => onMemberModeration('demote_admin')}
                 className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isModeratingMember && pendingMemberAction === 'demote'
+                {isModeratingMember && pendingMemberAction === 'demote_admin'
                   ? 'Demoting...'
                   : 'Demote to member'}
+              </button>
+            ) : null}
+            {canSuspendMember ? (
+              <button
+                type="button"
+                disabled={isModeratingMember}
+                onClick={() => onMemberModeration('suspend_member')}
+                className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isModeratingMember && pendingMemberAction === 'suspend_member'
+                  ? 'Suspending...'
+                  : 'Suspend access'}
               </button>
             ) : null}
             {canDeactivateMember ? (
               <button
                 type="button"
                 disabled={isModeratingMember}
-                onClick={() => onMemberModeration('deactivate')}
+                onClick={() => onMemberModeration('deactivate_member')}
                 className="rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-xs font-semibold text-[var(--color-brand-warm-strong)] shadow-sm transition hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isModeratingMember && pendingMemberAction === 'deactivate'
+                {isModeratingMember &&
+                pendingMemberAction === 'deactivate_member'
                   ? 'Deactivating...'
                   : 'Deactivate access'}
               </button>
@@ -371,6 +415,33 @@ function ReportCard({
               {memberModerationError}
             </p>
           ) : null}
+        </div>
+      ) : null}
+
+      {report.moderationActions.length > 0 ? (
+        <div className="mt-3 rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+            Moderation history
+          </p>
+          <ul className="mt-2 space-y-2">
+            {report.moderationActions.slice(0, 3).map((action) => (
+              <li
+                key={action.id}
+                className="rounded-xl bg-white/80 px-3 py-2 text-xs leading-5 text-[var(--text-secondary)]"
+              >
+                <span className="font-semibold text-[var(--text-primary)]">
+                  {moderationActionLabel(action.actionType)}
+                </span>{' '}
+                by {action.moderator.displayName} on{' '}
+                {formatDate(action.createdAt)}
+                {action.note ? (
+                  <span className="block text-[var(--text-tertiary)]">
+                    {action.note}
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
 
@@ -498,9 +569,14 @@ export default function AdminReportsPage() {
       if (!member) {
         throw new Error('Member context is no longer available.');
       }
-      return updateCommunityMember(member.communityId, member.userId, {
-        ...(action === 'demote' ? { role: 'member' as const } : {}),
-        ...(action === 'deactivate' ? { status: 'inactive' as const } : {}),
+      return runReportMemberAction(report.id, {
+        action,
+        note:
+          action === 'suspend_member'
+            ? 'Suspended from report review.'
+            : action === 'deactivate_member'
+              ? 'Deactivated from report review.'
+              : 'Demoted from report review.',
       });
     },
     onSuccess: async () => {

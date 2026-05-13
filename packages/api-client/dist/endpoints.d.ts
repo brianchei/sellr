@@ -85,6 +85,41 @@ export type ApiNotification = SharedNotification;
 export type ApiReportStatus = 'open' | 'in_review' | 'resolved' | 'dismissed';
 export type ApiCommunityMemberRole = 'member' | 'admin';
 export type ApiCommunityMemberStatus = 'active' | 'inactive';
+export type ApiCommunityThemeKey = 'default' | 'badger' | 'campus' | 'neighborhood';
+export type ApiMemberAccessStatusReason = 'admin_deactivated' | 'report_deactivated' | 'report_suspension' | 'reactivated';
+export type ApiCommunityPresentation = {
+    shortDescription?: string | null;
+    themeKey?: ApiCommunityThemeKey | null;
+    accentColor?: string | null;
+    bannerImageUrl?: string | null;
+    logoImageUrl?: string | null;
+    pickupGuidance?: string | null;
+    localAreas?: string[];
+};
+export type ApiModerationAction = {
+    id: string;
+    reportId: string | null;
+    communityId: string;
+    targetUserId: string;
+    moderatorId: string;
+    actionType: 'admin_demoted' | 'member_deactivated' | 'member_suspended' | 'member_reactivated' | 'admin_promoted';
+    previousRole: string | null;
+    nextRole: string | null;
+    previousStatus: string | null;
+    nextStatus: string | null;
+    previousAccessStatusReason: string | null;
+    nextAccessStatusReason: string | null;
+    note: string | null;
+    createdAt: string;
+    moderator: {
+        id: string;
+        displayName: string;
+    };
+    targetUser: {
+        id: string;
+        displayName: string;
+    };
+};
 export type ApiReport = {
     id: string;
     reporterId: string;
@@ -114,9 +149,12 @@ export type ApiReport = {
             displayName: string;
             role: ApiCommunityMemberRole;
             status: ApiCommunityMemberStatus;
+            accessStatusReason: ApiMemberAccessStatusReason | null;
+            accessSuspendedUntil: string | null;
             contact: string;
         } | null;
     } | null;
+    moderationActions: ApiModerationAction[];
 };
 export type ApiCommunityInviteCode = {
     id: string;
@@ -132,6 +170,9 @@ export type ApiCommunityAdminMember = {
     communityId: string;
     role: ApiCommunityMemberRole;
     status: ApiCommunityMemberStatus;
+    accessStatusReason: ApiMemberAccessStatusReason | null;
+    accessStatusNote: string | null;
+    accessSuspendedUntil: string | null;
     joinedAt: string;
     user: {
         id: string;
@@ -151,6 +192,7 @@ export type ApiCommunityAdminCommunity = {
     accessMethod: 'invite_code' | 'email_domain';
     emailDomain: string | null;
     rules: unknown;
+    presentation: unknown;
     status: string;
     createdAt: string;
     members: ApiCommunityAdminMember[];
@@ -162,6 +204,7 @@ export type UpdateCommunityDetailsInput = {
     accessMethod?: ApiCommunityAdminCommunity['accessMethod'];
     emailDomain?: string | null;
     rules?: string[];
+    presentation?: ApiCommunityPresentation;
 };
 export type ApiCommunityDetail = {
     id: string;
@@ -170,12 +213,15 @@ export type ApiCommunityDetail = {
     accessMethod: 'invite_code' | 'email_domain';
     emailDomain: string | null;
     rules: unknown;
+    presentation: unknown;
     status: string;
     createdAt: string;
 };
 export type ApiCommunityMembership = {
     role: string;
     status: string;
+    accessStatusReason: string | null;
+    accessSuspendedUntil: string | null;
     joinedAt: string;
 };
 export type ApiCommunityStats = {
@@ -309,6 +355,9 @@ export declare function updateCommunityDetails(communityId: string, body: Update
 export declare function updateCommunityMember(communityId: string, userId: string, body: {
     role?: ApiCommunityMemberRole;
     status?: ApiCommunityMemberStatus;
+    accessStatusReason?: ApiMemberAccessStatusReason | null;
+    accessStatusNote?: string | null;
+    accessSuspendedUntil?: string | null;
 }): Promise<{
     member: ApiCommunityAdminMember;
 }>;
@@ -450,5 +499,11 @@ export declare function updateReportStatus(reportId: string, status: ApiReportSt
 export declare function removeReportedListing(reportId: string): Promise<{
     report: ApiReport;
     listingRemoved: boolean;
+}>;
+export declare function runReportMemberAction(reportId: string, body: {
+    action: 'demote_admin' | 'deactivate_member' | 'suspend_member';
+    note?: string;
+}): Promise<{
+    report: ApiReport;
 }>;
 //# sourceMappingURL=endpoints.d.ts.map

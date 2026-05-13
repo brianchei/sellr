@@ -18,14 +18,14 @@ React Query, and typed helpers from `@sellr/api-client`.
   photo upload, verified contact display, storefront access, and readiness
   guidance.
 - `/communities/[communityId]`: member-only community homepage with membership
-  context, marketplace stats, recent listing previews, lightweight Badger/campus
-  presentation cues, guidance, scoped browse/sell actions, and leave-community
-  controls with active-listing protection.
+  context, marketplace stats, recent listing previews, lightweight configurable
+  presentation cues, guidance, optional approved imagery, scoped browse/sell
+  actions, and leave-community controls with active-listing protection.
 - `/communities/join`: post-login flow for joining another community with an
   invite code or verified email-domain match.
-- `/admin/community`: admin community detail editing, invite/member management
-  with search and role/status filters, and a management-community switcher for
-  admins who operate multiple communities.
+- `/admin/community`: admin community detail and presentation editing,
+  invite/member management with search and role/status filters, and a
+  management-community switcher for admins who operate multiple communities.
 - `/marketplace`: community-scoped browse, search, filters, and listing cards.
 - `/marketplace/[listingId]`: listing detail, seller trust card, contact seller,
   and report listing.
@@ -41,8 +41,8 @@ React Query, and typed helpers from `@sellr/api-client`.
 - `/notifications`: activity center with unread/listing/message filters and
   mark-read actions.
 - `/admin/reports`: admin-only report review, status updates, target member
-  management links, scoped member demote/deactivate actions, and explicit
-  listing removal for listing reports.
+  management links, scoped member demote/deactivate/suspend actions, moderation
+  history, and explicit listing removal for listing reports.
 
 ## Local Development
 

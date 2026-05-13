@@ -65,6 +65,7 @@ export const ModelName = {
   Message: 'Message',
   SavedSearch: 'SavedSearch',
   Report: 'Report',
+  ModerationAction: 'ModerationAction',
   UserFlag: 'UserFlag',
   Notification: 'Notification'
 } as const
@@ -109,6 +110,7 @@ export const CommunityScalarFieldEnum = {
   accessMethod: 'accessMethod',
   emailDomain: 'emailDomain',
   rules: 'rules',
+  presentation: 'presentation',
   status: 'status',
   createdAt: 'createdAt'
 } as const
@@ -121,6 +123,9 @@ export const CommunityMemberScalarFieldEnum = {
   communityId: 'communityId',
   role: 'role',
   status: 'status',
+  accessStatusReason: 'accessStatusReason',
+  accessStatusNote: 'accessStatusNote',
+  accessSuspendedUntil: 'accessSuspendedUntil',
   joinedAt: 'joinedAt'
 } as const
 
@@ -295,6 +300,26 @@ export const ReportScalarFieldEnum = {
 } as const
 
 export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
+
+
+export const ModerationActionScalarFieldEnum = {
+  id: 'id',
+  reportId: 'reportId',
+  communityId: 'communityId',
+  targetUserId: 'targetUserId',
+  moderatorId: 'moderatorId',
+  actionType: 'actionType',
+  previousRole: 'previousRole',
+  nextRole: 'nextRole',
+  previousStatus: 'previousStatus',
+  nextStatus: 'nextStatus',
+  previousAccessStatusReason: 'previousAccessStatusReason',
+  nextAccessStatusReason: 'nextAccessStatusReason',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type ModerationActionScalarFieldEnum = (typeof ModerationActionScalarFieldEnum)[keyof typeof ModerationActionScalarFieldEnum]
 
 
 export const UserFlagScalarFieldEnum = {

@@ -159,6 +159,57 @@ export const LeaveCommunitySchema = z.object({
   removeListings: z.boolean().optional().default(false),
 });
 
+export const CommunityThemeKeySchema = z.enum([
+  'default',
+  'badger',
+  'campus',
+  'neighborhood',
+]);
+
+function isCommunityImageUrl(value: string): boolean {
+  if (value.startsWith('/')) {
+    return /^\/[a-zA-Z0-9/_-]+\.(jpg|jpeg|png|webp)$/i.test(value);
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export const CommunityPresentationSchema = z.object({
+  shortDescription: z.string().trim().max(240).nullable().optional(),
+  themeKey: CommunityThemeKeySchema.nullable().optional(),
+  accentColor: z
+    .string()
+    .trim()
+    .regex(/^#[0-9a-fA-F]{6}$/, 'Use a 6-digit hex color such as #C5050C')
+    .nullable()
+    .optional(),
+  bannerImageUrl: z
+    .string()
+    .trim()
+    .max(2048)
+    .refine(isCommunityImageUrl, {
+      error: 'Banner image must be a site-local or http(s) image URL',
+    })
+    .nullable()
+    .optional(),
+  logoImageUrl: z
+    .string()
+    .trim()
+    .max(2048)
+    .refine(isCommunityImageUrl, {
+      error: 'Logo image must be a site-local or http(s) image URL',
+    })
+    .nullable()
+    .optional(),
+  pickupGuidance: z.string().trim().max(240).nullable().optional(),
+  localAreas: z.array(z.string().trim().min(2).max(60)).max(8).optional(),
+});
+
 export const CommunityAdminParamsSchema = z.object({
   communityId: z.uuid(),
 });
@@ -197,6 +248,7 @@ export const UpdateCommunityDetailsSchema = z
     accessMethod: z.enum(['invite_code', 'email_domain']).optional(),
     emailDomain: CommunityEmailDomainSchema.nullable().optional(),
     rules: z.array(z.string().trim().min(2).max(240)).max(8).optional(),
+    presentation: CommunityPresentationSchema.optional(),
   })
   .refine(
     (data) =>
@@ -204,7 +256,8 @@ export const UpdateCommunityDetailsSchema = z
       data.type !== undefined ||
       data.accessMethod !== undefined ||
       data.emailDomain !== undefined ||
-      data.rules !== undefined,
+      data.rules !== undefined ||
+      data.presentation !== undefined,
     { error: 'At least one community detail field is required' },
   )
   .refine(
@@ -225,10 +278,34 @@ export const UpdateCommunityMemberSchema = z
   .object({
     role: z.enum(['member', 'admin']).optional(),
     status: z.enum(['active', 'inactive']).optional(),
+    accessStatusReason: z
+      .enum([
+        'admin_deactivated',
+        'report_deactivated',
+        'report_suspension',
+        'reactivated',
+      ])
+      .nullable()
+      .optional(),
+    accessStatusNote: z.string().trim().max(300).nullable().optional(),
+    accessSuspendedUntil: z.iso.datetime().nullable().optional(),
   })
-  .refine((data) => data.role !== undefined || data.status !== undefined, {
-    error: 'Role or status is required',
-  });
+  .refine(
+    (data) =>
+      data.role !== undefined ||
+      data.status !== undefined ||
+      data.accessStatusReason !== undefined ||
+      data.accessStatusNote !== undefined ||
+      data.accessSuspendedUntil !== undefined,
+    {
+      error: 'Role, status, or access metadata is required',
+    },
+  );
+
+export const ReportMemberActionSchema = z.object({
+  action: z.enum(['demote_admin', 'deactivate_member', 'suspend_member']),
+  note: z.string().trim().max(500).optional(),
+});
 
 // Listings
 export const AvailabilityWindowSchema = z.object({
