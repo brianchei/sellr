@@ -195,6 +195,7 @@ export async function createListing(args: {
   condition?: 'like_new' | 'good' | 'fair' | 'for_parts';
   price?: number;
   locationNeighborhood?: string;
+  locationRadiusM?: number;
   photoUrls?: string[];
 }) {
   listingCounter += 1;
@@ -210,7 +211,7 @@ export async function createListing(args: {
       price: new Prisma.Decimal(String(args.price ?? 25)),
       negotiable: false,
       locationNeighborhood: args.locationNeighborhood ?? 'Westside',
-      locationRadiusM: 1000,
+      locationRadiusM: args.locationRadiusM ?? 1000,
       availabilityWindows: [
         { dayOfWeek: 6, startHour: 10, endHour: 18 },
       ] as unknown as Prisma.InputJsonValue,

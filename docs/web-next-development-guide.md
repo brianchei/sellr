@@ -276,6 +276,8 @@ Acceptance notes:
 
 Goal: improve the core buyer/seller loop without adding broad marketplace scope.
 
+Status: complete for the current web SLC.
+
 Implemented:
 
 - Listing creation and edit now include an inline listing-strength checklist for
@@ -287,23 +289,22 @@ Implemented:
   preserving the existing meter-based API contract.
 - Marketplace browse now sends search, category, condition, has-photo, and
   recent/price sort controls to the community-scoped listings API.
+- Marketplace browse now includes server-backed price range and pickup-radius
+  filters, with inline validation for unusable price ranges.
 - Listing cards now surface photo count, approximate pickup radius, seller name,
   active listing count, and verified/community-member trust cues for faster
   scanning.
 - Listing detail now brings seller/trust context into the primary listing
   content, adds an at-a-glance scan section, and formats pickup windows with
   buyer-friendly AM/PM times.
+- Listing creation/edit now has quick-pick price, pickup area, and common pickup
+  window helpers, a sticky buyer preview, clearer next-step listing-strength
+  guidance, and AM/PM preview timing.
 
-Work items:
+Follow-ups:
 
-- Continue streamlining the listing creation experience.
-- Continue simplifying listing form UI and reducing unnecessary friction.
-- Keep listing quality high through helper text, preview, validation, and photo
-  guidance.
-- Add more browse filters where they have clear buyer value, especially price
-  range and distance/pickup radius.
-- Keep tuning listing detail hierarchy as real seed inventory and buyer
-  feedback reveal what needs to be easier to scan.
+- Keep tuning listing creation and detail hierarchy only as real seed inventory
+  and buyer feedback reveal specific friction.
 
 Acceptance notes:
 
@@ -448,12 +449,23 @@ Remaining:
 
 ### Listings And Browse
 
-- Streamline listing experience.
-- Simplify listing form UI.
-- Fix mobile image upload for iPhone HEIF/HEIC files.
-- Add more browse filters and functionality.
-- Use approximate radius in miles.
-- Simplify listing date/time display.
+Completed in Phase 4:
+
+- Streamlined listing creation/edit with listing-strength guidance, quick-pick
+  helpers, buyer preview, validation, and photo guidance.
+- Fixed mobile image upload for iPhone HEIF/HEIC files where browsers can decode
+  and convert them.
+- Added server-backed browse search, category, condition, photo-only, price
+  range, pickup-radius, and sort controls.
+- Added scan-friendly listing cards with seller trust cues, photo count, active
+  listing count, and approximate pickup radius.
+- Used approximate radius in miles and simplified listing date/time display
+  across listing cards, detail, and preview surfaces.
+
+Remaining:
+
+- Tune listing form/detail hierarchy only when seed inventory or buyer feedback
+  shows a specific issue.
 
 ### Messaging
 
@@ -585,3 +597,16 @@ Keep this guide aligned with:
 - Added community presentation config fields and homepage rendering for
   descriptions, theme keys, accent color, pickup guidance, local areas, and
   optional approved banner/logo image URLs.
+
+### Phase 4 Complete
+
+- Added listing-strength guidance, durable multi-photo upload, browser-assisted
+  HEIC/HEIF conversion, buyer preview, quick-pick price and pickup helpers, and
+  friendlier pickup time formatting to listing creation/edit.
+- Added server-backed marketplace filters for search, category, condition,
+  photo-only, price range, pickup radius, and price/recent sort.
+- Upgraded listing cards and listing detail with faster scanability, seller
+  trust cues, active listing counts, photo count, approximate pickup radius,
+  at-a-glance detail metadata, and buyer-friendly pickup timing.
+- Kept location privacy aligned with the SLC: browse/detail surfaces expose
+  approximate area and seller pickup radius, not exact pickup addresses.

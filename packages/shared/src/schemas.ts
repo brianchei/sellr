@@ -352,18 +352,29 @@ const QueryBooleanSchema = z.preprocess((value) => {
   return value;
 }, z.boolean());
 
-export const ListListingsQuerySchema = z.object({
-  communityId: z.uuid(),
-  q: z.string().trim().max(200).optional().default(''),
-  category: z.string().trim().min(1).max(80).optional(),
-  condition: z.enum(ListingCondition).optional(),
-  hasPhotos: QueryBooleanSchema.optional().default(false),
-  sort: z
-    .enum(['recent', 'price-asc', 'price-desc'])
-    .optional()
-    .default('recent'),
-  limit: z.coerce.number().int().min(1).max(50).optional().default(20),
-});
+export const ListListingsQuerySchema = z
+  .object({
+    communityId: z.uuid(),
+    q: z.string().trim().max(200).optional().default(''),
+    category: z.string().trim().min(1).max(80).optional(),
+    condition: z.enum(ListingCondition).optional(),
+    hasPhotos: QueryBooleanSchema.optional().default(false),
+    minPrice: z.coerce.number().min(0).max(100_000).optional(),
+    maxPrice: z.coerce.number().min(0).max(100_000).optional(),
+    maxPickupRadiusM: z.coerce.number().int().min(100).max(5000).optional(),
+    sort: z
+      .enum(['recent', 'price-asc', 'price-desc'])
+      .optional()
+      .default('recent'),
+    limit: z.coerce.number().int().min(1).max(50).optional().default(20),
+  })
+  .refine(
+    (data) =>
+      data.minPrice === undefined ||
+      data.maxPrice === undefined ||
+      data.minPrice <= data.maxPrice,
+    { error: 'Minimum price must be less than or equal to maximum price' },
+  );
 
 export const ListSellerListingsQuerySchema = z.object({
   communityId: z.uuid(),

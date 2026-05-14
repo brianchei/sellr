@@ -518,6 +518,9 @@ export function fetchCommunityListings(params: {
   category?: string;
   condition?: string;
   hasPhotos?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  maxPickupRadiusM?: number;
   sort?: 'recent' | 'price-asc' | 'price-desc';
   limit?: number;
 }) {
@@ -533,6 +536,15 @@ export function fetchCommunityListings(params: {
   }
   if (params.hasPhotos) {
     q.set('hasPhotos', 'true');
+  }
+  if (params.minPrice != null) {
+    q.set('minPrice', String(params.minPrice));
+  }
+  if (params.maxPrice != null) {
+    q.set('maxPrice', String(params.maxPrice));
+  }
+  if (params.maxPickupRadiusM != null) {
+    q.set('maxPickupRadiusM', String(params.maxPickupRadiusM));
   }
   if (params.sort) {
     q.set('sort', params.sort);

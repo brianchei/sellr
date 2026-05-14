@@ -4,7 +4,11 @@ import {
   isValidImageUrl,
   type ListingFormValues,
 } from '@/lib/listing-form';
-import { formatPrice } from '@/lib/listing-format';
+import {
+  formatPickupHour,
+  formatPrice,
+  formatRadius,
+} from '@/lib/listing-format';
 
 export type ListingImageStatus = 'idle' | 'loading' | 'loaded' | 'error';
 
@@ -25,7 +29,18 @@ function formatPreviewAvailability(values: ListingFormValues): string {
     return 'Pickup window pending';
   }
 
-  return `${dayLabel(values.dayOfWeek)}, ${String(start).padStart(2, '0')}:00-${String(end).padStart(2, '0')}:00`;
+  return `${dayLabel(values.dayOfWeek)}, ${formatPickupHour(start)}-${formatPickupHour(end)}`;
+}
+
+function formatPreviewPickup(values: ListingFormValues): string {
+  const radius = Number.parseInt(values.locationRadiusM, 10);
+  const neighborhood = values.locationNeighborhood.trim() || 'Pickup area';
+
+  if (!Number.isInteger(radius)) {
+    return neighborhood;
+  }
+
+  return `${neighborhood} - ${formatRadius(radius)} radius`;
 }
 
 export function ListingBuyerPreview({
@@ -41,7 +56,7 @@ export function ListingBuyerPreview({
   const description =
     values.description.trim() ||
     'A clear description will help buyers decide whether to reach out.';
-  const neighborhood = values.locationNeighborhood.trim() || 'Pickup area';
+  const pickup = formatPreviewPickup(values);
   const category = values.subcategory.trim() || values.category;
 
   return (
@@ -93,9 +108,7 @@ export function ListingBuyerPreview({
       <dl className="mt-4 grid gap-3 text-sm">
         <div>
           <dt className="font-medium text-[var(--text-primary)]">Pickup</dt>
-          <dd className="mt-0.5 text-[var(--text-secondary)]">
-            {neighborhood}
-          </dd>
+          <dd className="mt-0.5 text-[var(--text-secondary)]">{pickup}</dd>
         </div>
         <div>
           <dt className="font-medium text-[var(--text-primary)]">

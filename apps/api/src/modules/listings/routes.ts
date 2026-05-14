@@ -294,8 +294,18 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       schema: { querystring: ListListingsQuerySchema },
     },
     async (request, reply) => {
-      const { communityId, q, category, condition, hasPhotos, sort, limit } =
-        ListListingsQuerySchema.parse(request.query);
+      const {
+        communityId,
+        q,
+        category,
+        condition,
+        hasPhotos,
+        minPrice,
+        maxPrice,
+        maxPickupRadiusM,
+        sort,
+        limit,
+      } = ListListingsQuerySchema.parse(request.query);
       if (!request.user.communityIds.includes(communityId)) {
         return reply
           .code(403)
@@ -309,6 +319,21 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
         ...(category ? { category } : {}),
         ...(condition ? { condition } : {}),
         ...(hasPhotos ? { photoUrls: { not: [] } } : {}),
+        ...(minPrice !== undefined || maxPrice !== undefined
+          ? {
+              price: {
+                ...(minPrice !== undefined
+                  ? { gte: new Prisma.Decimal(String(minPrice)) }
+                  : {}),
+                ...(maxPrice !== undefined
+                  ? { lte: new Prisma.Decimal(String(maxPrice)) }
+                  : {}),
+              },
+            }
+          : {}),
+        ...(maxPickupRadiusM !== undefined
+          ? { locationRadiusM: { lte: maxPickupRadiusM } }
+          : {}),
         ...(trimmedQuery
           ? {
               OR: [

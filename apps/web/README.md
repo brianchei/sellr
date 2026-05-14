@@ -27,14 +27,16 @@ React Query, and typed helpers from `@sellr/api-client`.
   invite/member management with search and role/status filters, and a
   management-community switcher for admins who operate multiple communities.
 - `/marketplace`: community-scoped browse with server-backed search, category,
-  condition, photo-only, and sort controls plus scan-friendly listing cards.
+  condition, photo-only, price range, pickup-radius, and sort controls plus
+  scan-friendly listing cards.
 - `/marketplace/[listingId]`: listing detail with seller/trust context,
   at-a-glance pickup/listing cues, contact seller, and report listing.
 - `/sellers/[sellerId]`: seller storefront-lite with trust signals, active
   listings, report seller action, and contact-through-listing guidance.
 - `/sell`: structured listing creation with listing-strength guidance,
   JPG/PNG/WebP plus browser-converted iPhone HEIC image upload, durable
-  production media delivery, mile-based pickup radius labels, and buyer preview.
+  production media delivery, quick-pick price/pickup helpers, mile-based pickup
+  radius labels, and buyer preview.
 - `/listings`: seller inventory management, status filters, publish/unpublish,
   delete, mark sold, and seller identity preview.
 - `/listings/[listingId]/edit`: owner-only listing edit flow.

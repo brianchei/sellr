@@ -12,6 +12,13 @@ import { ACTIVITY_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 
 type SortOption = 'recent' | 'price-asc' | 'price-desc';
 type ConditionOption = 'all' | keyof typeof CONDITION_LABELS_MAP;
+type PickupRadiusOption = 'all' | '500' | '1000' | '2500';
+
+type PriceFilterState = {
+  minPrice?: number;
+  maxPrice?: number;
+  error?: string;
+};
 
 const CONDITION_LABELS_MAP = CONDITION_LABELS;
 
@@ -33,16 +40,73 @@ const CONDITION_FILTERS: Array<{ value: ConditionOption; label: string }> = [
   })),
 ];
 
+const PICKUP_RADIUS_FILTERS: Array<{
+  value: PickupRadiusOption;
+  label: string;
+}> = [
+  { value: 'all', label: 'Any' },
+  { value: '500', label: '0.3 mi or tighter' },
+  { value: '1000', label: '0.6 mi or tighter' },
+  { value: '2500', label: '1.6 mi or tighter' },
+];
+
+function parseOptionalPriceFilter(value: string): number | undefined | null {
+  const cleanValue = value.trim();
+  if (!cleanValue) {
+    return undefined;
+  }
+
+  const parsed = Number.parseFloat(cleanValue);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return null;
+  }
+
+  return Math.round(parsed * 100) / 100;
+}
+
+function parsePriceFilterState(
+  minPriceValue: string,
+  maxPriceValue: string,
+): PriceFilterState {
+  const minPrice = parseOptionalPriceFilter(minPriceValue);
+  const maxPrice = parseOptionalPriceFilter(maxPriceValue);
+
+  if (minPrice === null || maxPrice === null) {
+    return { error: 'Enter positive numbers for price filters.' };
+  }
+
+  if (
+    minPrice !== undefined &&
+    maxPrice !== undefined &&
+    minPrice > maxPrice
+  ) {
+    return { error: 'Minimum price must be less than maximum price.' };
+  }
+
+  return { minPrice, maxPrice };
+}
+
 export default function MarketplacePage() {
   const { primaryCommunityId } = useAuth();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [condition, setCondition] = useState<ConditionOption>('all');
   const [sort, setSort] = useState<SortOption>('recent');
+  const [minPriceValue, setMinPriceValue] = useState('');
+  const [maxPriceValue, setMaxPriceValue] = useState('');
+  const [pickupRadius, setPickupRadius] =
+    useState<PickupRadiusOption>('all');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [hasPhotosOnly, setHasPhotosOnly] = useState(false);
 
   const trimmedQuery = query.trim();
+  const priceFilter = useMemo(
+    () => parsePriceFilterState(minPriceValue, maxPriceValue),
+    [minPriceValue, maxPriceValue],
+  );
+  const maxPickupRadiusM =
+    pickupRadius === 'all' ? undefined : Number.parseInt(pickupRadius, 10);
+  const canFetchListings = Boolean(primaryCommunityId) && !priceFilter.error;
 
   const listingsQuery = useQuery({
     queryKey: [
@@ -52,6 +116,9 @@ export default function MarketplacePage() {
         category,
         condition,
         hasPhotosOnly,
+        maxPickupRadiusM,
+        maxPrice: priceFilter.maxPrice,
+        minPrice: priceFilter.minPrice,
         q: trimmedQuery,
         sort,
       },
@@ -66,11 +133,18 @@ export default function MarketplacePage() {
         ...(category !== 'all' ? { category } : {}),
         ...(condition !== 'all' ? { condition } : {}),
         hasPhotos: hasPhotosOnly,
+        ...(priceFilter.minPrice !== undefined
+          ? { minPrice: priceFilter.minPrice }
+          : {}),
+        ...(priceFilter.maxPrice !== undefined
+          ? { maxPrice: priceFilter.maxPrice }
+          : {}),
+        ...(maxPickupRadiusM !== undefined ? { maxPickupRadiusM } : {}),
         sort,
         limit: 50,
       });
     },
-    enabled: Boolean(primaryCommunityId),
+    enabled: canFetchListings,
     refetchInterval: ACTIVITY_REFETCH_INTERVAL_MS,
   });
 
@@ -93,6 +167,9 @@ export default function MarketplacePage() {
     category !== 'all' ||
     condition !== 'all' ||
     sort !== 'recent' ||
+    Boolean(minPriceValue.trim()) ||
+    Boolean(maxPriceValue.trim()) ||
+    pickupRadius !== 'all' ||
     verifiedOnly ||
     hasPhotosOnly;
 
@@ -101,6 +178,9 @@ export default function MarketplacePage() {
     setCategory('all');
     setCondition('all');
     setSort('recent');
+    setMinPriceValue('');
+    setMaxPriceValue('');
+    setPickupRadius('all');
     setVerifiedOnly(false);
     setHasPhotosOnly(false);
   };
@@ -229,6 +309,54 @@ export default function MarketplacePage() {
           onChange={setCondition}
         />
 
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+              Min price
+            </span>
+            <input
+              value={minPriceValue}
+              onChange={(event) => setMinPriceValue(event.target.value)}
+              inputMode="decimal"
+              placeholder="No minimum"
+              aria-invalid={Boolean(priceFilter.error)}
+              aria-describedby="listing-price-filter-error"
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+              Max price
+            </span>
+            <input
+              value={maxPriceValue}
+              onChange={(event) => setMaxPriceValue(event.target.value)}
+              inputMode="decimal"
+              placeholder="No maximum"
+              aria-invalid={Boolean(priceFilter.error)}
+              aria-describedby="listing-price-filter-error"
+              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            />
+          </label>
+        </div>
+        {priceFilter.error ? (
+          <p
+            id="listing-price-filter-error"
+            className="mt-2 text-xs font-medium text-[var(--color-brand-warm-strong)]"
+            role="alert"
+          >
+            {priceFilter.error}
+          </p>
+        ) : null}
+
+        <FilterChipRow
+          label="Pickup radius"
+          value={pickupRadius}
+          options={PICKUP_RADIUS_FILTERS}
+          onChange={setPickupRadius}
+        />
+
         {verifiedAvailable || verifiedOnly ? (
           <div className="mt-4 flex flex-wrap gap-2">
             <button
@@ -320,7 +448,11 @@ export default function MarketplacePage() {
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
         <p className="text-[var(--text-secondary)]">
-          {listingsQuery.isLoading ? (
+          {priceFilter.error ? (
+            <span className="text-[var(--text-tertiary)]">
+              Adjust the price range to update results
+            </span>
+          ) : listingsQuery.isLoading ? (
             <span className="text-[var(--text-tertiary)]">Loading…</span>
           ) : (
             <>
@@ -356,7 +488,7 @@ export default function MarketplacePage() {
         ) : null}
       </div>
 
-      {listingsQuery.isLoading ? (
+      {!priceFilter.error && listingsQuery.isLoading ? (
         <section
           aria-label="Loading listings"
           className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
@@ -381,7 +513,7 @@ export default function MarketplacePage() {
         </section>
       ) : null}
 
-      {listingsQuery.isError ? (
+      {!priceFilter.error && listingsQuery.isError ? (
         <section
           className="mt-4 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
           role="alert"
@@ -402,7 +534,8 @@ export default function MarketplacePage() {
         </section>
       ) : null}
 
-      {!listingsQuery.isLoading &&
+      {!priceFilter.error &&
+      !listingsQuery.isLoading &&
       !listingsQuery.isError &&
       listings.length === 0 &&
       !hasActiveFilters ? (
@@ -422,7 +555,8 @@ export default function MarketplacePage() {
         </section>
       ) : null}
 
-      {!listingsQuery.isLoading &&
+      {!priceFilter.error &&
+      !listingsQuery.isLoading &&
       !listingsQuery.isError &&
       hasActiveFilters &&
       filteredListings.length === 0 ? (
@@ -431,8 +565,8 @@ export default function MarketplacePage() {
             No listings match those filters
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Try a broader search, a different category, or clearing the
-            trust/photo filters.
+            Try a broader search, a different category, a wider price or pickup
+            radius, or clearing the trust/photo filters.
           </p>
           <button
             type="button"
@@ -444,7 +578,7 @@ export default function MarketplacePage() {
         </section>
       ) : null}
 
-      {filteredListings.length > 0 ? (
+      {!priceFilter.error && filteredListings.length > 0 ? (
         <section
           aria-label="Listings"
           className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { formatAvailabilityWindow, formatRadius } from './listing-format';
+import {
+  formatAvailabilityWindow,
+  formatPickupHour,
+  formatRadius,
+} from './listing-format';
 
 describe('formatRadius', () => {
   it('formats approximate pickup radius in miles', () => {
@@ -11,6 +15,12 @@ describe('formatRadius', () => {
 });
 
 describe('formatAvailabilityWindow', () => {
+  it('formats pickup hours without leading zeroes', () => {
+    expect(formatPickupHour(0)).toBe('12 AM');
+    expect(formatPickupHour(12)).toBe('12 PM');
+    expect(formatPickupHour(17)).toBe('5 PM');
+  });
+
   it('formats weekly pickup windows with buyer-friendly times', () => {
     expect(
       formatAvailabilityWindow({
