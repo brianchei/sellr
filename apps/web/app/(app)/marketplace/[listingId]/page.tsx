@@ -14,12 +14,16 @@ import {
 import { useAuth } from '@/components/auth-provider';
 import { PhotoGallery } from '@/components/photo-gallery';
 import { ReportDialog } from '@/components/report-dialog';
-import { SellerProfileCard } from '@/components/seller-profile-card';
+import {
+  SellerProfileCard,
+  profileInitials,
+} from '@/components/seller-profile-card';
 import {
   availabilityWindows,
   formatAvailabilityWindow,
   formatCondition,
   formatPrice,
+  formatPostedDate,
   formatRadius,
   formatRelativeListedDate,
   photoUrls,
@@ -120,6 +124,165 @@ function freshnessClasses(tone: ListedFreshness['tone']) {
   return 'border-[var(--border-default)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)]';
 }
 
+function photoCountLabel(count: number): string {
+  if (count === 0) {
+    return 'No photos';
+  }
+  return `${count} ${count === 1 ? 'photo' : 'photos'}`;
+}
+
+function activeListingLabel(count: number | undefined): string {
+  const safeCount = count ?? 0;
+  return `${safeCount} active ${safeCount === 1 ? 'listing' : 'listings'}`;
+}
+
+function sellerDisplayName(listing: ApiListing): string {
+  return listing.seller?.displayName?.trim() || 'Community seller';
+}
+
+function SellerInlineSummary({
+  listing,
+  isOwnListing,
+}: {
+  listing: ApiListing;
+  isOwnListing: boolean;
+}) {
+  const sellerName = sellerDisplayName(listing);
+  const sellerHref = listing.seller ? `/sellers/${listing.seller.id}` : null;
+  const sellerListings = activeListingLabel(listing.seller?.listingCount);
+
+  return (
+    <section
+      aria-label="Seller snapshot"
+      className="mt-5 border-y border-[var(--border-default)] py-4"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            aria-label={`${sellerName} avatar`}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-xs font-bold text-[var(--text-primary)] ring-4 ring-[var(--color-brand-primary-soft)]"
+            style={
+              listing.seller?.avatarUrl
+                ? { backgroundImage: `url("${listing.seller.avatarUrl}")` }
+                : undefined
+            }
+          >
+            {listing.seller?.avatarUrl ? null : profileInitials(sellerName)}
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+              {isOwnListing ? 'Your seller profile' : 'Seller'}
+            </p>
+            <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+              {sellerName}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {listing.seller?.communityMember !== false ? (
+            <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
+              Community member
+            </span>
+          ) : null}
+          {listing.seller?.verifiedAt ? (
+            <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
+              Verified sign-in
+            </span>
+          ) : null}
+          <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]">
+            {sellerListings}
+          </span>
+          {sellerHref ? (
+            <Link
+              href={sellerHref}
+              className="rounded-full px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-contrast)] no-underline hover:bg-[var(--color-brand-contrast-soft)]"
+            >
+              View storefront
+            </Link>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DetailStat({
+  label,
+  value,
+  note,
+}: {
+  label: string;
+  value: string;
+  note?: string;
+}) {
+  return (
+    <div className="border-l border-[var(--border-default)] pl-3">
+      <dt className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+        {label}
+      </dt>
+      <dd className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+        {value}
+      </dd>
+      {note ? (
+        <dd className="mt-0.5 text-xs leading-5 text-[var(--text-secondary)]">
+          {note}
+        </dd>
+      ) : null}
+    </div>
+  );
+}
+
+function ListingAtAGlance({
+  listing,
+  photoCount,
+  freshness,
+}: {
+  listing: ApiListing;
+  photoCount: number;
+  freshness: ListedFreshness | null;
+}) {
+  const status = statusDisplay(listing.status);
+  const sellerName = sellerDisplayName(listing);
+
+  return (
+    <section aria-labelledby="listing-glance-heading" className="mt-6">
+      <h2
+        id="listing-glance-heading"
+        className="text-sm font-semibold text-[var(--text-primary)]"
+      >
+        At a glance
+      </h2>
+      <dl className="mt-3 grid gap-x-4 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+        <DetailStat
+          label="Listed"
+          value={freshness?.label ?? 'Recently listed'}
+          note={formatPostedDate(listing.createdAt)}
+        />
+        <DetailStat
+          label="Pickup"
+          value={listing.locationNeighborhood}
+          note={`Approx. ${formatRadius(listing.locationRadiusM)} radius`}
+        />
+        <DetailStat
+          label="Photos"
+          value={photoCountLabel(photoCount)}
+          note={
+            photoCount > 0 ? 'Review condition before messaging.' : undefined
+          }
+        />
+        <DetailStat
+          label="Seller"
+          value={sellerName}
+          note={`${status.label} listing · ${activeListingLabel(
+            listing.seller?.listingCount,
+          )}`}
+        />
+      </dl>
+    </section>
+  );
+}
+
 export default function ListingDetailPage() {
   const params = useParams<{ listingId: string }>();
   const queryClient = useQueryClient();
@@ -217,7 +380,6 @@ export default function ListingDetailPage() {
     setMessage(reply.text);
     setMessageError(null);
   };
-
 
   if (listingQuery.isLoading) {
     return (
@@ -384,6 +546,17 @@ export default function ListingDetailPage() {
               ) : null}
             </div>
 
+            <SellerInlineSummary
+              listing={listing}
+              isOwnListing={isOwnListing}
+            />
+
+            <ListingAtAGlance
+              listing={listing}
+              photoCount={photos.length}
+              freshness={freshness}
+            />
+
             <div className="mt-6 border-t border-[var(--border-default)] pt-6">
               <h2 className="text-base font-semibold text-[var(--text-primary)]">
                 Description
@@ -419,70 +592,75 @@ export default function ListingDetailPage() {
               </div>
             ) : null}
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <section className="rounded-2xl border border-black/10 bg-white/80 p-4">
-                <h2 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-primary)]">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 21s7-6 7-12a7 7 0 0 0-14 0c0 6 7 12 7 12Z" />
-                    <circle cx="12" cy="9" r="2.5" />
-                  </svg>
-                  Pickup area
-                </h2>
-                <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">
-                  {listing.locationNeighborhood}
-                </p>
-                <p className="mt-0.5 text-xs text-[var(--text-tertiary)]">
-                  Approximate radius {formatRadius(listing.locationRadiusM)}.
-                  Precise spot is shared once both sides agree.
-                </p>
-              </section>
-
-              <section className="rounded-2xl border border-black/10 bg-white/80 p-4">
-                <h2 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-primary)]">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <rect x="3" y="4" width="18" height="17" rx="2" />
-                    <path d="M3 10h18" />
-                    <path d="M8 2v4" />
-                    <path d="M16 2v4" />
-                  </svg>
-                  Pickup window
-                </h2>
-                {windows.length > 0 ? (
-                  <ul className="mt-1.5 space-y-1 text-sm text-[var(--text-primary)]">
-                    {windows.map((window, index) => (
-                      <li key={index} className="flex items-baseline gap-2">
-                        <span className="h-1 w-1 rounded-full bg-[var(--color-brand-contrast)]" />
-                        {formatAvailabilityWindow(window)}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-1.5 text-sm text-[var(--text-secondary)]">
-                    Ask the seller about timing in your message.
+            <section className="mt-6 border-t border-[var(--border-default)] pt-6">
+              <h2 className="text-base font-semibold text-[var(--text-primary)]">
+                Pickup and timing
+              </h2>
+              <div className="mt-3 grid gap-5 sm:grid-cols-2">
+                <div className="border-l border-[var(--color-brand-contrast-muted)] pl-4">
+                  <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-primary)]">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 21s7-6 7-12a7 7 0 0 0-14 0c0 6 7 12 7 12Z" />
+                      <circle cx="12" cy="9" r="2.5" />
+                    </svg>
+                    Approximate area
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">
+                    {listing.locationNeighborhood}
                   </p>
-                )}
-              </section>
-            </div>
+                  <p className="mt-0.5 text-xs leading-5 text-[var(--text-tertiary)]">
+                    {formatRadius(listing.locationRadiusM)} radius. Precise
+                    spot is shared once both sides agree.
+                  </p>
+                </div>
+
+                <div className="border-l border-[var(--color-brand-contrast-muted)] pl-4">
+                  <h3 className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-primary)]">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="4" width="18" height="17" rx="2" />
+                      <path d="M3 10h18" />
+                      <path d="M8 2v4" />
+                      <path d="M16 2v4" />
+                    </svg>
+                    Best pickup windows
+                  </h3>
+                  {windows.length > 0 ? (
+                    <ul className="mt-1.5 space-y-1 text-sm text-[var(--text-primary)]">
+                      {windows.map((window, index) => (
+                        <li key={index} className="flex items-baseline gap-2">
+                          <span className="h-1 w-1 rounded-full bg-[var(--color-brand-contrast)]" />
+                          {formatAvailabilityWindow(window)}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-1.5 text-sm text-[var(--text-secondary)]">
+                      Ask the seller about timing in your message.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </section>
           </div>
         </article>
 

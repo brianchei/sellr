@@ -67,27 +67,52 @@ export function formatRadius(radiusM: number): string {
   return `${Number.parseFloat(miles.toFixed(1))} mi`;
 }
 
+function formatPickupHour(hour: number): string {
+  const normalizedHour = ((hour % 24) + 24) % 24;
+  const displayHour = normalizedHour % 12 || 12;
+  const meridiem = normalizedHour < 12 ? 'AM' : 'PM';
+  return `${displayHour} ${meridiem}`;
+}
+
+function formatPickupDate(value: unknown): string | null {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+  }).format(date);
+}
+
 export function formatAvailabilityWindow(window: AvailabilityWindow): string {
-  const day =
+  const dateLabel = formatPickupDate(window.specificDate);
+  const dayLabel =
     typeof window.dayOfWeek === 'number' &&
     window.dayOfWeek >= 0 &&
     window.dayOfWeek <= 6
       ? DAY_LABELS[window.dayOfWeek]
       : 'Available';
+  const label = dateLabel ?? dayLabel;
   const start =
     typeof window.startHour === 'number'
-      ? `${String(window.startHour).padStart(2, '0')}:00`
+      ? formatPickupHour(window.startHour)
       : null;
   const end =
     typeof window.endHour === 'number'
-      ? `${String(window.endHour).padStart(2, '0')}:00`
+      ? formatPickupHour(window.endHour)
       : null;
 
   if (start && end) {
-    return `${day}, ${start}-${end}`;
+    return `${label}, ${start}-${end}`;
   }
 
-  return day;
+  return label;
 }
 
 export function formatPostedDate(value: string): string {

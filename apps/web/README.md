@@ -28,8 +28,8 @@ React Query, and typed helpers from `@sellr/api-client`.
   management-community switcher for admins who operate multiple communities.
 - `/marketplace`: community-scoped browse with server-backed search, category,
   condition, photo-only, and sort controls plus scan-friendly listing cards.
-- `/marketplace/[listingId]`: listing detail, seller trust card, contact seller,
-  and report listing.
+- `/marketplace/[listingId]`: listing detail with seller/trust context,
+  at-a-glance pickup/listing cues, contact seller, and report listing.
 - `/sellers/[sellerId]`: seller storefront-lite with trust signals, active
   listings, report seller action, and contact-through-listing guidance.
 - `/sell`: structured listing creation with listing-strength guidance,
