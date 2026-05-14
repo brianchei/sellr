@@ -371,6 +371,11 @@ export declare function fetchListingsNearby(params: {
 }>;
 export declare function fetchCommunityListings(params: {
     communityId: string;
+    q?: string;
+    category?: string;
+    condition?: string;
+    hasPhotos?: boolean;
+    sort?: 'recent' | 'price-asc' | 'price-desc';
     limit?: number;
 }): Promise<{
     listings: ApiListing[];

@@ -285,6 +285,11 @@ Implemented:
   when conversion is unavailable.
 - Pickup radius labels and listing display formatting now use miles while
   preserving the existing meter-based API contract.
+- Marketplace browse now sends search, category, condition, has-photo, and
+  recent/price sort controls to the community-scoped listings API.
+- Listing cards now surface photo count, approximate pickup radius, seller name,
+  active listing count, and verified/community-member trust cues for faster
+  scanning.
 
 Work items:
 
@@ -294,15 +299,9 @@ Work items:
   guidance.
 - Add seller info to listings where appropriate.
 - Simplify listing date/time display.
-- Add more browse filters and sorting:
-  - Category.
-  - Condition.
-  - Price range.
-  - Distance or pickup radius.
-  - Recently listed.
-  - Has photos.
-  - Seller/community trust cues where supported by data.
-- Improve marketplace card and listing detail scanability.
+- Add more browse filters where they have clear buyer value, especially price
+  range and distance/pickup radius.
+- Improve listing detail scanability to match the marketplace card upgrades.
 
 Acceptance notes:
 

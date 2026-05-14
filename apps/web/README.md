@@ -26,7 +26,8 @@ React Query, and typed helpers from `@sellr/api-client`.
 - `/admin/community`: admin community detail and presentation editing,
   invite/member management with search and role/status filters, and a
   management-community switcher for admins who operate multiple communities.
-- `/marketplace`: community-scoped browse, search, filters, and listing cards.
+- `/marketplace`: community-scoped browse with server-backed search, category,
+  condition, photo-only, and sort controls plus scan-friendly listing cards.
 - `/marketplace/[listingId]`: listing detail, seller trust card, contact seller,
   and report listing.
 - `/sellers/[sellerId]`: seller storefront-lite with trust signals, active

@@ -165,6 +165,18 @@ function listingPreview(title: string, message: string): string {
   return `${title}: ${message}`.slice(0, 140);
 }
 
+function listingBrowseOrderBy(
+  sort: 'recent' | 'price-asc' | 'price-desc',
+): Prisma.ListingOrderByWithRelationInput[] {
+  if (sort === 'price-asc') {
+    return [{ price: 'asc' }, { createdAt: 'desc' }];
+  }
+  if (sort === 'price-desc') {
+    return [{ price: 'desc' }, { createdAt: 'desc' }];
+  }
+  return [{ createdAt: 'desc' }];
+}
+
 async function notifyCommunityAboutNewListing(listing: {
   id: string;
   communityId: string;
@@ -282,18 +294,57 @@ const plugin: FastifyPluginCallback = (fastify, _opts, done) => {
       schema: { querystring: ListListingsQuerySchema },
     },
     async (request, reply) => {
-      const { communityId, limit } = ListListingsQuerySchema.parse(
-        request.query,
-      );
+      const { communityId, q, category, condition, hasPhotos, sort, limit } =
+        ListListingsQuerySchema.parse(request.query);
       if (!request.user.communityIds.includes(communityId)) {
         return reply
           .code(403)
           .send({ error: 'Not a member of this community' });
       }
 
+      const trimmedQuery = q.trim();
+      const where: Prisma.ListingWhereInput = {
+        communityId,
+        status: 'active',
+        ...(category ? { category } : {}),
+        ...(condition ? { condition } : {}),
+        ...(hasPhotos ? { photoUrls: { not: [] } } : {}),
+        ...(trimmedQuery
+          ? {
+              OR: [
+                { title: { contains: trimmedQuery, mode: 'insensitive' } },
+                {
+                  description: {
+                    contains: trimmedQuery,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  subcategory: {
+                    contains: trimmedQuery,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  conditionNote: {
+                    contains: trimmedQuery,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  locationNeighborhood: {
+                    contains: trimmedQuery,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
+            }
+          : {}),
+      };
+
       const listings = await prisma.listing.findMany({
-        where: { communityId, status: 'active' },
-        orderBy: { createdAt: 'desc' },
+        where,
+        orderBy: listingBrowseOrderBy(sort),
         take: limit,
       });
 

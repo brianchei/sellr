@@ -104,6 +104,15 @@ function jsonStableValue(value) {
 function listingPreview(title, message) {
     return `${title}: ${message}`.slice(0, 140);
 }
+function listingBrowseOrderBy(sort) {
+    if (sort === 'price-asc') {
+        return [{ price: 'asc' }, { createdAt: 'desc' }];
+    }
+    if (sort === 'price-desc') {
+        return [{ price: 'desc' }, { createdAt: 'desc' }];
+    }
+    return [{ createdAt: 'desc' }];
+}
 async function notifyCommunityAboutNewListing(listing) {
     const members = await prisma_1.prisma.communityMember.findMany({
         where: {
@@ -172,15 +181,54 @@ const plugin = (fastify, _opts, done) => {
         preHandler: auth_1.verifyJWT,
         schema: { querystring: shared_1.ListListingsQuerySchema },
     }, async (request, reply) => {
-        const { communityId, limit } = shared_1.ListListingsQuerySchema.parse(request.query);
+        const { communityId, q, category, condition, hasPhotos, sort, limit } = shared_1.ListListingsQuerySchema.parse(request.query);
         if (!request.user.communityIds.includes(communityId)) {
             return reply
                 .code(403)
                 .send({ error: 'Not a member of this community' });
         }
+        const trimmedQuery = q.trim();
+        const where = {
+            communityId,
+            status: 'active',
+            ...(category ? { category } : {}),
+            ...(condition ? { condition } : {}),
+            ...(hasPhotos ? { photoUrls: { not: [] } } : {}),
+            ...(trimmedQuery
+                ? {
+                    OR: [
+                        { title: { contains: trimmedQuery, mode: 'insensitive' } },
+                        {
+                            description: {
+                                contains: trimmedQuery,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            subcategory: {
+                                contains: trimmedQuery,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            conditionNote: {
+                                contains: trimmedQuery,
+                                mode: 'insensitive',
+                            },
+                        },
+                        {
+                            locationNeighborhood: {
+                                contains: trimmedQuery,
+                                mode: 'insensitive',
+                            },
+                        },
+                    ],
+                }
+                : {}),
+        };
         const listings = await prisma_1.prisma.listing.findMany({
-            where: { communityId, status: 'active' },
-            orderBy: { createdAt: 'desc' },
+            where,
+            orderBy: listingBrowseOrderBy(sort),
             take: limit,
         });
         return reply.send((0, response_1.ok)({ listings: await withListingSellerProfiles(listings) }));
