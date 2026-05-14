@@ -221,6 +221,53 @@ describe.skipIf(!integrationDbAvailable)('listings integration', () => {
 
       expect(res.statusCode).toBe(403);
     });
+
+    it('filters browse results by price range and pickup radius', async () => {
+      const seller = await createUser();
+      const buyer = await createUser();
+      const community = await createCommunity();
+      await addMember(seller.id, community.id);
+      await addMember(buyer.id, community.id);
+
+      const matching = await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        status: 'active',
+        title: 'Matching desk',
+        price: 45,
+        locationRadiusM: 1000,
+      });
+      await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        status: 'active',
+        title: 'Too expensive sofa',
+        price: 200,
+        locationRadiusM: 1000,
+      });
+      await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        status: 'active',
+        title: 'Too broad pickup lamp',
+        price: 35,
+        locationRadiusM: 5000,
+      });
+
+      const res = await app.inject({
+        method: 'GET',
+        url: `/api/v1/listings?communityId=${community.id}&minPrice=25&maxPrice=75&maxPickupRadiusM=2500`,
+        headers: { cookie: await accessCookieFor(app, buyer.id) },
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = res.json<{
+        data: { listings: Array<{ id: string; title: string }> };
+      }>();
+      expect(body.data.listings.map((listing) => listing.id)).toEqual([
+        matching.id,
+      ]);
+    });
   });
 
   describe('GET /api/v1/listings/:listingId', () => {

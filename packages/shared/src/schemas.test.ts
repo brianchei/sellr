@@ -140,6 +140,9 @@ describe('ListListingsQuerySchema', () => {
       category: 'Furniture',
       condition: 'good',
       hasPhotos: 'true',
+      minPrice: '20',
+      maxPrice: '125.50',
+      maxPickupRadiusM: '2500',
       sort: 'price-desc',
       limit: '30',
     });
@@ -150,6 +153,9 @@ describe('ListListingsQuerySchema', () => {
       category: 'Furniture',
       condition: 'good',
       hasPhotos: true,
+      minPrice: 20,
+      maxPrice: 125.5,
+      maxPickupRadiusM: 2500,
       sort: 'price-desc',
       limit: 30,
     });
@@ -162,6 +168,16 @@ describe('ListListingsQuerySchema', () => {
     });
 
     expect(result.hasPhotos).toBe(false);
+  });
+
+  it('rejects inverted price ranges', () => {
+    const result = ListListingsQuerySchema.safeParse({
+      communityId: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
+      minPrice: '100',
+      maxPrice: '25',
+    });
+
+    expect(result.success).toBe(false);
   });
 });
 

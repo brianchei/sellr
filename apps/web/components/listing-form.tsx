@@ -24,6 +24,7 @@ import {
   getListingFormErrors,
   type ListingFormValues,
 } from '@/lib/listing-form';
+import { formatPickupHour } from '@/lib/listing-format';
 
 type ListingFormProps = {
   values: ListingFormValues;
@@ -42,6 +43,25 @@ type ListingQualityItem = {
   detail: string;
   complete: boolean;
 };
+type PickupWindowPreset = {
+  label: string;
+  dayOfWeek: string;
+  startHour: string;
+  endHour: string;
+};
+
+const PRICE_PRESETS = [
+  { label: 'Free', value: '0' },
+  { label: '$10', value: '10' },
+  { label: '$25', value: '25' },
+  { label: '$50', value: '50' },
+];
+
+const PICKUP_WINDOW_PRESETS: PickupWindowPreset[] = [
+  { label: 'Sat morning', dayOfWeek: '6', startHour: '9', endHour: '12' },
+  { label: 'Sat afternoon', dayOfWeek: '6', startHour: '12', endHour: '16' },
+  { label: 'Weeknight', dayOfWeek: '3', startHour: '17', endHour: '20' },
+];
 
 function fieldClassName(hasError: boolean): string {
   return `mt-2 w-full rounded-2xl border bg-white/90 px-3 py-2.5 text-sm shadow-xs outline-none transition focus:ring-2 ${
@@ -124,6 +144,7 @@ export function ListingForm({
   const fieldErrors = getListingFormErrors(values);
   const qualityItems = listingQualityItems(values);
   const completedQualityItems = qualityItems.filter((item) => item.complete);
+  const nextQualityItem = qualityItems.find((item) => !item.complete);
   const cleanPhotoUrl = values.photoUrls[0]?.trim() ?? '';
   const canPreviewImage = cleanPhotoUrl.length > 0 && !fieldErrors.photoUrls;
   const imageStatus: ListingImageStatus = !canPreviewImage
@@ -180,6 +201,10 @@ export function ListingForm({
     value: ListingFormValues[Key],
   ) => {
     onChange({ ...values, [key]: value });
+  };
+
+  const setFields = (updatedValues: Partial<ListingFormValues>) => {
+    onChange({ ...values, ...updatedValues });
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -306,6 +331,11 @@ export function ListingForm({
               {completedQualityItems.length}/{qualityItems.length} ready
             </span>
           </div>
+          <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
+            {nextQualityItem
+              ? `Next: ${nextQualityItem.detail}`
+              : 'Ready to publish. Preview how the listing will read to buyers before saving.'}
+          </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {qualityItems.map((item) => (
               <div
@@ -437,9 +467,10 @@ export function ListingForm({
             </select>
           </label>
 
-          <label className="block text-sm font-medium text-[var(--text-primary)]">
-            Price
+          <div className="block text-sm font-medium text-[var(--text-primary)]">
+            <label htmlFor="listing-price">Price</label>
             <input
+              id="listing-price"
               value={values.price}
               onChange={(event) => setField('price', event.target.value)}
               onBlur={() => markTouched('price')}
@@ -453,7 +484,25 @@ export function ListingForm({
               id="listing-price-error"
               message={visibleError('price')}
             />
-          </label>
+            <div
+              className="mt-2 flex flex-wrap gap-1.5"
+              aria-label="Quick price choices"
+            >
+              {PRICE_PRESETS.map((preset) => (
+                <button
+                  key={preset.value}
+                  type="button"
+                  onClick={() => {
+                    setField('price', preset.value);
+                    markTouched('price');
+                  }}
+                  className="rounded-full border border-black/10 bg-white/80 px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <label className="block text-sm font-medium text-[var(--text-primary)]">
@@ -566,7 +615,7 @@ export function ListingForm({
         </label>
       </section>
 
-      <aside className="space-y-5">
+      <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
         <ListingBuyerPreview values={values} imageStatus={imageStatus} />
 
         <section className="app-panel p-5">
@@ -602,6 +651,24 @@ export function ListingForm({
               message={visibleError('locationNeighborhood')}
             />
           </label>
+          <div
+            className="mt-2 flex flex-wrap gap-1.5"
+            aria-label="Common pickup areas"
+          >
+            {PICKUP_AREA_SUGGESTIONS.slice(0, 6).map((area) => (
+              <button
+                key={area}
+                type="button"
+                onClick={() => {
+                  setField('locationNeighborhood', area);
+                  markTouched('locationNeighborhood');
+                }}
+                className="rounded-full border border-black/10 bg-white/80 px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
+              >
+                {area}
+              </button>
+            ))}
+          </div>
 
           <label className="mt-4 block text-sm font-medium text-[var(--text-primary)]">
             Approximate radius
@@ -635,6 +702,32 @@ export function ListingForm({
             Add a recurring pickup window so buyers know when you are usually
             available.
           </p>
+          <div
+            className="mt-3 flex flex-wrap gap-1.5"
+            aria-label="Common pickup windows"
+          >
+            {PICKUP_WINDOW_PRESETS.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => {
+                  setFields({
+                    dayOfWeek: preset.dayOfWeek,
+                    startHour: preset.startHour,
+                    endHour: preset.endHour,
+                  });
+                  markTouched('endHour');
+                }}
+                className="rounded-full border border-black/10 bg-white/80 px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
+              >
+                {preset.label}{' '}
+                <span className="font-medium text-[var(--text-tertiary)]">
+                  {formatPickupHour(Number.parseInt(preset.startHour, 10))}-
+                  {formatPickupHour(Number.parseInt(preset.endHour, 10))}
+                </span>
+              </button>
+            ))}
+          </div>
 
           <label className="mt-4 block text-sm font-medium text-[var(--text-primary)]">
             Day

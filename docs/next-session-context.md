@@ -42,7 +42,7 @@ The current web SLC includes:
   dashboard readiness guidance, seller-owned listing identity previews, and
   buyer-facing seller-card cache refreshes now point users toward that profile
   surface.
-- Phase 3 community product work has started with active community summaries on
+- Phase 3 community product work has shipped with active community summaries on
   `/auth/me` and a quiet authenticated app-shell community indicator/switcher for
   multi-community users. A member-only `/communities/[communityId]` homepage now
   gives members community details, membership context, stats, guidance, recent
@@ -62,6 +62,14 @@ The current web SLC includes:
   management view, support scoped report-linked demote/deactivate/suspend
   actions, and show moderation history while keeping report status review
   separate.
+- Phase 4 listing and browse work is complete for the current web SLC:
+  sell/edit flows include listing-strength guidance, durable photo upload with
+  browser-assisted HEIC conversion, quick-pick price and pickup helpers, buyer
+  preview, and AM/PM pickup timing; marketplace browse includes server-backed
+  search, category, condition, photo-only, price range, pickup-radius, and sort
+  controls; listing cards and detail pages surface seller trust cues,
+  approximate pickup radius, photo count, active listing count, and
+  at-a-glance buyer context.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -286,16 +294,13 @@ verify admin/community access, run media health checks, watch Railway/Resend
 logs, and record any launch notes. Do not add new product scope.
 ```
 
-If continuing product development, continue Phase 3 community product surface work:
+If continuing product development, start Phase 5 trust, moderation, and
+messaging work:
 
 ```text
 Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
-docs/design-language.md, and docs/next-session-context.md. Phase 3 community
-product surface is complete for the SLC. Phase 4 has started with listing
-creation quality polish: the sell/edit form now has a listing-strength
-checklist, browser-converted iPhone HEIC upload support where available, clearer
-photo feedback, and mile-based pickup radius labels while keeping the existing
-meter-based API contract. Next, continue Phase 4 with marketplace browse/card
-scanability or seller trust cues on listing surfaces; keep new work inside the
-web SLC.
+docs/design-language.md, and docs/next-session-context.md. Phase 4 listing and
+browse work is complete for the current web SLC. Start Phase 5 with the
+archive/hide conversation behavior for the current user, preserving shared
+conversation history and auditability.
 ```

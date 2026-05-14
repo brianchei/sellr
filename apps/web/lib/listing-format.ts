@@ -67,7 +67,7 @@ export function formatRadius(radiusM: number): string {
   return `${Number.parseFloat(miles.toFixed(1))} mi`;
 }
 
-function formatPickupHour(hour: number): string {
+export function formatPickupHour(hour: number): string {
   const normalizedHour = ((hour % 24) + 24) % 24;
   const displayHour = normalizedHour % 12 || 12;
   const meridiem = normalizedHour < 12 ? 'AM' : 'PM';

@@ -197,6 +197,9 @@ export declare const ListListingsQuerySchema: z.ZodObject<{
     category: z.ZodOptional<z.ZodString>;
     condition: z.ZodOptional<z.ZodEnum<typeof ListingCondition>>;
     hasPhotos: z.ZodDefault<z.ZodOptional<z.ZodPipe<z.ZodTransform<unknown, unknown>, z.ZodBoolean>>>;
+    minPrice: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    maxPrice: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    maxPickupRadiusM: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
     sort: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
         recent: "recent";
         "price-asc": "price-asc";
