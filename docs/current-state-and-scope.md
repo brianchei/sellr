@@ -62,7 +62,8 @@ Included:
 - Verified community onboarding through `wisc.edu` email domain or invite code.
 - Marketplace browse/search/filter with server-backed category, condition,
   photo-only, and sort controls, scan-friendly listing cards, and listing
-  detail pages.
+  detail pages with top-level seller/trust context and buyer-friendly pickup
+  timing.
 - Structured listing creation with durable R2-backed photo upload, listing
   strength guidance, browser-converted iPhone HEIC upload support where
   available, and mile-based pickup radius labels.

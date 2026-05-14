@@ -290,6 +290,9 @@ Implemented:
 - Listing cards now surface photo count, approximate pickup radius, seller name,
   active listing count, and verified/community-member trust cues for faster
   scanning.
+- Listing detail now brings seller/trust context into the primary listing
+  content, adds an at-a-glance scan section, and formats pickup windows with
+  buyer-friendly AM/PM times.
 
 Work items:
 
@@ -297,11 +300,10 @@ Work items:
 - Continue simplifying listing form UI and reducing unnecessary friction.
 - Keep listing quality high through helper text, preview, validation, and photo
   guidance.
-- Add seller info to listings where appropriate.
-- Simplify listing date/time display.
 - Add more browse filters where they have clear buyer value, especially price
   range and distance/pickup radius.
-- Improve listing detail scanability to match the marketplace card upgrades.
+- Keep tuning listing detail hierarchy as real seed inventory and buyer
+  feedback reveal what needs to be easier to scan.
 
 Acceptance notes:
 
