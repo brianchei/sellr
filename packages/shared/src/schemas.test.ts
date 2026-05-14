@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CreateListingSchema,
+  ListListingsQuerySchema,
   ListingPhotoUrlSchema,
   isListingPhotoUrl,
   isProfileAvatarUrl,
@@ -128,6 +129,39 @@ describe('CreateListingSchema photoUrls', () => {
       photoUrls: ['javascript:alert(1)'],
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('ListListingsQuerySchema', () => {
+  it('parses browse filters and sort options', () => {
+    const result = ListListingsQuerySchema.parse({
+      communityId: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
+      q: ' desk ',
+      category: 'Furniture',
+      condition: 'good',
+      hasPhotos: 'true',
+      sort: 'price-desc',
+      limit: '30',
+    });
+
+    expect(result).toEqual({
+      communityId: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
+      q: 'desk',
+      category: 'Furniture',
+      condition: 'good',
+      hasPhotos: true,
+      sort: 'price-desc',
+      limit: 30,
+    });
+  });
+
+  it('parses explicit false boolean query values', () => {
+    const result = ListListingsQuerySchema.parse({
+      communityId: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
+      hasPhotos: 'false',
+    });
+
+    expect(result.hasPhotos).toBe(false);
   });
 });
 

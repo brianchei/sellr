@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCommunityListings, type ApiListing } from '@sellr/api-client';
+import { fetchCommunityListings } from '@sellr/api-client';
 import { useAuth } from '@/components/auth-provider';
 import { ListingCard } from '@/components/listing-card';
+import { CATEGORIES } from '@/lib/listing-form';
 import { CONDITION_LABELS } from '@/lib/listing-format';
 import { ACTIVITY_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 
@@ -32,48 +33,6 @@ const CONDITION_FILTERS: Array<{ value: ConditionOption; label: string }> = [
   })),
 ];
 
-function listingMatchesQuery(listing: ApiListing, query: string): boolean {
-  if (!query) {
-    return true;
-  }
-  const haystack = [
-    listing.title,
-    listing.description,
-    listing.category,
-    listing.subcategory ?? '',
-    listing.conditionNote ?? '',
-    listing.locationNeighborhood,
-  ]
-    .join(' ')
-    .toLowerCase();
-  return haystack.includes(query.toLowerCase());
-}
-
-function priceNumber(price: ApiListing['price']): number {
-  const value =
-    typeof price === 'number' ? price : Number.parseFloat(String(price));
-  return Number.isFinite(value) ? value : 0;
-}
-
-function sortListings(listings: ApiListing[], sort: SortOption): ApiListing[] {
-  const copy = [...listings];
-  if (sort === 'price-asc') {
-    return copy.sort(
-      (left, right) => priceNumber(left.price) - priceNumber(right.price),
-    );
-  }
-  if (sort === 'price-desc') {
-    return copy.sort(
-      (left, right) => priceNumber(right.price) - priceNumber(left.price),
-    );
-  }
-  return copy.sort((left, right) => {
-    return (
-      new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
-    );
-  });
-}
-
 export default function MarketplacePage() {
   const { primaryCommunityId } = useAuth();
   const [query, setQuery] = useState('');
@@ -81,15 +40,33 @@ export default function MarketplacePage() {
   const [condition, setCondition] = useState<ConditionOption>('all');
   const [sort, setSort] = useState<SortOption>('recent');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [hasPhotosOnly, setHasPhotosOnly] = useState(false);
+
+  const trimmedQuery = query.trim();
 
   const listingsQuery = useQuery({
-    queryKey: ['community-listings', primaryCommunityId],
+    queryKey: [
+      'community-listings',
+      primaryCommunityId,
+      {
+        category,
+        condition,
+        hasPhotosOnly,
+        q: trimmedQuery,
+        sort,
+      },
+    ],
     queryFn: () => {
       if (!primaryCommunityId) {
         throw new Error('Join a community before browsing listings.');
       }
       return fetchCommunityListings({
         communityId: primaryCommunityId,
+        ...(trimmedQuery ? { q: trimmedQuery } : {}),
+        ...(category !== 'all' ? { category } : {}),
+        ...(condition !== 'all' ? { condition } : {}),
+        hasPhotos: hasPhotosOnly,
+        sort,
         limit: 50,
       });
     },
@@ -100,40 +77,24 @@ export default function MarketplacePage() {
   const rawListings = listingsQuery.data?.listings;
   const listings = useMemo(() => rawListings ?? [], [rawListings]);
 
-  const categories = useMemo(() => {
-    return Array.from(new Set(listings.map((listing) => listing.category)))
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b));
-  }, [listings]);
-
   const verifiedAvailable = useMemo(
     () => listings.some((listing) => Boolean(listing.seller?.verifiedAt)),
     [listings],
   );
 
   const filteredListings = useMemo(() => {
-    const trimmed = query.trim();
-    const filtered = listings.filter((listing) => {
-      const matchesQuery = listingMatchesQuery(listing, trimmed);
-      const matchesCategory =
-        category === 'all' || listing.category === category;
-      const matchesCondition =
-        condition === 'all' || listing.condition === condition;
-      const matchesVerified =
-        !verifiedOnly || Boolean(listing.seller?.verifiedAt);
-      return (
-        matchesQuery && matchesCategory && matchesCondition && matchesVerified
-      );
-    });
-    return sortListings(filtered, sort);
-  }, [category, condition, listings, query, sort, verifiedOnly]);
+    return listings.filter(
+      (listing) => !verifiedOnly || Boolean(listing.seller?.verifiedAt),
+    );
+  }, [listings, verifiedOnly]);
 
   const hasActiveFilters =
-    Boolean(query.trim()) ||
+    Boolean(trimmedQuery) ||
     category !== 'all' ||
     condition !== 'all' ||
     sort !== 'recent' ||
-    verifiedOnly;
+    verifiedOnly ||
+    hasPhotosOnly;
 
   const clearFilters = () => {
     setQuery('');
@@ -141,6 +102,7 @@ export default function MarketplacePage() {
     setCondition('all');
     setSort('recent');
     setVerifiedOnly(false);
+    setHasPhotosOnly(false);
   };
 
   if (!primaryCommunityId) {
@@ -244,7 +206,7 @@ export default function MarketplacePage() {
               className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
             >
               <option value="all">All categories</option>
-              {categories.map((item) => (
+              {CATEGORIES.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -267,8 +229,8 @@ export default function MarketplacePage() {
           onChange={setCondition}
         />
 
-        {verifiedAvailable ? (
-          <div className="mt-4">
+        {verifiedAvailable || verifiedOnly ? (
+          <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => setVerifiedOnly((current) => !current)}
@@ -317,6 +279,43 @@ export default function MarketplacePage() {
             </button>
           </div>
         ) : null}
+
+        <div className={verifiedAvailable ? 'mt-2' : 'mt-4'}>
+          <button
+            type="button"
+            onClick={() => setHasPhotosOnly((current) => !current)}
+            aria-pressed={hasPhotosOnly}
+            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition"
+            style={{
+              borderColor: hasPhotosOnly
+                ? 'var(--color-brand-contrast)'
+                : 'var(--border-default)',
+              background: hasPhotosOnly
+                ? 'var(--color-brand-contrast-soft)'
+                : 'var(--bg-elevated)',
+              color: hasPhotosOnly
+                ? 'var(--color-brand-contrast)'
+                : 'var(--text-secondary)',
+            }}
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="6" width="18" height="14" rx="2" />
+              <circle cx="12" cy="13" r="3.5" />
+              <path d="M8 6V4h8v2" />
+            </svg>
+            Has photos
+          </button>
+        </div>
       </section>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
@@ -328,10 +327,8 @@ export default function MarketplacePage() {
               <span className="font-semibold text-[var(--text-primary)]">
                 {filteredListings.length}
               </span>{' '}
+              {hasActiveFilters ? 'matching ' : ''}
               {filteredListings.length === 1 ? 'listing' : 'listings'}
-              {hasActiveFilters && filteredListings.length !== listings.length
-                ? ` of ${listings.length}`
-                : ''}
             </>
           )}
         </p>
@@ -407,7 +404,8 @@ export default function MarketplacePage() {
 
       {!listingsQuery.isLoading &&
       !listingsQuery.isError &&
-      listings.length === 0 ? (
+      listings.length === 0 &&
+      !hasActiveFilters ? (
         <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
           <h2 className="text-xl font-semibold">No active listings yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
@@ -426,7 +424,7 @@ export default function MarketplacePage() {
 
       {!listingsQuery.isLoading &&
       !listingsQuery.isError &&
-      listings.length > 0 &&
+      hasActiveFilters &&
       filteredListings.length === 0 ? (
         <section className="app-panel mt-4 p-8 text-center">
           <h2 className="text-xl font-semibold">
@@ -434,7 +432,7 @@ export default function MarketplacePage() {
           </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Try a broader search, a different category, or clearing the
-            verified-only filter.
+            trust/photo filters.
           </p>
           <button
             type="button"

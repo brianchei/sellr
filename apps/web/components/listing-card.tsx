@@ -6,6 +6,7 @@ import type { ApiListing } from '@sellr/api-client';
 import {
   formatCondition,
   formatPrice,
+  formatRadius,
   formatRelativeListedDate,
   photoUrls,
   type ListedFreshness,
@@ -31,6 +32,8 @@ export function ListingCard({ listing }: ListingCardProps) {
   const photoCount = photos.length;
   const freshness = formatRelativeListedDate(listing.createdAt);
   const verified = Boolean(listing.seller?.verifiedAt);
+  const sellerName = listing.seller?.displayName?.trim() || 'Community seller';
+  const activeListingCount = listing.seller?.listingCount ?? 0;
   const isUnavailable = listing.status !== 'active';
 
   return (
@@ -70,7 +73,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           ) : null}
         </div>
 
-        {photoCount > 1 ? (
+        {photoCount > 0 ? (
           <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 text-[11px] font-medium text-white">
             <svg
               width="11"
@@ -87,7 +90,7 @@ export function ListingCard({ listing }: ListingCardProps) {
               <circle cx="12" cy="13" r="3.5" />
               <path d="M8 6V4h8v2" />
             </svg>
-            {photoCount}
+            {photoCount} {photoCount === 1 ? 'photo' : 'photos'}
           </span>
         ) : null}
       </div>
@@ -120,6 +123,8 @@ export function ListingCard({ listing }: ListingCardProps) {
             </svg>
             {listing.locationNeighborhood}
           </span>
+          <span aria-hidden="true">·</span>
+          <span>{formatRadius(listing.locationRadiusM)}</span>
           <span aria-hidden="true">·</span>
           <span className={`font-medium ${freshnessClasses(freshness.tone)}`}>
             {freshness.label}
@@ -171,6 +176,27 @@ export function ListingCard({ listing }: ListingCardProps) {
               Verified seller
             </span>
           ) : null}
+          {listing.seller?.communityMember ? (
+            <span className="rounded-full bg-[var(--color-brand-contrast-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-contrast)]">
+              Community member
+            </span>
+          ) : null}
+        </div>
+
+        <div className="mt-4 border-t border-black/10 pt-3 text-xs text-[var(--text-secondary)]">
+          <div className="flex min-w-0 items-center justify-between gap-3">
+            <span className="min-w-0 truncate">
+              Seller:{' '}
+              <span className="font-semibold text-[var(--text-primary)]">
+                {sellerName}
+              </span>
+            </span>
+            {activeListingCount > 1 ? (
+              <span className="shrink-0 text-[var(--text-tertiary)]">
+                {activeListingCount} active
+              </span>
+            ) : null}
+          </div>
         </div>
       </div>
     </Link>

@@ -346,8 +346,22 @@ export const UpdateListingSchema = CreateListingSchema.omit({
   aiGenerated: true,
 });
 
+const QueryBooleanSchema = z.preprocess((value) => {
+  if (value === 'true' || value === true) return true;
+  if (value === 'false' || value === false) return false;
+  return value;
+}, z.boolean());
+
 export const ListListingsQuerySchema = z.object({
   communityId: z.uuid(),
+  q: z.string().trim().max(200).optional().default(''),
+  category: z.string().trim().min(1).max(80).optional(),
+  condition: z.enum(ListingCondition).optional(),
+  hasPhotos: QueryBooleanSchema.optional().default(false),
+  sort: z
+    .enum(['recent', 'price-asc', 'price-desc'])
+    .optional()
+    .default('recent'),
   limit: z.coerce.number().int().min(1).max(50).optional().default(20),
 });
 

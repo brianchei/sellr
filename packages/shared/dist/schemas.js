@@ -279,8 +279,23 @@ exports.UpdateListingSchema = exports.CreateListingSchema.omit({
     communityId: true,
     aiGenerated: true,
 });
+const QueryBooleanSchema = zod_1.z.preprocess((value) => {
+    if (value === 'true' || value === true)
+        return true;
+    if (value === 'false' || value === false)
+        return false;
+    return value;
+}, zod_1.z.boolean());
 exports.ListListingsQuerySchema = zod_1.z.object({
     communityId: zod_1.z.uuid(),
+    q: zod_1.z.string().trim().max(200).optional().default(''),
+    category: zod_1.z.string().trim().min(1).max(80).optional(),
+    condition: zod_1.z.enum(enums_1.ListingCondition).optional(),
+    hasPhotos: QueryBooleanSchema.optional().default(false),
+    sort: zod_1.z
+        .enum(['recent', 'price-asc', 'price-desc'])
+        .optional()
+        .default('recent'),
     limit: zod_1.z.coerce.number().int().min(1).max(50).optional().default(20),
 });
 exports.ListSellerListingsQuerySchema = zod_1.z.object({

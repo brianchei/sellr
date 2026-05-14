@@ -157,6 +157,21 @@ function fetchListingsNearby(params) {
 }
 function fetchCommunityListings(params) {
     const q = new URLSearchParams({ communityId: params.communityId });
+    if (params.q) {
+        q.set('q', params.q);
+    }
+    if (params.category) {
+        q.set('category', params.category);
+    }
+    if (params.condition) {
+        q.set('condition', params.condition);
+    }
+    if (params.hasPhotos) {
+        q.set('hasPhotos', 'true');
+    }
+    if (params.sort) {
+        q.set('sort', params.sort);
+    }
     if (params.limit != null) {
         q.set('limit', String(params.limit));
     }

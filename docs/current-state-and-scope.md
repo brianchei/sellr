@@ -60,7 +60,9 @@ Included:
 
 - Email-first OTP login through Resend, with Twilio phone fallback.
 - Verified community onboarding through `wisc.edu` email domain or invite code.
-- Marketplace browse/search/filter and listing detail pages.
+- Marketplace browse/search/filter with server-backed category, condition,
+  photo-only, and sort controls, scan-friendly listing cards, and listing
+  detail pages.
 - Structured listing creation with durable R2-backed photo upload, listing
   strength guidance, browser-converted iPhone HEIC upload support where
   available, and mile-based pickup radius labels.

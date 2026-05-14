@@ -193,6 +193,15 @@ export declare const UpdateListingSchema: z.ZodObject<{
 }, z.core.$strip>;
 export declare const ListListingsQuerySchema: z.ZodObject<{
     communityId: z.ZodUUID;
+    q: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+    category: z.ZodOptional<z.ZodString>;
+    condition: z.ZodOptional<z.ZodEnum<typeof ListingCondition>>;
+    hasPhotos: z.ZodDefault<z.ZodOptional<z.ZodPipe<z.ZodTransform<unknown, unknown>, z.ZodBoolean>>>;
+    sort: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        recent: "recent";
+        "price-asc": "price-asc";
+        "price-desc": "price-desc";
+    }>>>;
     limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
 }, z.core.$strip>;
 export declare const ListSellerListingsQuerySchema: z.ZodObject<{
