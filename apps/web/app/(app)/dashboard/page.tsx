@@ -419,7 +419,7 @@ function KpiStrip({
         <Link
           key={tile.label}
           href={tile.href}
-          className="group flex items-center gap-3 rounded-3xl border border-black/10 bg-white/90 p-4 no-underline shadow-[var(--shadow-app-card)] backdrop-blur transition hover:-translate-y-1 hover:border-black/20 hover:bg-white hover:shadow-xl"
+          className="app-list-row group flex items-center gap-3 p-4 no-underline transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
         >
           <span
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
@@ -528,7 +528,7 @@ function RecentListingsPanel({
           Could not load your listings.
         </p>
       ) : listings.length === 0 ? (
-        <div className="mt-4 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-5 text-center">
+        <div className="app-empty-state mt-4 p-5 text-center">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             No listings yet
           </p>
@@ -662,7 +662,7 @@ function RecentInboxPanel({
           Could not load conversations.
         </p>
       ) : conversations.length === 0 ? (
-        <div className="mt-4 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-5 text-center">
+        <div className="app-empty-state mt-4 p-5 text-center">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             No conversations yet
           </p>

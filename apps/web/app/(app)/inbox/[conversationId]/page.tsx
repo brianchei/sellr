@@ -12,7 +12,7 @@ import { MESSAGE_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
 function ThreadSkeleton() {
   return (
     <section className="mt-4 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
-      <div className="space-y-3 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)]">
+      <div className="app-panel space-y-3 p-4">
         {Array.from({ length: 5 }, (_, index) => (
           <div key={index} className="flex gap-3 rounded-lg p-3">
             <div className="h-12 w-12 rounded-lg bg-[var(--bg-tertiary)]" />
@@ -23,7 +23,7 @@ function ThreadSkeleton() {
           </div>
         ))}
       </div>
-      <div className="rounded-3xl border border-black/10 bg-white/90 p-6 shadow-[var(--shadow-app-card)]">
+      <div className="app-panel p-6">
         <div className="h-6 w-48 rounded bg-[var(--bg-tertiary)]" />
         <div className="mt-8 space-y-4">
           <div className="h-16 w-2/3 rounded-lg bg-[var(--bg-tertiary)]" />
@@ -134,7 +134,7 @@ export default function ConversationPage() {
       conversationQuery.data?.conversation ? (
         <section className="mt-4 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
           {conversationsQuery.isLoading ? (
-            <div className="hidden space-y-3 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)] lg:block">
+            <div className="app-panel hidden space-y-3 p-4 lg:block">
               {Array.from({ length: 5 }, (_, index) => (
                 <div key={index} className="flex gap-3 rounded-lg p-3">
                   <div className="h-12 w-12 rounded-lg bg-[var(--bg-tertiary)]" />

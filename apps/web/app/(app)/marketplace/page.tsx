@@ -496,7 +496,7 @@ export default function MarketplacePage() {
           {Array.from({ length: 6 }, (_, index) => (
             <div
               key={index}
-              className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]"
+              className="app-panel overflow-hidden"
             >
               <div className="aspect-[4/3] bg-[var(--bg-tertiary)]" />
               <div className="space-y-3 p-4">
@@ -539,7 +539,7 @@ export default function MarketplacePage() {
       !listingsQuery.isError &&
       listings.length === 0 &&
       !hasActiveFilters ? (
-        <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
+        <section className="app-empty-state mt-4 p-8 text-center">
           <h2 className="text-xl font-semibold">No active listings yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Your community marketplace is ready. Start with everyday items
@@ -560,7 +560,7 @@ export default function MarketplacePage() {
       !listingsQuery.isError &&
       hasActiveFilters &&
       filteredListings.length === 0 ? (
-        <section className="app-panel mt-4 p-8 text-center">
+        <section className="app-empty-state mt-4 p-8 text-center">
           <h2 className="text-xl font-semibold">
             No listings match those filters
           </h2>

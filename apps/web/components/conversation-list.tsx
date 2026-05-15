@@ -20,8 +20,8 @@ export function ConversationList({
   userId,
 }: ConversationListProps) {
   return (
-    <aside className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] backdrop-blur">
-      <div className="border-b border-black/10 bg-[var(--color-brand-primary-soft)] px-4 py-3">
+    <aside className="app-panel overflow-hidden">
+      <div className="border-b border-black/10 bg-[var(--bg-secondary)] px-4 py-3">
         <h2 className="text-sm font-semibold text-[var(--text-primary)]">
           Conversations
           <span className="ml-1 text-[var(--text-tertiary)]">
