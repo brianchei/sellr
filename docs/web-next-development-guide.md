@@ -354,11 +354,28 @@ Goal: simplify the current web SLC and make the product feel personal,
 trustworthy, attractive, and purpose-built for local community resale before
 adding AI.
 
-Status: planned and should be completed before Phase 6 begins.
+Status: started and should be completed before Phase 6 begins.
 
 Source guide:
 
 - [`docs/ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md)
+
+Implementation phases:
+
+- Phase A: direction and documentation. Complete as a docs-only pass before
+  broad UI code changes.
+- Phase B: design system foundation. Clean up tokens, surfaces, component
+  primitives, and accessibility baselines.
+- Phase C: onboarding and navigation. Simplify landing, login, verification,
+  community join, and first signed-in action.
+- Phase D: marketplace core screens. Redesign browse, search/filter, listing
+  cards, listing detail, listing creation/edit, inventory, profile, and
+  storefront.
+- Phase E: trust and coordination flows. Align buyer contact, inbox,
+  notifications, safety/reporting, and admin moderation while keeping
+  coordination item-anchored.
+- Phase F: polish and launch readiness. Standardize states, analytics,
+  responsive QA, accessibility QA, performance, and SLC readiness.
 
 Work items:
 
@@ -375,11 +392,26 @@ Work items:
 - Align inbox, profile, storefront, notifications, and admin surfaces with the
   new tokens and interaction patterns.
 
+Phase B progress:
+
+- Reviewed the attached visual flow-reference PDF from Airbnb, Craft,
+  ElevenLabs, and Fey and captured the applicable heuristics in
+  `docs/ui-ux-overhaul-guide.md` and `docs/design-language.md`.
+- Lightened the existing Tailwind CSS 4 token utilities in
+  `apps/web/app/globals.css` instead of adding a new design-system library.
+- Reduced default authenticated app gradient/panel weight, softened card
+  shadows, added calmer panel/card radii tokens, introduced future-friendly
+  `app-section`, `app-list-row`, and `app-empty-state` utilities, and made
+  listing/seller trust cards less frosted/nested.
+
 Acceptance notes:
 
 - The redesign should not add broad product scope or depend on AI.
 - Core auth, community scoping, listing lifecycle, media upload, messaging,
   reporting, and admin behavior should continue to work.
+- Onboarding should stay contextual and activation-oriented: no long tutorial,
+  no preference quiz unless the answer immediately changes the user's next
+  useful screen, and no AI-first positioning.
 - Every touched flow needs loading, empty, error, validation, and success states
   appropriate to the interaction.
 - Desktop and mobile browser verification should cover the route list in
@@ -575,9 +607,14 @@ Keep this guide aligned with:
 
 - Added the Pre-Phase 6 UI/UX overhaul as the next product-development priority
   before AI listing-assistant work.
-- Added `docs/ui-ux-overhaul-guide.md` with redesign goals, scope, route/file
-  map, recommended implementation slices, acceptance criteria, and verification
-  guidance.
+- Expanded `docs/ui-ux-overhaul-guide.md` with the repository/route audit,
+  current UX diagnosis, onboarding redesign plan, screen-by-screen direction,
+  component guidance, microcopy, accessibility requirements, metrics, Phase A-F
+  implementation sequencing, acceptance criteria, and verification guidance.
+- Started Phase B of the Pre-Phase-6 UI/UX overhaul with flow-reference notes
+  from the attached PDF and a small token/component foundation pass across
+  `apps/web/app/globals.css`, `components/listing-card.tsx`, and
+  `components/seller-profile-card.tsx`.
 
 ### May 12, 2026
 

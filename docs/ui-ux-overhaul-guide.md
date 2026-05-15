@@ -2,394 +2,992 @@
 
 Last updated: May 15, 2026.
 
-Use this guide before Phase 6 AI work. The next product slice should overhaul
-the web UI/UX so Sellr feels simpler, more personal, more attractive, and less
-like a generic AI-generated marketplace template.
+Use this guide before Phase 6 AI work. Sellr already has a functional web SLC;
+the next job is to make the existing buyer/seller loop feel simpler, more
+personal, more local, and more trustworthy before adding another layer of
+features.
 
-This is a planning and implementation handoff. It does not replace
-`docs/design-language.md`; it sharpens the next redesign pass and names the
-flows, files, and acceptance criteria needed for a separate implementation
-session.
+This is a product/design/implementation handoff. It does not implement the UI
+overhaul by itself. It should steer the next design-system and frontend pass.
 
-## Why This Comes Before Phase 6
+## Executive Summary
 
-The current SLC is functionally broad enough for the launch buyer/seller loop:
-email-first sign-in, community onboarding, marketplace browsing, listing
-creation, contact, inbox, reporting, admin setup, and trust cues are all
-present. Before adding AI listing assistance, the product needs a focused
-experience pass so the existing surface feels easier and more human.
+Sellr is a safer, simpler local marketplace for verified communities. The first
+launch is `Badger Market`, a UW-Madison community for practical student resale:
+dorm and apartment essentials, furniture, books, electronics, bikes, winter
+gear, and move-in/move-out items.
 
-Phase 6 AI should remain deferred until the core web experience is cleaner.
-Otherwise AI will add another layer of complexity on top of flows that already
-feel too busy.
+The current app is broad enough for the SLC: email OTP login, community access,
+browse/search/filter, listing detail, durable photo upload, seller inventory,
+sold lifecycle, buyer contact, inbox replies, notifications, reports, admin
+community setup, and seller readiness are present. The product problem is no
+longer missing surface area. The problem is clarity, hierarchy, and feeling.
 
-## Problem Statement
+The UI/UX overhaul should:
 
-Current feedback:
+- Shorten the path from first visit to first meaningful action.
+- Make community verification feel like a trust benefit, not red tape.
+- Put listings, sellers, pickup context, and next actions ahead of explanation.
+- Reduce generic dashboard composition, nested cards, excessive chips, and
+  "AI startup" visual patterns.
+- Keep safety, reports, blocking/archiving, verification, and moderation cues
+  visible and usable.
+- Defer Phase 6 AI until the core flow feels confident without it.
 
-- The interface feels too generic and "AI/vibe-coded."
-- The onboarding and first-run flow has too many competing explanations and
-  surfaces.
-- The app often reads as a dashboard template rather than a local marketplace
-  made for real people in a real community.
-- Important trust, listing, and pickup context exists, but it is spread across
-  too many panels, chips, and secondary UI elements.
-- The product needs stronger personality without becoming decorative,
-  overbranded, or less usable.
+## Source Inputs
 
-The redesign goal is not to add features. It is to make the existing SLC feel
-clear, personal, direct, trustworthy, and enjoyable to use.
+Reviewed for this direction:
 
-## Product Direction
+- Repository docs: `README.md`, `AGENTS.md`, `docs/current-state-and-scope.md`,
+  `docs/design-language.md`, `docs/web-next-development-guide.md`,
+  `docs/slc-readiness.md`, `docs/deployment.md`,
+  `docs/email-first-auth.md`, and `apps/web/README.md`.
+- Product implementation: `apps/web`, `apps/api`, `apps/mobile`,
+  `packages/shared`, and `packages/api-client`.
+- Attached onboarding notes in
+  `/Users/brianchei/Downloads/ui-ux-onboarding-notes.md`.
+- Attached Womp onboarding screenshots and current Sellr landing screenshot.
+- Framer template reference at `https://better-recipient-702514.framer.app/`.
+- Inspiration references: `https://www.acquired.fm/`,
+  `https://www.complexlaw.co.uk/`, and the provided Pinterest board.
+- Phase B reference flow PDF:
+  `/Users/brianchei/Downloads/Template flows.pdf`.
 
-Sellr should feel like:
+Notes:
 
-- A local community marketplace, not a generic SaaS dashboard.
-- Personal and neighborly, without becoming cute, noisy, or casual to the point
-  of losing trust.
-- Faster to understand on first visit, especially for users who only want to
-  browse, sell, or reply to a buyer.
-- Warm and human, while still using honest trust signals backed by real product
-  behavior.
-- Built around the object for sale, the seller, the community, and pickup
-  confidence.
+- The Framer page loaded as a template collection rather than a single product
+  spec. Treat it as a reference for section rhythm and product-preview density,
+  not for crypto, wallet, or generic SaaS content.
+- The `view-source:` Framer reference was not accessible in this audit. Do not
+  depend on Framer source code for the implementation plan.
+- The Phase B PDF was a visual Figma export with no extractable text. It was
+  reviewed by extracting the embedded app-flow frames. Treat the observations
+  below as reference heuristics, not source-of-truth product requirements.
 
-Avoid:
+## Phase B Reference Flow Notes
 
-- Decorative AI-style gradients, shimmer, bokeh, blobs, or vague futuristic
-  visuals.
-- Nested cards, card-heavy dashboards, and excessive pills/chips.
-- Long instructional copy inside task flows.
-- Empty marketing sections that do not help users complete a task.
-- Fake proof, invented testimonials, unsupported safety claims, or mock-only
-  controls.
-- Broad feature expansion disguised as redesign.
+The attached PDF includes Mobbin-curated flows from Airbnb, Craft, ElevenLabs,
+and Fey. The useful overlap for Sellr is not the branding; it is the way mature
+products keep core tasks direct while moving supporting explanation into small,
+contextual surfaces.
 
-## Scope
+Reference takeaways for Sellr:
 
-The overhaul should update the web app experience across the current SLC
-surface. It should preserve API contracts unless a small contract adjustment is
-clearly needed for the redesigned flow.
+- **Airbnb marketplace/search:** inventory stays first, with compact search,
+  filter overlays, map/list context, and trust or price notes shown near the
+  moment of decision. For Sellr, this supports lighter browse surfaces,
+  action-scoped drawers/modals, and fewer always-visible filter panels or
+  dashboard cards.
+- **Airbnb account and host setup:** sign-up, security, community commitment,
+  and host/listing creation use one focused panel or full-screen step at a
+  time, with visible progress and direct manipulation. For Sellr, profile,
+  community access, and listing creation should ask only what is needed for the
+  next useful action and keep preview/progress close to the task.
+- **Airbnb profile, messages, and trips:** identity and reservation context are
+  anchored to real objects, people, and conversations instead of abstract
+  metrics. For Sellr, seller trust, pickup context, and inbox state should sit
+  beside the listing or message they affect.
+- **Craft onboarding:** calm centered auth and OTP states can be beautiful, but
+  the immersive cloud treatment belongs to public/auth moments, not dense app
+  workflows. For Sellr, keep auth calm and branded while making signed-in
+  surfaces quieter and more content-led.
+- **ElevenLabs product app:** dense tool screens work when selected state,
+  navigation, and primary task controls are clear. For Sellr admin and seller
+  management, choose utilitarian lists, rows, and dividers over stacked panels.
+- **Fey AI onboarding:** the cinematic dark AI onboarding works for an AI-native
+  product, but Sellr should not borrow that mood before Phase 6. If AI appears
+  later, it should be a quiet optional helper inside seller workflows.
 
-In scope:
+Phase B design-system implication: update existing tokens and utilities in
+place so authenticated screens inherit a calmer canvas, lighter panel shadows,
+smaller radii, quieter chips, and task-first buttons without introducing a new
+design-system library or changing SLC behavior.
 
-- Public landing and first-run entry.
-- Email-first login with phone fallback.
-- Community onboarding and join-another-community flow.
-- Authenticated app shell and navigation.
-- Dashboard or home experience.
-- Marketplace browse and filters.
-- Listing detail.
-- Listing creation and edit.
-- Seller inventory.
-- Inbox and conversation thread.
-- Profile and seller storefront-lite.
-- Notifications.
-- Shared listing, seller, report, empty, loading, and error states.
-- Admin/community/report pages only enough to align shell, typography, spacing,
-  and tokens. Keep admin utilitarian.
+## Repository Audit
 
-Out of scope:
+### Existing Product And Reference Docs
 
-- Phase 6 AI listing assistant.
-- Payments, escrow, offers, ratings, advanced KYC, logistics, delivery,
-  advanced moderation, and growth loops.
-- Full community theming engine.
-- Native mobile parity.
-- New analytics, external services, or production dependencies unless strongly
-  justified.
+- `README.md`: current status, repository map, platform, capabilities, commands.
+- `AGENTS.md`: operating rules, current product direction, deployment context.
+- `docs/current-state-and-scope.md`: current SLC surface and launch scope.
+- `docs/design-language.md`: brand tokens, component direction, content voice.
+- `docs/web-next-development-guide.md`: phase history, Pre-Phase 6 plan, Phase 6
+  AI plan.
+- `docs/slc-readiness.md` and `docs/slc-smoke-test.md`: readiness gates and
+  smoke coverage.
+- `docs/deployment.md`, `docs/custom-domain-cutover.md`,
+  `docs/email-first-auth.md`, `docs/production-runbook.md`, and
+  `docs/next-session-context.md`: production and handoff references.
 
-## Design Principles
+### App Structure
 
-1. **One obvious next step.** Every screen should make the next useful action
-   obvious: browse, sell, complete profile, join community, contact seller, or
-   reply.
-2. **Reduce the number of containers.** Prefer fewer panels with stronger
-   hierarchy over many stacked cards. Do not put cards inside cards.
-3. **Show the marketplace sooner.** After sign-in and community access, users
-   should quickly see real inventory or an empty state that tells them how to
-   start.
-4. **Personal beats generic.** Use real names, community context, seller
-   identity, pickup area, and listing photos as the emotional center.
-5. **Trust must be backed.** Use only signals the product actually supports:
-   verified contact, active community membership, profile photo presence,
-   active listings, and approximate pickup context.
-6. **Short copy, concrete words.** Replace platform language with plain user
-   language. Avoid long onboarding explanations.
-7. **Mobile first, desktop polished.** Core actions must be reachable, readable,
-   and stable on small screens without horizontal scroll or clipped labels.
-8. **Useful states count as design.** Loading, empty, error, validation, and
-   success states should feel intentional and actionable.
+- `apps/web`: Next.js 16 App Router web SLC using React 19 and Tailwind CSS 4.
+- `apps/api`: Fastify API, Prisma 7 generated client, routes for auth,
+  communities, listings, messages, offers, meetups, notifications, reports,
+  uploads, and search.
+- `apps/mobile`: Expo app scaffold. Keep compatible with Expo SDK 55; do not
+  prioritize native parity for this overhaul.
+- `packages/shared`: domain enums, types, and Zod schemas.
+- `packages/api-client`: typed fetch helpers used by web/mobile.
 
-## Visual Direction
+### Web Route Surface
 
-Keep the Sellr mustard brand signal and current brand assets, but simplify the
-visual system.
+- Public entry: `/`
+- Auth: `/login`
+- First-run community access: `/onboarding`
+- Authenticated shell: `apps/web/app/(app)/layout.tsx`
+- Home/dashboard: `/dashboard`
+- Marketplace: `/marketplace`
+- Listing detail: `/marketplace/[listingId]`
+- Listing create/edit: `/sell`, `/listings/[listingId]/edit`
+- Seller inventory: `/listings`
+- Community pages: `/communities/[communityId]`, `/communities/join`
+- Inbox: `/inbox`, `/inbox/[conversationId]`
+- Notifications: `/notifications`
+- Profile/storefront: `/profile`, `/sellers/[sellerId]`
+- Admin: `/admin`, `/admin/community`, `/admin/reports`
 
-Recommended direction:
+### Design Assets And Tokens
 
-- Warm off-white canvas, ink text, mustard accents, and restrained secondary
-  colors.
-- Stronger typography hierarchy with less hero-scale type inside app screens.
-- Clear section rhythm and dividers instead of decorative panels everywhere.
-- More real product imagery and listing photos when available.
-- Fewer badges and chips; keep only metadata that helps the decision.
-- Compact icon buttons for repeated tools and familiar actions.
-- Rounded corners around `8px` to `12px` for controls and repeated cards;
-  reserve larger radii for modal-like or feature surfaces only when needed.
-- Soft elevation only for layering. Borders and spacing should do most of the
-  structural work.
+- Brand assets live in `apps/web/public/brand`.
+- Expo mirrors app icon assets in `apps/mobile/assets`.
+- Tailwind CSS 4 is configured through `@import "tailwindcss"` and custom
+  tokens/utilities in `apps/web/app/globals.css`.
+- No `tailwind.config.*`, `components.json`, `@/components/ui` shadcn setup, or
+  lucide dependency was found. Do not introduce shadcn or a new icon system
+  during this documentation phase.
+- Current brand tokens already preserve the known palette:
+  `#ffe347` mustard, `#6457a6` purple, `#23f0c7` mint, warm off-white canvas,
+  and charcoal text.
+- Current app utilities include `app-shell-bg`, `app-panel`, `app-panel-soft`,
+  `app-chip`, `app-action-primary`, and `app-action-secondary`.
 
-Avoid:
+### Phase 6 AI Context
 
-- Purple-heavy or one-note gradient pages.
-- Marketing-style hero composition inside authenticated app flows.
-- Decorative background orbs, abstract SVG art, and AI-themed flourishes.
-- Oversized dashboard metrics that do not help the buyer/seller loop.
-- Text that explains visual styling, keyboard shortcuts, or implementation.
+Phase 6 is documented in `docs/web-next-development-guide.md` as a future AI
+listing assistant: title/description/category/condition suggestions and quality
+checks. It must remain deferred until this overhaul is complete. Future AI
+touchpoints should be quiet, editable suggestions inside seller workflows, not
+the product identity.
 
-## Content Direction
+## Current UI/UX Diagnosis
 
-The copy should sound like Sellr is helping someone buy or sell locally, not
-explaining a platform.
+The current web app has the right product thesis and many working flows, but it
+often explains Sellr instead of letting people use Sellr. It feels more like a
+polished internal dashboard/landing template than a local marketplace shaped
+around student resale.
 
-Prefer:
+Main diagnosis:
 
-- `What are you selling?`
-- `Add a clear photo`
-- `Choose where pickup usually works`
-- `Message seller`
-- `Ready to publish`
-- `You are browsing Badger Market`
-- `Only members can see and contact sellers here`
+- The landing page is thesis-rich but too long before activation.
+- Auth and onboarding are functional, but copy can make verification feel like
+  an obstacle instead of the first trust win.
+- The app shell and dashboard use many panels, KPIs, chips, and readiness
+  blocks; the next action can compete with secondary information.
+- Browse and listing detail contain useful seller/pickup/trust signals, but the
+  UI presents many of them as metadata chips instead of a natural decision
+  hierarchy.
+- Listing creation has good safeguards, photo upload, and quality guidance, but
+  the form can still feel like a configuration surface rather than guided
+  selling.
+- Empty/loading/error states exist in many places, but the overhaul should
+  standardize them as activation moments.
 
-Avoid:
+## Product Experience Goals
 
-- `Unlock marketplace intelligence`
-- `AI-powered trust layer`
-- `Seamless community commerce platform`
-- `Leverage your verified marketplace identity`
-- `Optimize your selling journey`
+1. **Activation first.** A new verified student should know what Sellr is, join
+   Badger Market, and browse or sell within minutes.
+2. **Marketplace density.** The product should feel alive through real listings,
+   seller names, item photos, pickup context, and recent activity.
+3. **Trust without drama.** Verification, community membership, reporting, and
+   approximate pickup guidance should be obvious, calm, and backed.
+4. **Shorter decision paths.** Buyer and seller screens should make the next
+   useful step visible without multiple explanatory panels.
+5. **Campus launch specificity.** Badger Market should feel tailored to
+   UW-Madison without hardcoding Sellr into one campus forever.
+6. **Accessible polish.** Keyboard, focus, contrast, touch targets, semantic
+   state messaging, and responsive behavior are launch requirements.
 
-## Core User Flows
+## Target User Mental Model
 
-### New User
+### Buyer
 
-Target flow:
+> "I want to find a useful item near campus from someone real, understand pickup
+> expectations, and message without weird uncertainty."
 
-1. Land on a simple page that explains the marketplace in one screen.
-2. Sign in with email OTP, with phone fallback available but secondary.
-3. Join or confirm community access.
-4. Land in the marketplace or a home surface that points directly to browse and
-   sell.
+Buyer priorities:
 
-Requirements:
-
-- Keep the login/onboarding sequence visually calm and step-based.
-- Do not require users to understand every Sellr feature before entering.
-- Make community access feel like a trust benefit, not a bureaucratic wall.
-- Route missing profile/contact/community requirements to the shortest repair
-  path.
-
-### Returning Buyer
-
-Target flow:
-
-1. Open app.
-2. Browse or search community inventory.
-3. Open listing detail.
-4. Understand seller, pickup area, condition, and availability.
-5. Message seller.
-6. Continue in inbox.
-
-Requirements:
-
-- Listing cards should make price, title, image, condition, pickup area, and
-  seller trust cue scannable.
-- Listing detail should center the item and seller context, not a dashboard of
-  metadata.
-- Contact should feel like a clear next action, not a form hidden under panels.
+- Is this item available and worth the price?
+- Is the seller in my community?
+- Where would pickup generally happen?
+- What condition is it in?
+- What should I ask or send next?
 
 ### Seller
 
-Target flow:
+> "I want to post something quickly, look credible, reduce repetitive questions,
+> and coordinate with a serious buyer."
 
-1. Start from `Sell` or a clear seller CTA.
-2. Add photos and core details.
-3. See listing quality guidance without being overwhelmed.
-4. Preview what buyers will see.
-5. Publish and manage listing status.
+Seller priorities:
 
-Requirements:
+- What should I include so buyers stop asking basic questions?
+- Does my listing look trustworthy?
+- Who messaged me and about which item?
+- How do I mark this sold or cleanly manage it?
 
-- Listing creation should feel guided but compact.
-- Use progressive disclosure for secondary details where possible.
-- Keep the buyer preview helpful, especially on desktop, without stealing
-  attention from the current form step.
-- Preserve validation, upload feedback, HEIC guidance, and publish safeguards.
+### Community Admin
 
-### Member With Messages
+> "I need to manage access, review reports, and take explicit actions without
+> accidentally harming trust."
 
-Target flow:
+Admin priorities:
 
-1. See unread message cue.
-2. Open inbox.
-3. Recognize listing context and participant.
-4. Reply or archive/hide.
+- Which community am I managing?
+- Who or what was reported?
+- What action is allowed and auditable?
+- What changed after I acted?
 
-Requirements:
+## Design Personality
 
-- Conversations should stay anchored to the listing and participant.
-- Archived state should be clear and reversible.
-- Long messages must wrap cleanly on mobile.
+Sellr should be:
 
-### Admin
+- Warm, local, and practical.
+- Friendly, not childish.
+- Clear, not corporate.
+- Confident, not hype-driven.
+- Designed around actual listings, not abstract product metaphors.
+- More curated and trustworthy than Facebook Marketplace, but still familiar.
 
-Target flow:
+Reference interpretation:
 
-1. Open admin report or community page.
-2. Find the target member/listing.
-3. Take scoped, auditable action.
+- From Womp: borrow simple step flow, calm OTP layout, rich visual content after
+  entry, and lightweight personalization. Do not copy the playful 3D/creator
+  identity.
+- From Acquired: borrow editorial confidence, restrained navigation, and a
+  recognizable voice. Do not make Sellr media-heavy at the expense of tasks.
+- From Complex Law: borrow plain-language trust and serious warmth. Do not make
+  Sellr feel like professional services.
+- From Framer templates: borrow section rhythm and high-quality product-preview
+  framing. Avoid generic SaaS/crypto sections, fake metrics, and shiny effects.
 
-Requirements:
+## Visual Design Direction
 
-- Keep admin pages dense, clear, and utilitarian.
-- Align typography, spacing, buttons, and shell treatment with the redesign.
-- Do not make admin pages more editorial or decorative.
+### Brand Application
 
-## Route And File Map
+Preserve the Sellr palette and logo assets. Tighten usage:
 
-Start with these files when implementing the redesign:
+- Mustard is the primary brand signal and highlight color. Use it for selected
+  states, verified/community accents, primary launch moments, and small
+  confidence cues.
+- Charcoal/ink should carry primary text and high-contrast actions.
+- Purple should support focus, links, selected navigation, and secondary brand
+  moments. Do not let the app become purple-dominant.
+- Mint should represent positive trust/safety states: verified contact, active
+  community member, pickup-friendly, success.
+- Coral/red should be reserved for destructive, report, warning, and error
+  states.
+- Warm off-white should be the main canvas, but app surfaces should not all be
+  large frosted cards.
 
-| Surface | Files |
-| --- | --- |
-| App shell and global style | `apps/web/app/layout.tsx`, `apps/web/app/globals.css`, `apps/web/app/(app)/layout.tsx`, `apps/web/components/app-header.tsx`, `apps/web/components/app-footer.tsx` |
-| Public entry | `apps/web/app/page.tsx`, `apps/web/components/landing-app-preview.tsx` |
-| Auth and onboarding | `apps/web/app/login/page.tsx`, `apps/web/app/onboarding/page.tsx`, `apps/web/app/(app)/communities/join/page.tsx`, `apps/web/components/auth-provider.tsx` |
-| Home and readiness | `apps/web/app/(app)/dashboard/page.tsx` |
-| Marketplace | `apps/web/app/(app)/marketplace/page.tsx`, `apps/web/components/listing-card.tsx` |
-| Listing detail and media | `apps/web/app/(app)/marketplace/[listingId]/page.tsx`, `apps/web/components/photo-gallery.tsx`, `apps/web/components/seller-profile-card.tsx` |
-| Listing create/edit | `apps/web/app/(app)/sell/page.tsx`, `apps/web/app/(app)/listings/[listingId]/edit/page.tsx`, `apps/web/components/listing-form.tsx`, `apps/web/components/listing-buyer-preview.tsx` |
-| Seller inventory | `apps/web/app/(app)/listings/page.tsx` |
-| Messaging | `apps/web/app/(app)/inbox/page.tsx`, `apps/web/app/(app)/inbox/[conversationId]/page.tsx`, `apps/web/components/conversation-list.tsx`, `apps/web/components/conversation-thread.tsx` |
-| Profile and storefront | `apps/web/app/(app)/profile/page.tsx`, `apps/web/app/(app)/sellers/[sellerId]/page.tsx` |
-| Notifications | `apps/web/app/(app)/notifications/page.tsx` |
-| Admin alignment | `apps/web/app/(app)/admin/community/page.tsx`, `apps/web/app/(app)/admin/reports/page.tsx` |
-| Shared safety UI | `apps/web/components/report-dialog.tsx` |
+### Visual System
 
-## Recommended Implementation Slices
+- Use fewer, stronger containers. Replace nested panels with open sections,
+  dividers, list rows, and stable grids.
+- Keep cards for repeated listings, modals, and genuinely grouped form/safety
+  content.
+- Reduce decorative gradients in authenticated app screens. A calm canvas with
+  one brand accent beats a template-like background.
+- Prefer real listing photos, campus-approved imagery, and actual product UI
+  over abstract artwork.
+- Use iconography only where it clarifies navigation or state.
+- Use clear button hierarchy: one primary action per screen, secondary actions
+  near the content they affect, destructive actions visually distinct.
 
-### Slice 1: Experience Audit And Design Tokens
+## Onboarding Strategy
+
+The onboarding goal is not to teach Sellr. The goal is to help a verified user
+complete the first useful action.
+
+### First-Run Path
+
+1. Public entry gives a one-screen promise: verified local resale, campus launch,
+   clear `Join your community` CTA.
+2. Login requests the `wisc.edu` email first. Phone remains a fallback.
+3. Email OTP screen confirms where the code was sent and offers resend/change
+   account without alarmist copy.
+4. Community join confirms Badger Market access with the verified email.
+5. First signed-in screen asks the user to choose:
+   `Browse listings`, `Sell an item`, or `Complete profile` if required.
+
+### Verification Flow
+
+- Use positive framing: `Verify your community access`.
+- Explain the why in one sentence: `Badger Market is for verified UW-Madison
+  members, so listings and messages stay local.`
+- Preserve invite-code fallback for seed sellers and trusted non-Wisc users.
+- Never imply verification is a background check, safety guarantee, or KYC.
+
+### Optional Profile Setup
+
+Make profile setup contextual:
+
+- Ask for display name/photo only when needed for high-intent actions like
+  listing or contacting.
+- Use small readiness checklist copy: `Add your display name so sellers know who
+  is messaging.`
+- Avoid a long profile wizard before users see the marketplace.
+
+### Buyer Path
+
+- After community access, show browse by default or offer `Browse listings`.
+- Empty marketplace should invite saved search and selling without shame:
+  `No desks near campus yet. Save this search or list one for your community.`
+- First contact should use structured quick replies plus editable text.
+
+### Seller Path
+
+- Let sellers begin with photos and item basics.
+- Show one next quality suggestion at a time.
+- Keep preview visible on desktop, below the form on mobile.
+- Confirm publish with what buyers will see: price, pickup area, community, and
+  seller identity.
+
+### First Saved Search Path
+
+Saved search is useful when inventory is sparse. If saved search is implemented
+in web UI later:
+
+- Offer it from empty/filtered marketplace states, not as onboarding homework.
+- Copy: `Save this search and Sellr can help you check back when something
+  matches.`
+- Do not create a broad growth loop before launch unless explicitly requested.
+
+### First Offer/Meetup Path
+
+The current web SLC is buyer contact and listing-tied inbox, not a formal offer
+or meetup scheduler. Direction:
+
+- Treat the first "offer" as a structured message intent in the listing detail.
+- Encourage approximate pickup windows before exact addresses.
+- Future meetup UI should live inside the conversation, anchored to the item,
+  with safety guidance and clear status.
+
+### Contextual Help Strategy
+
+- Use inline guidance, empty states, and one-step checklists.
+- Avoid coach marks, long tours, and modal stacks.
+- Persist helpful checklists only where they reflect real progress, such as
+  seller readiness or listing quality.
+
+### What To Avoid
+
+- Long tutorial onboarding.
+- Asking for user preferences that do not personalize the next screen.
+- AI-oriented copy before users experience marketplace value.
+- Permission prompts or notification asks before there is a clear user benefit.
+- Fake testimonials, invented campus proof, or vague safety promises.
+
+## Current Product Audit
+
+| Area | Current state | Main UX problem | Recommended direction | Priority | Type |
+| --- | --- | --- | --- | --- | --- |
+| Landing page `/` | Strong trust-native thesis, long multi-section page, app preview, proof, pain, benefits, FAQ. | Too much explanation before activation; reads like a polished template. | One sharp first viewport, shorter proof, real listing/campus imagery when approved, CTA to login and a preview of inventory path. | P0 | Future implementation |
+| Sign up/login `/login` | Email OTP primary with phone fallback, Wisc email validation, code step, loading/error states. | Panel is functional but can feel standalone and generic; fallback may compete with primary path. | Make email-first path feel campus-specific and calm; phone fallback secondary; OTP copy shorter and more helpful. | P0 | Future implementation |
+| Community verification `/onboarding` | Email/invite tabs, trust pillars, clear form validation. | Too much explanatory copy before the action; trust pillars feel like a landing section. | Reduce to "verify access" action plus one-sentence why; move trust explanation into small inline cues. | P0 | Future implementation |
+| First-time onboarding | Login routes to onboarding then dashboard. Profile requirements appear contextually. | First signed-in destination can feel like account setup rather than marketplace activation. | Route to a home surface with one obvious choice: browse, sell, or complete profile if blocked. | P0 | Future implementation |
+| Dashboard `/dashboard` | Greeting, KPIs, recent listings/inbox, setup panel, profile section. | KPI/dashboard framing competes with local marketplace intent. | Rework into `Home`: next best action, active community, recent listing/message context, small readiness checklist. | P0 | Future implementation |
+| Browse/search `/marketplace` | Server-backed filters, search, category/condition/price/radius/photo/sort, listing grid. | Filter panel is heavy; chips and fields can bury inventory. | Inventory first; collapsible/segmented filters; campus categories and quick chips for move-out essentials. | P0 | Future implementation |
+| Listing cards | Image, category, status, photo count, title, price, neighborhood, radius, freshness, description, chips, seller. | Too many badges/metadata points for fast scanning. | Prioritize image, price, title, condition, neighborhood, seller trust. Move low-value details to detail page. | P0 | Future implementation |
+| Listing detail | Photo gallery, at-a-glance stats, seller snapshot/card, quick replies, report. | Useful but dense; seller/trust appears in multiple blocks. | Item-first layout with sticky contact action, integrated seller/pickup confidence, clear report path. | P0 | Future implementation |
+| Offer flow | No full formal offer UI in web SLC; quick message/offer intent exists. API modules for offers exist. | User may expect an offer/handoff state but only sees a message. | Document as structured inquiry for SLC; future offer UI should live after message intent, not before contact. | P1 | Future implementation |
+| Meetup coordination | No dedicated web meetup scheduler in current screens; pickup windows exist in listings/messages. API modules exist. | Safety/coordination guidance is present but not a coherent meetup state. | Add future conversation-anchored meetup cards with approximate area, public-place guidance, and status. | P1 | Future implementation |
+| Inbox/messages | Listing-tied conversations, archive/restore, unread activity, thread UI. | Needs stronger item/person anchoring and mobile scan polish. | Show item card, seller/buyer identity, next reply action, and safety/report affordance without extra panels. | P0 | Future implementation |
+| Notifications | Notification list and unread badges. | Risk of feeling like a log rather than actionable activity. | Group by message/listing/community/admin; every item should link to one next action. | P1 | Future implementation |
+| Profile `/profile` | Display name, photo upload, verified contact, storefront, readiness. | Can feel like account settings instead of trust setup. | Frame as "How you appear to buyers/sellers"; contextualize missing fields by blocked actions. | P1 | Future implementation |
+| Seller storefront `/sellers/[sellerId]` | Seller trust signals and active listings. | Needs more local trust clarity and less generic profile-card language. | Storefront should answer: who, community, verified contact, active listings, how to contact through item. | P1 | Future implementation |
+| Safety/reporting/blocking | Report dialog, admin reports, conversation archive/hide, moderation actions. | Safety affordances exist but copy/state should be consistent across flows. | Preserve all safety entry points; standardize warning copy, suspicious-payment guidance, report outcomes, and admin clarity. | P0 | Future implementation |
+| Admin/moderation | Admin community and reports dashboards are functional and explicit. | Admin surfaces inherit visual noise from app panels and need density discipline. | Keep utilitarian; align tokens, spacing, action hierarchy, audit history, and empty/error states. | P1 | Future implementation |
+| Empty states | Present across pages but inconsistent in tone/detail. | Some empty states explain the system instead of offering the next action. | Standardize: what happened, why it matters, one next step, optional secondary action. | P0 | Future implementation |
+| Error states | Forms and queries show errors; API validation exists. | Error copy can be technical or visually disconnected. | Tie field errors with `aria-describedby`; use friendly repair copy and no color-only signals. | P0 | Future implementation |
+| Loading states | Basic loading text/skeletons across some flows. | Generic `Loading...` breaks polish and can cause layout shifts. | Use stable skeletons/disabled states that preserve page structure and action context. | P1 | Future implementation |
+
+## Screen-By-Screen Direction
+
+### Landing Page
+
+- User goal: understand Sellr and join the right community.
+- UX principle: marketplace-first, one obvious next step.
+- Layout: compact header, first viewport with Sellr promise, primary CTA, and a
+  real/realistic marketplace preview that hints at listings and pickup.
+- Key components: hero, preview, concise trust commitments, launch FAQ.
+- Primary CTA: `Join your community`.
+- Secondary actions: `Sign in`, `See how it works`.
+- Trust/safety cues: verified `wisc.edu`, community-scoped listings, no exact
+  pickup address before conversation.
+- Empty state: if launch inventory is not public, show seed categories and
+  honest launch access rather than fake listings.
+- Error state: public page should not dead-end; broken CTA routes to login.
+- Mobile: first viewport must show headline, CTA, and hint of preview without
+  clipping.
+- Future AI touchpoint: none in landing headline. AI can appear later as seller
+  listing help, not brand identity.
+
+### Login
+
+- User goal: verify contact and continue.
+- UX principle: safety by default, no long tutorial.
+- Layout: single calm auth panel with campus-context side note or small preview.
+- Key components: email input, OTP input, resend/change account, phone fallback.
+- Primary CTA: `Send code` / `Verify code`.
+- Secondary actions: `Use phone instead`, `Back to email`.
+- Trust/safety cues: `Use your wisc.edu email to join Badger Market`.
+- Empty/loading/error: disabled submit while sending; OTP error says what to fix.
+- Mobile: input and CTA stay above fold; code field supports paste/autofill.
+- Future AI touchpoint: none.
+
+### Community Verification
+
+- User goal: join Badger Market or another verified community.
+- UX principle: trust is visible.
+- Layout: action-first card with active verified email, invite fallback, and one
+  sentence of why.
+- Key components: student email confirmation, invite code, community summary.
+- Primary CTA: `Join Badger Market`.
+- Secondary actions: `Use invite code`, `Sign out`.
+- Trust/safety cues: member-only browsing/contact; invite codes for trusted
+  early users.
+- Empty/error: invalid code/domain tells user the exact repair.
+- Mobile: tab/segmented control labels must not wrap awkwardly.
+- Future AI touchpoint: none.
+
+### Home / Dashboard
+
+- User goal: choose browse, sell, reply, or fix readiness.
+- UX principle: one obvious next step.
+- Layout: home surface, not analytics dashboard. Lead with active community and
+  next best action.
+- Key components: community context, primary action rail, recent messages,
+  recent listings, small readiness checklist.
+- Primary CTA: dynamic: `Browse listings`, `Sell an item`, `Reply in inbox`, or
+  `Complete profile`.
+- Secondary actions: profile, notifications, community home.
+- Trust/safety cues: verified contact/community member badges only if backed.
+- Empty/error: show a task-based empty state, not a blank dashboard.
+- Mobile: primary action rail becomes stacked buttons; no KPI grid above action.
+- Future AI touchpoint: a future seller nudge may say `Improve this listing`
+  after Phase 6, never as a homepage chatbot.
+
+### Marketplace Browse/Search
+
+- User goal: find relevant items quickly.
+- UX principle: marketplace-first.
+- Layout: inventory grid/list first, compact search row, collapsible filters.
+- Key components: search, quick categories, sort, filter drawer, listing grid.
+- Primary CTA: `Sell an item` if inventory is sparse; otherwise listing cards
+  are the primary interaction.
+- Secondary actions: clear filters, save search later if implemented.
+- Trust/safety cues: active community, verified sellers, approximate pickup.
+- Empty/error: filtered empty state suggests clearing filters, saving search, or
+  listing an item.
+- Mobile: sticky search/filter controls; listing card tap targets at least 44px.
+- Future AI touchpoint: later search assistance may suggest query refinements,
+  but not before baseline search is excellent.
+
+### Listing Detail
+
+- User goal: decide whether to contact seller.
+- UX principle: trust is visible.
+- Layout: photo gallery and item facts first; seller/pickup confidence next to
+  the contact action.
+- Key components: photos, title, price, condition, pickup area, availability,
+  seller summary, editable message intent, report action.
+- Primary CTA: `Message seller`.
+- Secondary actions: view seller, report listing, edit/manage if own listing.
+- Trust/safety cues: verified contact, active community member, public meetup
+  reminder, no exact address guidance.
+- Empty/error: deleted/sold/unavailable listings explain status and offer return
+  to marketplace.
+- Mobile: sticky bottom contact action after initial item details.
+- Future AI touchpoint: later buyer-side AI should be limited to optional
+  message drafting; never auto-send.
+
+### Listing Creation / Edit
+
+- User goal: publish a trustworthy listing quickly.
+- UX principle: progressive disclosure.
+- Layout: guided sections with one current focus; preview visible but secondary.
+- Key components: photo upload, title, price, condition, category, description,
+  pickup area/radius, availability, quality checklist, buyer preview.
+- Primary CTA: `Publish listing`.
+- Secondary actions: save draft, preview, cancel.
+- Trust/safety cues: public pickup guidance, exact-address warning, photo and
+  detail quality prompts.
+- Empty/error: field errors tie to labels; upload errors explain format/size.
+- Mobile: preview below form; sticky publish only after required fields are in
+  view or as summary action.
+- Future AI touchpoint: title/description/category suggestions after Phase 6,
+  always editable and optional.
+
+### Seller Inventory
+
+- User goal: manage active, draft, sold, and stale listings.
+- UX principle: one obvious next step.
+- Layout: grouped list by status, not a dashboard.
+- Key components: listing row/card, status, messages, publish/unpublish, mark
+  sold, edit.
+- Primary CTA: `Create listing`.
+- Secondary actions: edit, mark sold, delete, view listing.
+- Trust/safety cues: buyer-contact count and listing quality flags.
+- Empty/error: empty inventory invites first listing with examples.
+- Mobile: action menus should not hide destructive actions without confirmation.
+- Future AI touchpoint: `Improve listing` after Phase 6 for drafts/stale items.
+
+### Inbox / Messages
+
+- User goal: respond and coordinate around an item.
+- UX principle: conversations stay item-anchored.
+- Layout: conversation list with item thumbnails; thread with item/seller header
+  and reply composer.
+- Key components: listing context, participant identity, message list, archive,
+  restore, report/block entry, quick replies.
+- Primary CTA: `Send reply`.
+- Secondary actions: view listing, archive, report.
+- Trust/safety cues: public meetup and suspicious-payment guidance in relevant
+  moments.
+- Empty/error: empty inbox points to browse/sell; archived empty explains
+  restore behavior.
+- Mobile: list/detail navigation should preserve context and back behavior.
+- Future AI touchpoint: optional reply suggestions only after message intent is
+  clear; no automated negotiation.
+
+### Notifications
+
+- User goal: see what needs attention.
+- UX principle: useful states count as design.
+- Layout: grouped activity list by today/recent/older.
+- Key components: unread state, listing/message/admin icons, mark read, target
+  link.
+- Primary CTA: each notification links to the target.
+- Secondary actions: mark all read.
+- Trust/safety cues: admin/report notifications use explicit language.
+- Empty/error: empty state says `You're caught up` and offers browse/sell.
+- Mobile: row text wraps cleanly; no tiny icon-only controls.
+- Future AI touchpoint: none for launch.
+
+### Profile / Seller Storefront
+
+- User goal: understand or improve public trust.
+- UX principle: trust must be backed.
+- Layout: `How you appear` preview plus editable fields; storefront item grid.
+- Key components: display name, avatar, verified contact, active community,
+  active listings, report seller where relevant.
+- Primary CTA: `Save profile` or `View listings`.
+- Secondary actions: upload photo, view storefront.
+- Trust/safety cues: backed badges only; no ratings until real.
+- Empty/error: missing display name/photo states explain the high-intent action
+  they affect.
+- Mobile: avatar upload and form controls need large targets.
+- Future AI touchpoint: none.
+
+### Safety / Reporting / Blocking
+
+- User goal: report concerns or reduce unsafe contact.
+- UX principle: safety by default.
+- Layout: report entry near listing/seller/message context, clear modal, clear
+  post-submit state.
+- Key components: reason, optional details, target summary, submit, cancel.
+- Primary CTA: `Submit report`.
+- Secondary actions: cancel, archive/hide conversation, admin review link.
+- Trust/safety cues: `If you feel unsafe, stop the pickup and report it.`
+- Empty/error: report form errors identify missing reason/details.
+- Mobile: dialog fits small screens and focus returns after close.
+- Future AI touchpoint: no automated moderation promises in UI before Phase 6.
+
+### Admin / Moderation
+
+- User goal: manage community and reports safely.
+- UX principle: operational clarity.
+- Layout: dense tables/lists, explicit action panels, audit history.
+- Key components: community switcher, member filters, report cards, moderation
+  actions, removal/deactivation confirmation.
+- Primary CTA: context-specific admin action.
+- Secondary actions: view listing/member, close report, clear filters.
+- Trust/safety cues: every destructive action states target and consequence.
+- Empty/error: no reports/no members states are utilitarian and clear.
+- Mobile: admin may be desktop-priority, but must remain usable without broken
+  layout.
+- Future AI touchpoint: AI summary of reports is out of scope before launch.
+
+## Component System Guidance
+
+### Color Usage
+
+- Primary action: ink background with mustard text or mustard background with
+  ink text, depending on surrounding contrast.
+- Links/focus: purple.
+- Success/trust: mint, paired with text/icons.
+- Warning/destructive: coral/red.
+- Background: warm off-white/white; reduce large gradient panels in app screens.
+
+### Typography
+
+- Keep Inter.
+- Use restrained headings in app screens: generally 20-32px, not hero-scale.
+- Listing titles should remain readable at card sizes.
+- Metadata must meet contrast requirements.
+- Do not use negative letter spacing.
+
+### Spacing, Radius, Shadows
+
+- Use a 4px/8px spacing rhythm.
+- Default controls: 8-12px radius.
+- Listing cards: 12-16px radius after the overhaul unless photo-heavy card
+  shape needs more softness.
+- Modals: 20-24px radius.
+- Shadows should be subtle and functional; borders and spacing should carry
+  most hierarchy.
+
+### Cards And Panels
+
+- Avoid cards inside cards.
+- Use panels for forms, modals, empty states, and admin action containers.
+- Use open sections or dividers for dashboard/home and detail layouts.
+- Repeated marketplace items can be cards because comparison is the task.
+
+### Buttons
+
+- One primary CTA per screen region.
+- Secondary buttons are bordered/quiet.
+- Destructive buttons use explicit copy and confirmation.
+- Icon-only buttons need accessible labels and tooltips where meaning is not
+  universal.
+
+### Forms
+
+- Labels stay visible.
+- Helper text should explain outcome or input format, not the whole product.
+- Errors must be tied to fields with `aria-describedby`.
+- Required fields must be clear without relying only on color.
+- Loading/disabled states must preserve button size.
+
+### Badges And Verification Indicators
+
+Use backed signals only:
+
+- `Verified contact`
+- `Active community member`
+- `Joined Badger Market`
+- `Local pickup`
+- `Photo-backed listing`
+- `Open to offers`
+
+Avoid:
+
+- `Trusted seller` unless backed by real reputation logic.
+- `Safe pickup guaranteed`.
+- `AI verified`.
+- `Top seller` without real criteria.
+
+### Trust/Safety Components
+
+Create or standardize:
+
+- Seller trust summary.
+- Buyer/seller pickup guidance.
+- Suspicious payment warning.
+- Report entry and report confirmation.
+- Admin action confirmation.
+- Profile readiness checklist.
+
+### Marketplace Listing Cards
+
+Card hierarchy:
+
+1. Photo or stable placeholder.
+2. Price.
+3. Title.
+4. Condition.
+5. Pickup area/radius.
+6. Seller/community trust signal.
+7. Freshness/status when useful.
+
+Remove or demote:
+
+- Long descriptions on cards.
+- Multiple competing badges.
+- Photo count unless it is a strong decision signal.
+
+### Search And Filter UI
+
+- Search stays prominent.
+- Filters collapse on mobile and can be condensed on desktop.
+- Use quick chips for campus-specific categories: furniture, books, dorm,
+  electronics, bikes, winter gear, free.
+- Always show active filter summary and clear filters.
+
+### Navigation
+
+- Authenticated nav should prioritize `Browse`, `Sell`, `Inbox`, and profile.
+- `Dashboard` can become `Home`.
+- Community context should be visible but quiet.
+- Admin links remain role-gated and secondary.
+
+### Motion And Microinteractions
+
+- Motion clarifies state: hover, press, menu open, upload progress, save
+  success, message sent.
+- Respect `prefers-reduced-motion`.
+- Avoid decorative ambient motion in core marketplace flows.
+
+### Empty, Loading, And Error Patterns
+
+Every state should answer:
+
+1. What happened?
+2. Why does it matter?
+3. What can I do next?
+
+Examples:
+
+- Empty marketplace: `No listings match "mini fridge" yet. Clear filters or
+  save the search for later.`
+- Empty seller inventory: `You have not listed anything yet. Start with a photo
+  and a pickup area.`
+- Error: `We could not send the code. Check the email and try again.`
+- Loading: `Checking your community access...`
+
+## Microcopy System
+
+Tone: clear, friendly, direct, safety-aware, community-oriented, not corporate,
+not childish, not AI-hype driven.
+
+### Examples
+
+- Onboarding welcome: `Buy and sell with people in your verified community.`
+- Email verification: `Use your wisc.edu email to join Badger Market.`
+- OTP sent: `We sent a 6-digit code to maya@wisc.edu.`
+- Community join: `Join Badger Market with your verified UW-Madison email.`
+- Empty marketplace: `No listings here yet. Be the first to post something your
+  community can use.`
+- Empty filtered search: `No results for this search. Try a wider pickup radius
+  or clear a filter.`
+- Empty inbox: `No messages yet. Contact a seller from a listing, or post an
+  item and replies will appear here.`
+- Empty listings: `You have not listed anything yet. Start with one clear photo.`
+- Listing creation intro: `Tell buyers what it is, what shape it is in, and
+  where pickup usually works.`
+- Listing quality nudge: `Add one clear photo so buyers can judge condition.`
+- Offer/message submission: `Send message to seller.`
+- Message success: `Message sent. You can keep the pickup details in this
+  thread.`
+- Meetup confirmation: `Pickup plan saved. Share exact details only when both
+  sides are ready.`
+- Public meetup guidance: `Meet in a public, familiar place when possible.`
+- Suspicious payment warning: `Do not send deposits, gift cards, or payment
+  codes before seeing the item.`
+- Report intro: `Tell us what happened. Reports help community admins review
+  unsafe or misleading listings.`
+- Block/archive flow: `Hide this conversation from your inbox. It will come back
+  if a new message arrives.`
+- Profile trust badge: `Verified contact`
+- Community trust badge: `Active Badger Market member`
+- Notification copy: `Maya replied about Walnut writing desk.`
+- Admin action confirmation: `Remove this listing from Badger Market? The seller
+  will no longer be able to publish it.`
+
+### Copy Rules
+
+- Prefer verbs: `Browse`, `Sell`, `Reply`, `Publish`, `Report`.
+- Use concrete nouns: listing, seller, pickup area, community.
+- Avoid platform language: ecosystem, intelligence, unlock, leverage, journey.
+- Avoid overpromising: safer than public boards is fine; guaranteed safety is
+  not.
+- Keep safety copy calm and specific.
+
+## Accessibility And Quality Bar
+
+Accessibility is part of launch readiness:
+
+- Keyboard navigation must cover nav, filters, dialogs, forms, listing cards,
+  message composer, and admin actions.
+- Visible focus states must be consistent and high contrast.
+- Color contrast must meet WCAG AA for text and meaningful UI states.
+- Touch targets should be at least 44px for primary mobile actions.
+- Icon-only controls need accessible names.
+- Use semantic HTML: headings, lists, forms, labels, buttons, links, and dialogs.
+- Dialogs must trap focus, support Escape, and restore focus after close.
+- Error messages must be tied to fields with `aria-describedby`.
+- Do not communicate status by color alone; pair color with text/icon.
+- OTP/auth flows must support paste, autocomplete, clear error recovery, and
+  screen reader labels.
+- Respect `prefers-reduced-motion`.
+- Responsive layouts must avoid overlap, clipped labels, horizontal scroll, and
+  layout shift at mobile, tablet, and desktop widths.
+- Loading states must preserve layout dimensions where possible.
+- Images need useful alt text when informative; decorative imagery should use
+  empty alt text.
+
+## Mobile Responsiveness Expectations
+
+- Core flows must work at 360px wide.
+- Primary actions should remain reachable without horizontal scroll.
+- Listing cards should not crop price/title in a way that hides decision data.
+- Filter UI should use drawers, disclosure, or stacked controls on mobile.
+- Listing detail should place message CTA near the item context and optionally
+  use a sticky bottom action after the user has enough information.
+- Forms should use single-column layouts, full-width inputs, and stable helper
+  text.
+- Admin tables may become stacked rows, but actions and audit context must stay
+  readable.
+
+## Analytics And UX Success Metrics
+
+Track after implementation:
+
+- Signup completion rate.
+- Verification completion rate.
+- First community joined.
+- First listing created.
+- First search performed.
+- First offer/message intent sent.
+- First message/structured inquiry sent.
+- First meetup scheduled, once formal meetup UI exists.
+- Listing publish completion rate.
+- Search-to-listing-view rate.
+- Listing-view-to-offer/message rate.
+- Offer/message-to-meetup rate.
+- No-show/cancellation rate, once supported.
+- Report/block/archive rate.
+- D1/D7 retention.
+- Seller repeat-listing rate.
+- Buyer saved-search usage, once web saved search exists.
+- Time to first meaningful action.
+
+Qualitative validation:
+
+- Run 5-10 usability tests with UW-Madison target users.
+- Observe first-run onboarding without coaching.
+- Ask users what Sellr feels like compared with Facebook Marketplace.
+- Identify where users hesitate, mistrust, or misunderstand.
+- Ask sellers to create a listing from a real item photo and watch where they
+  slow down.
+- Ask buyers to find a dorm/apartment item and send a pickup-safe message.
+
+## Implementation Phases
+
+### Phase A - Direction And Documentation
 
 Deliver:
 
-- Capture current desktop and mobile screenshots for the core routes.
-- Identify repeated generic patterns: nested cards, excess chips, vague copy,
-  oversized headings, confusing next actions.
-- Update global tokens and reusable surface/button utilities in
-  `apps/web/app/globals.css`.
-- Define or adjust shared component patterns before rewriting routes.
+- Finalize this guide and update reference docs.
+- No broad UI code changes.
+- Capture assumptions, unresolved references, and phase order.
 
 Acceptance:
 
-- New tokens support a simpler, warmer, less gradient-heavy app.
-- Existing functionality still renders after token changes.
-- No new product dependencies unless justified.
+- Another Codex session can start Phase B without rediscovering product
+  strategy.
+- Docs clearly defer Phase 6 AI.
 
-### Slice 2: Entry, Login, And Onboarding
+### Phase B - Design System Foundation
+
+Status: started. The May 15 foundation pass added the attached flow-reference
+notes, lightened global app surface tokens/utilities, and updated shared
+listing/seller trust card patterns without adding dependencies or changing SLC
+behavior.
 
 Deliver:
 
-- Simplify `/`, `/login`, `/onboarding`, and `/communities/join`.
-- Make the first-run sequence feel like one coherent path.
-- Reduce copy, tighten hierarchy, and make email-first auth primary.
-- Keep phone fallback visible but secondary.
+- Audit `apps/web/app/globals.css` tokens/utilities.
+- Reduce gradient/panel dependency in app surfaces.
+- Define updated button, panel, card, badge, form, empty, loading, error, and
+  focus patterns.
+- Confirm no new design library is needed.
 
 Acceptance:
 
-- A new user understands what Sellr is, why community access matters, and what
-  to do next within the first viewport.
-- The path from landing to community access has clear loading, error, and
-  success states.
-- The flow works on mobile without clipped labels or awkward panel stacking.
+- Existing routes still render.
+- Reusable utilities support the simpler marketplace direction.
+- Accessibility baseline is documented and testable.
 
-### Slice 3: App Shell And Home
+### Phase C - Onboarding And Navigation
 
 Deliver:
 
-- Redesign authenticated navigation and active community context.
-- Rework `/dashboard` into a useful home or next-action surface rather than a
-  generic dashboard.
-- Preserve readiness/profile requirements, but simplify presentation.
+- Simplify `/`, `/login`, `/onboarding`, `/communities/join`.
+- Rename/reframe dashboard into a home/next-action surface if chosen.
+- Update app header/navigation priority around browse, sell, inbox, profile.
 
 Acceptance:
 
-- Users can quickly choose browse, sell, profile completion, or messages.
-- Active community is visible without dominating the header.
-- Admin links remain available only for authorized users.
+- New user path from public entry to community access is shorter and clearer.
+- First signed-in screen presents one obvious next step.
+- Email-first auth remains primary with phone fallback.
 
-### Slice 4: Buyer Browse And Listing Detail
+### Phase D - Marketplace Core Screens
 
 Deliver:
 
-- Simplify `/marketplace`, listing cards, filters, and listing detail.
-- Reduce metadata noise while preserving useful buyer signals.
-- Make seller trust and pickup context feel integrated into the item page.
+- Redesign browse/search/filter, listing cards, listing detail, create/edit
+  listing, seller inventory, profile, and storefront.
+- Preserve listing upload, validation, lifecycle, seller trust, and community
+  scoping.
 
 Acceptance:
 
 - Buyers can scan inventory faster.
-- Mobile filter controls are usable and do not crowd the listing grid.
-- Contact seller remains clear and gated by existing readiness rules.
+- Sellers can publish with fewer distractions.
+- Listing detail clearly answers item, seller, pickup, and contact questions.
 
-### Slice 5: Seller Listing Flow And Inventory
-
-Deliver:
-
-- Simplify `/sell`, edit, buyer preview, and seller inventory.
-- Keep listing quality guidance, upload validation, and publish safeguards.
-- Make preview and readiness guidance feel helpful rather than heavy.
-
-Acceptance:
-
-- Sellers can create a good listing with fewer visual distractions.
-- Validation and upload progress remain clear.
-- Inventory status actions are easy to understand and do not cause layout shift.
-
-### Slice 6: Messaging, Profile, Storefront, Notifications, Admin Alignment
+### Phase E - Trust And Coordination Flows
 
 Deliver:
 
-- Align inbox/thread, profile, storefront, notifications, and admin surfaces
-  with the new shell and tokens.
-- Keep admin dense and operational.
-- Remove remaining generic copy and inconsistent panel styling.
+- Align inbox/thread, buyer contact intent, safety warnings, report dialog,
+  notifications, and admin report/community surfaces.
+- Clarify offer/meetup direction as structured message/coordination states
+  until formal UI exists.
 
 Acceptance:
 
-- Messaging feels anchored to people and listings.
-- Profile/storefront trust language remains backed by real signals.
-- Admin flows remain explicit and auditable.
+- Safety/reporting/blocking affordances remain visible.
+- Conversation stays anchored to item and participant.
+- Admin actions remain explicit and auditable.
 
-## Acceptance Checklist
+### Phase F - Polish And Launch Readiness
+
+Deliver:
+
+- Standardize empty/loading/error/success states.
+- Add analytics events for UX metrics if missing.
+- Run responsive, accessibility, performance, and SLC readiness QA.
+- Use real seed inventory and approved imagery where available.
+
+Acceptance:
+
+- No clipped/overlapping text on mobile/tablet/desktop.
+- Focus states and field errors meet launch quality.
+- `pnpm --filter @sellr/web lint`, `typecheck`, `build`, and `pnpm slc:ready`
+  pass or documented blockers are resolved.
+
+## Acceptance Criteria For The Overhaul
 
 The overhaul is complete when:
 
-- The new-user path from `/` to community access is shorter, clearer, and more
-  visually coherent.
-- The signed-in first screen makes the next best action obvious.
-- Marketplace browse and listing detail feel item-first and person-aware.
-- Listing creation feels guided without looking like a long settings form.
+- The new-user path from `/` to community access is short, clear, and coherent.
+- First signed-in screen makes the next best action obvious.
+- Marketplace browse and listing detail feel item-first, local, and person-aware.
+- Listing creation feels guided without becoming a long settings form.
 - Trust cues are honest, backed, and consistently phrased.
+- Safety/reporting/blocking/moderation affordances are preserved.
 - Empty, loading, error, validation, and success states are covered for every
   changed flow.
 - Desktop and mobile layouts avoid overlap, clipping, horizontal scroll, and
   unstable action sizing.
 - Admin surfaces are visually aligned but remain utilitarian.
-- Existing auth, community scoping, listing lifecycle, messaging, reporting,
-  and media upload behavior still works.
+- Phase 6 AI remains future-only and does not define the UI identity.
 
-## Verification
+## Verification For Future Implementation
 
 Run focused checks while iterating:
 
@@ -405,7 +1003,7 @@ For broad handoff after a large redesign:
 pnpm slc:ready
 ```
 
-Also perform browser verification at desktop and mobile widths for:
+Browser verification should cover desktop and mobile widths for:
 
 - `/`
 - `/login`
@@ -422,20 +1020,20 @@ Also perform browser verification at desktop and mobile widths for:
 - `/admin/community`
 - `/admin/reports`
 
-Use real seeded/demo data where possible. Browser route smoke tests validate
-authenticated HTML responses, but they do not replace visual review.
+Use seeded/demo data where possible. Route smoke tests validate responses, but
+they do not replace visual, responsive, and accessibility review.
 
-## Reference Documents For The Next Session
+## Recommended Next Prompt For Phase B
 
-Read these before implementing:
-
-- `AGENTS.md`
-- `docs/ui-ux-overhaul-guide.md`
-- `docs/design-language.md`
-- `docs/web-next-development-guide.md`
-- `docs/current-state-and-scope.md`
-- `docs/slc-readiness.md`
-- `apps/web/README.md`
-
-Then inspect the route/component files listed in this guide and begin with
-Slice 1 unless the user explicitly asks for a different slice.
+```text
+Begin Phase B of the Sellr Pre-Phase-6 UI/UX overhaul. Read AGENTS.md,
+docs/ui-ux-overhaul-guide.md, docs/design-language.md,
+docs/current-state-and-scope.md, docs/web-next-development-guide.md,
+apps/web/README.md, and apps/web/app/globals.css. Audit the existing web design
+tokens and reusable surface/button/card/form patterns, then make a small,
+reviewable token/component-foundation pass that reduces generic dashboard
+styling, nested-card reliance, and excessive gradient/panel weight while
+preserving the current SLC behavior. Do not implement Phase 6 AI or add a new
+design system library. Run focused web lint/typecheck/build checks and summarize
+remaining risks.
+```

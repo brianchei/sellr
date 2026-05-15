@@ -48,7 +48,8 @@ current production state and launch scope,
 Cloudflare/Vercel/Railway domain cutover guide,
 [`docs/email-first-auth.md`](docs/email-first-auth.md) for the Resend email OTP
 flow, [`docs/ui-ux-overhaul-guide.md`](docs/ui-ux-overhaul-guide.md) for the
-Pre-Phase 6 redesign handoff, and
+Pre-Phase 6 redesign handoff, including onboarding, route-by-route UX
+direction, accessibility, metrics, and Phase A-F implementation sequencing, and
 [`docs/next-session-context.md`](docs/next-session-context.md) for a short
 handoff brief for continuing work in a new agent session.
 

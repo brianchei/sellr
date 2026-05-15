@@ -104,13 +104,15 @@
   --shadow-md: 0 4px 6px -1px rgba(24, 24, 27, 0.07), 0 2px 4px -2px rgba(24, 24, 27, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(24, 24, 27, 0.07), 0 4px 6px -4px rgba(24, 24, 27, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(24, 24, 27, 0.08), 0 8px 10px -6px rgba(24, 24, 27, 0.05);
-  --shadow-glow: 0 0 0 3px rgba(100, 87, 166, 0.18), 0 0 0 5px rgba(255, 227, 71, 0.18);
+  --shadow-glow: 0 0 0 3px rgba(100, 87, 166, 0.18);
 
   /* Radii */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 10px;
   --radius-xl: 12px;
+  --radius-panel: 16px;
+  --radius-card: 16px;
   --radius-2xl: 20px;
   --radius-full: 9999px;
 
@@ -119,8 +121,11 @@
     0 32px 60px -28px rgba(24, 24, 27, 0.18),
     0 8px 20px -10px rgba(100, 87, 166, 0.16);
   --shadow-app-card:
-    0 24px 50px -32px rgba(24, 24, 27, 0.28),
-    0 8px 24px -18px rgba(100, 87, 166, 0.24);
+    0 16px 34px -28px rgba(24, 24, 27, 0.26),
+    0 1px 2px rgba(24, 24, 27, 0.05);
+  --shadow-app-card-hover:
+    0 18px 38px -30px rgba(24, 24, 27, 0.28),
+    0 2px 5px rgba(24, 24, 27, 0.06);
 
   /* Transitions */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -347,18 +352,7 @@ body {
 .app-shell-bg {
   position: relative;
   isolation: isolate;
-  background:
-    radial-gradient(
-      ellipse 52% 34% at 22% -8%,
-      rgba(255, 227, 71, 0.38) 0%,
-      transparent 68%
-    ),
-    radial-gradient(
-      ellipse 42% 26% at 94% 2%,
-      rgba(100, 87, 166, 0.14) 0%,
-      transparent 72%
-    ),
-    linear-gradient(180deg, #fff9d7 0%, #fafaf7 28%, #ffffff 58%, #f1f0fb 100%);
+  background: linear-gradient(180deg, #fffdf0 0%, #fafaf7 28%, #ffffff 78%);
 }
 
 .app-shell-bg::before {
@@ -367,34 +361,26 @@ body {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image:
-    linear-gradient(rgba(24, 24, 27, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(24, 24, 27, 0.035) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(180deg, black 0%, transparent 70%);
-  -webkit-mask-image: linear-gradient(180deg, black 0%, transparent 70%);
+  background: linear-gradient(180deg, rgba(255, 227, 71, 0.16) 0%, transparent 34%);
 }
 
 :where(.app-panel) {
-  border: 1px solid rgba(24, 24, 27, 0.08);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-panel);
+  background: var(--bg-elevated);
   box-shadow: var(--shadow-app-card);
-  backdrop-filter: blur(18px);
 }
 
 :where(.app-panel-soft) {
-  border: 1px solid rgba(100, 87, 166, 0.14);
-  border-radius: 24px;
-  background:
-    linear-gradient(135deg, rgba(255, 249, 215, 0.86) 0%, rgba(255, 255, 255, 0.94) 52%),
-    var(--bg-elevated);
-  box-shadow: var(--shadow-app-card);
+  border: 1px solid rgba(122, 98, 0, 0.14);
+  border-radius: var(--radius-panel);
+  background: #fffdf2;
+  box-shadow: var(--shadow-sm);
 }
 
 :where(.app-panel-dark) {
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px;
+  border-radius: var(--radius-panel);
   background: #111111;
   color: white;
   box-shadow: 0 28px 60px -34px rgba(0, 0, 0, 0.65);
@@ -405,13 +391,12 @@ body {
   align-items: center;
   gap: 6px;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(24, 24, 27, 0.08);
-  background: rgba(255, 255, 255, 0.78);
-  padding: 6px 12px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-primary);
+  padding: 5px 10px;
   color: var(--text-secondary);
   font-size: var(--text-xs);
   font-weight: 600;
-  box-shadow: var(--shadow-xs);
 }
 
 :where(.app-action-primary) {
@@ -422,7 +407,7 @@ body {
   border-radius: var(--radius-full);
   background: #111111;
   color: var(--color-brand-primary);
-  box-shadow: 0 18px 30px -18px rgba(17, 17, 17, 0.8);
+  box-shadow: var(--shadow-xs);
   font-weight: 700;
   text-decoration: none;
   transition:
@@ -433,8 +418,7 @@ body {
 
 :where(.app-action-primary:hover:not(:disabled)) {
   background: #000000;
-  box-shadow: 0 22px 34px -18px rgba(17, 17, 17, 0.9);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 :where(.app-action-secondary) {
@@ -444,9 +428,8 @@ body {
   gap: 8px;
   border: 1px solid rgba(24, 24, 27, 0.1);
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--bg-primary);
   color: var(--text-primary);
-  box-shadow: var(--shadow-xs);
   font-weight: 600;
   text-decoration: none;
   transition:
@@ -457,8 +440,26 @@ body {
 
 :where(.app-action-secondary:hover:not(:disabled)) {
   border-color: rgba(24, 24, 27, 0.2);
-  background: white;
-  transform: translateY(-1px);
+  background: var(--bg-secondary);
+}
+
+:where(.app-section) {
+  border-top: 1px solid var(--border-default);
+  padding-block: 20px;
+}
+
+:where(.app-list-row) {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-panel);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-xs);
+}
+
+:where(.app-empty-state) {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-panel);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
 }
 
 /* Subtle ticked divider for marketing sections */
@@ -652,15 +653,15 @@ body {
 .card {
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-card);
   box-shadow: var(--shadow-app-card);
   transition: all var(--duration-normal) var(--ease-out);
 }
 
 .card-hover:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-app-card-hover);
   border-color: var(--border-strong);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .card-interactive {
@@ -668,9 +669,9 @@ body {
 }
 
 .card-interactive:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-app-card-hover);
   border-color: var(--color-brand-contrast-muted);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .card-interactive:active {

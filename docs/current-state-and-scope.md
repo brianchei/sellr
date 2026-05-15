@@ -21,10 +21,13 @@ actions, and refreshed marketplace, listing, messaging, seller, admin, login,
 and onboarding surfaces.
 
 Before Phase 6 AI work, the next product-development priority is the UI/UX
-overhaul in [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md). The goal is
-to simplify onboarding and the current buyer/seller loop, make the app feel more
-personal and local, and remove generic "AI/vibe-coded" UI patterns without
-adding new product scope.
+overhaul in [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md). The guide
+now records the repository/route audit, current experience diagnosis,
+activation-oriented onboarding strategy, screen-by-screen direction, component
+system guidance, microcopy system, accessibility bar, UX metrics, and Phase A-F
+implementation plan. The goal is to simplify onboarding and the current
+buyer/seller loop, make the app feel more personal and local, and remove generic
+"AI/vibe-coded" UI patterns without adding new product scope.
 
 ## Production State
 
@@ -136,7 +139,10 @@ Use `docs/ui-ux-overhaul-guide.md` as the implementation handoff. The redesign
 should preserve current auth, community, listing, media, messaging, reporting,
 and admin behavior while simplifying the experience across landing, onboarding,
 home, marketplace, listing detail, seller flows, inbox, profile, storefront, and
-notifications.
+notifications. Phase B has started with a small token/component foundation pass
+that lightens app surfaces, listing cards, seller trust cards, chips, buttons,
+and the authenticated app shell while preserving existing behavior. Continue
+with focused route-level UI cleanup before beginning Phase 6 AI.
 
 ## Deliberately Deferred
 

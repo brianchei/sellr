@@ -79,10 +79,12 @@ The current web SLC includes:
   membership, profile photo presence, and active listings.
 
 Before Phase 6 AI listing-assistant work, the next product-development priority
-is the UI/UX overhaul in `docs/ui-ux-overhaul-guide.md`: simplify onboarding,
-make the app feel more personal and local, reduce generic "AI/vibe-coded"
-patterns, and preserve the current SLC behavior while improving the existing
-flows.
+is the UI/UX overhaul in `docs/ui-ux-overhaul-guide.md`. That guide now contains
+the route/repo audit, current UX diagnosis, onboarding redesign plan,
+screen-by-screen direction, component guidance, microcopy, accessibility bar,
+metrics, and Phase A-F implementation plan. Simplify onboarding, make the app
+feel more personal and local, reduce generic "AI/vibe-coded" patterns, and
+preserve the current SLC behavior while improving the existing flows.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -320,11 +322,14 @@ If continuing product development, complete the Pre-Phase 6 UI/UX overhaul
 before starting AI listing assistant work:
 
 ```text
-Read AGENTS.md, docs/ui-ux-overhaul-guide.md, docs/web-next-development-guide.md,
-docs/current-state-and-scope.md, docs/design-language.md,
-docs/next-session-context.md, docs/slc-readiness.md, and apps/web/README.md.
-Before Phase 6 AI work, begin Slice 1 of the UI/UX overhaul: audit the current
-desktop/mobile experience, simplify the design tokens and reusable web surface
-patterns, and prepare the app for a cleaner onboarding and buyer/seller flow.
-Do not add new product scope.
+Continue the Sellr Pre-Phase-6 UI/UX overhaul after the initial Phase B
+foundation pass. Read AGENTS.md, docs/ui-ux-overhaul-guide.md,
+docs/design-language.md, docs/current-state-and-scope.md,
+docs/web-next-development-guide.md, apps/web/README.md, and
+apps/web/app/globals.css. Build on the lighter token/surface baseline by
+cleaning up the highest-impact route-level patterns first: onboarding/login,
+dashboard-as-home, marketplace filters/cards, listing detail, seller flows, and
+inbox/profile trust surfaces. Preserve current SLC behavior, do not implement
+Phase 6 AI, do not add broad product scope, and do not add a new design-system
+library.
 ```
