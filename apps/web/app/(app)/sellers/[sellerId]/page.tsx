@@ -47,13 +47,13 @@ function StorefrontSkeleton() {
             </div>
           </div>
         </div>
-        <div className="h-56 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
+        <div className="app-panel h-56" />
       </section>
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={index}
-            className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]"
+            className="app-panel overflow-hidden"
           >
             <div className="aspect-[4/3] bg-[var(--bg-tertiary)]" />
             <div className="space-y-3 p-4">
@@ -263,7 +263,7 @@ export default function SellerStorefrontPage() {
           {mostRecentListing && recencyLabel ? (
             <Link
               href={`/marketplace/${mostRecentListing.id}`}
-              className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/70 p-3 text-sm no-underline transition hover:border-black/20 hover:bg-white"
+              className="app-list-row mt-5 flex items-center justify-between gap-3 p-3 text-sm no-underline transition hover:border-black/20 hover:bg-white"
             >
               <div className="min-w-0">
                 <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
@@ -337,7 +337,7 @@ export default function SellerStorefrontPage() {
             ))}
           </div>
         ) : (
-          <div className="mt-5 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
+          <div className="app-empty-state mt-5 p-8 text-center">
             <h3 className="text-lg font-semibold">
               {isOwnProfile ? 'No active listings yet' : 'No active listings'}
             </h3>
@@ -415,7 +415,7 @@ function ContactCard({
 
 function SelfStorefrontCard({ hasListings }: { hasListings: boolean }) {
   return (
-    <div className="rounded-3xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-5 shadow-[var(--shadow-app-card)]">
+    <div className="app-panel-soft p-5">
       <h2 className="text-sm font-semibold text-[var(--text-primary)]">
         Storefront preview
       </h2>

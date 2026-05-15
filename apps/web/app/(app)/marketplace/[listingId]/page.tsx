@@ -388,7 +388,7 @@ export default function ListingDetailPage() {
       <main className="mx-auto max-w-6xl px-4 py-8">
         <div className="h-5 w-28 rounded bg-[var(--bg-tertiary)]" />
         <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]">
+          <div className="app-panel overflow-hidden">
             <div className="aspect-[4/3] bg-[var(--bg-tertiary)]" />
             <div className="space-y-3 p-5">
               <div className="h-4 w-32 rounded bg-[var(--bg-tertiary)]" />
@@ -398,8 +398,8 @@ export default function ListingDetailPage() {
             </div>
           </div>
           <div className="space-y-4">
-            <div className="h-44 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
-            <div className="h-64 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
+            <div className="app-panel h-44" />
+            <div className="app-panel h-64" />
           </div>
         </section>
       </main>
@@ -462,7 +462,7 @@ export default function ListingDetailPage() {
       </Link>
 
       <section className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <article className="overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] backdrop-blur">
+        <article className="app-panel overflow-hidden">
           <PhotoGallery
             photos={photos}
             selectedIndex={selectedPhotoIndex}
@@ -973,7 +973,7 @@ function SafePickupCard({
 
   return (
     <section
-      className="rounded-3xl border border-[var(--color-brand-accent-muted)] p-5 shadow-[var(--shadow-app-card)]"
+      className="app-panel border-[var(--color-brand-accent-muted)] p-5"
       style={{
         background:
           'linear-gradient(180deg, var(--color-brand-accent-soft) 0%, var(--bg-elevated) 70%)',

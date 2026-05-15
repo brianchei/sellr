@@ -605,11 +605,11 @@ function SetupSkeleton() {
           {[0, 1, 2].map((item) => (
             <div
               key={item}
-              className="h-24 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]"
+              className="app-list-row h-24"
             />
           ))}
         </div>
-        <div className="mt-6 h-96 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
+        <div className="app-panel mt-6 h-96" />
       </div>
     </main>
   );
@@ -1092,7 +1092,7 @@ export default function AdminCommunityPage() {
 
           <div className="mt-5 space-y-2">
             {selectedCommunity.inviteCodes.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] px-4 py-5 text-center text-sm text-[var(--text-secondary)]">
+              <p className="app-empty-state px-4 py-5 text-center text-sm text-[var(--text-secondary)]">
                 No invite codes yet.
               </p>
             ) : (
@@ -1101,7 +1101,7 @@ export default function AdminCommunityPage() {
                 return (
                   <article
                     key={invite.id}
-                    className="rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3"
+                    className="app-list-row p-3"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="font-mono text-sm font-semibold tracking-wider text-[var(--text-primary)]">
@@ -1190,7 +1190,7 @@ export default function AdminCommunityPage() {
 
           <div className="mt-4 space-y-3">
             {visibleMembers.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] px-4 py-6 text-center">
+              <div className="app-empty-state px-4 py-6 text-center">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">
                   No members match these filters
                 </h3>
@@ -1220,7 +1220,7 @@ export default function AdminCommunityPage() {
               return (
                 <article
                   key={member.userId}
-                  className="rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-4"
+                  className="app-list-row p-4"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -1334,7 +1334,7 @@ function MetricCard({
   children: React.ReactNode;
 }) {
   return (
-    <article className="rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)]">
+    <article className="app-list-row p-4">
       <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
         {label}
       </p>
