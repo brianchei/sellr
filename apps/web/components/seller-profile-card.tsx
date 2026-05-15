@@ -1,5 +1,11 @@
 import Link from 'next/link';
 import type { ApiUserTrustProfile } from '@sellr/api-client';
+import {
+  activeListingCountLabel,
+  communityTrustLabel,
+  profileSignalSummary,
+  publicContactVerificationLabel,
+} from '@/lib/trust-signals';
 
 type SellerProfileCardProps = {
   profile?: ApiUserTrustProfile | null;
@@ -43,15 +49,10 @@ export function formatMemberSince(value?: string | null): string {
   }).format(date);
 }
 
-function listingCountLabel(count: number | undefined): string {
-  const safeCount = count ?? 0;
-  return `${safeCount} active ${safeCount === 1 ? 'listing' : 'listings'}`;
-}
-
 export function SellerProfileCard({
   profile,
   heading = 'Seller',
-  contextLabel = 'This member is in your community.',
+  contextLabel = 'Profile signals are visible inside your community.',
   profileHref,
   profileLabel = 'View profile',
   editableHref,
@@ -60,6 +61,9 @@ export function SellerProfileCard({
 }: SellerProfileCardProps) {
   const displayName = profile?.displayName ?? 'Community member';
   const memberSince = profile?.memberSince ?? profile?.createdAt ?? null;
+  const contactSignal = publicContactVerificationLabel(profile);
+  const communitySignal = communityTrustLabel(profile);
+  const signalSummary = profileSignalSummary(profile);
 
   return (
     <section
@@ -108,17 +112,23 @@ export function SellerProfileCard({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {profile?.communityMember !== false ? (
+        {communitySignal ? (
           <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
-            Community member
+            {communitySignal}
           </span>
         ) : null}
-        {profile?.verifiedAt ? (
+        {contactSignal ? (
           <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
-            Verified sign-in
+            {contactSignal}
           </span>
         ) : null}
       </div>
+
+      {signalSummary ? (
+        <p className="mt-3 rounded-2xl border border-black/10 bg-white/70 px-3 py-2 text-xs leading-5 text-[var(--text-secondary)]">
+          {signalSummary}
+        </p>
+      ) : null}
 
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-black/10 pt-4 text-sm">
         <div>
@@ -134,7 +144,7 @@ export function SellerProfileCard({
             Listings
           </dt>
           <dd className="mt-1 font-medium text-[var(--text-primary)]">
-            {listingCountLabel(profile?.listingCount)}
+            {activeListingCountLabel(profile?.listingCount)}
           </dd>
         </div>
       </dl>

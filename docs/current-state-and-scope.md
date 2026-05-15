@@ -1,6 +1,6 @@
 # Sellr Current State And Scope
 
-Last updated: May 13, 2026.
+Last updated: May 14, 2026.
 
 ## Product Scope
 
@@ -115,10 +115,13 @@ Included:
   reported admins or deactivate/suspend member access from report cards, and
   records audit-friendly moderation history while keeping report status review
   separate.
-- Phase 5 messaging control has started with per-user conversation
-  archive/hide. Archived conversations are removed from the active inbox for
-  the current user only, remain available in an archived view, can be restored,
-  and return to the active inbox when a new message arrives.
+- Phase 5 trust, moderation, and messaging work is complete for the current web
+  SLC. Users can archive/hide conversations from the active inbox without
+  deleting shared history, restore archived threads, and receive them back in
+  the active inbox when a new message arrives. Admin report/member moderation
+  remains explicit and audit-friendly, and profile/listing/storefront/inbox
+  trust language now uses consistent backed signals such as verified contact,
+  active community membership, profile photo presence, and active listings.
 
 ## Deliberately Deferred
 

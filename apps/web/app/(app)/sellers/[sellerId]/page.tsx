@@ -20,6 +20,11 @@ import {
   formatRelativeListedDate,
   type ListedFreshness,
 } from '@/lib/listing-format';
+import {
+  activeListingCountLabel,
+  communityTrustLabel,
+  publicContactVerificationLabel,
+} from '@/lib/trust-signals';
 
 function freshnessTextClass(tone: ListedFreshness['tone']): string {
   if (tone === 'fresh') return 'text-[var(--color-brand-accent-strong)]';
@@ -157,6 +162,8 @@ export default function SellerStorefrontPage() {
     seller.memberSince ?? seller.createdAt,
   );
   const activeCount = seller.listingCount ?? listings.length;
+  const contactSignal = publicContactVerificationLabel(seller);
+  const communitySignal = communityTrustLabel(seller);
   const recencyLabel =
     mostRecentListing != null
       ? formatRelativeListedDate(mostRecentListing.createdAt)
@@ -206,7 +213,7 @@ export default function SellerStorefrontPage() {
                 {seller.displayName}
               </h1>
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                {seller.verifiedAt ? (
+                {contactSignal ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 font-medium text-[var(--color-brand-accent-strong)]">
                     <svg
                       width="11"
@@ -235,19 +242,18 @@ export default function SellerStorefrontPage() {
                         fill="none"
                       />
                     </svg>
-                    Verified phone
+                    {contactSignal}
                   </span>
                 ) : null}
                 <span className="inline-flex items-center rounded-full bg-[var(--bg-secondary)] px-2.5 py-1 font-medium text-[var(--text-secondary)]">
                   Member since {memberSinceLabel}
                 </span>
                 <span className="inline-flex items-center rounded-full bg-[var(--bg-secondary)] px-2.5 py-1 font-medium text-[var(--text-secondary)]">
-                  {activeCount} active{' '}
-                  {activeCount === 1 ? 'listing' : 'listings'}
+                  {activeListingCountLabel(activeCount)}
                 </span>
-                {seller.communityMember !== false ? (
+                {communitySignal ? (
                   <span className="inline-flex items-center rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 font-medium text-[var(--color-brand-primary-strong)]">
-                    Local community
+                    {communitySignal}
                   </span>
                 ) : null}
               </div>
@@ -320,7 +326,7 @@ export default function SellerStorefrontPage() {
             </p>
           </div>
           <p className="text-xs text-[var(--text-tertiary)]">
-            Contact stays tied to the listing, not the seller directly.
+            Contact starts from a listing so item context stays attached.
           </p>
         </header>
 
@@ -372,8 +378,8 @@ function ContactCard({
         How to contact {sellerName.split(' ')[0] || sellerName}
       </h2>
       <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-        Conversations are anchored to a listing so price, condition, and
-        pickup context stay attached for both sides.
+        Conversations start from a listing so price, condition, and pickup
+        context stay visible for both sides.
       </p>
 
       <ul className="mt-4 space-y-2 text-xs">
@@ -414,8 +420,8 @@ function SelfStorefrontCard({ hasListings }: { hasListings: boolean }) {
         Storefront preview
       </h2>
       <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-        This is how buyers see your profile inside the community. Keep
-        listings fresh and your display name accurate to build trust.
+        This is how buyers see your backed profile signals inside the
+        community. Keep listings fresh and your display name recognizable.
       </p>
 
       <div className="mt-5 grid gap-2">

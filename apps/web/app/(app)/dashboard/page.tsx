@@ -32,6 +32,7 @@ import {
   PROFILE_COMPLETION_COPY,
   profileCompletionIssues,
 } from '@/lib/profile-readiness';
+import { contactVerificationLabel } from '@/lib/trust-signals';
 
 type MeData = Awaited<ReturnType<typeof fetchMe>>;
 
@@ -209,7 +210,7 @@ function GreetingHero({
         year: 'numeric',
       }).format(new Date(memberSince))
     : null;
-  const verified = Boolean(me?.user.verifiedAt);
+  const verificationLabel = me ? contactVerificationLabel(me.user, '') : '';
 
   return (
     <section
@@ -238,7 +239,7 @@ function GreetingHero({
                 : 'Welcome back'}
           </h1>
           <div className="mt-2 flex flex-wrap gap-2 text-xs">
-            {verified ? (
+            {verificationLabel ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 font-medium text-[var(--color-brand-accent-strong)]">
                 <svg
                   width="11"
@@ -267,7 +268,7 @@ function GreetingHero({
                     fill="none"
                   />
                 </svg>
-                Verified phone
+                {verificationLabel}
               </span>
             ) : null}
             {memberSinceLabel ? (
@@ -777,7 +778,7 @@ function SetupPanel({
         : {
             label: 'Create listing',
             href: '/sell',
-            copy: 'Add one polished listing with photos to complete seller setup.',
+            copy: 'Add one polished listing with photos to complete seller readiness.',
           }
       : listingsMissingPhotosCount > 0
         ? {
@@ -794,7 +795,7 @@ function SetupPanel({
           : {
               label: 'View storefront',
               href: userId ? `/sellers/${userId}` : '/marketplace',
-              copy: 'Setup looks ready. Review how buyers see your profile.',
+              copy: 'Your backed signals are ready. Review how buyers see your profile.',
             };
 
   return (
@@ -802,10 +803,10 @@ function SetupPanel({
       <header className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            Sellr setup
+            Seller readiness
           </h2>
           <p className="text-xs text-[var(--text-secondary)]">
-            A quick health check.
+            Backed signals buyers can rely on.
           </p>
         </div>
         <span

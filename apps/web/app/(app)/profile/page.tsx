@@ -24,6 +24,7 @@ import {
   PROFILE_COMPLETION_COPY,
   profileCompletionIssues,
 } from '@/lib/profile-readiness';
+import { contactVerificationLabel } from '@/lib/trust-signals';
 
 type MeData = Awaited<ReturnType<typeof fetchMe>>;
 
@@ -37,12 +38,6 @@ function fieldClassName(hasError: boolean): string {
 
 function contactLabel(me: MeData): string {
   return me.user.email ?? me.user.phoneE164 ?? 'Not set';
-}
-
-function verifiedContactLabel(me: MeData): string {
-  if (me.user.emailVerifiedAt) return 'Verified email';
-  if (me.user.phoneE164 && me.user.verifiedAt) return 'Verified phone';
-  return 'Needs verification';
 }
 
 function issueHref(issue: ProfileCompletionIssue): string {
@@ -124,7 +119,7 @@ function ProfileContent({ me, userId }: { me: MeData; userId: string | null }) {
               Community-visible identity
             </span>
             <span className="rounded-2xl border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] px-3 py-2 font-semibold text-[var(--color-brand-contrast-strong)]">
-              Pickup trust signals
+              Profile readiness signals
             </span>
           </div>
         </div>
@@ -180,13 +175,13 @@ function ProfileSummary({
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
-            Public trust card
+            Profile signal preview
           </p>
           <h2 className="break-words text-xl font-semibold text-[var(--text-primary)]">
             {me.user.displayName}
           </h2>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            {verifiedContactLabel(me)} | Member since{' '}
+            {contactVerificationLabel(me.user)} | Member since{' '}
             {formatMemberSince(me.user.memberSince ?? me.user.createdAt)}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -197,7 +192,7 @@ function ProfileSummary({
             </span>
             <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
               {ready
-                ? 'Ready to post and contact'
+                ? 'Ready for listing and contact'
                 : `${issues.length} ${issues.length === 1 ? 'step' : 'steps'} left`}
             </span>
           </div>
@@ -206,8 +201,8 @@ function ProfileSummary({
 
       <dl className="mt-5 grid gap-3 border-t border-black/10 pt-5 text-sm sm:grid-cols-3">
         <ProfileFact
-          label="Verified contact"
-          value={contactLabel(me)}
+          label="Contact method"
+          value={`${contactVerificationLabel(me.user)} · ${contactLabel(me)}`}
           tone="accent"
         />
         <ProfileFact
@@ -443,7 +438,10 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
         </label>
 
         <dl className="grid grid-cols-2 gap-4 text-sm">
-          <ProfileFact label="Verified contact" value={contactLabel(me)} />
+          <ProfileFact
+            label="Contact method"
+            value={`${contactVerificationLabel(me.user)} · ${contactLabel(me)}`}
+          />
           <ProfileFact
             label="Communities"
             value={
@@ -508,7 +506,7 @@ function ProfileReadinessPanel({
     {
       issue: 'verified_contact',
       complete: !issues.includes('verified_contact'),
-      completeLabel: verifiedContactLabel(me),
+      completeLabel: contactVerificationLabel(me.user),
     },
     {
       issue: 'community_membership',
@@ -530,7 +528,8 @@ function ProfileReadinessPanel({
                 Profile readiness
               </h2>
               <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-                Requirements for posting listings and contacting sellers.
+                Backed signals required for posting listings and contacting
+                sellers.
               </p>
             </div>
             <span className="rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)] shadow-sm">
@@ -604,8 +603,8 @@ function ProfileReadinessPanel({
               Trust tips
             </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              A recognizable name and photo make pickup coordination easier and
-              help buyers understand who they are meeting.
+              A recognizable name and photo help buyers understand who they are
+              coordinating with before pickup.
             </p>
           </div>
         </div>

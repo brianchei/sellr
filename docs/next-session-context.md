@@ -70,10 +70,13 @@ The current web SLC includes:
   controls; listing cards and detail pages surface seller trust cues,
   approximate pickup radius, photo count, active listing count, and
   at-a-glance buyer context.
-- Phase 5 messaging control has started: users can archive/hide conversations
-  from their active inbox without deleting shared history, view archived
-  threads, restore them, and receive them back in the active inbox when a new
-  message arrives.
+- Phase 5 trust, moderation, and messaging work is complete for the current web
+  SLC: users can archive/hide conversations without deleting shared history,
+  view and restore archived threads, and receive them back in the active inbox
+  when a new message arrives. Admin report/member moderation remains scoped and
+  auditable, and profile/listing/storefront/inbox trust language now uses
+  consistent backed signals such as verified contact, active community
+  membership, profile photo presence, and active listings.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -247,8 +250,16 @@ Admin: +15550000003 / Priya Shah
 Local email/SMS OTP: 000000
 ```
 
-For API integration tests, use a dedicated test DB and `TEST_DATABASE_URL`.
-Without it, local DB integration suites are skipped by the repo safety guard.
+For API integration tests, use a dedicated local Supabase test DB and set:
+
+```env
+TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/sellr_integration_test
+TEST_DIRECT_URL=postgresql://postgres:postgres@127.0.0.1:54322/sellr_integration_test
+```
+
+With that configured, the focused API integration command currently runs the
+full local API suite: 9 files / 71 tests. Without it, local DB integration
+suites are skipped by the repo safety guard.
 
 ## Files To Read First
 
@@ -298,14 +309,12 @@ verify admin/community access, run media health checks, watch Railway/Resend
 logs, and record any launch notes. Do not add new product scope.
 ```
 
-If continuing product development, start Phase 5 trust, moderation, and
-messaging work:
+If continuing product development, start Phase 6 AI listing assistant work:
 
 ```text
 Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
-docs/design-language.md, and docs/next-session-context.md. Phase 4 listing and
-browse work is complete for the current web SLC, and the first Phase 5
-messaging slice has added per-user conversation archive/hide. Continue Phase 5
-with trust/profile progress language across profile, listings, and seller
-cards, then keep any follow-up admin safety work scoped to launch operations.
+docs/design-language.md, and docs/next-session-context.md. Phase 5 trust,
+moderation, and messaging work is complete for the current web SLC. Begin Phase
+6 with the smallest AI listing-quality assistant slice, keeping generated
+suggestions reviewable by the seller and avoiding broad recommendation scope.
 ```

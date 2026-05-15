@@ -324,11 +324,16 @@ Work items:
   archived view, can be restored, and reappear automatically when a new message
   arrives.
 - Add admin ability to disable or suspend a member from report review.
+  Completed with scoped report-linked member actions.
 - Connect report moderation actions to member management where appropriate.
+  Completed with member-management links and moderation history.
 - Update admin community management with clearer status, role, and moderation
-  controls.
+  controls. Completed with role/status filters, access labels, reason context,
+  and empty states.
 - Refine trust/profile progress language across profile, listings, and seller
-  cards.
+  cards. Completed with consistent backed-signal copy for verified contact,
+  active community membership, profile photos, active listings, storefronts,
+  and inbox profile details.
 
 Acceptance notes:
 
@@ -432,6 +437,8 @@ Completed in Phase 2:
 - Add profile pictures.
 - Add trust/profile progress.
 - Show seller info on user listings.
+- Refine backed-signal language across profile, listing cards/detail,
+  storefronts, and inbox profile details.
 
 Remaining:
 

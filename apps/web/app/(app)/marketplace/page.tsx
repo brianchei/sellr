@@ -403,7 +403,7 @@ export default function MarketplacePage() {
                   fill="none"
                 />
               </svg>
-              Verified sellers only
+              Verified contact only
             </button>
           </div>
         ) : null}

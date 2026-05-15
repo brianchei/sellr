@@ -215,8 +215,8 @@ Seller listing creation should feel guided and confidence-building:
 
 Trust UI should be simple and honest:
 
-- `Community member`
-- `Verified email`
+- `Active community member`
+- `Verified contact`
 - `Local pickup`
 - `Responsive seller` only when backed by real data
 - `Report listing`
