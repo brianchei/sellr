@@ -88,6 +88,7 @@ const TRUNCATE_TABLES = [
   'meetups',
   'offers',
   'messages',
+  'conversation_participant_states',
   'conversations',
   'reports',
   'notifications',

@@ -7,7 +7,9 @@ import {
   addMember,
   buildTestApp,
   createCommunity,
+  createConversation,
   createListing,
+  createMessage,
   createUser,
   prisma,
   truncateAll,
@@ -197,6 +199,107 @@ describe.skipIf(!integrationDbAvailable)('conversations integration', () => {
 
       const total = await prisma.conversation.count();
       expect(total).toBe(0);
+    });
+  });
+
+  describe('conversation archive visibility', () => {
+    it('hides an archived conversation only for the current user and restores it', async () => {
+      const seller = await createUser();
+      const buyer = await createUser();
+      const community = await createCommunity();
+      await addMember(seller.id, community.id);
+      await addMember(buyer.id, community.id);
+      const listing = await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        status: 'active',
+      });
+      const conversation = await createConversation({
+        listingId: listing.id,
+        participantIds: [buyer.id, seller.id],
+      });
+      await createMessage({
+        conversationId: conversation.id,
+        senderId: buyer.id,
+        content: 'Can I pick this up today?',
+      });
+      const buyerCookie = await accessCookieFor(app, buyer.id);
+      const sellerCookie = await accessCookieFor(app, seller.id);
+
+      const archiveRes = await app.inject({
+        method: 'PATCH',
+        url: `/api/v1/conversations/${conversation.id}/archive`,
+        headers: { cookie: buyerCookie },
+        payload: { archived: true },
+      });
+      expect(archiveRes.statusCode).toBe(200);
+      expect(
+        archiveRes.json<{
+          data: { conversation: { archivedAt: string | null } };
+        }>().data.conversation.archivedAt,
+      ).toEqual(expect.any(String));
+
+      const buyerActive = await app.inject({
+        method: 'GET',
+        url: '/api/v1/conversations',
+        headers: { cookie: buyerCookie },
+      });
+      expect(buyerActive.statusCode).toBe(200);
+      expect(
+        buyerActive.json<{ data: { conversations: { id: string }[] } }>().data
+          .conversations,
+      ).toHaveLength(0);
+
+      const sellerActive = await app.inject({
+        method: 'GET',
+        url: '/api/v1/conversations',
+        headers: { cookie: sellerCookie },
+      });
+      expect(sellerActive.statusCode).toBe(200);
+      expect(
+        sellerActive
+          .json<{ data: { conversations: { id: string }[] } }>()
+          .data.conversations.map((item) => item.id),
+      ).toContain(conversation.id);
+
+      const buyerArchived = await app.inject({
+        method: 'GET',
+        url: '/api/v1/conversations?status=archived',
+        headers: { cookie: buyerCookie },
+      });
+      expect(buyerArchived.statusCode).toBe(200);
+      const archivedBody = buyerArchived.json<{
+        data: { conversations: { id: string; archivedAt: string | null }[] };
+      }>();
+      expect(archivedBody.data.conversations).toHaveLength(1);
+      expect(archivedBody.data.conversations[0].id).toBe(conversation.id);
+      expect(archivedBody.data.conversations[0].archivedAt).toEqual(
+        expect.any(String),
+      );
+
+      const restoreRes = await app.inject({
+        method: 'PATCH',
+        url: `/api/v1/conversations/${conversation.id}/archive`,
+        headers: { cookie: buyerCookie },
+        payload: { archived: false },
+      });
+      expect(restoreRes.statusCode).toBe(200);
+      expect(
+        restoreRes.json<{
+          data: { conversation: { archivedAt: string | null } };
+        }>().data.conversation.archivedAt,
+      ).toBeNull();
+
+      const buyerRestored = await app.inject({
+        method: 'GET',
+        url: '/api/v1/conversations',
+        headers: { cookie: buyerCookie },
+      });
+      expect(
+        buyerRestored
+          .json<{ data: { conversations: { id: string }[] } }>()
+          .data.conversations.map((item) => item.id),
+      ).toContain(conversation.id);
     });
   });
 });

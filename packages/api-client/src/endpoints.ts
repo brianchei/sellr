@@ -81,6 +81,7 @@ export type ApiConversation = {
   participantIds: string[];
   type: string;
   createdAt: string;
+  archivedAt?: string | null;
 };
 
 export type ApiMessage = {
@@ -706,10 +707,18 @@ export function createConversation(body: { listingId: string }) {
   });
 }
 
-export function fetchConversations(params?: { limit?: number }) {
+export type ConversationInboxStatus = 'active' | 'archived' | 'all';
+
+export function fetchConversations(params?: {
+  limit?: number;
+  status?: ConversationInboxStatus;
+}) {
   const q = new URLSearchParams();
   if (params?.limit != null) {
     q.set('limit', String(params.limit));
+  }
+  if (params?.status != null) {
+    q.set('status', params.status);
   }
   const qs = q.toString();
   return apiFetch<{ conversations: ApiConversationSummary[] }>(
@@ -720,6 +729,19 @@ export function fetchConversations(params?: { limit?: number }) {
 export function fetchConversation(conversationId: string) {
   return apiFetch<{ conversation: ApiConversationSummary }>(
     `/conversations/${conversationId}`,
+  );
+}
+
+export function updateConversationArchive(
+  conversationId: string,
+  body: { archived: boolean },
+) {
+  return apiFetch<{ conversation: ApiConversationSummary }>(
+    `/conversations/${conversationId}/archive`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    },
   );
 }
 

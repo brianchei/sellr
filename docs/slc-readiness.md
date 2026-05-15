@@ -145,8 +145,9 @@ widths:
   report action, owner action state.
 - `/sellers/[sellerId]`: seller trust signals, active listing cards,
   contact-through-listing copy, report seller action.
-- `/inbox` and `/inbox/[conversationId]`: conversation list, message thread,
-  composer, long message wrapping, report message action.
+- `/inbox` and `/inbox/[conversationId]`: conversation list, active/archived
+  filters, message thread, composer, long message wrapping, archive/restore,
+  report message action.
 - `/notifications`: unread badge, category tabs, mark-read actions, links to
   inbox/listing detail, empty/error states.
 - `/admin/reports`: admin-only report list, filters, target links, status

@@ -70,6 +70,10 @@ The current web SLC includes:
   controls; listing cards and detail pages surface seller trust cues,
   approximate pickup radius, photo count, active listing count, and
   at-a-glance buyer context.
+- Phase 5 messaging control has started: users can archive/hide conversations
+  from their active inbox without deleting shared history, view archived
+  threads, restore them, and receive them back in the active inbox when a new
+  message arrives.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -300,7 +304,8 @@ messaging work:
 ```text
 Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
 docs/design-language.md, and docs/next-session-context.md. Phase 4 listing and
-browse work is complete for the current web SLC. Start Phase 5 with the
-archive/hide conversation behavior for the current user, preserving shared
-conversation history and auditability.
+browse work is complete for the current web SLC, and the first Phase 5
+messaging slice has added per-user conversation archive/hide. Continue Phase 5
+with trust/profile progress language across profile, listings, and seller
+cards, then keep any follow-up admin safety work scoped to launch operations.
 ```

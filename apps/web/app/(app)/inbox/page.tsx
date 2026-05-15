@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchConversations } from '@sellr/api-client';
+import {
+  fetchConversations,
+  type ConversationInboxStatus,
+} from '@sellr/api-client';
 import { ConversationList } from '@/components/conversation-list';
 import { useAuth } from '@/components/auth-provider';
 import { MESSAGE_REFETCH_INTERVAL_MS } from '@/lib/query-refresh';
@@ -42,6 +45,8 @@ function InboxSkeleton() {
 export default function InboxPage() {
   const router = useRouter();
   const { primaryCommunityId, userId } = useAuth();
+  const [inboxStatus, setInboxStatus] =
+    useState<ConversationInboxStatus>('active');
   const [filter, setFilter] = useState<InboxFilter>('all');
 
   useEffect(() => {
@@ -54,8 +59,8 @@ export default function InboxPage() {
   }, [router]);
 
   const conversationsQuery = useQuery({
-    queryKey: ['conversations', primaryCommunityId],
-    queryFn: () => fetchConversations({ limit: 50 }),
+    queryKey: ['conversations', primaryCommunityId, inboxStatus],
+    queryFn: () => fetchConversations({ limit: 50, status: inboxStatus }),
     enabled: Boolean(primaryCommunityId),
     refetchInterval: MESSAGE_REFETCH_INTERVAL_MS,
   });
@@ -71,9 +76,13 @@ export default function InboxPage() {
   );
 
   const filteredConversations = useMemo(
-    () => filterConversations(conversations, filter, userId),
-    [conversations, filter, userId],
+    () =>
+      inboxStatus === 'archived'
+        ? conversations
+        : filterConversations(conversations, filter, userId),
+    [conversations, filter, inboxStatus, userId],
   );
+  const archivedView = inboxStatus === 'archived';
 
   if (!primaryCommunityId) {
     return (
@@ -105,8 +114,12 @@ export default function InboxPage() {
             Coordinate pickup with buyers and sellers
           </h1>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            {conversations.length === 0
-              ? 'No conversations yet'
+            {archivedView
+              ? conversations.length === 0
+                ? 'No archived conversations'
+                : `${conversations.length} archived ${conversations.length === 1 ? 'conversation' : 'conversations'}`
+              : conversations.length === 0
+                ? 'No conversations yet'
               : needsReplyCount > 0
                 ? `${conversations.length} ${conversations.length === 1 ? 'conversation' : 'conversations'} · ${needsReplyCount} ${needsReplyCount === 1 ? 'needs' : 'need'} a reply`
                 : `${conversations.length} ${conversations.length === 1 ? 'conversation' : 'conversations'} · all caught up`}
@@ -143,21 +156,60 @@ export default function InboxPage() {
         </section>
       ) : null}
 
+      {!conversationsQuery.isLoading && !conversationsQuery.isError ? (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <FilterChip
+            active={inboxStatus === 'active'}
+            onClick={() => {
+              setInboxStatus('active');
+              setFilter('all');
+            }}
+            label="Active"
+            count={inboxStatus === 'active' ? conversations.length : undefined}
+          />
+          <FilterChip
+            active={inboxStatus === 'archived'}
+            onClick={() => {
+              setInboxStatus('archived');
+              setFilter('all');
+            }}
+            label="Archived"
+            count={
+              inboxStatus === 'archived' ? conversations.length : undefined
+            }
+            tone="contrast"
+          />
+        </div>
+      ) : null}
+
       {!conversationsQuery.isLoading &&
       !conversationsQuery.isError &&
       conversations.length === 0 ? (
         <section className="mt-6 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
-          <h2 className="text-xl font-semibold">No conversations yet</h2>
+          <h2 className="text-xl font-semibold">
+            {archivedView ? 'No archived conversations' : 'No conversations yet'}
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Messages appear here after a buyer contacts a seller from a listing
-            detail page.
+            {archivedView
+              ? 'Archived conversations are hidden from your active inbox and stay available here if you need them later.'
+              : 'Messages appear here after a buyer contacts a seller from a listing detail page.'}
           </p>
-          <Link
-            href="/marketplace"
-            className="app-action-primary mt-5 px-4 py-2 text-sm"
-          >
-            Browse marketplace
-          </Link>
+          {archivedView ? (
+            <button
+              type="button"
+              onClick={() => setInboxStatus('active')}
+              className="app-action-secondary mt-5 px-4 py-2 text-sm"
+            >
+              View active inbox
+            </button>
+          ) : (
+            <Link
+              href="/marketplace"
+              className="app-action-primary mt-5 px-4 py-2 text-sm"
+            >
+              Browse marketplace
+            </Link>
+          )}
         </section>
       ) : null}
 
@@ -165,21 +217,23 @@ export default function InboxPage() {
       !conversationsQuery.isError &&
       conversations.length > 0 ? (
         <>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <FilterChip
-              active={filter === 'all'}
-              onClick={() => setFilter('all')}
-              label="All"
-              count={conversations.length}
-            />
-            <FilterChip
-              active={filter === 'needs-reply'}
-              onClick={() => setFilter('needs-reply')}
-              label="Needs reply"
-              count={needsReplyCount}
-              tone="contrast"
-            />
-          </div>
+          {!archivedView ? (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <FilterChip
+                active={filter === 'all'}
+                onClick={() => setFilter('all')}
+                label="All"
+                count={conversations.length}
+              />
+              <FilterChip
+                active={filter === 'needs-reply'}
+                onClick={() => setFilter('needs-reply')}
+                label="Needs reply"
+                count={needsReplyCount}
+                tone="contrast"
+              />
+            </div>
+          ) : null}
 
           {filteredConversations.length === 0 ? (
             <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
@@ -237,7 +291,7 @@ function FilterChip({
   active: boolean;
   onClick: () => void;
   label: string;
-  count: number;
+  count?: number;
   tone?: 'default' | 'contrast';
 }) {
   const activeBg =
@@ -268,19 +322,21 @@ function FilterChip({
       }
     >
       <span>{label}</span>
-      <span
-        className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
-        style={
-          active
-            ? { background: 'rgba(255,255,255,0.25)', color: activeText }
-            : {
-                background: 'var(--bg-tertiary)',
-                color: 'var(--text-tertiary)',
-              }
-        }
-      >
-        {count}
-      </span>
+      {count != null ? (
+        <span
+          className="inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold"
+          style={
+            active
+              ? { background: 'rgba(255,255,255,0.25)', color: activeText }
+              : {
+                  background: 'var(--bg-tertiary)',
+                  color: 'var(--text-tertiary)',
+                }
+          }
+        >
+          {count}
+        </span>
+      ) : null}
     </button>
   );
 }

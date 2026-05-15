@@ -100,6 +100,59 @@ describe.skipIf(!integrationDbAvailable)('messages integration', () => {
       );
     });
 
+    it('returns an archived thread to active inboxes when a new message arrives', async () => {
+      const seller = await createUser();
+      const buyer = await createUser();
+      const community = await createCommunity();
+      await addMember(seller.id, community.id);
+      await addMember(buyer.id, community.id);
+      const listing = await createListing({
+        sellerId: seller.id,
+        communityId: community.id,
+        status: 'active',
+      });
+      const conversation = await createConversation({
+        listingId: listing.id,
+        participantIds: [buyer.id, seller.id],
+      });
+      await prisma.conversationParticipantState.create({
+        data: {
+          conversationId: conversation.id,
+          userId: seller.id,
+          archivedAt: new Date(),
+        },
+      });
+
+      const res = await app.inject({
+        method: 'POST',
+        url: `/api/v1/conversations/${conversation.id}/messages`,
+        headers: { cookie: await accessCookieFor(app, buyer.id) },
+        payload: { content: 'Still interested.' },
+      });
+      expect(res.statusCode).toBe(201);
+
+      const state = await prisma.conversationParticipantState.findUnique({
+        where: {
+          conversationId_userId: {
+            conversationId: conversation.id,
+            userId: seller.id,
+          },
+        },
+      });
+      expect(state?.archivedAt).toBeNull();
+
+      const sellerActive = await app.inject({
+        method: 'GET',
+        url: '/api/v1/conversations',
+        headers: { cookie: await accessCookieFor(app, seller.id) },
+      });
+      expect(
+        sellerActive
+          .json<{ data: { conversations: { id: string }[] } }>()
+          .data.conversations.map((item) => item.id),
+      ).toContain(conversation.id);
+    });
+
     it('rejects non-participants with 403', async () => {
       const seller = await createUser();
       const buyer = await createUser();

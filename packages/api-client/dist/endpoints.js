@@ -38,6 +38,7 @@ exports.fetchMeetup = fetchMeetup;
 exports.createConversation = createConversation;
 exports.fetchConversations = fetchConversations;
 exports.fetchConversation = fetchConversation;
+exports.updateConversationArchive = updateConversationArchive;
 exports.fetchConversationMessages = fetchConversationMessages;
 exports.sendMessage = sendMessage;
 exports.fetchNotifications = fetchNotifications;
@@ -169,6 +170,15 @@ function fetchCommunityListings(params) {
     if (params.hasPhotos) {
         q.set('hasPhotos', 'true');
     }
+    if (params.minPrice != null) {
+        q.set('minPrice', String(params.minPrice));
+    }
+    if (params.maxPrice != null) {
+        q.set('maxPrice', String(params.maxPrice));
+    }
+    if (params.maxPickupRadiusM != null) {
+        q.set('maxPickupRadiusM', String(params.maxPickupRadiusM));
+    }
     if (params.sort) {
         q.set('sort', params.sort);
     }
@@ -290,11 +300,20 @@ function fetchConversations(params) {
     if (params?.limit != null) {
         q.set('limit', String(params.limit));
     }
+    if (params?.status != null) {
+        q.set('status', params.status);
+    }
     const qs = q.toString();
     return (0, fetch_1.apiFetch)(`/conversations${qs ? `?${qs}` : ''}`);
 }
 function fetchConversation(conversationId) {
     return (0, fetch_1.apiFetch)(`/conversations/${conversationId}`);
+}
+function updateConversationArchive(conversationId, body) {
+    return (0, fetch_1.apiFetch)(`/conversations/${conversationId}/archive`, {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+    });
 }
 function fetchConversationMessages(conversationId) {
     return (0, fetch_1.apiFetch)(`/conversations/${conversationId}/messages`);

@@ -181,7 +181,7 @@ const plugin = (fastify, _opts, done) => {
         preHandler: auth_1.verifyJWT,
         schema: { querystring: shared_1.ListListingsQuerySchema },
     }, async (request, reply) => {
-        const { communityId, q, category, condition, hasPhotos, sort, limit } = shared_1.ListListingsQuerySchema.parse(request.query);
+        const { communityId, q, category, condition, hasPhotos, minPrice, maxPrice, maxPickupRadiusM, sort, limit, } = shared_1.ListListingsQuerySchema.parse(request.query);
         if (!request.user.communityIds.includes(communityId)) {
             return reply
                 .code(403)
@@ -194,6 +194,21 @@ const plugin = (fastify, _opts, done) => {
             ...(category ? { category } : {}),
             ...(condition ? { condition } : {}),
             ...(hasPhotos ? { photoUrls: { not: [] } } : {}),
+            ...(minPrice !== undefined || maxPrice !== undefined
+                ? {
+                    price: {
+                        ...(minPrice !== undefined
+                            ? { gte: new client_1.Prisma.Decimal(String(minPrice)) }
+                            : {}),
+                        ...(maxPrice !== undefined
+                            ? { lte: new client_1.Prisma.Decimal(String(maxPrice)) }
+                            : {}),
+                    },
+                }
+                : {}),
+            ...(maxPickupRadiusM !== undefined
+                ? { locationRadiusM: { lte: maxPickupRadiusM } }
+                : {}),
             ...(trimmedQuery
                 ? {
                     OR: [

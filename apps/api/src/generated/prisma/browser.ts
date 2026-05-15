@@ -78,6 +78,11 @@ export type Conversation = Prisma.ConversationModel
  */
 export type Message = Prisma.MessageModel
 /**
+ * Model ConversationParticipantState
+ *
+ */
+export type ConversationParticipantState = Prisma.ConversationParticipantStateModel
+/**
  * Model SavedSearch
  *
  */

@@ -224,6 +224,14 @@ export declare const CreateConversationSchema: z.ZodObject<{
 }, z.core.$strip>;
 export declare const ListConversationsQuerySchema: z.ZodObject<{
     limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
+    status: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
+        active: "active";
+        archived: "archived";
+        all: "all";
+    }>>>;
+}, z.core.$strip>;
+export declare const UpdateConversationArchiveSchema: z.ZodObject<{
+    archived: z.ZodBoolean;
 }, z.core.$strip>;
 export declare const CreateMessageSchema: z.ZodObject<{
     content: z.ZodString;
