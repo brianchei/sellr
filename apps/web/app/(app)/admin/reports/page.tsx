@@ -149,7 +149,7 @@ function ReportSkeleton() {
       {[0, 1, 2].map((item) => (
         <div
           key={item}
-          className="animate-pulse rounded-3xl border border-black/10 bg-white/90 p-5 shadow-[var(--shadow-app-card)]"
+          className="app-list-row animate-pulse p-5"
         >
           <div className="h-4 w-40 rounded bg-[var(--bg-tertiary)]" />
           <div className="mt-4 h-5 w-3/4 rounded bg-[var(--bg-tertiary)]" />
@@ -265,7 +265,7 @@ function ReportCard({
   );
 
   return (
-    <article className="rounded-3xl border border-black/10 bg-white/90 p-5 shadow-[var(--shadow-app-card)] backdrop-blur">
+    <article className="app-panel p-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <input
@@ -1000,7 +1000,7 @@ export default function AdminReportsPage() {
       {!reportsQuery.isLoading &&
       !reportsQuery.isError &&
       filteredReports.length === 0 ? (
-        <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
+        <section className="app-empty-state mt-4 p-8 text-center">
           <h2 className="text-xl font-semibold">
             {search.trim().length > 0
               ? 'No reports match this search'

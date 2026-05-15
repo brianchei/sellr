@@ -60,7 +60,7 @@ function NotificationSkeleton() {
       {Array.from({ length: 4 }, (_, index) => (
         <div
           key={index}
-          className="rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)]"
+          className="app-list-row p-4"
         >
           <div className="h-4 w-24 rounded bg-[var(--bg-tertiary)]" />
           <div className="mt-3 h-5 w-2/3 rounded bg-[var(--bg-tertiary)]" />
@@ -100,7 +100,7 @@ function NotificationCard({
 
   return (
     <article
-      className="group relative rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] backdrop-blur transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white hover:shadow-xl"
+      className="app-list-row group relative transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
       style={{
         borderLeftColor: accentColor,
         borderLeftWidth: accentColor === 'transparent' ? '1px' : '4px',
@@ -390,7 +390,7 @@ export default function NotificationsPage() {
       {!notificationsQuery.isLoading &&
       !notificationsQuery.isError &&
       notifications.length === 0 ? (
-        <section className="mt-6 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
+        <section className="app-empty-state mt-6 p-8 text-center">
           <h2 className="text-xl font-semibold">No notifications yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Updates appear here after messages, marketplace posts, and listing
@@ -409,7 +409,7 @@ export default function NotificationsPage() {
       !notificationsQuery.isError &&
       notifications.length > 0 &&
       filteredNotifications.length === 0 ? (
-        <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
+        <section className="app-empty-state mt-4 p-8 text-center">
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
             {filter === 'unread' ? 'You are caught up' : 'Nothing in this tab'}
           </h2>

@@ -103,7 +103,7 @@ function MyListingsFallback() {
         {Array.from({ length: 3 }, (_, index) => (
           <div
             key={index}
-            className="grid gap-4 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)] sm:grid-cols-[96px_minmax(0,1fr)_220px]"
+            className="app-list-row grid gap-4 p-4 sm:grid-cols-[96px_minmax(0,1fr)_220px]"
           >
             <div className="h-24 rounded-lg bg-[var(--bg-tertiary)]" />
             <div className="space-y-3">
@@ -376,7 +376,7 @@ function MyListingsContent() {
           {Array.from({ length: 4 }, (_, index) => (
             <div
               key={index}
-              className="grid gap-4 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)] sm:grid-cols-[96px_minmax(0,1fr)_220px]"
+              className="app-list-row grid gap-4 p-4 sm:grid-cols-[96px_minmax(0,1fr)_220px]"
             >
               <div className="h-24 rounded-lg bg-[var(--bg-tertiary)]" />
               <div className="space-y-3">
@@ -428,7 +428,7 @@ function MyListingsContent() {
       {!listingsQuery.isLoading &&
       !listingsQuery.isError &&
       listings.length === 0 ? (
-        <section className="mt-6 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
+        <section className="app-empty-state mt-6 p-8 text-center">
           <h2 className="text-xl font-semibold">No listings yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Create your first structured listing so buyers have enough context
@@ -447,7 +447,7 @@ function MyListingsContent() {
       !listingsQuery.isError &&
       listings.length > 0 &&
       filteredListings.length === 0 ? (
-        <section className="app-panel mt-6 p-8 text-center">
+        <section className="app-empty-state mt-6 p-8 text-center">
           <h2 className="text-xl font-semibold">No {statusFilter} listings</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             Try another status filter or create a new listing.
@@ -528,7 +528,7 @@ function ListingRow({
       : null;
 
   return (
-    <article className="grid gap-4 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white hover:shadow-xl sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
+    <article className="app-list-row grid gap-4 p-4 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
       <Link
         href={`/marketplace/${listing.id}`}
         aria-label={`Open ${listing.title} detail page`}

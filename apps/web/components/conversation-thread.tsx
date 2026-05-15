@@ -98,7 +98,7 @@ function ListingContextHeader({
   const listing = conversation.listing;
   if (!listing) {
     return (
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-dashed border-[var(--border-strong)] bg-[var(--bg-secondary)] p-3">
+      <div className="app-empty-state flex items-center justify-between gap-3 p-3">
         <div>
           <p className="text-sm font-semibold text-[var(--text-primary)]">
             {conversationTitle(conversation)}
@@ -143,7 +143,7 @@ function ListingContextHeader({
   return (
     <Link
       href={`/marketplace/${listing.id}`}
-      className="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3 rounded-2xl border border-black/10 bg-white/85 p-3 no-underline transition hover:border-black/20 hover:bg-white"
+      className="app-list-row grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3 p-3 no-underline transition hover:border-black/20 hover:bg-white"
     >
       <div
         className="aspect-square h-16 w-16 overflow-hidden rounded-2xl bg-[var(--bg-tertiary)] bg-cover bg-center"
@@ -281,8 +281,8 @@ export function ConversationThread({
   }
 
   return (
-    <article className="flex min-h-[460px] flex-col overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] backdrop-blur lg:min-h-[560px]">
-      <header className="border-b border-black/10 bg-white/70 p-4">
+    <article className="app-panel flex min-h-[460px] flex-col overflow-hidden lg:min-h-[560px]">
+      <header className="border-b border-black/10 bg-white p-4">
         <ListingContextHeader conversation={conversation} role={role} />
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -394,7 +394,7 @@ export function ConversationThread({
         ) : null}
       </header>
 
-      <div className="max-h-[520px] flex-1 overflow-y-auto bg-[linear-gradient(180deg,var(--color-brand-primary-soft)_0%,var(--bg-secondary)_32%,#ffffff_100%)] p-4 lg:max-h-none">
+      <div className="max-h-[520px] flex-1 overflow-y-auto bg-[var(--bg-secondary)] p-4 lg:max-h-none">
         {messagesQuery.isLoading ? (
           <div className="space-y-4">
             <div className="h-16 w-2/3 rounded-2xl bg-[var(--bg-tertiary)]" />
@@ -426,7 +426,7 @@ export function ConversationThread({
         {!messagesQuery.isLoading &&
         !messagesQuery.isError &&
         messages.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-[var(--border-strong)] bg-white p-6 text-center">
+          <div className="app-empty-state p-6 text-center">
             <h3 className="text-base font-semibold">
               No messages in this conversation
             </h3>

@@ -20,7 +20,7 @@ import {
 function InboxSkeleton() {
   return (
     <section className="mt-6 grid min-h-[420px] gap-4 lg:min-h-[560px] lg:grid-cols-[360px_minmax(0,1fr)]">
-      <div className="space-y-3 rounded-3xl border border-black/10 bg-white/90 p-4 shadow-[var(--shadow-app-card)]">
+      <div className="app-panel space-y-3 p-4">
         {Array.from({ length: 5 }, (_, index) => (
           <div key={index} className="flex gap-3 rounded-lg p-3">
             <div className="h-12 w-12 rounded-lg bg-[var(--bg-tertiary)]" />
@@ -31,7 +31,7 @@ function InboxSkeleton() {
           </div>
         ))}
       </div>
-      <div className="rounded-3xl border border-black/10 bg-white/90 p-6 shadow-[var(--shadow-app-card)]">
+      <div className="app-panel p-6">
         <div className="h-6 w-48 rounded bg-[var(--bg-tertiary)]" />
         <div className="mt-8 space-y-4">
           <div className="h-16 w-2/3 rounded-lg bg-[var(--bg-tertiary)]" />
@@ -185,7 +185,7 @@ export default function InboxPage() {
       {!conversationsQuery.isLoading &&
       !conversationsQuery.isError &&
       conversations.length === 0 ? (
-        <section className="mt-6 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
+        <section className="app-empty-state mt-6 p-8 text-center">
           <h2 className="text-xl font-semibold">
             {archivedView ? 'No archived conversations' : 'No conversations yet'}
           </h2>
@@ -236,7 +236,7 @@ export default function InboxPage() {
           ) : null}
 
           {filteredConversations.length === 0 ? (
-            <section className="mt-4 rounded-3xl border border-dashed border-[var(--border-strong)] bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)]">
+            <section className="app-empty-state mt-4 p-8 text-center">
               <h2 className="text-base font-semibold text-[var(--text-primary)]">
                 You are caught up
               </h2>
@@ -258,7 +258,7 @@ export default function InboxPage() {
                 userId={userId}
               />
 
-              <article className="flex min-h-[320px] items-center justify-center rounded-3xl border border-black/10 bg-white/90 p-8 text-center shadow-[var(--shadow-app-card)] backdrop-blur lg:min-h-[560px]">
+              <article className="app-empty-state flex min-h-[320px] items-center justify-center p-8 text-center lg:min-h-[560px]">
                 <div>
                   <h2 className="text-xl font-semibold">Open a conversation</h2>
                   <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
