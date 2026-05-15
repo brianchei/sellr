@@ -78,6 +78,12 @@ The current web SLC includes:
   consistent backed signals such as verified contact, active community
   membership, profile photo presence, and active listings.
 
+Before Phase 6 AI listing-assistant work, the next product-development priority
+is the UI/UX overhaul in `docs/ui-ux-overhaul-guide.md`: simplify onboarding,
+make the app feel more personal and local, reduce generic "AI/vibe-coded"
+patterns, and preserve the current SLC behavior while improving the existing
+flows.
+
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
 explicitly requested.
@@ -271,6 +277,7 @@ suites are skipped by the repo safety guard.
 - `docs/email-first-auth.md`
 - `docs/slc-readiness.md`
 - `docs/slc-smoke-test.md`
+- `docs/ui-ux-overhaul-guide.md`
 - `docs/design-language.md`
 - `apps/web/README.md`
 - `sellr-technical-implementation-guide-v2.md`
@@ -309,12 +316,15 @@ verify admin/community access, run media health checks, watch Railway/Resend
 logs, and record any launch notes. Do not add new product scope.
 ```
 
-If continuing product development, start Phase 6 AI listing assistant work:
+If continuing product development, complete the Pre-Phase 6 UI/UX overhaul
+before starting AI listing assistant work:
 
 ```text
-Read AGENTS.md, docs/web-next-development-guide.md, docs/current-state-and-scope.md,
-docs/design-language.md, and docs/next-session-context.md. Phase 5 trust,
-moderation, and messaging work is complete for the current web SLC. Begin Phase
-6 with the smallest AI listing-quality assistant slice, keeping generated
-suggestions reviewable by the seller and avoiding broad recommendation scope.
+Read AGENTS.md, docs/ui-ux-overhaul-guide.md, docs/web-next-development-guide.md,
+docs/current-state-and-scope.md, docs/design-language.md,
+docs/next-session-context.md, docs/slc-readiness.md, and apps/web/README.md.
+Before Phase 6 AI work, begin Slice 1 of the UI/UX overhaul: audit the current
+desktop/mobile experience, simplify the design tokens and reusable web surface
+patterns, and prepare the app for a cleaner onboarding and buyer/seller flow.
+Do not add new product scope.
 ```

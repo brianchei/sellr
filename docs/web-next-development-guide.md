@@ -1,6 +1,6 @@
 # Sellr Web Next Development Guide
 
-Last updated: May 13, 2026.
+Last updated: May 15, 2026.
 
 Use this as the living guide for the next wave of Sellr web work after the
 current SLC/MVP. Update it as implementation progresses, decisions change, or
@@ -25,6 +25,13 @@ the web app, and the production visual smoke pass completed successfully. The
 remaining Phase 1 work is not new product functionality: it is adding real
 launch proof, testimonials, statistics, and approved imagery once those assets
 exist.
+
+Before beginning Phase 6 AI listing-assistant work, prioritize the UI/UX
+overhaul documented in [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md).
+The current SLC is functionally complete enough that the next product risk is
+experience quality: onboarding should be simpler, the app should feel more
+personal and local, and generic "AI/vibe-coded" visual patterns should be
+removed from the core buyer/seller flow.
 
 ## Product Theme
 
@@ -341,9 +348,48 @@ Acceptance notes:
 - Admin actions should be explicit, auditable, and scoped to authorized admins.
 - Trust language should be honest and backed by actual product behavior.
 
+### Pre-Phase 6: UI/UX Overhaul
+
+Goal: simplify the current web SLC and make the product feel personal,
+trustworthy, attractive, and purpose-built for local community resale before
+adding AI.
+
+Status: planned and should be completed before Phase 6 begins.
+
+Source guide:
+
+- [`docs/ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md)
+
+Work items:
+
+- Audit the existing desktop and mobile experience for generic dashboard
+  patterns, nested cards, excess chips, vague copy, and unclear next actions.
+- Simplify the landing, login, onboarding, and join-another-community path so
+  new users understand Sellr and reach community-scoped inventory faster.
+- Redesign the authenticated shell and `/dashboard` into a calmer home or
+  next-action surface.
+- Make marketplace browse and listing detail more item-first, with seller trust
+  and pickup context integrated naturally instead of scattered across panels.
+- Simplify listing creation/edit and seller inventory while preserving listing
+  quality guidance, media upload feedback, validation, and publish safeguards.
+- Align inbox, profile, storefront, notifications, and admin surfaces with the
+  new tokens and interaction patterns.
+
+Acceptance notes:
+
+- The redesign should not add broad product scope or depend on AI.
+- Core auth, community scoping, listing lifecycle, media upload, messaging,
+  reporting, and admin behavior should continue to work.
+- Every touched flow needs loading, empty, error, validation, and success states
+  appropriate to the interaction.
+- Desktop and mobile browser verification should cover the route list in
+  `docs/ui-ux-overhaul-guide.md`.
+
 ### Phase 6: AI Listing Assistant
 
 Goal: use AI to improve listing quality first, not to add vague AI features.
+
+Status: deferred until the Pre-Phase 6 UI/UX overhaul is complete.
 
 Initial AI scope:
 
@@ -369,6 +415,17 @@ Acceptance notes:
 ## Consolidated Backlog
 
 ### UI/UX And Branding
+
+Planned before Phase 6:
+
+- Complete the UI/UX overhaul in `docs/ui-ux-overhaul-guide.md`.
+- Simplify onboarding and first-run flow from public entry to community access.
+- Reduce generic dashboard patterns, nested cards, excess chips, and decorative
+  AI-style visuals.
+- Make the signed-in home, marketplace, listing detail, seller flows, inbox,
+  profile, and storefront feel more personal, local, and task-focused.
+- Preserve all current SLC behavior while improving visual hierarchy, content
+  voice, mobile usability, and state coverage.
 
 Completed in Phase 1:
 
@@ -505,6 +562,7 @@ When a feature is implemented, update this guide with:
 
 Keep this guide aligned with:
 
+- `docs/ui-ux-overhaul-guide.md`
 - `docs/current-state-and-scope.md`
 - `docs/design-language.md`
 - `docs/slc-readiness.md`
@@ -512,6 +570,14 @@ Keep this guide aligned with:
 - `apps/web/README.md`
 
 ## Implementation Log
+
+### May 15, 2026
+
+- Added the Pre-Phase 6 UI/UX overhaul as the next product-development priority
+  before AI listing-assistant work.
+- Added `docs/ui-ux-overhaul-guide.md` with redesign goals, scope, route/file
+  map, recommended implementation slices, acceptance criteria, and verification
+  guidance.
 
 ### May 12, 2026
 

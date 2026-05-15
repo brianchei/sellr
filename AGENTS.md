@@ -8,6 +8,10 @@ availability, and pickup coordination matter.
 Current priority is the web SLC/MVP: the smallest complete buyer/seller
 experience that feels usable, polished, and trustworthy.
 
+Before Phase 6 AI work, prioritize the documented UI/UX overhaul in
+`docs/ui-ux-overhaul-guide.md`: simplify onboarding and core flows, make the app
+feel more personal and local, and remove generic "AI/vibe-coded" UI patterns.
+
 ## Scope Discipline
 Prioritize complete core flows over broad feature coverage. Defer payments,
 advanced AI, native mobile polish, complex moderation, ratings, delivery and
@@ -71,7 +75,8 @@ polished and covered by the readiness gate.
 - See `docs/current-state-and-scope.md`, `docs/deployment.md`,
   `docs/custom-domain-cutover.md`, `docs/email-first-auth.md`, and
   `docs/next-session-context.md` before continuing deployment or
-  production-hardening work.
+  production-hardening work. See `docs/ui-ux-overhaul-guide.md` before
+  continuing product UI work.
 
 ## Repository Map
 - `apps/web`: Next.js 16 App Router web SLC and seller/admin surfaces.

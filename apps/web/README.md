@@ -111,6 +111,11 @@ components:
   staying task-focused: clear hierarchy, honest trust cues, compact metadata,
   and no decorative controls that do not work.
 
+Before Phase 6 AI work, the next web product priority is the UI/UX overhaul in
+`../../docs/ui-ux-overhaul-guide.md`. Use that guide to simplify onboarding,
+reduce generic dashboard/card-heavy patterns, and make the existing SLC feel
+more personal and local before adding new features.
+
 See `../../docs/design-language.md` and
 `../../docs/web-next-development-guide.md` before adding new web surfaces.
 
