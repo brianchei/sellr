@@ -140,6 +140,13 @@ deployment handoff.
 After automated checks pass, review the core routes at desktop and mobile
 widths:
 
+For the Pre-Phase 6 UI/UX overhaul, also use
+[`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md) as the visual acceptance
+brief. In addition to route coverage below, confirm onboarding is simpler, the
+signed-in first screen has one obvious next action, generic card-heavy patterns
+are reduced, and the app feels more personal and local without adding new
+product scope.
+
 - `/marketplace`: filters, listing cards, empty/error states, tap targets.
 - `/marketplace/[listingId]`: photo area, seller trust card, contact form,
   report action, owner action state.

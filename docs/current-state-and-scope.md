@@ -1,6 +1,6 @@
 # Sellr Current State And Scope
 
-Last updated: May 14, 2026.
+Last updated: May 15, 2026.
 
 ## Product Scope
 
@@ -19,6 +19,12 @@ brand assets, metadata/icons, community-first landing copy, interactive product
 preview, warm gradient shells, rounded elevated app panels, high-contrast
 actions, and refreshed marketplace, listing, messaging, seller, admin, login,
 and onboarding surfaces.
+
+Before Phase 6 AI work, the next product-development priority is the UI/UX
+overhaul in [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md). The goal is
+to simplify onboarding and the current buyer/seller loop, make the app feel more
+personal and local, and remove generic "AI/vibe-coded" UI patterns without
+adding new product scope.
 
 ## Production State
 
@@ -92,7 +98,7 @@ Included:
   high-intent profile-completion CTAs, dashboard readiness guidance,
   seller-owned listing identity previews, and buyer-facing seller-card cache
   refreshes now connect into this profile surface.
-- Phase 3 community product work has started with a quiet authenticated app-shell
+- Phase 3 community product work has shipped with a quiet authenticated app-shell
   community indicator/switcher backed by active community summaries from
   `/auth/me`, plus a member-only `/communities/[communityId]` homepage for
   community details, membership context, stats, guidance, recent listings, and
@@ -123,13 +129,23 @@ Included:
   trust language now uses consistent backed signals such as verified contact,
   active community membership, profile photo presence, and active listings.
 
+## Next Product Priority
+
+Complete the Pre-Phase 6 UI/UX overhaul before adding the AI listing assistant.
+Use `docs/ui-ux-overhaul-guide.md` as the implementation handoff. The redesign
+should preserve current auth, community, listing, media, messaging, reporting,
+and admin behavior while simplifying the experience across landing, onboarding,
+home, marketplace, listing detail, seller flows, inbox, profile, storefront, and
+notifications.
+
 ## Deliberately Deferred
 
 Do not add these before launch unless explicitly requested:
 
 - Payments, escrow, or delivery/logistics.
 - Ratings, advanced reputation, advanced KYC, or complex moderation.
-- Advanced AI/recommendations or growth loops.
+- Advanced AI/recommendations or growth loops. Phase 6 AI listing assistance is
+  also deferred until the UI/UX overhaul is complete.
 - Native mobile parity and mobile polish.
 - Broad admin tooling beyond current community/report management.
 - Full API ESM production build migration.

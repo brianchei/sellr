@@ -47,8 +47,10 @@ current production state and launch scope,
 [`docs/custom-domain-cutover.md`](docs/custom-domain-cutover.md) for the
 Cloudflare/Vercel/Railway domain cutover guide,
 [`docs/email-first-auth.md`](docs/email-first-auth.md) for the Resend email OTP
-flow, and [`docs/next-session-context.md`](docs/next-session-context.md) for a
-short handoff brief for continuing work in a new agent session.
+flow, [`docs/ui-ux-overhaul-guide.md`](docs/ui-ux-overhaul-guide.md) for the
+Pre-Phase 6 redesign handoff, and
+[`docs/next-session-context.md`](docs/next-session-context.md) for a short
+handoff brief for continuing work in a new agent session.
 
 ## Repository Layout
 
@@ -293,8 +295,9 @@ The detailed implementation baseline lives in
 `sellr-technical-implementation-guide-v2.md`. It documents the Phase 0
 architecture, local setup expectations, infrastructure decisions, and planned
 next phases. The web visual direction is documented in
-`docs/design-language.md`; deployment is documented in `docs/deployment.md`;
-SLC readiness is documented in `docs/slc-readiness.md`; the detailed smoke
-checklist is documented in `docs/slc-smoke-test.md`; production operations are
-documented in `docs/production-runbook.md`; and the current handoff brief is
-documented in `docs/next-session-context.md`.
+`docs/design-language.md`; the Pre-Phase 6 UI/UX overhaul handoff is documented
+in `docs/ui-ux-overhaul-guide.md`; deployment is documented in
+`docs/deployment.md`; SLC readiness is documented in `docs/slc-readiness.md`;
+the detailed smoke checklist is documented in `docs/slc-smoke-test.md`;
+production operations are documented in `docs/production-runbook.md`; and the
+current handoff brief is documented in `docs/next-session-context.md`.

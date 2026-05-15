@@ -1,6 +1,6 @@
 # Sellr Design Language
 
-Last updated: May 12, 2026.
+Last updated: May 15, 2026.
 
 Sellr is a trust-native local marketplace for high-trust, peer-to-peer commerce. The product should feel structured, local, approachable, and safer than a generic listing board. It should be bright enough to feel memorable, but calm enough that buyers and sellers can scan listings, make decisions, and complete tasks quickly.
 
@@ -15,6 +15,29 @@ Sellr should feel:
 - More polished than a broad social marketplace, but still fast and familiar.
 
 The visual language should support confidence: clean hierarchy, obvious actions, readable listing information, and trust signals that are easy to understand at a glance.
+
+## Pre-Phase 6 Overhaul Direction
+
+Before Phase 6 AI listing-assistant work, the web app needs a focused UI/UX
+overhaul. The goal is to keep Sellr recognizable, but make the current SLC feel
+simpler, more personal, and less like a generic AI-generated marketplace
+template.
+
+Use [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md) as the handoff guide
+for that pass. It supersedes any earlier Phase 1 tendency toward heavy gradients,
+large rounded panels, nested cards, or decorative dashboard composition when
+those patterns make the core buyer/seller flow feel busy.
+
+The redesign should preserve the existing product contracts and trusted
+marketplace scope while prioritizing:
+
+- Fewer containers, panels, chips, and explanatory blocks.
+- Clearer first-run onboarding from landing to login to community access.
+- A signed-in home surface with one obvious next action.
+- Item-first browse/detail pages with seller and pickup context integrated
+  naturally.
+- Seller flows that feel guided and compact rather than form-heavy.
+- A warmer, more human content voice with only backed trust claims.
 
 ## Design Principles
 
@@ -126,7 +149,7 @@ Sellr should use a **hybrid marketplace shell**.
 The app should combine a focused product shell with a consumer-friendly marketplace browsing experience:
 
 - Compact top navigation for authenticated web flows.
-- Warm gradient authenticated app shell with glassy/elevated panels.
+- Warm, simple authenticated app shell with restrained elevation.
 - Responsive marketplace grid with clear image, price, condition, and location hierarchy.
 - Seller forms that feel structured and guided, not like a generic blank form.
 - Dashboard and account areas that are denser and more operational.
@@ -143,12 +166,13 @@ The app should combine a focused product shell with a consumer-friendly marketpl
 
 ## Shape, Spacing, and Elevation
 
-Sellr should feel polished, modern, and sturdy rather than bubbly. The refreshed
-web app uses larger rounded panels for warmth, while keeping controls and dense
-marketplace content compact enough to scan.
+Sellr should feel polished, modern, and sturdy rather than bubbly. The next
+redesign should keep warmth while reducing the visual weight of large rounded
+panels, especially where they make app flows feel like nested dashboards.
 
 - Default utility/control radius: `8px` to `12px`.
-- Refreshed app panels: `24px`.
+- App panels: prefer `12px` to `16px`; use larger radii only for intentional
+  modal-like or feature surfaces.
 - Soft marketing and preview cards: `20px` to `32px` depending on scale.
 - Compact controls: `8px` to `12px`.
 - Badges and pills: fully rounded.
@@ -186,7 +210,7 @@ Cards should avoid decorative clutter. Badges should clarify trust, condition, a
 
 ### App Surfaces
 
-The refreshed web app uses reusable surface utilities:
+The refreshed web app currently uses reusable surface utilities:
 
 - `app-shell-bg`: warm gradient canvas with subtle grid texture for authenticated
   surfaces and standalone auth pages.
@@ -197,8 +221,9 @@ The refreshed web app uses reusable surface utilities:
 - `app-action-primary` and `app-action-secondary`: primary and secondary app
   action patterns.
 
-Prefer these utilities for new web surfaces before introducing one-off panel or
-button styles.
+During the UI/UX overhaul, update these utilities in place where possible so
+existing routes inherit the simpler direction. Prefer that over introducing
+one-off panel or button styles.
 
 ### Forms
 
