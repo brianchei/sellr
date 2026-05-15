@@ -107,6 +107,9 @@ components:
   rhythm, gradients, and `components/landing-app-preview.tsx`.
 - Authenticated surfaces use `app-shell-bg`, `app-panel`, `app-panel-soft`,
   `app-chip`, `app-action-primary`, and `app-action-secondary`.
+- The Phase B foundation pass keeps those utilities in place but makes the app
+  shell, panels, listing cards, chips, and button hover states calmer so
+  existing routes rely less on generic dashboard weight.
 - App surfaces should preserve the refreshed modern marketplace language while
   staying task-focused: clear hierarchy, honest trust cues, compact metadata,
   and no decorative controls that do not work.
@@ -114,7 +117,11 @@ components:
 Before Phase 6 AI work, the next web product priority is the UI/UX overhaul in
 `../../docs/ui-ux-overhaul-guide.md`. Use that guide to simplify onboarding,
 reduce generic dashboard/card-heavy patterns, and make the existing SLC feel
-more personal and local before adding new features.
+more personal and local before adding new features. The guide is intentionally
+repo-actionable: it maps the current routes/components, notes that this app has
+Tailwind CSS 4 token utilities rather than a shadcn/ui setup, and phases the
+work from design-system foundation through onboarding, marketplace screens,
+trust/coordination flows, and launch QA.
 
 See `../../docs/design-language.md` and
 `../../docs/web-next-development-guide.md` before adding new web surfaces.

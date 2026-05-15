@@ -28,6 +28,13 @@ for that pass. It supersedes any earlier Phase 1 tendency toward heavy gradients
 large rounded panels, nested cards, or decorative dashboard composition when
 those patterns make the core buyer/seller flow feel busy.
 
+The expanded overhaul guide is also the source of truth for onboarding,
+screen-by-screen UX direction, microcopy, accessibility requirements, and
+implementation phasing. In particular, the next design pass should treat
+onboarding as contextual activation rather than a tutorial: get users to
+verified community access and then to browse, sell, or reply as quickly as the
+current trust gates allow.
+
 The redesign should preserve the existing product contracts and trusted
 marketplace scope while prioritizing:
 
@@ -38,6 +45,36 @@ marketplace scope while prioritizing:
   naturally.
 - Seller flows that feel guided and compact rather than form-heavy.
 - A warmer, more human content voice with only backed trust claims.
+
+## Reference Flow Heuristics
+
+Phase B reviewed `/Users/brianchei/Downloads/Template flows.pdf`, a visual
+Figma export of app flows from Airbnb, Craft, ElevenLabs, and Fey. Use it as
+pattern evidence, not as visual direction to copy.
+
+Carry forward:
+
+- Keep the primary object visible. Airbnb keeps homes, experiences, maps,
+  reservations, and messages in view while details, filters, and trust checks
+  appear as focused overlays. Sellr should keep listings, seller identity,
+  pickup context, and message intent ahead of explanatory panels.
+- Ask progressively. Airbnb host setup and Craft auth both use one focused task
+  at a time with clear progress. Sellr listing creation, community access, and
+  profile readiness should do the same.
+- Make trust contextual. Trust commitments, verification, security checks, and
+  support actions should sit next to the account, listing, seller, report, or
+  conversation they affect.
+- Use dense operational UI when the job is dense. ElevenLabs shows that
+  dashboard-style screens can be calm when hierarchy is driven by navigation,
+  rows, labels, and primary controls rather than heavy cards.
+- Keep AI mood out of the marketplace foundation. Fey-style cinematic dark AI
+  onboarding is not appropriate for Sellr before Phase 6; future AI should be a
+  quiet optional helper inside seller workflows.
+
+Token consequence for the web SLC: lighten authenticated app backgrounds,
+panels, cards, chips, and hover effects globally before doing route-level
+redesign. Use gradients and frosted weight sparingly, mostly for public/auth or
+modal-like moments.
 
 ## Design Principles
 
@@ -141,6 +178,8 @@ Inter supports the current product goals because it is readable, neutral, fast t
 - Metadata should use smaller type with enough contrast to remain scannable.
 - Buttons and labels should use concise verbs: `Browse`, `Sell`, `Publish listing`, `Contact seller`.
 - Avoid negative letter spacing.
+- Do not use hero-scale type inside dense app panels, cards, sidebars, inbox
+  threads, admin screens, or form surfaces.
 
 ## Layout
 
@@ -302,14 +341,21 @@ Avoid:
   --radius-md: 8px;
   --radius-lg: 10px;
   --radius-xl: 12px;
+  --radius-panel: 16px;
+  --radius-card: 16px;
 }
 ```
 
 ## Implementation Notes
 
-- Update the existing web CSS tokens to reflect this language before broad UI polish.
+- Update the existing web CSS tokens to reflect this language before broad UI
+  polish; prefer token changes that let current routes inherit a calmer app
+  foundation before rewriting screens.
 - Keep Inter unless there is a later brand reason to revisit typography.
 - Prefer completing the marketplace, seller listing, listing detail, and contact flows before investing in decorative brand moments.
 - Use the design language as a product filter: bright, local, trustworthy, complete.
 - Keep `docs/web-next-development-guide.md` as the source of truth for phase
   status and remaining product direction.
+- Use `docs/ui-ux-overhaul-guide.md` for the concrete Pre-Phase 6 route audit,
+  onboarding plan, component rules, microcopy examples, accessibility bar, and
+  metrics.

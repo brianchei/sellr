@@ -46,7 +46,7 @@ export function ListingCard({ listing }: ListingCardProps) {
     <Link
       href={`/marketplace/${listing.id}`}
       aria-label={`${listing.title} — ${formatPrice(listing.price)}`}
-      className="group relative flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)] no-underline backdrop-blur transition hover:-translate-y-1 hover:border-black/20 hover:bg-white hover:shadow-xl focus-visible:-translate-y-1 focus-visible:border-[var(--color-brand-contrast)] focus-visible:shadow-xl"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-[var(--border-default)] bg-white shadow-[var(--shadow-app-card)] no-underline transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[var(--shadow-app-card-hover)] focus-visible:-translate-y-0.5 focus-visible:border-[var(--color-brand-contrast)] focus-visible:shadow-[var(--shadow-app-card-hover)]"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--bg-tertiary)]">
         {primaryPhoto ? (

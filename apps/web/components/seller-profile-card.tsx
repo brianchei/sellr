@@ -66,9 +66,7 @@ export function SellerProfileCard({
   const signalSummary = profileSignalSummary(profile);
 
   return (
-    <section
-      className={`app-panel p-5 ${className}`}
-    >
+    <section className={`app-panel p-5 ${className}`}>
       <div className="flex items-start justify-between gap-3">
         <h2 className="text-base font-semibold">{heading}</h2>
         <div className="flex flex-wrap justify-end gap-3">
@@ -125,7 +123,7 @@ export function SellerProfileCard({
       </div>
 
       {signalSummary ? (
-        <p className="mt-3 rounded-2xl border border-black/10 bg-white/70 px-3 py-2 text-xs leading-5 text-[var(--text-secondary)]">
+        <p className="mt-3 border-l-2 border-[var(--color-brand-accent-muted)] pl-3 text-xs leading-5 text-[var(--text-secondary)]">
           {signalSummary}
         </p>
       ) : null}
