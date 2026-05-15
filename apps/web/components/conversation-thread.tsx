@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchConversationMessages,
   sendMessage,
+  updateConversationArchive,
   type ApiConversationSummary,
   type ApiMessage,
 } from '@sellr/api-client';
@@ -188,11 +189,13 @@ function ListingContextHeader({
 type ConversationThreadProps = {
   conversation: ApiConversationSummary;
   userId: string | null;
+  onArchiveChange?: (archived: boolean) => void;
 };
 
 export function ConversationThread({
   conversation,
   userId,
+  onArchiveChange,
 }: ConversationThreadProps) {
   const queryClient = useQueryClient();
   const [reply, setReply] = useState('');
@@ -206,6 +209,7 @@ export function ConversationThread({
     conversation.peer?.id != null &&
     conversation.peer.id === conversation.listing?.sellerId;
   const peerName = conversationPeer(conversation);
+  const archived = Boolean(conversation.archivedAt);
 
   const messagesQuery = useQuery({
     queryKey: ['conversation-messages', conversation.id],
@@ -222,6 +226,18 @@ export function ConversationThread({
       setReply('');
       setReplyError(null);
       await invalidateConversationActivity(queryClient, conversation.id);
+    },
+  });
+
+  const archiveMutation = useMutation({
+    mutationFn: (nextArchived: boolean) =>
+      updateConversationArchive(conversation.id, {
+        archived: nextArchived,
+      }),
+    onSuccess: async (result) => {
+      const nextArchived = Boolean(result.conversation.archivedAt);
+      await invalidateConversationActivity(queryClient, conversation.id);
+      onArchiveChange?.(nextArchived);
     },
   });
 
@@ -297,14 +313,30 @@ export function ConversationThread({
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowPeerDetails((value) => !value)}
-            className="-mr-2 inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--color-brand-primary-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
-            aria-expanded={showPeerDetails}
-          >
-            {showPeerDetails ? 'Hide details' : 'Trust details'}
-          </button>
+          <div className="-mr-2 flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+            <button
+              type="button"
+              onClick={() => archiveMutation.mutate(!archived)}
+              disabled={archiveMutation.isPending}
+              className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+            >
+              {archiveMutation.isPending
+                ? archived
+                  ? 'Restoring...'
+                  : 'Archiving...'
+                : archived
+                  ? 'Restore'
+                  : 'Archive'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowPeerDetails((value) => !value)}
+              className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--color-brand-primary-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+              aria-expanded={showPeerDetails}
+            >
+              {showPeerDetails ? 'Hide details' : 'Trust details'}
+            </button>
+          </div>
         </div>
 
         {showPeerDetails ? (
@@ -335,6 +367,26 @@ export function ConversationThread({
               className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-brand-contrast)]"
             />
             Awaiting your reply
+          </p>
+        ) : null}
+
+        {archived ? (
+          <p
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--bg-tertiary)] px-3 py-1 text-xs font-semibold text-[var(--text-secondary)]"
+            role="status"
+          >
+            Hidden from your active inbox
+          </p>
+        ) : null}
+
+        {archiveMutation.isError ? (
+          <p
+            className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+            role="alert"
+          >
+            {archiveMutation.error instanceof Error
+              ? archiveMutation.error.message
+              : 'Could not update this conversation.'}
           </p>
         ) : null}
       </header>

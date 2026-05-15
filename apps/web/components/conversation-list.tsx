@@ -126,6 +126,21 @@ export function ConversationList({
                       You · {role}
                     </span>
                   ) : null}
+                  {conversation.archivedAt ? (
+                    <span
+                      className="inline-flex items-center rounded-full bg-[var(--bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-secondary)]"
+                      style={
+                        selected
+                          ? {
+                              background: 'rgba(255,255,255,0.12)',
+                              color: 'rgba(255,255,255,0.76)',
+                            }
+                          : undefined
+                      }
+                    >
+                      Archived
+                    </span>
+                  ) : null}
                   {conversation.listing ? (
                     <span
                       className={

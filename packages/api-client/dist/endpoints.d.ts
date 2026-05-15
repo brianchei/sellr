@@ -71,6 +71,7 @@ export type ApiConversation = {
     participantIds: string[];
     type: string;
     createdAt: string;
+    archivedAt?: string | null;
 };
 export type ApiMessage = {
     id: string;
@@ -375,6 +376,9 @@ export declare function fetchCommunityListings(params: {
     category?: string;
     condition?: string;
     hasPhotos?: boolean;
+    minPrice?: number;
+    maxPrice?: number;
+    maxPickupRadiusM?: number;
     sort?: 'recent' | 'price-asc' | 'price-desc';
     limit?: number;
 }): Promise<{
@@ -453,12 +457,19 @@ export declare function createConversation(body: {
 }): Promise<{
     conversation: ApiConversation;
 }>;
+export type ConversationInboxStatus = 'active' | 'archived' | 'all';
 export declare function fetchConversations(params?: {
     limit?: number;
+    status?: ConversationInboxStatus;
 }): Promise<{
     conversations: ApiConversationSummary[];
 }>;
 export declare function fetchConversation(conversationId: string): Promise<{
+    conversation: ApiConversationSummary;
+}>;
+export declare function updateConversationArchive(conversationId: string, body: {
+    archived: boolean;
+}): Promise<{
     conversation: ApiConversationSummary;
 }>;
 export declare function fetchConversationMessages(conversationId: string): Promise<{

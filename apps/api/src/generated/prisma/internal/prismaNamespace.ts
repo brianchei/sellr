@@ -396,6 +396,7 @@ export const ModelName = {
   UserReputation: 'UserReputation',
   Conversation: 'Conversation',
   Message: 'Message',
+  ConversationParticipantState: 'ConversationParticipantState',
   SavedSearch: 'SavedSearch',
   Report: 'Report',
   ModerationAction: 'ModerationAction',
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "community" | "communityMember" | "inviteCode" | "listing" | "mediaAsset" | "offer" | "meetup" | "rating" | "userReputation" | "conversation" | "message" | "savedSearch" | "report" | "moderationAction" | "userFlag" | "notification"
+    modelProps: "user" | "community" | "communityMember" | "inviteCode" | "listing" | "mediaAsset" | "offer" | "meetup" | "rating" | "userReputation" | "conversation" | "message" | "conversationParticipantState" | "savedSearch" | "report" | "moderationAction" | "userFlag" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1308,6 +1309,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ConversationParticipantState: {
+      payload: Prisma.$ConversationParticipantStatePayload<ExtArgs>
+      fields: Prisma.ConversationParticipantStateFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ConversationParticipantStateFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ConversationParticipantStateFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>
+        }
+        findFirst: {
+          args: Prisma.ConversationParticipantStateFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ConversationParticipantStateFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>
+        }
+        findMany: {
+          args: Prisma.ConversationParticipantStateFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>[]
+        }
+        create: {
+          args: Prisma.ConversationParticipantStateCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>
+        }
+        createMany: {
+          args: Prisma.ConversationParticipantStateCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ConversationParticipantStateCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>[]
+        }
+        delete: {
+          args: Prisma.ConversationParticipantStateDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>
+        }
+        update: {
+          args: Prisma.ConversationParticipantStateUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>
+        }
+        deleteMany: {
+          args: Prisma.ConversationParticipantStateDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ConversationParticipantStateUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ConversationParticipantStateUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>[]
+        }
+        upsert: {
+          args: Prisma.ConversationParticipantStateUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ConversationParticipantStatePayload>
+        }
+        aggregate: {
+          args: Prisma.ConversationParticipantStateAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateConversationParticipantState>
+        }
+        groupBy: {
+          args: Prisma.ConversationParticipantStateGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConversationParticipantStateGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ConversationParticipantStateCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ConversationParticipantStateCountAggregateOutputType> | number
+        }
+      }
+    }
     SavedSearch: {
       payload: Prisma.$SavedSearchPayload<ExtArgs>
       fields: Prisma.SavedSearchFieldRefs
@@ -1905,6 +1980,17 @@ export const MessageScalarFieldEnum = {
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
 
 
+export const ConversationParticipantStateScalarFieldEnum = {
+  conversationId: 'conversationId',
+  userId: 'userId',
+  archivedAt: 'archivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationParticipantStateScalarFieldEnum = (typeof ConversationParticipantStateScalarFieldEnum)[keyof typeof ConversationParticipantStateScalarFieldEnum]
+
+
 export const SavedSearchScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2231,10 +2317,12 @@ export type ListEnumReportSeverityFieldRefInput<$PrismaModel> = FieldRefInputTyp
 export type EnumModerationActionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModerationActionType'>
 
 
+
 /**
  * Reference to a field of type 'ModerationActionType[]'
  */
 export type ListEnumModerationActionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModerationActionType[]'>
+
 
 
 /**
@@ -2385,6 +2473,7 @@ export type GlobalOmitConfig = {
   userReputation?: Prisma.UserReputationOmit
   conversation?: Prisma.ConversationOmit
   message?: Prisma.MessageOmit
+  conversationParticipantState?: Prisma.ConversationParticipantStateOmit
   savedSearch?: Prisma.SavedSearchOmit
   report?: Prisma.ReportOmit
   moderationAction?: Prisma.ModerationActionOmit

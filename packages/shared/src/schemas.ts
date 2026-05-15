@@ -397,6 +397,11 @@ export const CreateConversationSchema = z.object({
 
 export const ListConversationsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).optional().default(30),
+  status: z.enum(['active', 'archived', 'all']).optional().default('active'),
+});
+
+export const UpdateConversationArchiveSchema = z.object({
+  archived: z.boolean(),
 });
 
 export const CreateMessageSchema = z.object({

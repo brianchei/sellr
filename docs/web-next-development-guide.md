@@ -319,7 +319,10 @@ Goal: improve safety and control around the existing interaction loop.
 
 Work items:
 
-- Add archive/hide conversation behavior for the current user.
+- Add archive/hide conversation behavior for the current user. Completed:
+  archived threads are hidden from the active inbox, remain available in an
+  archived view, can be restored, and reappear automatically when a new message
+  arrives.
 - Add admin ability to disable or suspend a member from report review.
 - Connect report moderation actions to member management where appropriate.
 - Update admin community management with clearer status, role, and moderation
@@ -469,7 +472,9 @@ Remaining:
 
 ### Messaging
 
-- Add archive/hide conversation for current user.
+- Current-user conversation archive/hide is implemented with reversible inbox
+  filters and per-user persistence. New messages restore archived threads to
+  the active inbox.
 
 ### Admin And Safety
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { fetchConversation, fetchConversations } from '@sellr/api-client';
 import { ConversationList } from '@/components/conversation-list';
@@ -36,6 +36,7 @@ function ThreadSkeleton() {
 }
 
 export default function ConversationPage() {
+  const router = useRouter();
   const params = useParams<{ conversationId: string }>();
   const conversationId = params.conversationId;
   const { primaryCommunityId, userId } = useAuth();
@@ -48,8 +49,8 @@ export default function ConversationPage() {
   });
 
   const conversationsQuery = useQuery({
-    queryKey: ['conversations', primaryCommunityId],
-    queryFn: () => fetchConversations({ limit: 50 }),
+    queryKey: ['conversations', primaryCommunityId, 'all'],
+    queryFn: () => fetchConversations({ limit: 50, status: 'all' }),
     enabled: Boolean(primaryCommunityId),
     refetchInterval: MESSAGE_REFETCH_INTERVAL_MS,
   });
@@ -180,6 +181,11 @@ export default function ConversationPage() {
           <ConversationThread
             conversation={conversationQuery.data.conversation}
             userId={userId}
+            onArchiveChange={(archived) => {
+              if (archived) {
+                router.replace('/inbox');
+              }
+            }}
           />
         </section>
       ) : null}

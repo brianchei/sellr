@@ -116,10 +116,13 @@ function getConversationCommunityId(conversation) {
         conversation.offer?.listing.communityId ??
         null);
 }
-function conversationSummaryPayload(conversation, peer) {
+function conversationSummaryPayload(conversation, peer, viewerUserId) {
     if (!conversation) {
         return null;
     }
+    const archivedAt = viewerUserId == null
+        ? null
+        : (conversation.participantStates.find((state) => state.userId === viewerUserId)?.archivedAt ?? null);
     return {
         id: conversation.id,
         listingId: conversation.listingId,
@@ -127,6 +130,7 @@ function conversationSummaryPayload(conversation, peer) {
         participantIds: conversation.participantIds,
         type: conversation.type,
         createdAt: conversation.createdAt,
+        archivedAt,
         listing: conversation.listing
             ? {
                 id: conversation.listing.id,
@@ -180,6 +184,12 @@ async function findConversationSummary(conversationId) {
                     messages: true,
                 },
             },
+            participantStates: {
+                select: {
+                    userId: true,
+                    archivedAt: true,
+                },
+            },
         },
     });
 }
@@ -188,10 +198,18 @@ const plugin = (fastify, _opts, done) => {
         preHandler: auth_1.verifyJWT,
         schema: { querystring: shared_1.ListConversationsQuerySchema },
     }, async (request, reply) => {
-        const { limit } = shared_1.ListConversationsQuerySchema.parse(request.query);
+        const { limit, status } = shared_1.ListConversationsQuerySchema.parse(request.query);
         if (request.user.communityIds.length === 0) {
             return reply.send((0, response_1.ok)({ conversations: [] }));
         }
+        const archivedStateFilter = {
+            participantStates: {
+                some: {
+                    userId: request.user.sub,
+                    archivedAt: { not: null },
+                },
+            },
+        };
         const conversations = await prisma_1.prisma.conversation.findMany({
             where: {
                 participantIds: { has: request.user.sub },
@@ -200,6 +218,8 @@ const plugin = (fastify, _opts, done) => {
                         communityId: { in: request.user.communityIds },
                     },
                 },
+                ...(status === 'active' ? { NOT: archivedStateFilter } : {}),
+                ...(status === 'archived' ? archivedStateFilter : {}),
             },
             include: {
                 listing: {
@@ -222,6 +242,15 @@ const plugin = (fastify, _opts, done) => {
                 _count: {
                     select: {
                         messages: true,
+                    },
+                },
+                participantStates: {
+                    where: {
+                        userId: request.user.sub,
+                    },
+                    select: {
+                        userId: true,
+                        archivedAt: true,
                     },
                 },
             },
@@ -250,6 +279,7 @@ const plugin = (fastify, _opts, done) => {
                 participantIds: conversation.participantIds,
                 type: conversation.type,
                 createdAt: conversation.createdAt,
+                archivedAt: conversation.participantStates.at(0)?.archivedAt ?? null,
                 listing: conversation.listing,
                 peer: peerId && conversation.listing
                     ? (peersByKey.get(userTrustKey({
@@ -342,7 +372,57 @@ const plugin = (fastify, _opts, done) => {
                 communityId,
             })
             : null;
-        return reply.send((0, response_1.ok)({ conversation: conversationSummaryPayload(conversation, peer) }));
+        return reply.send((0, response_1.ok)({
+            conversation: conversationSummaryPayload(conversation, peer, request.user.sub),
+        }));
+    });
+    fastify.patch('/:conversationId/archive', {
+        preHandler: auth_1.verifyJWT,
+        schema: { body: shared_1.UpdateConversationArchiveSchema },
+    }, async (request, reply) => {
+        const { conversationId } = request.params;
+        const body = shared_1.UpdateConversationArchiveSchema.parse(request.body);
+        const conv = await findConversationWithAccessContext(conversationId);
+        if (!conv) {
+            return reply.code(404).send({ error: 'Conversation not found' });
+        }
+        if (!conv.participantIds.includes(request.user.sub)) {
+            return reply.code(403).send({ error: 'Forbidden' });
+        }
+        const communityId = getConversationCommunityId(conv);
+        if (!communityId || !request.user.communityIds.includes(communityId)) {
+            return reply.code(403).send({ error: 'Forbidden' });
+        }
+        await prisma_1.prisma.conversationParticipantState.upsert({
+            where: {
+                conversationId_userId: {
+                    conversationId,
+                    userId: request.user.sub,
+                },
+            },
+            create: {
+                conversationId,
+                userId: request.user.sub,
+                archivedAt: body.archived ? new Date() : null,
+            },
+            update: {
+                archivedAt: body.archived ? new Date() : null,
+            },
+        });
+        const conversation = await findConversationSummary(conversationId);
+        if (!conversation) {
+            return reply.code(404).send({ error: 'Conversation not found' });
+        }
+        const peerId = conversation.participantIds.find((id) => id !== request.user.sub);
+        const peer = peerId
+            ? await findUserTrustProfile({
+                userId: peerId,
+                communityId,
+            })
+            : null;
+        return reply.send((0, response_1.ok)({
+            conversation: conversationSummaryPayload(conversation, peer, request.user.sub),
+        }));
     });
     fastify.get('/:conversationId/messages', { preHandler: auth_1.verifyJWT }, async (request, reply) => {
         const { conversationId } = request.params;
@@ -381,12 +461,25 @@ const plugin = (fastify, _opts, done) => {
         if (!communityId || !request.user.communityIds.includes(communityId)) {
             return reply.code(403).send({ error: 'Forbidden' });
         }
-        const message = await prisma_1.prisma.message.create({
-            data: {
-                conversationId,
-                senderId: request.user.sub,
-                content: body.content,
-            },
+        const message = await prisma_1.prisma.$transaction(async (tx) => {
+            const created = await tx.message.create({
+                data: {
+                    conversationId,
+                    senderId: request.user.sub,
+                    content: body.content,
+                },
+            });
+            await tx.conversationParticipantState.updateMany({
+                where: {
+                    conversationId,
+                    userId: { in: conv.participantIds },
+                    archivedAt: { not: null },
+                },
+                data: {
+                    archivedAt: null,
+                },
+            });
+            return created;
         });
         const peerId = conv.participantIds.find((id) => id !== request.user.sub);
         if (peerId) {
