@@ -57,9 +57,9 @@ describe('<ListingCard />', () => {
 
     expect(screen.getByText('0.6 mi')).toBeTruthy();
     expect(screen.getByText('1 photo')).toBeTruthy();
-    expect(screen.getByText('Verified seller')).toBeTruthy();
-    expect(screen.getByText('Community member')).toBeTruthy();
+    expect(screen.getByText('Verified contact')).toBeTruthy();
+    expect(screen.getByText('Active community member')).toBeTruthy();
     expect(screen.getByText('Maya Chen')).toBeTruthy();
-    expect(screen.getByText('3 active')).toBeTruthy();
+    expect(screen.getByText('3 active listings')).toBeTruthy();
   });
 });

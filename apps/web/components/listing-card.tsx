@@ -11,6 +11,11 @@ import {
   photoUrls,
   type ListedFreshness,
 } from '@/lib/listing-format';
+import {
+  activeListingCountLabel,
+  communityTrustLabel,
+  publicContactVerificationLabel,
+} from '@/lib/trust-signals';
 
 type ListingCardProps = {
   listing: ApiListing;
@@ -31,7 +36,8 @@ export function ListingCard({ listing }: ListingCardProps) {
   const primaryPhoto = photos[0];
   const photoCount = photos.length;
   const freshness = formatRelativeListedDate(listing.createdAt);
-  const verified = Boolean(listing.seller?.verifiedAt);
+  const contactSignal = publicContactVerificationLabel(listing.seller);
+  const communitySignal = communityTrustLabel(listing.seller);
   const sellerName = listing.seller?.displayName?.trim() || 'Community seller';
   const activeListingCount = listing.seller?.listingCount ?? 0;
   const isUnavailable = listing.status !== 'active';
@@ -144,7 +150,7 @@ export function ListingCard({ listing }: ListingCardProps) {
               Open to offers
             </span>
           ) : null}
-          {verified ? (
+          {contactSignal ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
               <svg
                 width="11"
@@ -173,12 +179,12 @@ export function ListingCard({ listing }: ListingCardProps) {
                   fill="none"
                 />
               </svg>
-              Verified seller
+              {contactSignal}
             </span>
           ) : null}
-          {listing.seller?.communityMember ? (
+          {communitySignal ? (
             <span className="rounded-full bg-[var(--color-brand-contrast-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-contrast)]">
-              Community member
+              {communitySignal}
             </span>
           ) : null}
         </div>
@@ -193,7 +199,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             </span>
             {activeListingCount > 1 ? (
               <span className="shrink-0 text-[var(--text-tertiary)]">
-                {activeListingCount} active
+                {activeListingCountLabel(activeListingCount)}
               </span>
             ) : null}
           </div>

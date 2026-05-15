@@ -37,6 +37,11 @@ import {
   PROFILE_COMPLETION_COPY,
   profileCompletionIssues,
 } from '@/lib/profile-readiness';
+import {
+  activeListingCountLabel,
+  communityTrustLabel,
+  publicContactVerificationLabel,
+} from '@/lib/trust-signals';
 import type { ProfileCompletionIssue } from '@sellr/shared';
 
 const DEFAULT_MESSAGE =
@@ -131,11 +136,6 @@ function photoCountLabel(count: number): string {
   return `${count} ${count === 1 ? 'photo' : 'photos'}`;
 }
 
-function activeListingLabel(count: number | undefined): string {
-  const safeCount = count ?? 0;
-  return `${safeCount} active ${safeCount === 1 ? 'listing' : 'listings'}`;
-}
-
 function sellerDisplayName(listing: ApiListing): string {
   return listing.seller?.displayName?.trim() || 'Community seller';
 }
@@ -149,7 +149,9 @@ function SellerInlineSummary({
 }) {
   const sellerName = sellerDisplayName(listing);
   const sellerHref = listing.seller ? `/sellers/${listing.seller.id}` : null;
-  const sellerListings = activeListingLabel(listing.seller?.listingCount);
+  const sellerListings = activeListingCountLabel(listing.seller?.listingCount);
+  const contactSignal = publicContactVerificationLabel(listing.seller);
+  const communitySignal = communityTrustLabel(listing.seller);
 
   return (
     <section
@@ -180,14 +182,14 @@ function SellerInlineSummary({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {listing.seller?.communityMember !== false ? (
+          {communitySignal ? (
             <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
-              Community member
+              {communitySignal}
             </span>
           ) : null}
-          {listing.seller?.verifiedAt ? (
+          {contactSignal ? (
             <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
-              Verified sign-in
+              {contactSignal}
             </span>
           ) : null}
           <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]">
@@ -274,7 +276,7 @@ function ListingAtAGlance({
         <DetailStat
           label="Seller"
           value={sellerName}
-          note={`${status.label} listing · ${activeListingLabel(
+          note={`${status.label} listing · ${activeListingCountLabel(
             listing.seller?.listingCount,
           )}`}
         />
@@ -669,9 +671,9 @@ export default function ListingDetailPage() {
             profile={listing.seller}
             heading="Seller of this item"
             contextLabel={
-              listing.seller?.verifiedAt
-                ? 'Verified member of your community.'
-                : 'Member of your community.'
+              publicContactVerificationLabel(listing.seller)
+                ? 'Verified contact with community-scoped listing history.'
+                : 'Community-scoped seller profile.'
             }
             profileHref={
               listing.seller ? `/sellers/${listing.seller.id}` : undefined

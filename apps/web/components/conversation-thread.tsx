@@ -28,6 +28,7 @@ import {
   invalidateConversationActivity,
   MESSAGE_REFETCH_INTERVAL_MS,
 } from '@/lib/query-refresh';
+import { profileSignalSummary } from '@/lib/trust-signals';
 
 const BUYER_QUICK_REPLIES = [
   'Is this still available?',
@@ -210,6 +211,7 @@ export function ConversationThread({
     conversation.peer.id === conversation.listing?.sellerId;
   const peerName = conversationPeer(conversation);
   const archived = Boolean(conversation.archivedAt);
+  const peerSignals = profileSignalSummary(conversation.peer);
 
   const messagesQuery = useQuery({
     queryKey: ['conversation-messages', conversation.id],
@@ -305,11 +307,12 @@ export function ConversationThread({
                 {peerName}
               </p>
               <p className="text-xs text-[var(--text-secondary)]">
-                {peerIsListingSeller
-                  ? 'Seller in this conversation'
-                  : isSeller
-                    ? 'Buyer in this conversation'
-                    : 'Member in this conversation'}
+                {peerSignals ||
+                  (peerIsListingSeller
+                    ? 'Seller in this conversation'
+                    : isSeller
+                      ? 'Buyer in this conversation'
+                      : 'Member in this conversation')}
               </p>
             </div>
           </div>
@@ -334,7 +337,7 @@ export function ConversationThread({
               className="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] hover:bg-[var(--color-brand-primary-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
               aria-expanded={showPeerDetails}
             >
-              {showPeerDetails ? 'Hide details' : 'Trust details'}
+              {showPeerDetails ? 'Hide details' : 'Profile signals'}
             </button>
           </div>
         </div>
@@ -345,8 +348,8 @@ export function ConversationThread({
             heading={peerIsListingSeller ? 'Seller profile' : 'Member profile'}
             contextLabel={
               peerIsListingSeller
-                ? 'Buyer is reviewing this seller in your community.'
-                : 'This member is in your community.'
+                ? 'Seller signals are scoped to this listing and community.'
+                : 'Member signals are scoped to this community.'
             }
             profileHref={
               peerIsListingSeller && conversation.peer?.id
