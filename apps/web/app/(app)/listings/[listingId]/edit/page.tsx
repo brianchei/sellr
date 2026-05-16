@@ -76,7 +76,7 @@ function EditListingForm({ listing }: { listing: ApiListing }) {
     <>
       {notice ? (
         <p
-          className="mt-6 rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm text-[var(--color-brand-accent-strong)]"
+          className="app-list-row mt-6 border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm text-[var(--color-brand-accent-strong)]"
           role="status"
         >
           {notice}
@@ -140,7 +140,7 @@ export default function EditListingPage() {
         <div className="h-5 w-28 rounded bg-[var(--bg-tertiary)]" />
         <div className="mt-3 h-9 w-64 rounded bg-[var(--bg-tertiary)]" />
         <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="space-y-5 rounded-3xl border border-black/10 bg-white/90 p-6 shadow-[var(--shadow-app-card)]">
+          <div className="app-panel space-y-5 p-6">
             <div className="h-6 w-36 rounded bg-[var(--bg-tertiary)]" />
             <div className="h-11 rounded bg-[var(--bg-tertiary)]" />
             <div className="h-32 rounded bg-[var(--bg-tertiary)]" />
@@ -150,8 +150,8 @@ export default function EditListingPage() {
             </div>
           </div>
           <div className="space-y-5">
-            <div className="h-48 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
-            <div className="h-48 rounded-3xl border border-black/10 bg-white/90 shadow-[var(--shadow-app-card)]" />
+            <div className="app-panel h-48" />
+            <div className="app-panel h-48" />
           </div>
         </section>
       </main>
@@ -162,7 +162,7 @@ export default function EditListingPage() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <section
-          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert p-6"
           role="alert"
         >
           <h1 className="text-xl font-semibold">Could not load listing</h1>
@@ -198,7 +198,7 @@ export default function EditListingPage() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <section
-          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert p-6"
           role="alert"
         >
           <h1 className="text-xl font-semibold">Only the seller can edit</h1>
