@@ -80,14 +80,14 @@ export default function LoginPage() {
   const intro =
     step === 'phone' || step === 'phone-code'
       ? {
-          eyebrow: 'Invite access fallback',
-          title: 'Use phone sign-in for invite access',
-          body: 'Phone sign-in is for trusted invite-code access. Email remains the primary Badger Market path.',
+          eyebrow: 'Invite fallback',
+          title: 'Use phone for invite access',
+          body: 'Use this only when an organizer gave you an invite path. Student email is still the fastest Badger Market route.',
         }
       : {
-          eyebrow: 'Badger Market access',
-          title: 'Sign in with your wisc.edu email',
-          body: 'We will send a 6-digit code. If you have not joined yet, the next step verifies Badger Market access.',
+          eyebrow: 'Campus sign-in',
+          title: 'Use your wisc.edu email',
+          body: 'Get a 6-digit code, verify Badger Market access, then browse or sell in your community.',
         };
 
   useEffect(() => {
@@ -283,6 +283,12 @@ export default function LoginPage() {
           {intro.body}
         </p>
 
+        <ol className="mt-5 grid gap-2 text-xs text-[var(--text-secondary)] sm:grid-cols-3">
+          <EntryStep number="1" label="Sign in" />
+          <EntryStep number="2" label="Verify access" />
+          <EntryStep number="3" label="Browse or sell" />
+        </ol>
+
         {step === 'email' ? (
           <form onSubmit={handleEmailSubmit} className="mt-6">
             <label className="block text-sm font-medium text-[var(--text-primary)]">
@@ -306,8 +312,7 @@ export default function LoginPage() {
               id="login-email-help"
               className="mt-1.5 text-xs text-[var(--text-tertiary)]"
             >
-              Email verification keeps campus community access tied to your
-              student account.
+              We use this only to send your code and match campus access.
             </p>
             <button
               type="submit"
@@ -321,8 +326,8 @@ export default function LoginPage() {
                 Invite-code access
               </p>
               <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-                Use phone fallback only if your community organizer gave you an
-                invite path.
+                Use phone only if your community organizer gave you an invite
+                path.
               </p>
               <button
                 type="button"
@@ -444,7 +449,7 @@ export default function LoginPage() {
             Student email is the primary Badger Market access signal.
           </TrustPoint>
           <TrustPoint>
-            Phone fallback remains available for invite-code members.
+            Invite access remains available for organizer-approved members.
           </TrustPoint>
         </ul>
 
@@ -466,6 +471,17 @@ export default function LoginPage() {
         </Link>
       </section>
     </main>
+  );
+}
+
+function EntryStep({ number, label }: { number: string; label: string }) {
+  return (
+    <li className="flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-secondary)] px-3 py-2">
+      <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--text-primary)] text-[11px] font-semibold text-[var(--color-brand-primary)]">
+        {number}
+      </span>
+      <span className="font-medium text-[var(--text-primary)]">{label}</span>
+    </li>
   );
 }
 

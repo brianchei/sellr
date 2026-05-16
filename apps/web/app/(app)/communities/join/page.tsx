@@ -121,18 +121,18 @@ export default function JoinCommunityPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
-      <header className="app-panel-soft overflow-hidden p-5 sm:p-7">
+      <header className="border-b border-[var(--border-default)] pb-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
               Add community access
             </p>
             <h1 className="mt-3 text-2xl font-semibold text-[var(--text-primary)] sm:text-3xl">
-              Join another community
+              Join a community
             </h1>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              Use an invite code or your verified email. Sellr switches your
-              active community after you join.
+              Use an invite code or your verified email. After joining, Sellr
+              switches your active community to that local marketplace.
             </p>
           </div>
           <div className="rounded-full border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-4 py-2">
@@ -153,11 +153,11 @@ export default function JoinCommunityPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section className="app-panel p-5 sm:p-6">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-            Enter access details
+            Access details
           </h2>
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-            Invite codes are best for organizer-approved access. Verified email
-            works when a community is tied to your email domain.
+            Invite codes work for organizer-approved access. Verified email
+            works when a community is tied to your account.
           </p>
 
           <div
@@ -242,14 +242,14 @@ export default function JoinCommunityPage() {
                 className="mt-1.5 text-xs leading-5 text-[var(--text-tertiary)]"
               >
                 Codes are case-insensitive. Use the code shared by the
-                community organizer or admin.
+                community organizer.
               </p>
             ) : (
               <p
                 id="join-email-help"
                 className="mt-1.5 text-xs leading-5 text-[var(--text-tertiary)]"
               >
-                Sellr can only join email-domain communities through the email
+                Sellr can only join email communities through the address
                 already verified on this account.
               </p>
             )}
@@ -281,12 +281,21 @@ export default function JoinCommunityPage() {
         <aside className="space-y-5">
           <section className="app-panel-soft p-5">
             <h2 className="text-base font-semibold text-[var(--text-primary)]">
-              What happens next
+              Next after joining
             </h2>
             <ul className="mt-3 divide-y divide-[var(--border-default)]">
-              <GuidanceItem text="Your active community switches to the one you just joined." />
-              <GuidanceItem text="Browse, sell, listings, and community pages use that context." />
-              <GuidanceItem text="You can switch communities from the app header." />
+              <GuidanceItem
+                number="1"
+                text="Your active community switches to the one you joined."
+              />
+              <GuidanceItem
+                number="2"
+                text="Browse, sell, and messages use that community context."
+              />
+              <GuidanceItem
+                number="3"
+                text="You can switch communities from the app header."
+              />
             </ul>
           </section>
 
@@ -295,9 +304,8 @@ export default function JoinCommunityPage() {
               Need a code?
             </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              Ask a community organizer or admin for an invite. Sellr keeps
-              community access gated so local listings and messages stay scoped
-              to verified members.
+              Ask a community organizer for an invite. Sellr keeps local
+              listings and messages scoped to verified members.
             </p>
           </section>
         </aside>
@@ -306,13 +314,15 @@ export default function JoinCommunityPage() {
   );
 }
 
-function GuidanceItem({ text }: { text: string }) {
+function GuidanceItem({ number, text }: { number: string; text: string }) {
   return (
     <li className="flex gap-3 py-3">
       <span
         aria-hidden="true"
-        className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--color-brand-accent)]"
-      />
+        className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--text-primary)] text-[11px] font-semibold text-[var(--color-brand-primary)]"
+      >
+        {number}
+      </span>
       <p className="text-sm leading-6 text-[var(--text-secondary)]">{text}</p>
     </li>
   );
