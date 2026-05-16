@@ -20,7 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
   { label: 'Listings', href: '/listings', icon: ListingsIcon },
   { label: 'Inbox', href: '/inbox', icon: InboxIcon },
-  { label: 'Notifications', href: '/notifications', icon: NotificationIcon },
+  { label: 'Profile', href: '/profile', icon: ProfileIcon },
 ];
 
 function isActive(pathname: string, href: string): boolean {
@@ -89,6 +89,7 @@ export function AppHeader() {
 
   const communityCount = communities?.length ?? 0;
   const canSwitchCommunity = communityCount > 1;
+  const notificationsActive = isActive(pathname, '/notifications');
 
   return (
     <header
@@ -226,8 +227,6 @@ export function AppHeader() {
         >
           {NAV_ITEMS.map((item) => {
             const active = isActive(pathname, item.href);
-            const showBadge =
-              item.href === '/notifications' && unreadCount > 0;
             return (
               <Link
                 key={item.href}
@@ -243,11 +242,6 @@ export function AppHeader() {
               >
                 <item.icon />
                 {item.label}
-                {showBadge ? (
-                  <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-brand-warm)] px-1 text-[10px] font-semibold leading-none text-white">
-                    {unreadLabel}
-                  </span>
-                ) : null}
               </Link>
             );
           })}
@@ -262,6 +256,32 @@ export function AppHeader() {
             Sell
           </Link>
 
+          <Link
+            href="/notifications"
+            aria-label={
+              unreadCount > 0
+                ? `${unreadCount} unread notifications`
+                : 'Notifications'
+            }
+            aria-current={notificationsActive ? 'page' : undefined}
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 text-[var(--text-primary)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+            style={{
+              background: notificationsActive
+                ? 'var(--text-primary)'
+                : undefined,
+              color: notificationsActive
+                ? 'var(--color-brand-primary)'
+                : undefined,
+            }}
+          >
+            <NotificationIcon />
+            {unreadCount > 0 ? (
+              <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-brand-warm)] px-1 text-[10px] font-semibold leading-none text-white">
+                {unreadLabel}
+              </span>
+            ) : null}
+          </Link>
+
           <button
             type="button"
             onClick={() => setDrawerOpen((value) => !value)}
@@ -271,11 +291,6 @@ export function AppHeader() {
             className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 text-[var(--text-primary)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)] md:hidden"
           >
             {drawerOpen ? <CloseIcon /> : <MenuIcon />}
-            {!drawerOpen && unreadCount > 0 ? (
-              <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-brand-warm)] px-1 text-[10px] font-semibold leading-none text-white">
-                {unreadLabel}
-              </span>
-            ) : null}
           </button>
 
           <div className="relative" ref={accountRef}>
@@ -485,11 +500,33 @@ export function AppHeader() {
                 <SellIcon />
                 Sell an item
               </Link>
+              <Link
+                href="/notifications"
+                onClick={() => setDrawerOpen(false)}
+                aria-current={notificationsActive ? 'page' : undefined}
+                className="mb-2 flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold no-underline transition"
+                style={{
+                  color: notificationsActive
+                    ? 'var(--color-brand-primary)'
+                    : 'var(--text-secondary)',
+                  background: notificationsActive
+                    ? 'var(--text-primary)'
+                    : 'transparent',
+                }}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <NotificationIcon />
+                  Notifications
+                </span>
+                {unreadCount > 0 ? (
+                  <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--color-brand-warm)] px-1.5 text-[10px] font-semibold leading-none text-white">
+                    {unreadLabel}
+                  </span>
+                ) : null}
+              </Link>
               <ul className="space-y-1">
                 {NAV_ITEMS.map((item) => {
                   const active = isActive(pathname, item.href);
-                  const showBadge =
-                    item.href === '/notifications' && unreadCount > 0;
                   return (
                     <li key={item.href}>
                       <Link
@@ -510,11 +547,6 @@ export function AppHeader() {
                           <item.icon />
                           {item.label}
                         </span>
-                        {showBadge ? (
-                          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--color-brand-warm)] px-1.5 text-[10px] font-semibold leading-none text-white">
-                            {unreadLabel}
-                          </span>
-                        ) : null}
                       </Link>
                     </li>
                   );
@@ -611,6 +643,25 @@ function ListingsIcon() {
       <path d="M3 6h.01" />
       <path d="M3 12h.01" />
       <path d="M3 18h.01" />
+    </svg>
+  );
+}
+
+function ProfileIcon() {
+  return (
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M20 21a8 8 0 0 0-16 0" />
     </svg>
   );
 }

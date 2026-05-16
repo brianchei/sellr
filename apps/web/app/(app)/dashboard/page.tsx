@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { hasRealDisplayName } from '@sellr/shared';
+import { hasRealDisplayName, type ProfileCompletionIssue } from '@sellr/shared';
 import {
   fetchConversations,
   fetchMe,
@@ -53,6 +53,10 @@ type HomeAction = {
   label: string;
 };
 
+function profileIssueHref(issue: ProfileCompletionIssue): string {
+  return issue === 'community_membership' ? '/onboarding' : '/profile';
+}
+
 function getHomeAction({
   activeListingsCount,
   buyerConversationCount,
@@ -60,8 +64,8 @@ function getHomeAction({
   listingsMissingPhotosCount,
   listingsTotal,
   hasCommunity,
+  profileIssue,
   unreadCount,
-  userId,
 }: {
   activeListingsCount: number;
   buyerConversationCount: number;
@@ -69,8 +73,8 @@ function getHomeAction({
   hasCommunity: boolean;
   listingsMissingPhotosCount: number;
   listingsTotal: number;
+  profileIssue: ProfileCompletionIssue | undefined;
   unreadCount: number;
-  userId: string | null;
 }): HomeAction {
   if (!hasCommunity) {
     return {
@@ -78,6 +82,16 @@ function getHomeAction({
       label: 'Join community',
       href: '/onboarding',
       copy: 'Join a verified local community before browsing, selling, or messaging.',
+    };
+  }
+
+  if (profileIssue) {
+    const copy = PROFILE_COMPLETION_COPY[profileIssue];
+    return {
+      eyebrow: 'Readiness needed',
+      label: copy.action,
+      href: profileIssueHref(profileIssue),
+      copy: copy.body,
     };
   }
 
@@ -125,10 +139,10 @@ function getHomeAction({
   }
 
   return {
-    eyebrow: 'Profile ready',
-    label: 'View storefront',
-    href: userId ? `/sellers/${userId}` : '/marketplace',
-    copy: 'Your backed signals are ready. Review how buyers see your profile and listings.',
+    eyebrow: 'Ready to browse',
+    label: 'Browse listings',
+    href: '/marketplace',
+    copy: 'Your backed signals are ready. See what is active in your community and message from item pages.',
   };
 }
 
@@ -173,6 +187,8 @@ export default function DashboardPage() {
     [conversationsQuery.data?.conversations],
   );
   const unreadCount = unreadQuery.data?.notifications.length ?? 0;
+  const profileIssues = profileCompletionIssues(me);
+  const blockingProfileIssue = profileIssues[0];
 
   const activeListings = useMemo(
     () => listings.filter((listing) => listing.status === 'active'),
@@ -223,8 +239,8 @@ export default function DashboardPage() {
     hasCommunity: Boolean(primaryCommunityId),
     listingsMissingPhotosCount: listingsMissingPhotos.length,
     listingsTotal: listings.length,
+    profileIssue: blockingProfileIssue,
     unreadCount,
-    userId,
   });
 
   return (
