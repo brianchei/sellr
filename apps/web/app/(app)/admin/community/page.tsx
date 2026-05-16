@@ -997,7 +997,7 @@ export default function AdminCommunityPage() {
         }}
       />
 
-      <section className="mt-5 grid gap-3 sm:grid-cols-3">
+      <section className="app-panel mt-5 grid divide-y divide-[var(--border-default)] overflow-hidden sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         <MetricCard label="Members" value={String(memberCount)}>
           {selectedActiveMemberCount} active
         </MetricCard>
@@ -1090,9 +1090,9 @@ export default function AdminCommunityPage() {
             </button>
           </form>
 
-          <div className="mt-5 space-y-2">
+          <div className="mt-5 border-t border-[var(--border-default)]">
             {selectedCommunity.inviteCodes.length === 0 ? (
-              <p className="app-empty-state px-4 py-5 text-center text-sm text-[var(--text-secondary)]">
+              <p className="app-empty-state mt-3 px-4 py-5 text-center text-sm text-[var(--text-secondary)]">
                 No invite codes yet.
               </p>
             ) : (
@@ -1101,7 +1101,7 @@ export default function AdminCommunityPage() {
                 return (
                   <article
                     key={invite.id}
-                    className="app-list-row p-3"
+                    className="border-b border-[var(--border-default)] py-3 last:border-b-0"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="font-mono text-sm font-semibold tracking-wider text-[var(--text-primary)]">
@@ -1188,7 +1188,7 @@ export default function AdminCommunityPage() {
             </p>
           ) : null}
 
-          <div className="mt-4 space-y-3">
+          <div className="mt-4 divide-y divide-[var(--border-default)]">
             {visibleMembers.length === 0 ? (
               <div className="app-empty-state px-4 py-6 text-center">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">
@@ -1211,110 +1211,110 @@ export default function AdminCommunityPage() {
               </div>
             ) : (
               visibleMembers.map((member) => {
-              const isPending =
-                memberMutation.isPending && pendingUserId === member.userId;
-              const memberIsLastActiveAdmin =
-                member.role === 'admin' &&
-                member.status === 'active' &&
-                activeAdminCount <= 1;
-              return (
-                <article
-                  key={member.userId}
-                  className="app-list-row p-4"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="truncate text-sm font-semibold text-[var(--text-primary)]">
-                          {member.user.displayName}
-                          {member.userId === userId ? ' (you)' : ''}
-                        </h3>
-                        <span
-                          className="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
-                          style={roleTone(member.role)}
-                        >
-                          {member.role}
-                        </span>
-                        <span
-                          className="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
-                          style={statusTone(member.status)}
-                        >
-                          {member.status}
-                        </span>
-                      </div>
-                      <p className="mt-1 font-mono text-xs text-[var(--text-tertiary)]">
-                        {memberContact(member)}
-                      </p>
-                      <p className="mt-1 text-xs text-[var(--text-tertiary)]">
-                        Joined {formatDate(member.joinedAt)}
-                      </p>
-                      {accessRestrictionLabel(member.accessStatusReason) ? (
-                        <p className="mt-1 text-xs font-semibold text-[var(--color-brand-warm-strong)]">
-                          {accessRestrictionLabel(member.accessStatusReason)}
-                          {member.accessStatusNote
-                            ? ` · ${member.accessStatusNote}`
-                            : ''}
+                const isPending =
+                  memberMutation.isPending && pendingUserId === member.userId;
+                const memberIsLastActiveAdmin =
+                  member.role === 'admin' &&
+                  member.status === 'active' &&
+                  activeAdminCount <= 1;
+                return (
+                  <article
+                    key={member.userId}
+                    className="py-4 first:pt-0 last:pb-0"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                            {member.user.displayName}
+                            {member.userId === userId ? ' (you)' : ''}
+                          </h3>
+                          <span
+                            className="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                            style={roleTone(member.role)}
+                          >
+                            {member.role}
+                          </span>
+                          <span
+                            className="rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                            style={statusTone(member.status)}
+                          >
+                            {member.status}
+                          </span>
+                        </div>
+                        <p className="mt-1 font-mono text-xs text-[var(--text-tertiary)]">
+                          {memberContact(member)}
                         </p>
-                      ) : null}
-                    </div>
+                        <p className="mt-1 text-xs text-[var(--text-tertiary)]">
+                          Joined {formatDate(member.joinedAt)}
+                        </p>
+                        {accessRestrictionLabel(member.accessStatusReason) ? (
+                          <p className="mt-1 text-xs font-semibold text-[var(--color-brand-warm-strong)]">
+                            {accessRestrictionLabel(member.accessStatusReason)}
+                            {member.accessStatusNote
+                              ? ` · ${member.accessStatusNote}`
+                              : ''}
+                          </p>
+                        ) : null}
+                      </div>
 
-                    <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
-                      {member.role === 'admin' ? (
-                        <button
-                          type="button"
-                          disabled={isPending || memberIsLastActiveAdmin}
-                          onClick={() =>
-                            runMemberUpdate(member, { role: 'member' })
-                          }
-                          className="app-action-secondary flex-1 px-3 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-                        >
-                          Demote to member
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          disabled={isPending}
-                          onClick={() =>
-                            runMemberUpdate(member, { role: 'admin' })
-                          }
-                          className="app-action-secondary flex-1 px-3 py-2 text-xs hover:bg-[var(--color-brand-primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-                        >
-                          Promote to admin
-                        </button>
-                      )}
+                      <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
+                        {member.role === 'admin' ? (
+                          <button
+                            type="button"
+                            disabled={isPending || memberIsLastActiveAdmin}
+                            onClick={() =>
+                              runMemberUpdate(member, { role: 'member' })
+                            }
+                            className="app-action-secondary flex-1 px-3 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                          >
+                            Demote to member
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() =>
+                              runMemberUpdate(member, { role: 'admin' })
+                            }
+                            className="app-action-secondary flex-1 px-3 py-2 text-xs hover:bg-[var(--color-brand-primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                          >
+                            Promote to admin
+                          </button>
+                        )}
 
-                      {member.status === 'active' ? (
-                        <button
-                          type="button"
-                          disabled={isPending || memberIsLastActiveAdmin}
-                          onClick={() =>
-                            runMemberUpdate(member, { status: 'inactive' })
-                          }
-                          className="app-action-secondary flex-1 border-[var(--color-brand-warm)] px-3 py-2 text-xs text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-                        >
-                          Deactivate access
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          disabled={isPending}
-                          onClick={() =>
-                            runMemberUpdate(member, { status: 'active' })
-                          }
-                          className="app-action-primary flex-1 px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-                        >
-                          Reactivate access
-                        </button>
-                      )}
+                        {member.status === 'active' ? (
+                          <button
+                            type="button"
+                            disabled={isPending || memberIsLastActiveAdmin}
+                            onClick={() =>
+                              runMemberUpdate(member, { status: 'inactive' })
+                            }
+                            className="app-action-secondary flex-1 border-[var(--color-brand-warm)] px-3 py-2 text-xs text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                          >
+                            Deactivate access
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() =>
+                              runMemberUpdate(member, { status: 'active' })
+                            }
+                            className="app-action-primary flex-1 px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                          >
+                            Reactivate access
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  {memberIsLastActiveAdmin ? (
-                    <p className="mt-3 text-xs text-[var(--text-tertiary)]">
-                      This is the last active admin for this community.
-                    </p>
-                  ) : null}
-                </article>
-              );
+                    {memberIsLastActiveAdmin ? (
+                      <p className="mt-3 text-xs text-[var(--text-tertiary)]">
+                        This is the last active admin for this community.
+                      </p>
+                    ) : null}
+                  </article>
+                );
               })
             )}
           </div>
@@ -1334,11 +1334,11 @@ function MetricCard({
   children: React.ReactNode;
 }) {
   return (
-    <article className="app-list-row p-4">
+    <article className="p-4">
       <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
         {label}
       </p>
-      <p className="mt-2 text-3xl font-semibold text-[var(--text-primary)]">
+      <p className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">
         {value}
       </p>
       <p className="mt-1 text-sm text-[var(--text-secondary)]">{children}</p>

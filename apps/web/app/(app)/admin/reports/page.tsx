@@ -46,7 +46,7 @@ function statusLabel(status: ApiReportStatus) {
 }
 
 function formatDate(value: string | null) {
-  if (!value) return '—';
+  if (!value) return 'None';
   return new Intl.DateTimeFormat(undefined, {
     month: 'short',
     day: 'numeric',
@@ -333,18 +333,18 @@ function ReportCard({
       </p>
 
       {memberManagement ? (
-        <div className="app-list-row mt-4 border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-brand-contrast)]">
+        <div className="app-section mt-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
             Member context
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[var(--text-secondary)]">
             <span className="font-semibold text-[var(--text-primary)]">
               {memberManagement.displayName}
             </span>
-            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-contrast)]">
+            <span className="rounded-full bg-[var(--bg-secondary)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-contrast)]">
               {memberManagement.role}
             </span>
-            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+            <span className="rounded-full bg-[var(--bg-secondary)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
               {memberManagement.status}
             </span>
             <span className="font-mono text-xs text-[var(--text-tertiary)]">
@@ -423,11 +423,11 @@ function ReportCard({
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
             Moderation history
           </p>
-          <ul className="mt-2 space-y-2">
+          <ul className="mt-2 divide-y divide-[var(--border-default)]">
             {report.moderationActions.slice(0, 3).map((action) => (
               <li
                 key={action.id}
-                className="rounded-xl bg-white/80 px-3 py-2 text-xs leading-5 text-[var(--text-secondary)]"
+                className="py-2 text-xs leading-5 text-[var(--text-secondary)] first:pt-0 last:pb-0"
               >
                 <span className="font-semibold text-[var(--text-primary)]">
                   {moderationActionLabel(action.actionType)}
