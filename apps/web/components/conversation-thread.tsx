@@ -384,7 +384,7 @@ export function ConversationThread({
 
         {archiveMutation.isError ? (
           <p
-            className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+            className="app-alert mt-3 p-3 text-sm"
             role="alert"
           >
             {archiveMutation.error instanceof Error
@@ -404,7 +404,7 @@ export function ConversationThread({
 
         {messagesQuery.isError ? (
           <div
-            className="rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-[var(--color-brand-warm-strong)]"
+            className="app-alert p-4"
             role="alert"
           >
             <h3 className="text-sm font-semibold">Could not load messages</h3>
@@ -466,7 +466,7 @@ export function ConversationThread({
                 key={reply}
                 type="button"
                 onClick={() => applyQuickReply(reply)}
-                className="inline-flex items-center rounded-full border border-black/10 bg-[var(--bg-secondary)] px-3 py-1 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-black/20 hover:bg-white hover:text-[var(--text-primary)]"
+                className="app-chip bg-[var(--bg-secondary)] transition hover:border-black/20 hover:bg-white hover:text-[var(--text-primary)]"
               >
                 {reply}
               </button>
@@ -496,7 +496,7 @@ export function ConversationThread({
 
         {replyError ? (
           <p
-            className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+            className="app-alert mt-3 p-3 text-sm"
             role="alert"
           >
             {replyError}
@@ -505,7 +505,7 @@ export function ConversationThread({
 
         {replyMutation.isError ? (
           <p
-            className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+            className="app-alert mt-3 p-3 text-sm"
             role="alert"
           >
             {replyMutation.error instanceof Error

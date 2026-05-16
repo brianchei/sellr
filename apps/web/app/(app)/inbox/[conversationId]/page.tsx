@@ -100,7 +100,7 @@ export default function ConversationPage() {
 
       {conversationQuery.isError ? (
         <section
-          className="mt-4 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-4 p-6"
           role="alert"
         >
           <h2 className="text-base font-semibold">
@@ -149,7 +149,7 @@ export default function ConversationPage() {
 
           {conversationsQuery.isError ? (
             <aside
-              className="hidden rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4 text-[var(--color-brand-warm-strong)] lg:block"
+              className="app-alert hidden p-4 lg:block"
               role="alert"
             >
               <h2 className="text-sm font-semibold">
