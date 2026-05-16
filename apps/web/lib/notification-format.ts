@@ -12,6 +12,8 @@ export type NotificationViewModel = {
   title: string;
   body: string;
   category: NotificationCategory;
+  targetLabel: string;
+  actionLabel: string;
   href: string;
   sentAt: string;
   read: boolean;
@@ -43,6 +45,16 @@ function notificationHref(payload: Record<string, unknown>): string {
   return '/notifications';
 }
 
+function notificationTarget(payload: Record<string, unknown>): string {
+  if (payloadString(payload, 'conversationId')) {
+    return 'Conversation';
+  }
+  if (payloadString(payload, 'listingId')) {
+    return 'Listing';
+  }
+  return 'Notification center';
+}
+
 function fallbackBody(
   payload: Record<string, unknown>,
   fallback: string,
@@ -63,6 +75,8 @@ export function formatNotification(
       title: 'New message',
       body: fallbackBody(payload, 'Someone replied to your conversation.'),
       category: 'messages',
+      targetLabel: notificationTarget(payload),
+      actionLabel: 'Open conversation',
       href: notificationHref(payload),
       sentAt: notification.sentAt,
       read: Boolean(notification.readAt),
@@ -78,6 +92,8 @@ export function formatNotification(
         `${listingTitle(payload)} was posted in your community.`,
       ),
       category: 'marketplace',
+      targetLabel: notificationTarget(payload),
+      actionLabel: 'View listing',
       href: notificationHref(payload),
       sentAt: notification.sentAt,
       read: Boolean(notification.readAt),
@@ -96,6 +112,8 @@ export function formatNotification(
           : `${listingTitle(payload)} changed details.`,
       ),
       category: isPickupChange ? 'time-sensitive' : 'listings',
+      targetLabel: notificationTarget(payload),
+      actionLabel: isPickupChange ? 'Review pickup change' : 'View listing',
       href: notificationHref(payload),
       sentAt: notification.sentAt,
       read: Boolean(notification.readAt),
@@ -111,6 +129,8 @@ export function formatNotification(
         `${listingTitle(payload)} is now ${status ?? 'updated'}.`,
       ),
       category: 'listings',
+      targetLabel: notificationTarget(payload),
+      actionLabel: 'View listing',
       href: notificationHref(payload),
       sentAt: notification.sentAt,
       read: Boolean(notification.readAt),
@@ -123,6 +143,8 @@ export function formatNotification(
       title: 'Listing inquiry',
       body: fallbackBody(payload, 'Someone asked about your listing.'),
       category: 'messages',
+      targetLabel: notificationTarget(payload),
+      actionLabel: 'Open conversation',
       href: notificationHref(payload),
       sentAt: notification.sentAt,
       read: Boolean(notification.readAt),
@@ -134,6 +156,8 @@ export function formatNotification(
     title: 'Sellr notification',
     body: fallbackBody(payload, 'Open Sellr to review this update.'),
     category: 'other',
+    targetLabel: notificationTarget(payload),
+    actionLabel: 'Review update',
     href: notificationHref(payload),
     sentAt: notification.sentAt,
     read: Boolean(notification.readAt),
