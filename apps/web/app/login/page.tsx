@@ -265,11 +265,11 @@ export default function LoginPage() {
           Sign in
         </p>
         <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
-          Enter your community marketplace
+          Use your wisc.edu email to join Badger Market
         </h1>
         <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-          Use your verified student email first. Invite-only members can use
-          phone sign-in when their community shared a code.
+          Email is the primary path. After the code, you will verify community
+          access or land on Home if you have already joined.
         </p>
 
         {step === 'email' ? (
@@ -303,14 +303,14 @@ export default function LoginPage() {
               disabled={loading || !isWiscEmail(email)}
               className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Sending code...' : 'Send code'}
+              {loading ? 'Sending code...' : 'Send verification code'}
             </button>
             <button
               type="button"
               onClick={() => switchStep('phone')}
               className="mt-3 w-full text-center text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--color-brand-contrast)] hover:underline"
             >
-              Use phone sign-in instead
+              Use invite-code phone sign-in
             </button>
           </form>
         ) : null}
@@ -354,7 +354,7 @@ export default function LoginPage() {
               onClick={() => switchStep('email')}
               className="mt-3 w-full text-center text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--color-brand-contrast)] hover:underline"
             >
-              Use student email instead
+              Back to student email
             </button>
           </form>
         ) : null}

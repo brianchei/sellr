@@ -70,6 +70,9 @@ export default function OnboardingPage() {
     mode === 'invite'
       ? inviteValue.length >= 3
       : emailValue.length > 5 && emailValue.includes('@');
+  const helpId =
+    mode === 'invite' ? 'onboarding-invite-help' : 'onboarding-email-help';
+  const describedBy = error ? `${helpId} onboarding-error` : helpId;
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -173,39 +176,39 @@ export default function OnboardingPage() {
 
       <main className="flex-1 px-4 py-8 sm:py-12">
         <div className="mx-auto w-full max-w-5xl">
-          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-            <section className="space-y-5">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+            <section className="app-panel-soft p-5 sm:p-7">
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
                 One step left
               </p>
-              <div className="space-y-3">
-                <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-                  Join your community.
-                </h1>
-                <p className="max-w-xl text-base leading-7 text-[var(--text-secondary)]">
-                  Community access puts you in the right local marketplace
-                  before you browse, sell, or message. It keeps listings scoped
-                  to people with shared context.
-                </p>
-              </div>
-              <ul className="grid gap-3 sm:grid-cols-1">
-                <TrustPillar
-                  title="Verified group"
-                  body="Listings stay inside a known local community, not the open internet."
-                />
-                <TrustPillar
-                  title="Member context"
-                  body="Messages carry community and profile context before pickup is arranged."
-                />
-                <TrustPillar
-                  title="Scoped safety"
-                  body="Reports and access controls stay tied to the community they affect."
-                />
-              </ul>
-            </section>
+              <h1 className="mt-2 text-3xl font-semibold leading-tight text-[var(--text-primary)] sm:text-4xl">
+                Join Badger Market
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+                Badger Market is for verified UW-Madison members, so listings
+                and messages stay local.
+              </p>
 
-            <section className="app-panel-soft p-5 sm:p-7">
-              <h2 className="text-xl font-semibold text-[var(--text-primary)]">
+              {verifiedEmail ? (
+                <div className="app-list-row mt-5 flex items-start gap-3 border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-accent)] text-[var(--text-primary)]"
+                  >
+                    <CheckIcon />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-accent-strong)]">
+                      Verified email
+                    </p>
+                    <p className="mt-1 truncate text-sm font-semibold text-[var(--text-primary)]">
+                      {verifiedEmail}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
+              <h2 className="mt-5 text-xl font-semibold text-[var(--text-primary)]">
                 Verify community access
               </h2>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">
@@ -271,7 +274,7 @@ export default function OnboardingPage() {
                       }
                       autoComplete="off"
                       placeholder="INVITE2026"
-                      aria-describedby="onboarding-invite-help"
+                      aria-describedby={describedBy}
                       aria-invalid={Boolean(error)}
                       className="app-field mt-1.5 px-3 py-2.5 font-mono text-sm uppercase tracking-wider"
                     />
@@ -288,7 +291,7 @@ export default function OnboardingPage() {
                       type="email"
                       autoComplete="email"
                       placeholder="you@wisc.edu"
-                      aria-describedby="onboarding-email-help"
+                      aria-describedby={describedBy}
                       readOnly={Boolean(verifiedEmail)}
                       aria-invalid={Boolean(error)}
                       className="app-field mt-1.5 px-3 py-2.5 text-sm"
@@ -316,6 +319,7 @@ export default function OnboardingPage() {
 
                 {error ? (
                   <p
+                    id="onboarding-error"
                     className="app-alert mt-4 px-3 py-2 text-sm"
                     role="alert"
                   >
@@ -328,7 +332,11 @@ export default function OnboardingPage() {
                   disabled={loading || !canSubmit}
                   className="app-action-primary mt-5 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {loading ? 'Joining...' : 'Join community'}
+                  {loading
+                    ? 'Joining...'
+                    : mode === 'email'
+                      ? 'Join with verified email'
+                      : 'Join with invite code'}
                 </button>
               </form>
 
@@ -346,9 +354,41 @@ export default function OnboardingPage() {
 
               <p className="mt-4 text-center text-xs leading-5 text-[var(--text-tertiary)]">
                 Your verified contact stays private. You can join more
-                communities later from your dashboard.
+                communities later from Home.
               </p>
             </section>
+
+            <aside className="space-y-4">
+              <section className="app-panel p-5">
+                <h2 className="text-base font-semibold text-[var(--text-primary)]">
+                  After you join
+                </h2>
+                <ul className="mt-4 grid gap-3">
+                  <TrustPillar
+                    title="Browse local listings"
+                    body="Marketplace results use your verified community context."
+                  />
+                  <TrustPillar
+                    title="Sell when ready"
+                    body="Your profile and verified contact help buyers understand who is posting."
+                  />
+                  <TrustPillar
+                    title="Message from an item"
+                    body="Conversations stay tied to the listing and community they affect."
+                  />
+                </ul>
+              </section>
+
+              <section className="app-panel p-5">
+                <h2 className="text-base font-semibold text-[var(--text-primary)]">
+                  Invite codes
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+                  Codes remain available for trusted seed sellers and early
+                  members whose access comes from a community organizer.
+                </p>
+              </section>
+            </aside>
           </div>
         </div>
       </main>
@@ -364,19 +404,7 @@ function TrustPillar({ title, body }: { title: string; body: string }) {
           aria-hidden="true"
           className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]"
         >
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-            <path d="m9 12 2 2 4-4" />
-          </svg>
+          <CheckIcon />
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-[var(--text-primary)]">
@@ -388,5 +416,22 @@ function TrustPillar({ title, body }: { title: string; body: string }) {
         </div>
       </div>
     </li>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m5 12 5 5L20 7" />
+    </svg>
   );
 }
