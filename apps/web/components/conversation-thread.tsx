@@ -39,7 +39,7 @@ const BUYER_QUICK_REPLIES = [
 const SELLER_QUICK_REPLIES = [
   'Yes, still available.',
   'How does tomorrow work for pickup?',
-  'I can meet at a public spot — let me know what works.',
+  'I can meet at a public spot. Let me know what works.',
 ];
 
 function MessageBubble({
@@ -182,6 +182,9 @@ function ListingContextHeader({
             · You as {role}
           </span>
         </div>
+        <p className="mt-2 text-xs font-medium text-[var(--color-brand-contrast)]">
+          View listing context
+        </p>
       </div>
     </Link>
   );
@@ -212,6 +215,7 @@ export function ConversationThread({
   const peerName = conversationPeer(conversation);
   const archived = Boolean(conversation.archivedAt);
   const peerSignals = profileSignalSummary(conversation.peer);
+  const peerReportId = conversation.peer?.id;
 
   const messagesQuery = useQuery({
     queryKey: ['conversation-messages', conversation.id],
@@ -339,6 +343,15 @@ export function ConversationThread({
             >
               {showPeerDetails ? 'Hide details' : 'Profile signals'}
             </button>
+            {peerReportId ? (
+              <ReportDialog
+                targetId={peerReportId}
+                targetType="user"
+                subjectLabel={peerName}
+                triggerLabel="Report member"
+                triggerClassName="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+              />
+            ) : null}
           </div>
         </div>
 
@@ -473,6 +486,13 @@ export function ConversationThread({
             ))}
           </div>
         ) : null}
+
+        <div className="mb-3 rounded-[var(--radius-lg)] border border-black/10 bg-[var(--bg-secondary)] px-3 py-2.5 text-xs leading-5 text-[var(--text-secondary)]">
+          <p>
+            Meet in a public, familiar place when possible. Do not send
+            deposits, gift cards, or payment codes before seeing the item.
+          </p>
+        </div>
 
         <label className="block text-sm font-medium text-[var(--text-primary)]">
           <span className="sr-only">Reply</span>
