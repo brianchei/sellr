@@ -77,6 +77,18 @@ export default function LoginPage() {
   const destination = isEmailFlow
     ? email.trim().toLowerCase()
     : (normalizedPhone ?? phoneInput.trim());
+  const intro =
+    step === 'phone' || step === 'phone-code'
+      ? {
+          eyebrow: 'Invite access fallback',
+          title: 'Use phone sign-in for invite access',
+          body: 'Phone sign-in is for trusted invite-code access. Email remains the primary Badger Market path.',
+        }
+      : {
+          eyebrow: 'Badger Market access',
+          title: 'Sign in with your wisc.edu email',
+          body: 'We will send a 6-digit code. If you have not joined yet, the next step verifies Badger Market access.',
+        };
 
   useEffect(() => {
     if (hydrated && isAuthenticated && communityIds !== null) {
@@ -234,7 +246,7 @@ export default function LoginPage() {
     return (
       <main className="app-shell-bg flex min-h-screen items-center justify-center px-6 py-16">
         <p className="text-center text-sm text-[var(--text-tertiary)]">
-          Loading...
+          Checking your session...
         </p>
       </main>
     );
@@ -246,7 +258,7 @@ export default function LoginPage() {
 
   return (
     <main className="app-shell-bg flex min-h-screen items-center justify-center px-6 py-12 sm:py-16">
-      <section className="app-panel-soft w-full max-w-md p-6 sm:p-7">
+      <section className="app-panel w-full max-w-md p-6 sm:p-7">
         <Link
           href="/"
           className="mb-7 inline-flex items-center gap-2 no-underline"
@@ -262,14 +274,13 @@ export default function LoginPage() {
         </Link>
 
         <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
-          Sign in
+          {intro.eyebrow}
         </p>
         <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
-          Use your wisc.edu email to join Badger Market
+          {intro.title}
         </h1>
         <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-          Email is the primary path. After the code, you will verify community
-          access or land on Home if you have already joined.
+          {intro.body}
         </p>
 
         {step === 'email' ? (
@@ -303,15 +314,24 @@ export default function LoginPage() {
               disabled={loading || !isWiscEmail(email)}
               className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Sending code...' : 'Send verification code'}
+              {loading ? 'Sending code...' : 'Send email code'}
             </button>
-            <button
-              type="button"
-              onClick={() => switchStep('phone')}
-              className="mt-3 w-full text-center text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--color-brand-contrast)] hover:underline"
-            >
-              Use invite-code phone sign-in
-            </button>
+            <div className="mt-5 border-t border-[var(--border-default)] pt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+                Invite-code access
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+                Use phone fallback only if your community organizer gave you an
+                invite path.
+              </p>
+              <button
+                type="button"
+                onClick={() => switchStep('phone')}
+                className="mt-2 text-sm font-semibold text-[var(--color-brand-contrast)] hover:underline"
+              >
+                Use phone fallback
+              </button>
+            </div>
           </form>
         ) : null}
 
@@ -339,22 +359,21 @@ export default function LoginPage() {
               id="login-phone-help"
               className="mt-1.5 text-xs text-[var(--text-tertiary)]"
             >
-              US numbers are normalized to +1 format before verification. Use
-              this path only if you are joining with an invite code.
+              Use the phone number connected to your invite-code access.
             </p>
             <button
               type="submit"
               disabled={loading || !normalizedPhone}
               className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Sending code...' : 'Send code'}
+              {loading ? 'Sending code...' : 'Send phone code'}
             </button>
             <button
               type="button"
               onClick={() => switchStep('email')}
               className="mt-3 w-full text-center text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--color-brand-contrast)] hover:underline"
             >
-              Back to student email
+              Back to wisc.edu email
             </button>
           </form>
         ) : null}
@@ -362,7 +381,7 @@ export default function LoginPage() {
         {isCodeStep ? (
           <form onSubmit={handleOtpSubmit} className="mt-6">
             <p className="text-sm text-[var(--text-secondary)]">
-              We sent a code to{' '}
+              Enter the 6-digit code sent to{' '}
               <span className="font-medium text-[var(--text-primary)]">
                 {destination}
               </span>
@@ -389,7 +408,7 @@ export default function LoginPage() {
               disabled={loading || code.length !== OTP_CODE_LENGTH}
               className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Verifying...' : 'Verify and continue'}
+              {loading ? 'Verifying...' : 'Continue'}
             </button>
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs">
               <button
@@ -422,10 +441,10 @@ export default function LoginPage() {
 
         <ul className="mt-6 space-y-2 border-t border-black/10 pt-5 text-xs text-[var(--text-secondary)]">
           <TrustPoint>
-            Student email verification is the primary community trust signal.
+            Student email is the primary Badger Market access signal.
           </TrustPoint>
           <TrustPoint>
-            Phone sign-in remains available for invite-only access.
+            Phone fallback remains available for invite-code members.
           </TrustPoint>
         </ul>
 
