@@ -46,10 +46,96 @@ function freshnessTextClass(tone: ListedFreshness['tone']): string {
   return 'text-[var(--text-tertiary)]';
 }
 
+type HomeAction = {
+  copy: string;
+  eyebrow: string;
+  href: string;
+  label: string;
+};
+
+function getHomeAction({
+  activeListingsCount,
+  buyerConversationCount,
+  draftListingsCount,
+  listingsMissingPhotosCount,
+  listingsTotal,
+  hasCommunity,
+  unreadCount,
+  userId,
+}: {
+  activeListingsCount: number;
+  buyerConversationCount: number;
+  draftListingsCount: number;
+  hasCommunity: boolean;
+  listingsMissingPhotosCount: number;
+  listingsTotal: number;
+  unreadCount: number;
+  userId: string | null;
+}): HomeAction {
+  if (!hasCommunity) {
+    return {
+      eyebrow: 'Community access',
+      label: 'Join community',
+      href: '/onboarding',
+      copy: 'Join a verified local community before browsing, selling, or messaging.',
+    };
+  }
+
+  if (activeListingsCount === 0) {
+    return draftListingsCount > 0
+      ? {
+          eyebrow: 'Inventory started',
+          label: 'Publish a draft',
+          href: '/listings',
+          copy: 'You have inventory started. Publish one listing so buyers can find it.',
+        }
+      : {
+          eyebrow: 'Start selling',
+          label: 'Create listing',
+          href: '/sell',
+          copy: 'Add one polished listing with photos to make your community marketplace feel active.',
+        };
+  }
+
+  if (listingsTotal > 0 && listingsMissingPhotosCount > 0) {
+    return {
+      eyebrow: 'Improve trust',
+      label: 'Improve listings',
+      href: '/listings',
+      copy: 'Add photos to listings that need them so buyers can scan faster and message with more confidence.',
+    };
+  }
+
+  if (unreadCount > 0) {
+    return {
+      eyebrow: 'Needs attention',
+      label: 'Review activity',
+      href: '/notifications',
+      copy: 'Clear unread buyer or marketplace activity before it becomes stale.',
+    };
+  }
+
+  if (buyerConversationCount > 0) {
+    return {
+      eyebrow: 'Coordinate pickup',
+      label: 'Open inbox',
+      href: '/inbox',
+      copy: 'You have buyer context ready. Keep pickup coordination tied to the item thread.',
+    };
+  }
+
+  return {
+    eyebrow: 'Profile ready',
+    label: 'View storefront',
+    href: userId ? `/sellers/${userId}` : '/marketplace',
+    copy: 'Your backed signals are ready. Review how buyers see your profile and listings.',
+  };
+}
+
 /* -------------------------------------------------------------------------- */
 
 export default function DashboardPage() {
-  const { primaryCommunityId, userId } = useAuth();
+  const { primaryCommunity, primaryCommunityId, userId } = useAuth();
   const meQuery = useQuery({
     queryKey: ['me', userId],
     queryFn: fetchMe,
@@ -130,6 +216,16 @@ export default function DashboardPage() {
       })
       .slice(0, 3);
   }, [conversations]);
+  const homeAction = getHomeAction({
+    activeListingsCount: activeListings.length,
+    buyerConversationCount: buyerConversations.length,
+    draftListingsCount: draftListings.length,
+    hasCommunity: Boolean(primaryCommunityId),
+    listingsMissingPhotosCount: listingsMissingPhotos.length,
+    listingsTotal: listings.length,
+    unreadCount,
+    userId,
+  });
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
@@ -137,13 +233,18 @@ export default function DashboardPage() {
         me={me}
         isLoading={meQuery.isLoading}
         communityCount={me?.communityIds.length ?? 0}
+        primaryCommunityName={primaryCommunity?.name ?? null}
       />
 
-      <KpiStrip
+      <HomeFocusPanel
         activeListingsCount={activeListings.length}
+        activeCommunityHref={
+          primaryCommunityId ? `/communities/${primaryCommunityId}` : '/onboarding'
+        }
+        activeCommunityName={primaryCommunity?.name ?? null}
+        homeAction={homeAction}
         unreadCount={unreadCount}
         buyerConversationsCount={buyerConversations.length}
-        userId={userId}
       />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
@@ -179,7 +280,6 @@ export default function DashboardPage() {
           listingsTotal={listings.length}
           unreadCount={unreadCount}
           buyerConversationCount={buyerConversations.length}
-          userId={userId}
         />
       </div>
 
@@ -196,10 +296,12 @@ function GreetingHero({
   me,
   isLoading,
   communityCount,
+  primaryCommunityName,
 }: {
   me: MeData | undefined;
   isLoading: boolean;
   communityCount: number;
+  primaryCommunityName: string | null;
 }) {
   const displayName = me?.user.displayName ?? '';
   const initials = displayName ? profileInitials(displayName) : '··';
@@ -220,7 +322,7 @@ function GreetingHero({
           'linear-gradient(135deg, var(--color-brand-primary-soft) 0%, var(--bg-elevated) 48%, var(--color-brand-contrast-soft) 100%)',
       }}
     >
-      <div className="relative z-10 grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-5">
+      <div className="relative z-10 grid gap-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-5">
         <div
           className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-primary)] text-base font-bold text-[var(--text-primary)] shadow-sm sm:h-16 sm:w-16 sm:text-lg"
           aria-hidden="true"
@@ -229,7 +331,7 @@ function GreetingHero({
         </div>
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
-            Account home
+            Home
           </p>
           <h1 className="mt-1 text-balance text-xl font-semibold leading-tight text-[var(--text-primary)] sm:text-2xl">
             {isLoading
@@ -276,40 +378,21 @@ function GreetingHero({
                 Member since {memberSinceLabel}
               </span>
             ) : null}
-            <span className="inline-flex items-center rounded-full bg-white/70 px-2.5 py-1 font-medium text-[var(--text-secondary)]">
-              {communityCount === 0
-                ? 'No community yet'
-                : `${communityCount} ${communityCount === 1 ? 'community' : 'communities'} joined`}
-            </span>
+            {primaryCommunityName ? (
+              <span className="inline-flex items-center rounded-full bg-white/70 px-2.5 py-1 font-medium text-[var(--text-secondary)]">
+                Active: {primaryCommunityName}
+              </span>
+            ) : (
+              <span className="inline-flex items-center rounded-full bg-white/70 px-2.5 py-1 font-medium text-[var(--text-secondary)]">
+                No community yet
+              </span>
+            )}
+            {communityCount > 1 ? (
+              <span className="inline-flex items-center rounded-full bg-white/70 px-2.5 py-1 font-medium text-[var(--text-secondary)]">
+                {communityCount} communities joined
+              </span>
+            ) : null}
           </div>
-        </div>
-        <div className="flex flex-wrap gap-2 sm:shrink-0 sm:justify-end">
-          <Link
-            href="/sell"
-            className="app-action-primary flex-1 px-4 py-2 text-sm sm:flex-none"
-          >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M12 5v14" />
-              <path d="M5 12h14" />
-            </svg>
-            Sell an item
-          </Link>
-          <Link
-            href="/marketplace"
-            className="app-action-secondary flex-1 px-4 py-2 text-sm sm:flex-none"
-          >
-            Browse
-          </Link>
         </div>
       </div>
     </section>
@@ -317,155 +400,116 @@ function GreetingHero({
 }
 
 /* -------------------------------------------------------------------------- */
-/* KPI strip                                                                   */
+/* Home focus panel                                                            */
 /* -------------------------------------------------------------------------- */
 
-function KpiStrip({
+function HomeFocusPanel({
   activeListingsCount,
-  unreadCount,
+  activeCommunityHref,
+  activeCommunityName,
   buyerConversationsCount,
-  userId,
+  homeAction,
+  unreadCount,
 }: {
   activeListingsCount: number;
+  activeCommunityHref: string;
+  activeCommunityName: string | null;
   unreadCount: number;
   buyerConversationsCount: number;
-  userId: string | null;
+  homeAction: HomeAction;
 }) {
-  const tiles = [
+  const rows = [
     {
-      label: 'Active listings',
-      value: activeListingsCount,
-      tone: 'accent' as const,
+      label: 'Active community',
+      value: activeCommunityName ?? 'Join needed',
+      href: activeCommunityHref,
+      helper: activeCommunityName
+        ? 'Browse, sell, and messages use this context.'
+        : 'Join a community to unlock marketplace actions.',
+    },
+    {
+      label: 'Listings live',
+      value: activeListingsCount.toLocaleString(),
       href: '/listings',
-      hint:
+      helper:
         activeListingsCount === 0
-          ? 'No listings live yet'
-          : 'Live in the marketplace',
-      icon: (
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <rect x="3" y="3" width="7" height="7" rx="1" />
-          <rect x="14" y="3" width="7" height="7" rx="1" />
-          <rect x="3" y="14" width="7" height="7" rx="1" />
-          <rect x="14" y="14" width="7" height="7" rx="1" />
-        </svg>
-      ),
+          ? 'No items are visible in browse yet.'
+          : 'Visible to buyers in your active community.',
     },
     {
-      label: 'Unread notifications',
-      value: unreadCount,
-      tone: 'warm' as const,
+      label: 'Unread activity',
+      value: unreadCount.toLocaleString(),
       href: '/notifications',
-      hint: unreadCount === 0 ? 'You are caught up' : 'Need attention',
-      icon: (
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-        </svg>
-      ),
+      helper: unreadCount === 0 ? 'You are caught up.' : 'Review new activity.',
     },
     {
-      label: 'Buyer conversations',
-      value: buyerConversationsCount,
-      tone: 'contrast' as const,
-      href: userId ? '/inbox' : '/marketplace',
-      hint:
+      label: 'Buyer threads',
+      value: buyerConversationsCount.toLocaleString(),
+      href: '/inbox',
+      helper:
         buyerConversationsCount === 0
-          ? 'No buyer threads yet'
-          : 'Coordinate pickup',
-      icon: (
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
-        </svg>
-      ),
+          ? 'No buyer conversations yet.'
+          : 'Keep pickup coordination item-anchored.',
     },
   ];
 
   return (
-    <section
-      aria-label="Activity snapshot"
-      className="mt-6 grid gap-3 sm:grid-cols-3"
-    >
-      {tiles.map((tile) => (
-        <Link
-          key={tile.label}
-          href={tile.href}
-          className="app-list-row group flex items-center gap-3 p-4 no-underline transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
-        >
-          <span
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-            style={{
-              background:
-                tile.tone === 'accent'
-                  ? 'var(--color-brand-accent-soft)'
-                  : tile.tone === 'warm'
-                    ? 'var(--color-brand-warm-soft)'
-                    : 'var(--color-brand-contrast-soft)',
-              color:
-                tile.tone === 'accent'
-                  ? 'var(--color-brand-accent-strong)'
-                  : tile.tone === 'warm'
-                    ? 'var(--color-brand-warm-strong)'
-                    : 'var(--color-brand-contrast)',
-            }}
-            aria-hidden="true"
+    <section className="app-panel mt-6 p-5 sm:p-6">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.9fr)] lg:items-start">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
+            {homeAction.eyebrow}
+          </p>
+          <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">
+            Next best action
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+            {homeAction.copy}
+          </p>
+          <Link
+            href={homeAction.href}
+            className="app-action-primary mt-4 w-full px-4 py-2.5 text-sm sm:w-auto"
           >
-            {tile.icon}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
-              {tile.label}
-            </p>
-            <p className="mt-0.5 text-2xl font-semibold leading-tight text-[var(--text-primary)]">
-              {tile.value}
-            </p>
-            <p className="text-xs text-[var(--text-secondary)]">{tile.hint}</p>
-          </div>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="shrink-0 text-[var(--text-tertiary)] transition group-hover:translate-x-0.5 group-hover:text-[var(--color-brand-contrast)]"
-            aria-hidden="true"
-          >
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        </Link>
-      ))}
+            {homeAction.label}
+          </Link>
+        </div>
+
+        <div className="divide-y divide-[var(--border-default)] border-t border-[var(--border-default)] lg:border-t-0">
+          {rows.map((row) => (
+            <Link
+              key={row.label}
+              href={row.href}
+              className="group grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 py-3 no-underline"
+            >
+              <span className="min-w-0">
+                <span className="block text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+                  {row.label}
+                </span>
+                <span className="mt-0.5 block text-xs leading-5 text-[var(--text-secondary)]">
+                  {row.helper}
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-2 text-right text-sm font-semibold text-[var(--text-primary)]">
+                <span className="max-w-[150px] truncate">{row.value}</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="shrink-0 text-[var(--text-tertiary)] transition group-hover:translate-x-0.5 group-hover:text-[var(--color-brand-contrast)]"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -716,7 +760,6 @@ function SetupPanel({
   listingsTotal,
   unreadCount,
   buyerConversationCount,
-  userId,
 }: {
   isLoading: boolean;
   isError: boolean;
@@ -726,7 +769,6 @@ function SetupPanel({
   listingsTotal: number;
   unreadCount: number;
   buyerConversationCount: number;
-  userId: string | null;
 }) {
   const checks = [
     {
@@ -767,36 +809,6 @@ function SetupPanel({
   ];
 
   const completedCount = checks.filter((c) => c.complete).length;
-  const nextAction =
-    activeListingsCount === 0
-      ? draftListingsCount > 0
-        ? {
-            label: 'Publish a draft',
-            href: '/listings',
-            copy: 'You have inventory started. Publish one listing to become visible.',
-          }
-        : {
-            label: 'Create listing',
-            href: '/sell',
-            copy: 'Add one polished listing with photos to complete seller readiness.',
-          }
-      : listingsMissingPhotosCount > 0
-        ? {
-            label: 'Improve listings',
-            href: '/listings',
-            copy: 'Add photos to make your listings easier to scan and trust.',
-          }
-        : unreadCount > 0
-          ? {
-              label: 'Review activity',
-              href: '/notifications',
-              copy: 'Clear unread buyer or marketplace activity.',
-            }
-          : {
-              label: 'View storefront',
-              href: userId ? `/sellers/${userId}` : '/marketplace',
-              copy: 'Your backed signals are ready. Review how buyers see your profile.',
-            };
 
   return (
     <section className="app-panel p-5">
@@ -880,21 +892,6 @@ function SetupPanel({
               </li>
             ))}
           </ul>
-
-          <div className="app-list-row mt-4 border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-3">
-            <p className="text-xs font-semibold text-[var(--text-primary)]">
-              Next best action
-            </p>
-            <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-              {nextAction.copy}
-            </p>
-            <Link
-              href={nextAction.href}
-              className="app-action-primary mt-2 w-full px-3 py-1.5 text-xs"
-            >
-              {nextAction.label}
-            </Link>
-          </div>
         </>
       )}
     </section>
