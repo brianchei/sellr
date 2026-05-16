@@ -353,7 +353,7 @@ function MyListingsContent() {
 
       {notice ? (
         <p
-          className="mt-4 rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm text-[var(--color-brand-accent-strong)]"
+          className="app-list-row mt-4 border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm font-medium text-[var(--color-brand-accent-strong)]"
           role="status"
         >
           {notice}
@@ -418,7 +418,7 @@ function MyListingsContent() {
           <button
             type="button"
             onClick={() => void listingsQuery.refetch()}
-            className="mt-4 rounded-lg bg-[var(--color-brand-warm)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-warm-strong)]"
+            className="app-action-secondary mt-4 border-[var(--color-brand-warm)] px-4 py-2 text-sm text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
           >
             Retry
           </button>
@@ -463,7 +463,7 @@ function MyListingsContent() {
       ) : null}
 
       {filteredListings.length > 0 ? (
-        <section className="mt-6 space-y-3">
+        <section className="app-panel mt-6 divide-y divide-[var(--border-default)] overflow-hidden">
           {filteredListings.map((listing) => (
             <ListingRow
               key={listing.id}
@@ -525,7 +525,7 @@ function ListingRow({
       : null;
 
   return (
-    <article className="app-list-row grid gap-4 p-4 transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
+    <article className="grid gap-4 p-4 transition hover:bg-white sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
       <Link
         href={`/marketplace/${listing.id}`}
         aria-label={`Open ${listing.title} detail page`}

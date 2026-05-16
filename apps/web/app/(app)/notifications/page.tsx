@@ -113,12 +113,12 @@ function NotificationCard({
 
   return (
     <article
-      className="app-list-row group transition hover:border-black/20 hover:bg-white"
+      className="group transition hover:bg-white"
       style={
         isPickup
-          ? { borderColor: 'var(--color-brand-warm)' }
+          ? { background: 'var(--color-brand-warm-soft)' }
           : isUnread
-            ? { borderColor: 'var(--color-brand-contrast-muted)' }
+            ? { background: 'var(--color-brand-contrast-soft)' }
             : undefined
       }
     >
@@ -427,7 +427,7 @@ export default function NotificationsPage() {
           <button
             type="button"
             onClick={() => void notificationsQuery.refetch()}
-            className="mt-4 w-full rounded-lg bg-[var(--color-brand-warm)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-brand-warm-strong)] sm:w-auto"
+            className="app-action-secondary mt-4 w-full border-[var(--color-brand-warm)] px-4 py-2 text-sm text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] sm:w-auto"
           >
             Retry
           </button>
@@ -496,7 +496,7 @@ export default function NotificationsPage() {
               >
                 {group.label}
               </h2>
-              <div className="space-y-2">
+              <div className="app-panel divide-y divide-[var(--border-default)] overflow-hidden">
                 {group.items.map((notification) => (
                   <NotificationCard
                     key={notification.id}
