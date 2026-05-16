@@ -30,7 +30,7 @@ export function ConversationList({
         </h2>
       </div>
       <nav
-        className="max-h-[360px] space-y-1 overflow-y-auto p-2 lg:max-h-[640px]"
+        className="max-h-[360px] divide-y divide-black/10 overflow-y-auto lg:max-h-[640px]"
         aria-label="Conversations"
       >
         {conversations.map((conversation) => {
@@ -64,7 +64,7 @@ export function ConversationList({
               key={conversation.id}
               href={`/inbox/${conversation.id}`}
               aria-current={selected ? 'page' : undefined}
-              className="grid w-full grid-cols-[56px_minmax(0,1fr)] gap-3 rounded-2xl px-3 py-3 text-left no-underline transition hover:bg-[var(--bg-secondary)]"
+              className="grid w-full grid-cols-[56px_minmax(0,1fr)] gap-3 px-4 py-3 text-left no-underline transition hover:bg-[var(--bg-secondary)]"
               style={{
                 background: selected
                   ? 'linear-gradient(135deg, var(--text-primary) 0%, #2e2a24 100%)'

@@ -462,6 +462,14 @@ body {
   box-shadow: none;
 }
 
+:where(.app-alert) {
+  border: 1px solid var(--color-brand-warm);
+  border-radius: var(--radius-panel);
+  background: var(--color-brand-warm-soft);
+  color: var(--color-brand-warm-strong);
+  box-shadow: none;
+}
+
 /* Subtle ticked divider for marketing sections */
 .section-rule {
   height: 1px;

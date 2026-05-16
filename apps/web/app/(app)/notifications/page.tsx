@@ -320,7 +320,7 @@ export default function NotificationsPage() {
                 type="button"
                 onClick={() => setFilter(item.value)}
                 aria-pressed={active}
-                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:-translate-y-0.5"
+                className="app-chip transition hover:border-black/20 hover:text-[var(--text-primary)]"
                 style={
                   active
                     ? {
@@ -366,7 +366,7 @@ export default function NotificationsPage() {
 
       {notificationsQuery.isError ? (
         <section
-          className="mt-6 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-6 p-6"
           role="alert"
         >
           <h2 className="text-base font-semibold">
