@@ -142,8 +142,11 @@ home, marketplace, listing detail, seller flows, inbox, profile, storefront, and
 notifications. Phase B foundation work is complete for the current scope:
 lighter app surfaces, rows, fields, chips, alerts, empty states, listing cards,
 seller trust cards, buttons, and authenticated shell patterns are in place while
-preserving existing behavior. Continue with Phase C onboarding/navigation and
-first signed-in action work before beginning Phase 6 AI.
+preserving existing behavior. May 16 Browser DOM smoke covered the public entry,
+core buyer/seller routes, seller storefront, notifications, and admin community
+and reports routes; mobile viewport automation still needs a dedicated tool
+before launch readiness. Continue with Phase C onboarding/navigation and first
+signed-in action work before beginning Phase 6 AI.
 
 ## Deliberately Deferred
 
