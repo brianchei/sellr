@@ -192,7 +192,7 @@ export default function InboxPage() {
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
             {archivedView
               ? 'Archived conversations are hidden from your active inbox and stay available here if you need them later.'
-              : 'Messages appear here after a buyer contacts a seller from a listing detail page.'}
+              : 'Contact a seller from a listing, or post an item and replies will appear here.'}
           </p>
           {archivedView ? (
             <button
@@ -203,12 +203,20 @@ export default function InboxPage() {
               View active inbox
             </button>
           ) : (
-            <Link
-              href="/marketplace"
-              className="app-action-primary mt-5 px-4 py-2 text-sm"
-            >
-              Browse marketplace
-            </Link>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/marketplace"
+                className="app-action-primary px-4 py-2 text-sm"
+              >
+                Browse marketplace
+              </Link>
+              <Link
+                href="/sell"
+                className="app-action-secondary px-4 py-2 text-sm"
+              >
+                Sell an item
+              </Link>
+            </div>
           )}
         </section>
       ) : null}

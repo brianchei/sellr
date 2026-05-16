@@ -110,6 +110,21 @@ export function ConversationList({
                   >
                     {conversationPeer(conversation)}
                   </span>
+                  {needsReply ? (
+                    <span
+                      className="inline-flex items-center rounded-full bg-[var(--color-brand-primary-soft)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-primary-strong)]"
+                      style={
+                        selected
+                          ? {
+                              background: 'rgba(246,232,76,0.18)',
+                              color: 'var(--color-brand-primary)',
+                            }
+                          : undefined
+                      }
+                    >
+                      Needs reply
+                    </span>
+                  ) : null}
                   {userId != null ? (
                     <span
                       className="inline-flex items-center rounded-full bg-[var(--bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-secondary)]"
@@ -154,7 +169,7 @@ export function ConversationList({
                 <div className="mt-1 flex items-start gap-2">
                   {needsReply ? (
                     <span
-                      className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-contrast)]"
+                      className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-primary)]"
                       aria-label="Needs reply"
                     />
                   ) : null}
