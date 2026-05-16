@@ -183,7 +183,7 @@ function Hero() {
       aria-labelledby="hero-heading"
       className="relative overflow-hidden border-b border-black/10 bg-[radial-gradient(circle_at_50%_0%,#ffffff_0%,#fff9d7_32%,#f7f4ea_72%)]"
     >
-      <div className="mx-auto max-w-6xl px-4 pb-14 pt-10 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24">
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-12 lg:pb-16">
         <div className="mx-auto max-w-4xl text-center">
           <div className="mx-auto inline-flex max-w-full items-center gap-3 rounded-full border border-black/10 bg-white px-3 py-2 shadow-sm">
             <Image
@@ -201,38 +201,45 @@ function Hero() {
 
           <h1
             id="hero-heading"
-            className="mx-auto mt-7 max-w-4xl text-5xl font-semibold leading-[0.98] text-black sm:text-6xl lg:text-7xl"
+            className="mx-auto mt-6 max-w-4xl text-5xl font-semibold leading-[0.98] text-black sm:text-6xl"
           >
-            Buy and sell locally in your community
+            Badger Market
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
-            Sellr brings listings, messages, and pickup coordination into
-            verified local communities. Badger Market starts with UW-Madison,
-            where buyers and sellers share context before they meet.
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
+            Sellr&apos;s verified UW-Madison marketplace for local listings,
+            item-tied messages, and pickup coordination that starts with
+            community context.
           </p>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/login"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-6 py-3.5 text-sm font-semibold text-white no-underline shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:bg-[var(--color-brand-contrast-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)] sm:text-base"
             >
-              Join your community
+              Join Badger Market
               <ArrowRightIcon />
             </Link>
             <Link
-              href="#how-it-works"
+              href="#preview"
               className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/80 px-5 py-3 text-sm font-semibold text-[var(--text-primary)] no-underline transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             >
-              See how it works
+              Preview listings
             </Link>
           </div>
-          <p className="mx-auto mt-3 max-w-md text-xs leading-5 text-[var(--text-tertiary)]">
-            Start with a wisc.edu email. Invite codes remain available for
-            trusted early members.
-          </p>
+          <div className="mx-auto mt-4 flex max-w-2xl flex-wrap items-center justify-center gap-2 text-xs font-semibold text-[var(--text-secondary)]">
+            <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1">
+              wisc.edu access
+            </span>
+            <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1">
+              Approximate pickup areas
+            </span>
+            <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1">
+              Item-linked inbox
+            </span>
+          </div>
         </div>
 
-        <div className="mt-12 sm:mt-16">
+        <div id="preview" className="mt-9 scroll-mt-24 sm:mt-12">
           <LandingAppPreview />
         </div>
       </div>
@@ -251,32 +258,31 @@ function CommunityProof() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-xl">
             <p className="text-xs font-semibold uppercase text-[var(--color-brand-contrast)]">
-              Community proof
+              After joining
             </p>
             <h2
               id="proof-heading"
               className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl"
             >
-              Built around real local context.
+              The marketplace opens around the item, seller, and pickup.
             </h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Sellr starts with the trust signals that matter before a pickup:
-            verified access, clear listings, seller context, and a place to
-            report concerns.
+            Join with verified access, then browse listings with photos,
+            seller context, and messages that stay attached to the item.
           </p>
         </div>
 
-        <dl className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {proofItems.map((item) => (
             <div
               key={item.value}
-              className="rounded-3xl border border-black/10 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10"
+              className="rounded-2xl border border-black/10 bg-white p-4"
             >
-              <span className="mb-6 flex h-11 w-11 items-center justify-center rounded-full bg-[#f6e84c] text-black">
+              <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#f6e84c] text-black">
                 <ProofIcon type={item.icon} />
               </span>
-              <dt className="text-2xl font-semibold leading-tight text-black">
+              <dt className="text-xl font-semibold leading-tight text-black">
                 {item.value}
               </dt>
               <dd className="mt-2 text-sm font-semibold text-[var(--color-brand-contrast)]">
@@ -686,7 +692,7 @@ function FinalCta() {
             href="/login"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-[#f6e84c] px-6 py-3.5 text-base font-semibold text-black no-underline shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            Join your community
+            Join Badger Market
             <ArrowRightIcon />
           </Link>
         </div>
@@ -713,8 +719,8 @@ function Footer() {
         </div>
 
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm" aria-label="Footer">
-          <Link href="#why" className="text-white/65 no-underline hover:text-white">
-            Why Sellr
+          <Link href="#preview" className="text-white/65 no-underline hover:text-white">
+            Preview
           </Link>
           <Link
             href="#how-it-works"

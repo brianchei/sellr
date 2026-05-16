@@ -92,14 +92,14 @@ export function LandingAppPreview() {
             <aside className="flex flex-col justify-between rounded-[1.35rem] border border-white/10 bg-white/[0.06] p-5">
               <div>
                 <p className="text-xs font-semibold uppercase text-[#f6e84c]">
-                  Live controls
+                  Preview path
                 </p>
                 <h2 className="mt-3 text-2xl font-semibold leading-tight">
-                  Explore the marketplace the way a student would.
+                  Scan listings before the first message.
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-white/70">
-                  Switch views, adjust pickup radius, and see how listing,
-                  seller, and message context stay connected.
+                  Switch between browse, detail, and inbox views while pickup
+                  range keeps the marketplace local.
                 </p>
               </div>
 
@@ -108,7 +108,7 @@ export function LandingAppPreview() {
                   htmlFor="landing-radius"
                   className="flex items-center justify-between gap-4 text-sm font-semibold"
                 >
-                  Pickup radius
+                  Pickup range
                   <span className="rounded-full bg-[#f6e84c] px-3 py-1 text-xs">
                     {radiusLabel}
                   </span>
@@ -182,7 +182,7 @@ function ListingDetailPreview() {
     <div>
       <PreviewTopBar title="Listing detail" meta="Furniture / Lakeshore" />
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-3xl bg-[#f6e84c] p-5">
+        <div className="rounded-2xl bg-[#f6e84c] p-5">
           <p className="text-xs font-semibold uppercase">Photo gallery</p>
           <div className="mt-10 flex h-44 items-end justify-between rounded-2xl bg-white/50 p-4">
             <DeskIcon />
@@ -192,7 +192,7 @@ function ListingDetailPreview() {
           </div>
         </div>
 
-        <div className="rounded-3xl bg-white p-5">
+        <div className="rounded-2xl bg-white p-5">
           <p className="text-sm font-semibold text-[var(--color-brand-contrast)]">
             Walnut writing desk
           </p>
@@ -258,7 +258,7 @@ function InboxPreview() {
             ),
           )}
         </div>
-        <div className="rounded-3xl bg-white p-5">
+        <div className="rounded-2xl bg-white p-5">
           <div className="flex items-center justify-between gap-3 border-b border-black/10 pb-4">
             <div>
               <p className="text-sm font-semibold">Walnut writing desk</p>
@@ -292,7 +292,7 @@ function PreviewTopBar({ title, meta }: { title: string; meta: string }) {
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p className="text-xs font-semibold uppercase text-[var(--color-brand-contrast)]">
-          App view
+          Preview
         </p>
         <h2 className="mt-1 text-3xl font-semibold leading-tight">{title}</h2>
       </div>
@@ -316,7 +316,7 @@ function ListingPreviewCard({
         : 'bg-[var(--color-brand-contrast-soft)]';
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-black/10 bg-white">
+    <article className="overflow-hidden rounded-2xl border border-black/10 bg-white">
       <div className={`flex h-32 items-end justify-between p-3 ${bg}`}>
         <DeskIcon small />
         <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold">

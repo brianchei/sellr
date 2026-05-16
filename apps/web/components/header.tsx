@@ -5,9 +5,8 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const NAV_LINKS = [
-  { label: 'Proof', href: '/#proof' },
+  { label: 'Preview', href: '/#preview' },
   { label: 'How it works', href: '/#how-it-works' },
-  { label: 'Benefits', href: '/#benefits' },
   { label: 'FAQ', href: '/#faq' },
 ] as const;
 
@@ -95,7 +94,7 @@ export function Header() {
             href="/login"
             className="app-action-primary px-4 py-2 text-sm active:translate-y-0"
           >
-            Join your community
+            Join Badger Market
             <svg
               width="14"
               height="14"
@@ -181,7 +180,7 @@ export function Header() {
               onClick={() => setMobileOpen(false)}
               className="app-action-primary px-4 py-2.5 text-sm"
             >
-              Join your community
+              Join Badger Market
             </Link>
           </div>
         </div>
