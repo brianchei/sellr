@@ -253,7 +253,7 @@ export default function CommunityHomePage() {
           </div>
           {presentation.bannerImageUrl || presentation.logoImageUrl ? (
             <div
-              className="min-h-36 overflow-hidden rounded-3xl border border-white/70 bg-white/65 shadow-[var(--shadow-app-card)] lg:w-72"
+              className="app-list-row min-h-36 overflow-hidden border-white/70 bg-white/65 lg:w-72"
               style={
                 presentation.bannerImageUrl
                   ? {
@@ -268,7 +268,7 @@ export default function CommunityHomePage() {
               {presentation.logoImageUrl ? (
                 <div className="flex h-full min-h-36 items-center justify-center p-5">
                   <span
-                    className="block h-20 w-20 rounded-3xl border border-white/80 bg-white bg-center bg-contain bg-no-repeat shadow-sm"
+                    className="block h-20 w-20 rounded-[var(--radius-panel)] border border-white/80 bg-white bg-center bg-contain bg-no-repeat shadow-sm"
                     style={{
                       backgroundImage: `url("${presentation.logoImageUrl}")`,
                     }}
@@ -297,7 +297,7 @@ export default function CommunityHomePage() {
       </header>
 
       {!isActiveContext ? (
-        <section className="mt-4 rounded-3xl border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-4">
+        <section className="app-list-row mt-4 border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm font-medium text-[var(--color-brand-contrast-strong)]">
               You are viewing a community that is not currently active in the
@@ -360,7 +360,7 @@ export default function CommunityHomePage() {
               {Array.from({ length: 4 }, (_, index) => (
                 <div
                   key={index}
-                  className="h-72 rounded-3xl border border-black/10 bg-[var(--bg-tertiary)]"
+                  className="app-list-row h-72 bg-[var(--bg-tertiary)]"
                 />
               ))}
             </div>
@@ -371,7 +371,7 @@ export default function CommunityHomePage() {
               ))}
             </div>
           ) : (
-            <div className="mt-5 rounded-3xl border border-dashed border-black/15 bg-white/70 p-6">
+            <div className="app-empty-state mt-5 p-6">
               <h3 className="text-base font-semibold text-[var(--text-primary)]">
                 No active listings yet
               </h3>
@@ -408,7 +408,7 @@ export default function CommunityHomePage() {
               />
             </dl>
 
-            <div className="mt-5 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4">
+            <div className="app-alert mt-5 p-4">
               <h3 className="text-sm font-semibold text-[var(--color-brand-warm-strong)]">
                 Leave community
               </h3>
@@ -491,7 +491,7 @@ export default function CommunityHomePage() {
               {guidanceItems.slice(0, 5).map((rule) => (
                 <li
                   key={rule}
-                  className="rounded-2xl border border-black/10 bg-white/80 p-3 text-sm leading-6 text-[var(--text-secondary)]"
+                  className="app-list-row p-3 text-sm leading-6 text-[var(--text-secondary)]"
                 >
                   {rule}
                 </li>
@@ -572,7 +572,7 @@ function CommunityStat({
         : 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)]';
 
   return (
-    <div className={`rounded-3xl border p-4 ${toneClass}`}>
+    <div className={`app-list-row p-4 ${toneClass}`}>
       <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
         {label}
       </p>
@@ -596,7 +596,7 @@ function CommunityFact({
   tone?: 'plain' | 'accent';
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/80 px-3 py-2.5">
+    <div className="app-list-row flex items-center justify-between gap-3 px-3 py-2.5">
       <dt className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
         {label}
       </dt>

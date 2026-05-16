@@ -410,7 +410,7 @@ export default function ListingDetailPage() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <section
-          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert p-6"
           role="alert"
         >
           <h1 className="text-xl font-semibold">Could not load listing</h1>
@@ -770,7 +770,7 @@ function ContactCard({
       </h2>
 
       {isOwnListing ? (
-        <div className="mt-3 rounded-2xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+        <div className="app-list-row mt-3 border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             This is your listing.
           </p>
@@ -794,7 +794,7 @@ function ContactCard({
           </div>
         </div>
       ) : !isAvailable ? (
-        <div className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-4">
+        <div className="app-alert mt-3 p-4">
           <p className="text-sm font-medium text-[var(--color-brand-warm-strong)]">
             This listing is not currently available.
           </p>
@@ -812,7 +812,7 @@ function ContactCard({
           ) : null}
         </div>
       ) : profileLoading ? (
-        <div className="mt-3 rounded-2xl border border-black/10 bg-white/80 p-4">
+        <div className="app-list-row mt-3 p-4">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             Checking your profile
           </p>
@@ -821,7 +821,7 @@ function ContactCard({
           </p>
         </div>
       ) : profileIssue ? (
-        <div className="mt-3 rounded-2xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+        <div className="app-list-row mt-3 border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
           <p className="text-sm font-semibold text-[var(--text-primary)]">
             {PROFILE_COMPLETION_COPY[profileIssue].title}
           </p>
@@ -840,7 +840,7 @@ function ContactCard({
           </Link>
         </div>
       ) : sent ? (
-        <div className="mt-3 rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-4">
+        <div className="app-list-row mt-3 border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-4">
           <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-brand-accent-strong)]">
             <svg
               width="14"
@@ -888,7 +888,7 @@ function ContactCard({
                     type="button"
                     onClick={() => onApplyQuickReply(reply)}
                     aria-pressed={active}
-                    className="rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:-translate-y-0.5"
+                    className="app-chip px-3 py-1.5 transition"
                     style={{
                       borderColor: active
                         ? 'var(--color-brand-contrast)'
@@ -916,19 +916,19 @@ function ContactCard({
               rows={5}
               maxLength={8000}
               placeholder="Be specific about timing and pickup preferences."
-              className="mt-2 w-full resize-y rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-2 resize-y px-3 py-2.5 text-sm leading-6"
             />
           </label>
 
           {messageError ? (
-            <p className="mt-2 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]">
+            <p className="app-alert mt-2 p-3 text-sm" role="alert">
               {messageError}
             </p>
           ) : null}
 
           {isError ? (
             <p
-              className="mt-2 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+              className="app-alert mt-2 p-3 text-sm"
               role="alert"
             >
               {errorMessage ?? 'Could not send your message. Try again.'}

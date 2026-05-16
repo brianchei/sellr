@@ -509,7 +509,7 @@ function RecentListingsPanel({
           {Array.from({ length: 3 }, (_, index) => (
             <li
               key={index}
-              className="grid grid-cols-[56px_minmax(0,1fr)_60px] gap-3 rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3"
+              className="app-list-row grid grid-cols-[56px_minmax(0,1fr)_60px] gap-3 p-3"
             >
               <div className="h-14 w-14 rounded-md bg-[var(--bg-tertiary)]" />
               <div className="space-y-2">
@@ -523,7 +523,7 @@ function RecentListingsPanel({
       ) : isError ? (
         <p
           role="alert"
-          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-4 p-3 text-sm"
         >
           Could not load your listings.
         </p>
@@ -552,7 +552,7 @@ function RecentListingsPanel({
               <li key={listing.id}>
                 <Link
                   href={`/marketplace/${listing.id}`}
-                  className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-black/10 p-3 no-underline transition hover:border-black/20 hover:bg-[var(--bg-secondary)]"
+                  className="app-list-row grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 p-3 no-underline transition hover:border-black/20 hover:bg-[var(--bg-secondary)]"
                 >
                   <div
                     className="aspect-square h-14 w-14 overflow-hidden rounded-2xl bg-[var(--bg-tertiary)] bg-cover bg-center"
@@ -647,7 +647,7 @@ function RecentInboxPanel({
           {Array.from({ length: 3 }, (_, index) => (
             <li
               key={index}
-              className="rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3"
+              className="app-list-row p-3"
             >
               <div className="h-4 w-2/3 rounded bg-[var(--bg-tertiary)]" />
               <div className="mt-2 h-3 w-1/2 rounded bg-[var(--bg-tertiary)]" />
@@ -657,7 +657,7 @@ function RecentInboxPanel({
       ) : isError ? (
         <p
           role="alert"
-          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-4 p-3 text-sm"
         >
           Could not load conversations.
         </p>
@@ -676,7 +676,7 @@ function RecentInboxPanel({
             <li key={conversation.id}>
               <Link
                 href={`/inbox/${conversation.id}`}
-                className="block rounded-2xl border border-black/10 p-3 no-underline transition hover:border-black/20 hover:bg-[var(--bg-secondary)]"
+                className="app-list-row block p-3 no-underline transition hover:border-black/20 hover:bg-[var(--bg-secondary)]"
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="min-w-0 truncate text-sm font-semibold text-[var(--text-primary)]">
@@ -832,7 +832,7 @@ function SetupPanel({
       ) : isError ? (
         <p
           role="alert"
-          className="mt-4 rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-4 p-3 text-sm"
         >
           Could not load every readiness signal.
         </p>
@@ -842,7 +842,7 @@ function SetupPanel({
             {checks.map((check) => (
               <li
                 key={check.label}
-              className="flex gap-3 rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3"
+                className="app-list-row flex gap-3 p-3"
               >
                 <span
                   className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
@@ -881,7 +881,7 @@ function SetupPanel({
             ))}
           </ul>
 
-          <div className="mt-4 rounded-2xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-3">
+          <div className="app-list-row mt-4 border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-3">
             <p className="text-xs font-semibold text-[var(--text-primary)]">
               Next best action
             </p>
@@ -960,7 +960,7 @@ function ProfileReadinessSummary({ data }: { data: MeData }) {
   const copy = blockingIssue ? PROFILE_COMPLETION_COPY[blockingIssue] : null;
 
   return (
-    <div className="mt-4 rounded-2xl border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+    <div className="app-list-row mt-4 border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-[var(--text-primary)]">
@@ -1046,7 +1046,7 @@ function ProfileEditor({
           }}
           maxLength={60}
           autoComplete="name"
-          className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+          className="app-field mt-1.5 px-3 py-2.5 text-sm"
         />
       </label>
 
@@ -1073,7 +1073,7 @@ function ProfileEditor({
 
       {formError || profileMutation.isError ? (
         <p
-          className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)] md:col-span-2"
+          className="app-alert p-3 text-sm md:col-span-2"
           role="alert"
         >
           {formError ??

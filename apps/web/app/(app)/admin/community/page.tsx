@@ -408,7 +408,7 @@ function CommunityDetailsForm({
               value={name}
               onChange={(event) => setName(event.target.value)}
               maxLength={100}
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             />
           </label>
 
@@ -421,7 +421,7 @@ function CommunityDetailsForm({
                   event.target.value as ApiCommunityAdminCommunity['type'],
                 )
               }
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             >
               <option value="campus">Campus</option>
               <option value="residential">Residential</option>
@@ -441,7 +441,7 @@ function CommunityDetailsForm({
                     .value as ApiCommunityAdminCommunity['accessMethod'],
                 )
               }
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             >
               <option value="invite_code">Invite code</option>
               <option value="email_domain">Verified email domain</option>
@@ -455,7 +455,7 @@ function CommunityDetailsForm({
               onChange={(event) => setEmailDomain(event.target.value)}
               placeholder="wisc.edu"
               disabled={accessMethod !== 'email_domain'}
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)] disabled:cursor-not-allowed disabled:bg-[var(--bg-secondary)] disabled:text-[var(--text-tertiary)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm disabled:cursor-not-allowed disabled:bg-[var(--bg-secondary)] disabled:text-[var(--text-tertiary)]"
             />
             <span className="mt-1.5 block text-xs text-[var(--text-tertiary)]">
               Only required when members join through a verified email domain.
@@ -471,7 +471,7 @@ function CommunityDetailsForm({
             rows={2}
             maxLength={240}
             placeholder="A short member-facing description for this community homepage."
-            className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            className="app-field mt-1.5 px-3 py-2.5 text-sm"
           />
         </label>
 
@@ -483,7 +483,7 @@ function CommunityDetailsForm({
               onChange={(event) =>
                 setThemeKey(event.target.value as ApiCommunityThemeKey)
               }
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             >
               <option value="default">Default</option>
               <option value="badger">Badger</option>
@@ -498,7 +498,7 @@ function CommunityDetailsForm({
               value={accentColor}
               onChange={(event) => setAccentColor(event.target.value)}
               placeholder="#C5050C"
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             />
           </label>
 
@@ -509,7 +509,7 @@ function CommunityDetailsForm({
               onChange={(event) => setPickupGuidance(event.target.value)}
               maxLength={240}
               placeholder="Meet in familiar public spots when possible."
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             />
           </label>
         </div>
@@ -521,7 +521,7 @@ function CommunityDetailsForm({
               value={bannerImageUrl}
               onChange={(event) => setBannerImageUrl(event.target.value)}
               placeholder="/community/banner.webp or https://..."
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             />
           </label>
           <label className="text-sm font-medium text-[var(--text-primary)]">
@@ -530,7 +530,7 @@ function CommunityDetailsForm({
               value={logoImageUrl}
               onChange={(event) => setLogoImageUrl(event.target.value)}
               placeholder="/community/logo.png or https://..."
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             />
           </label>
         </div>
@@ -542,7 +542,7 @@ function CommunityDetailsForm({
             onChange={(event) => setLocalAreasText(event.target.value)}
             rows={3}
             placeholder="One pickup area per line."
-            className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            className="app-field mt-1.5 px-3 py-2.5 text-sm"
           />
         </label>
 
@@ -553,7 +553,7 @@ function CommunityDetailsForm({
             onChange={(event) => setRulesText(event.target.value)}
             rows={5}
             placeholder="One guideline per line, such as pickup expectations or community-specific rules."
-            className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            className="app-field mt-1.5 px-3 py-2.5 text-sm"
           />
           <span className="mt-1.5 block text-xs text-[var(--text-tertiary)]">
             These appear on the community homepage. Keep each line short and
@@ -563,7 +563,7 @@ function CommunityDetailsForm({
 
         {detailsError ? (
           <p
-            className="rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+            className="app-alert px-3 py-2 text-sm"
             role="alert"
           >
             {detailsError}
@@ -571,7 +571,7 @@ function CommunityDetailsForm({
         ) : null}
         {detailsMessage ? (
           <p
-            className="rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-3 py-2 text-sm text-[var(--color-brand-accent-strong)]"
+            className="app-list-row border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-3 py-2 text-sm text-[var(--color-brand-accent-strong)]"
             role="status"
           >
             {detailsMessage}
@@ -755,7 +755,7 @@ export default function AdminCommunityPage() {
     return (
       <main className="mx-auto max-w-3xl px-4 py-10">
         <section
-          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert p-6"
           role="alert"
         >
           <h1 className="text-lg font-semibold">
@@ -924,7 +924,7 @@ export default function AdminCommunityPage() {
               onChange={(event) =>
                 selectManagementCommunity(event.target.value)
               }
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)] disabled:cursor-not-allowed disabled:bg-[var(--bg-secondary)] disabled:text-[var(--text-tertiary)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm disabled:cursor-not-allowed disabled:bg-[var(--bg-secondary)] disabled:text-[var(--text-tertiary)]"
             >
               {communities.map((community) => (
                 <option key={community.id} value={community.id}>
@@ -953,7 +953,7 @@ export default function AdminCommunityPage() {
                   type="button"
                   onClick={() => selectManagementCommunity(community.id)}
                   aria-pressed={active}
-                  className={`rounded-2xl border px-3 py-3 text-left transition ${
+                  className={`app-list-row px-3 py-3 text-left transition ${
                     active
                       ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)]'
                       : 'border-black/10 bg-white/80 hover:bg-[var(--color-brand-primary-soft)]'
@@ -1038,7 +1038,7 @@ export default function AdminCommunityPage() {
                 }
                 placeholder="INVITE2026"
                 autoComplete="off"
-                className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 font-mono text-sm uppercase tracking-wider text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="app-field mt-1.5 px-3 py-2.5 font-mono text-sm uppercase tracking-wider"
               />
             </label>
 
@@ -1050,7 +1050,7 @@ export default function AdminCommunityPage() {
                   onChange={(event) => setMaxUses(event.target.value)}
                   inputMode="numeric"
                   placeholder="Unlimited"
-                  className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                  className="app-field mt-1.5 px-3 py-2.5 text-sm"
                 />
               </label>
               <label className="text-sm font-medium text-[var(--text-primary)]">
@@ -1059,14 +1059,14 @@ export default function AdminCommunityPage() {
                   type="datetime-local"
                   value={expiresAtLocal}
                   onChange={(event) => setExpiresAtLocal(event.target.value)}
-                  className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                  className="app-field mt-1.5 px-3 py-2.5 text-sm"
                 />
               </label>
             </div>
 
             {formError ? (
               <p
-                className="rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+                className="app-alert px-3 py-2 text-sm"
                 role="alert"
               >
                 {formError}
@@ -1074,7 +1074,7 @@ export default function AdminCommunityPage() {
             ) : null}
             {formMessage ? (
               <p
-                className="rounded-2xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-3 py-2 text-sm text-[var(--color-brand-accent-strong)]"
+                className="app-list-row border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-3 py-2 text-sm text-[var(--color-brand-accent-strong)]"
                 role="status"
               >
                 {formMessage}
@@ -1150,7 +1150,7 @@ export default function AdminCommunityPage() {
                 value={memberSearch}
                 onChange={(event) => setMemberSearch(event.target.value)}
                 placeholder="Name, email, phone, role, or status"
-                className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="app-field mt-1.5 px-3 py-2.5 text-sm"
               />
             </label>
 
@@ -1163,7 +1163,7 @@ export default function AdminCommunityPage() {
                     type="button"
                     onClick={() => setMemberFilter(option.id)}
                     aria-pressed={active}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                    className={`app-chip px-3 py-1.5 transition ${
                       active
                         ? 'border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] text-[var(--color-brand-contrast)]'
                         : 'border-black/10 bg-white/80 text-[var(--text-secondary)] hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]'
@@ -1181,7 +1181,7 @@ export default function AdminCommunityPage() {
 
           {memberError ? (
             <p
-              className="mt-4 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+              className="app-alert mt-4 px-3 py-2 text-sm"
               role="alert"
             >
               {memberError}
@@ -1266,7 +1266,7 @@ export default function AdminCommunityPage() {
                           onClick={() =>
                             runMemberUpdate(member, { role: 'member' })
                           }
-                          className="flex-1 rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm hover:bg-white hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                          className="app-action-secondary flex-1 px-3 py-2 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                         >
                           Demote to member
                         </button>
@@ -1277,7 +1277,7 @@ export default function AdminCommunityPage() {
                           onClick={() =>
                             runMemberUpdate(member, { role: 'admin' })
                           }
-                          className="flex-1 rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-primary)] shadow-sm hover:bg-[var(--color-brand-primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                          className="app-action-secondary flex-1 px-3 py-2 text-xs hover:bg-[var(--color-brand-primary-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                         >
                           Promote to admin
                         </button>
@@ -1290,7 +1290,7 @@ export default function AdminCommunityPage() {
                           onClick={() =>
                             runMemberUpdate(member, { status: 'inactive' })
                           }
-                          className="flex-1 rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-xs font-semibold text-[var(--color-brand-warm-strong)] shadow-sm hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                          className="app-action-secondary flex-1 border-[var(--color-brand-warm)] px-3 py-2 text-xs text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                         >
                           Deactivate access
                         </button>
@@ -1301,7 +1301,7 @@ export default function AdminCommunityPage() {
                           onClick={() =>
                             runMemberUpdate(member, { status: 'active' })
                           }
-                          className="flex-1 rounded-full bg-[#111111] px-3 py-2 text-xs font-semibold text-[var(--color-brand-primary)] shadow-sm hover:bg-black disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                          className="app-action-primary flex-1 px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
                         >
                           Reactivate access
                         </button>
