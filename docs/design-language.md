@@ -1,6 +1,6 @@
 # Sellr Design Language
 
-Last updated: May 15, 2026.
+Last updated: May 16, 2026.
 
 Sellr is a trust-native local marketplace for high-trust, peer-to-peer commerce. The product should feel structured, local, approachable, and safer than a generic listing board. It should be bright enough to feel memorable, but calm enough that buyers and sellers can scan listings, make decisions, and complete tasks quickly.
 
@@ -256,13 +256,22 @@ The refreshed web app currently uses reusable surface utilities:
 - `app-panel`: elevated white panel for primary cards, forms, empty states, and
   admin surfaces.
 - `app-panel-soft`: warmer panel treatment for hero/dashboard/preview surfaces.
+- `app-panel-dark`: high-contrast panel treatment for intentional dark app
+  moments.
+- `app-section`: simple divider-led page section spacing.
+- `app-list-row`: light repeated row/card treatment for lists, skeletons,
+  shortcuts, trust facts, and compact management items.
+- `app-empty-state`: dashed, low-elevation empty state treatment.
+- `app-alert`: shared warm error/warning treatment.
+- `app-field`: shared field treatment for inputs, selects, and textareas.
 - `app-chip`: compact pill for metadata and quiet status cues.
 - `app-action-primary` and `app-action-secondary`: primary and secondary app
   action patterns.
 
-During the UI/UX overhaul, update these utilities in place where possible so
-existing routes inherit the simpler direction. Prefer that over introducing
-one-off panel or button styles.
+During the UI/UX overhaul, keep extending these utilities in place where a
+pattern repeats. Prefer that over introducing one-off panel, field, alert, or
+button styles. Phase C and later route work should start from this foundation
+instead of adding a new design-system library.
 
 ### Forms
 

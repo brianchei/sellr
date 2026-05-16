@@ -139,10 +139,11 @@ Use `docs/ui-ux-overhaul-guide.md` as the implementation handoff. The redesign
 should preserve current auth, community, listing, media, messaging, reporting,
 and admin behavior while simplifying the experience across landing, onboarding,
 home, marketplace, listing detail, seller flows, inbox, profile, storefront, and
-notifications. Phase B has started with a small token/component foundation pass
-that lightens app surfaces, listing cards, seller trust cards, chips, buttons,
-and the authenticated app shell while preserving existing behavior. Continue
-with focused route-level UI cleanup before beginning Phase 6 AI.
+notifications. Phase B foundation work is complete for the current scope:
+lighter app surfaces, rows, fields, chips, alerts, empty states, listing cards,
+seller trust cards, buttons, and authenticated shell patterns are in place while
+preserving existing behavior. Continue with Phase C onboarding/navigation and
+first signed-in action work before beginning Phase 6 AI.
 
 ## Deliberately Deferred
 

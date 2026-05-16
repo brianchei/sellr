@@ -354,7 +354,9 @@ Goal: simplify the current web SLC and make the product feel personal,
 trustworthy, attractive, and purpose-built for local community resale before
 adding AI.
 
-Status: started and should be completed before Phase 6 begins.
+Status: in progress and should be completed before Phase 6 begins. Phase B is
+complete for the foundation scope; Phase C onboarding/navigation is the next
+best implementation slice.
 
 Source guide:
 
@@ -401,8 +403,18 @@ Phase B progress:
   `apps/web/app/globals.css` instead of adding a new design-system library.
 - Reduced default authenticated app gradient/panel weight, softened card
   shadows, added calmer panel/card radii tokens, introduced future-friendly
-  `app-section`, `app-list-row`, and `app-empty-state` utilities, and made
-  listing/seller trust cards less frosted/nested.
+  `app-section`, `app-list-row`, `app-empty-state`, `app-alert`, and
+  `app-field` utilities, and made listing/seller trust cards less
+  frosted/nested.
+- Applied the lighter foundation to high-impact repeated marketplace,
+  dashboard, listing detail, listing management, inbox/notification,
+  profile/report, admin, and community-home patterns while preserving current
+  SLC behavior.
+- May 16 closeout smoke covered `/`, `/marketplace`, `/dashboard`, and
+  `/admin/community` on the local desktop Browser session with no framework
+  overlay or console warning/error output. Full mobile viewport visual QA
+  remains a Phase F/readiness item because Playwright is not available as a
+  repo command and the in-app Browser surface did not expose viewport resizing.
 
 Acceptance notes:
 
