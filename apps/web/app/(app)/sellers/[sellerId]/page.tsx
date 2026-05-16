@@ -127,7 +127,7 @@ export default function SellerStorefrontPage() {
     return (
       <main className="mx-auto max-w-4xl px-4 py-10">
         <section
-          className="rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert p-6"
           role="alert"
         >
           <h1 className="text-xl font-semibold">Could not load seller</h1>
@@ -212,6 +212,10 @@ export default function SellerStorefrontPage() {
               <h1 className="mt-1 break-words text-2xl font-semibold text-[var(--text-primary)] sm:text-3xl">
                 {seller.displayName}
               </h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+                Review backed trust signals and active listings before
+                contacting through an item.
+              </p>
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                 {contactSignal ? (
                   <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 font-medium text-[var(--color-brand-accent-strong)]">
@@ -267,7 +271,7 @@ export default function SellerStorefrontPage() {
             >
               <div className="min-w-0">
                 <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
-                  Most recent listing
+                  Latest item to contact about
                 </p>
                 <p className="mt-0.5 truncate font-semibold text-[var(--text-primary)]">
                   {mostRecentListing.title}
@@ -313,7 +317,7 @@ export default function SellerStorefrontPage() {
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold text-[var(--text-primary)]">
-              Active listings
+              Active listings from {seller.displayName}
             </h2>
             <p className="mt-1 text-sm text-[var(--text-secondary)]">
               {listings.length === 0
@@ -326,7 +330,8 @@ export default function SellerStorefrontPage() {
             </p>
           </div>
           <p className="text-xs text-[var(--text-tertiary)]">
-            Contact starts from a listing so item context stays attached.
+            Choose a listing first. Messages stay tied to the item, price,
+            condition, and pickup context.
           </p>
         </header>
 
@@ -344,7 +349,7 @@ export default function SellerStorefrontPage() {
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
               {isOwnProfile
                 ? 'Create one polished listing with photos to appear in marketplace browse.'
-                : 'This seller does not have active items right now. Check back later or browse other community listings.'}
+                : 'This seller has no active items right now, so contact is unavailable until they post again.'}
             </p>
             <Link
               href={isOwnProfile ? '/sell' : '/marketplace'}
@@ -375,17 +380,17 @@ function ContactCard({
   return (
     <div className="app-panel p-5">
       <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-        How to contact {sellerName.split(' ')[0] || sellerName}
+        Contact through an item
       </h2>
       <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-        Conversations start from a listing so price, condition, and pickup
-        context stay visible for both sides.
+        Choose an active listing first. Sellr keeps the seller, item, price,
+        condition, and pickup context together.
       </p>
 
       <ul className="mt-4 space-y-2 text-xs">
-        <ContactPoint>Open the listing you are interested in.</ContactPoint>
+        <ContactPoint>Open the item you want to ask about.</ContactPoint>
         <ContactPoint>
-          Use the contact card to send a first message with item context.
+          Message from that listing so the conversation stays item-anchored.
         </ContactPoint>
         <ContactPoint>
           Coordinate pickup in a public local spot you both know.
@@ -399,7 +404,7 @@ function ContactCard({
           }
           className="app-action-primary justify-center px-4 py-2.5 text-sm"
         >
-          {latestListingId ? 'Open most recent listing' : 'Browse marketplace'}
+          {latestListingId ? 'Open latest item' : 'Browse marketplace'}
         </Link>
         <ReportDialog
           targetId={sellerId}
@@ -418,11 +423,11 @@ function SelfStorefrontCard({ hasListings }: { hasListings: boolean }) {
   return (
     <div className="app-panel-soft p-5">
       <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-        Storefront preview
+        How buyers see you
       </h2>
       <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-        This is how buyers see your backed profile signals inside the
-        community. Keep listings fresh and your display name recognizable.
+        Your storefront shows backed profile signals and active items inside
+        the community. Keep it recognizable before buyers message.
       </p>
 
       <div className="mt-5 grid gap-2">
