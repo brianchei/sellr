@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import type { MouseEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -23,6 +22,7 @@ import {
 } from '@/lib/query-refresh';
 
 type FilterValue = NotificationCategory | 'all' | 'unread';
+type NotificationGroupLabel = 'Today' | 'Recent' | 'Older';
 
 const FILTERS: Array<{ value: FilterValue; label: string }> = [
   { value: 'all', label: 'All' },
@@ -54,6 +54,26 @@ function categoryClass(category: NotificationCategory): string {
   return 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]';
 }
 
+function notificationGroupLabel(sentAt: string): NotificationGroupLabel {
+  const date = new Date(sentAt);
+  if (Number.isNaN(date.getTime())) {
+    return 'Recent';
+  }
+
+  const now = new Date();
+  const sameDay =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+  if (sameDay) {
+    return 'Today';
+  }
+
+  const ageMs = now.getTime() - date.getTime();
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  return ageMs <= sevenDaysMs ? 'Recent' : 'Older';
+}
+
 function NotificationSkeleton() {
   return (
     <section className="mt-4 space-y-3">
@@ -80,15 +100,8 @@ function NotificationCard({
 }) {
   const isPickup = notification.category === 'time-sensitive';
   const isUnread = !notification.read;
-  const accentColor = isPickup
-    ? 'var(--color-brand-warm)'
-    : isUnread
-      ? 'var(--color-brand-contrast)'
-      : 'transparent';
 
-  const handleMarkReadClick = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleMarkReadClick = () => {
     onMarkRead(notification.id);
   };
 
@@ -100,68 +113,99 @@ function NotificationCard({
 
   return (
     <article
-      className="app-list-row group relative transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-white"
-      style={{
-        borderLeftColor: accentColor,
-        borderLeftWidth: accentColor === 'transparent' ? '1px' : '4px',
-      }}
+      className="app-list-row group transition hover:border-black/20 hover:bg-white"
+      style={
+        isPickup
+          ? { borderColor: 'var(--color-brand-warm)' }
+          : isUnread
+            ? { borderColor: 'var(--color-brand-contrast-muted)' }
+            : undefined
+      }
     >
-      <Link
-        href={notification.href}
-        onClick={handleOpenClick}
-        className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 p-4 no-underline"
-      >
+      <div className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${categoryClass(
-                notification.category,
-              )}`}
-            >
-              {categoryLabel(notification.category)}
-            </span>
-            {isPickup ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-warm-soft)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-warm-strong)]">
-                <span
-                  aria-hidden="true"
-                  className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-brand-warm)]"
-                />
-                Time-sensitive
-              </span>
-            ) : null}
-            <time className="text-xs text-[var(--text-tertiary)]">
-              {formatNotificationTime(notification.sentAt)}
-            </time>
-          </div>
-          <div className="mt-2 flex items-start gap-2">
-            {isUnread ? (
+          <Link
+            href={notification.href}
+            onClick={handleOpenClick}
+            className="block min-w-0 no-underline"
+          >
+            <div className="flex flex-wrap items-center gap-2">
               <span
-                aria-label="Unread"
-                className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-contrast)]"
-              />
-            ) : null}
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${categoryClass(
+                  notification.category,
+                )}`}
+              >
+                {categoryLabel(notification.category)}
+              </span>
+              {isUnread ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-primary-soft)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-primary-strong)]">
+                  <span
+                    aria-hidden="true"
+                    className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-brand-primary)]"
+                  />
+                  Unread
+                </span>
+              ) : null}
+              {isPickup ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-warm-soft)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-warm-strong)]">
+                  <span
+                    aria-hidden="true"
+                    className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-brand-warm)]"
+                  />
+                  Time-sensitive
+                </span>
+              ) : null}
+              <time className="text-xs text-[var(--text-tertiary)]">
+                {formatNotificationTime(notification.sentAt)}
+              </time>
+            </div>
             <h2
-              className={`min-w-0 break-words text-base text-[var(--text-primary)] ${
+              className={`mt-2 min-w-0 break-words text-base text-[var(--text-primary)] ${
                 isUnread ? 'font-bold' : 'font-semibold'
               }`}
             >
               {notification.title}
             </h2>
-          </div>
-          <p
-            className={`mt-1 line-clamp-2 break-words text-sm leading-6 ${
-              isUnread
-                ? 'text-[var(--text-primary)]'
-                : 'text-[var(--text-secondary)]'
-            }`}
+            <p
+              className={`mt-1 line-clamp-2 break-words text-sm leading-6 ${
+                isUnread
+                  ? 'text-[var(--text-primary)]'
+                  : 'text-[var(--text-secondary)]'
+              }`}
+            >
+              {notification.body}
+            </p>
+            <p className="mt-2 text-xs font-medium text-[var(--text-tertiary)]">
+              Target: {notification.targetLabel}
+            </p>
+          </Link>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+          <Link
+            href={notification.href}
+            onClick={handleOpenClick}
+            className="app-action-secondary px-3 py-1.5 text-xs"
           >
-            {notification.body}
-          </p>
+            {notification.actionLabel}
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </Link>
           {isUnread ? (
             <button
               type="button"
               onClick={handleMarkReadClick}
-              className="mt-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold text-[var(--color-brand-contrast)] hover:bg-[var(--bg-secondary)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold text-[var(--color-brand-contrast)] hover:bg-[var(--bg-secondary)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             >
               <svg
                 width="11"
@@ -180,21 +224,7 @@ function NotificationCard({
             </button>
           ) : null}
         </div>
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="mt-1 shrink-0 text-[var(--text-tertiary)] transition group-hover:translate-x-0.5 group-hover:text-[var(--color-brand-contrast)]"
-          aria-hidden="true"
-        >
-          <path d="m9 18 6-6-6-6" />
-        </svg>
-      </Link>
+      </div>
     </article>
   );
 }
@@ -240,6 +270,23 @@ export default function NotificationsPage() {
       initial,
     );
   }, [notifications]);
+
+  const groupedNotifications = useMemo(() => {
+    const labels: NotificationGroupLabel[] = ['Today', 'Recent', 'Older'];
+    const groups: Record<NotificationGroupLabel, NotificationViewModel[]> = {
+      Today: [],
+      Recent: [],
+      Older: [],
+    };
+
+    filteredNotifications.forEach((notification) => {
+      groups[notificationGroupLabel(notification.sentAt)].push(notification);
+    });
+
+    return labels
+      .map((label) => ({ label, items: groups[label] }))
+      .filter((group) => group.items.length > 0);
+  }, [filteredNotifications]);
 
   const summaryLine =
     notifications.length === 0
@@ -391,17 +438,25 @@ export default function NotificationsPage() {
       !notificationsQuery.isError &&
       notifications.length === 0 ? (
         <section className="app-empty-state mt-6 p-8 text-center">
-          <h2 className="text-xl font-semibold">No notifications yet</h2>
+          <h2 className="text-xl font-semibold">You are caught up</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Updates appear here after messages, marketplace posts, and listing
-            changes affect your buyer or seller activity.
+            Browse listings or post an item. Messages, listing changes, and
+            community updates will appear here when they need attention.
           </p>
-          <Link
-            href="/marketplace"
-            className="app-action-primary mt-5 px-4 py-2 text-sm"
-          >
-            Browse marketplace
-          </Link>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/marketplace"
+              className="app-action-primary px-4 py-2 text-sm"
+            >
+              Browse marketplace
+            </Link>
+            <Link
+              href="/sell"
+              className="app-action-secondary px-4 py-2 text-sm"
+            >
+              Sell an item
+            </Link>
+          </div>
         </section>
       ) : null}
 
@@ -428,16 +483,31 @@ export default function NotificationsPage() {
         </section>
       ) : null}
 
-      {filteredNotifications.length > 0 ? (
-        <section className="mt-4 space-y-2">
-          {filteredNotifications.map((notification) => (
-            <NotificationCard
-              key={notification.id}
-              notification={notification}
-              onMarkRead={(notificationId) =>
-                markReadMutation.mutate(notificationId)
-              }
-            />
+      {groupedNotifications.length > 0 ? (
+        <section className="mt-4 space-y-5" aria-label="Notifications">
+          {groupedNotifications.map((group) => (
+            <section
+              key={group.label}
+              aria-labelledby={`notifications-${group.label.toLowerCase()}`}
+            >
+              <h2
+                id={`notifications-${group.label.toLowerCase()}`}
+                className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]"
+              >
+                {group.label}
+              </h2>
+              <div className="space-y-2">
+                {group.items.map((notification) => (
+                  <NotificationCard
+                    key={notification.id}
+                    notification={notification}
+                    onMarkRead={(notificationId) =>
+                      markReadMutation.mutate(notificationId)
+                    }
+                  />
+                ))}
+              </div>
+            </section>
           ))}
         </section>
       ) : null}
