@@ -125,22 +125,21 @@ export default function JoinCommunityPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
-              Community access
+              Add community access
             </p>
             <h1 className="mt-3 text-2xl font-semibold text-[var(--text-primary)] sm:text-3xl">
               Join another community
             </h1>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              Add a verified local group with an invite code or the verified
-              email already on your account. Sellr will switch your active
-              community after you join.
+              Use an invite code or your verified email. Sellr switches your
+              active community after you join.
             </p>
           </div>
-          <div className="app-list-row border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-4 py-3">
+          <div className="rounded-full border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-4 py-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-accent-strong)]">
               Current access
             </p>
-            <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+            <p className="text-sm font-semibold text-[var(--text-primary)]">
               {currentCommunityCount === 0
                 ? 'No active communities'
                 : `${currentCommunityCount} active ${
@@ -154,11 +153,11 @@ export default function JoinCommunityPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section className="app-panel p-5 sm:p-6">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-            Choose how to join
+            Enter access details
           </h2>
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-            Invite codes are best for early access. Verified email works when
-            the community is tied to your email domain.
+            Invite codes are best for organizer-approved access. Verified email
+            works when a community is tied to your email domain.
           </p>
 
           <div
@@ -280,24 +279,18 @@ export default function JoinCommunityPage() {
         </section>
 
         <aside className="space-y-5">
-          <section className="app-panel p-5">
+          <section className="app-panel-soft p-5">
             <h2 className="text-base font-semibold text-[var(--text-primary)]">
               What happens next
             </h2>
-            <div className="mt-4 space-y-3">
-              <GuidanceItem text="Your active community switches to the community you just joined." />
-              <GuidanceItem text="Browse, sell, listing inventory, and community pages use that active context." />
-              <GuidanceItem text="You can switch between active communities from the app header." />
-            </div>
+            <ul className="mt-3 divide-y divide-[var(--border-default)]">
+              <GuidanceItem text="Your active community switches to the one you just joined." />
+              <GuidanceItem text="Browse, sell, listings, and community pages use that context." />
+              <GuidanceItem text="You can switch communities from the app header." />
+            </ul>
           </section>
 
-          <section
-            className="app-panel p-5"
-            style={{
-              background:
-                'linear-gradient(135deg, var(--color-brand-primary-soft), rgba(255,255,255,0.96))',
-            }}
-          >
+          <section className="app-section">
             <h2 className="text-base font-semibold text-[var(--text-primary)]">
               Need a code?
             </h2>
@@ -315,12 +308,12 @@ export default function JoinCommunityPage() {
 
 function GuidanceItem({ text }: { text: string }) {
   return (
-    <div className="app-list-row flex gap-3 p-3">
+    <li className="flex gap-3 py-3">
       <span
         aria-hidden="true"
         className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--color-brand-accent)]"
       />
       <p className="text-sm leading-6 text-[var(--text-secondary)]">{text}</p>
-    </div>
+    </li>
   );
 }
