@@ -85,10 +85,14 @@ screen-by-screen direction, component guidance, microcopy, accessibility bar,
 metrics, and Phase A-F implementation plan. Phase B foundation work is complete
 for the current scope, with lighter reusable app surfaces, rows, fields, alerts,
 chips, empty states, and action utilities applied across high-impact signed-in
-surfaces. Continue with Phase C onboarding/navigation and first signed-in action
-work. Simplify onboarding, make the app feel more personal and local, reduce
-generic "AI/vibe-coded" patterns, and preserve the current SLC behavior while
-improving the existing flows.
+surfaces. May 16 Browser DOM smoke covered the public entry, marketplace,
+listing detail, dashboard, sell/listings, inbox, notifications, profile,
+storefront, and admin community/report routes; mobile viewport automation is
+still a launch-readiness risk until a local browser test command is available.
+Continue with Phase C onboarding/navigation and first signed-in action work.
+Simplify onboarding, make the app feel more personal and local, reduce generic
+"AI/vibe-coded" patterns, and preserve the current SLC behavior while improving
+the existing flows.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless

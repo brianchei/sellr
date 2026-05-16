@@ -921,11 +921,16 @@ Closeout notes:
 - Repeated heavy patterns such as oversized rounded panels, `bg-white/90`
   form fields, dashed empty states with extra card weight, and nested dashboard
   cards were reduced across the main signed-in surfaces.
-- Desktop Browser smoke on May 16 covered `/`, `/marketplace`, `/dashboard`,
-  and `/admin/community` with no framework overlay or console warning/error
-  output. Mobile viewport QA remains a Phase F/readiness item because the
-  available in-app Browser surface did not expose viewport resizing and the repo
-  does not currently include Playwright as a local command.
+- Browser DOM smoke on May 16 covered `/`, `/marketplace`, one listing detail,
+  `/dashboard`, `/sell`, `/listings`, `/inbox`, `/notifications`, `/profile`,
+  one seller storefront, `/admin/community`, and `/admin/reports` with no
+  route-blocking render failures or captured console errors. State smoke also
+  covered filtered seller-inventory empty state, empty inbox, empty
+  notifications, and disabled `Mark all read`.
+- Mobile viewport automation remains a Phase F/readiness risk because the
+  available in-app Browser surface does not expose viewport resizing and
+  `pnpm exec playwright` is not currently available as a local command without
+  adding tooling.
 
 ### Phase C - Onboarding And Navigation
 
