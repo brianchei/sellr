@@ -69,7 +69,7 @@ export function ListingBuyerPreview({
       </div>
 
       <div
-        className="mt-4 flex aspect-[4/3] items-center justify-center rounded-2xl border border-black/10 bg-[var(--bg-tertiary)] bg-cover bg-center text-sm font-medium text-[var(--text-tertiary)] shadow-inner"
+        className="mt-4 flex aspect-[4/3] items-center justify-center rounded-[var(--radius-panel)] border border-black/10 bg-[var(--bg-tertiary)] bg-cover bg-center text-sm font-medium text-[var(--text-tertiary)]"
         style={
           hasLoadedImage ? { backgroundImage: `url("${cleanPhotoUrl}")` } : {}
         }

@@ -314,7 +314,7 @@ function MyListingsContent() {
               type="button"
               onClick={() => setStatusFilter(filter.value)}
               aria-pressed={active}
-              className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+              className="app-chip transition hover:border-black/20 hover:text-[var(--text-primary)]"
               style={
                 active
                   ? {
@@ -362,7 +362,7 @@ function MyListingsContent() {
 
       {actionMutation.isError ? (
         <p
-          className="mt-4 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-4 p-3 text-sm"
           role="alert"
         >
           {actionMutation.error instanceof Error
@@ -406,7 +406,7 @@ function MyListingsContent() {
 
       {listingsQuery.isError ? (
         <section
-          className="mt-6 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-6 p-6"
           role="alert"
         >
           <h2 className="text-base font-semibold">Could not load listings</h2>
@@ -510,20 +510,17 @@ function ListingRow({
     type: ListingAction['type'];
     label: string;
     pendingLabel: string;
-    tone: 'primary' | 'contrast';
   } | null = canPublish
     ? {
         type: 'publish',
         label: status === 'expired' ? 'Republish' : 'Publish',
         pendingLabel: 'Publishing...',
-        tone: 'primary',
       }
     : canMarkSold
       ? {
           type: 'mark-sold',
           label: 'Mark sold',
           pendingLabel: 'Marking sold...',
-          tone: 'contrast',
         }
       : null;
 
@@ -586,18 +583,7 @@ function ListingRow({
             onClick={() =>
               runAction({ type: primaryAction.type, listing } as ListingAction)
             }
-            className="rounded-full px-3 py-2 text-sm font-bold shadow-sm transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
-            style={
-              primaryAction.tone === 'contrast'
-                ? {
-                    background: '#111111',
-                    color: 'var(--color-brand-primary)',
-                  }
-                : {
-                    background: '#111111',
-                    color: 'var(--color-brand-primary)',
-                  }
-            }
+            className="app-action-primary px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPending && pendingType === primaryAction.type
               ? primaryAction.pendingLabel
@@ -608,13 +594,13 @@ function ListingRow({
         <div className="grid grid-cols-2 gap-2">
           <Link
             href={`/listings/${listing.id}/edit`}
-            className="inline-flex justify-center rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-soft)]"
+            className="app-action-secondary px-3 py-1.5 text-xs"
           >
             Edit
           </Link>
           <Link
             href={`/marketplace/${listing.id}`}
-            className="inline-flex justify-center rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] no-underline shadow-sm hover:bg-[var(--color-brand-primary-soft)]"
+            className="app-action-secondary px-3 py-1.5 text-xs"
           >
             View
           </Link>
@@ -627,7 +613,7 @@ function ListingRow({
                 type="button"
                 disabled={isPending}
                 onClick={() => runAction({ type: 'unpublish', listing })}
-                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] shadow-sm hover:bg-[var(--bg-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-secondary px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isPending && pendingType === 'unpublish'
                   ? 'Unpublishing...'
@@ -641,7 +627,7 @@ function ListingRow({
                 type="button"
                 disabled={isPending}
                 onClick={() => runAction({ type: 'delete', listing })}
-                className="rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] shadow-sm hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-secondary border-[var(--color-brand-warm)] px-3 py-1.5 text-xs text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isPending && pendingType === 'delete'
                   ? 'Deleting...'

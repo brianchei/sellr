@@ -64,7 +64,7 @@ const PICKUP_WINDOW_PRESETS: PickupWindowPreset[] = [
 ];
 
 function fieldClassName(hasError: boolean): string {
-  return `mt-2 w-full rounded-2xl border bg-white/90 px-3 py-2.5 text-sm shadow-xs outline-none transition focus:ring-2 ${
+  return `mt-2 w-full rounded-[var(--radius-lg)] border bg-white px-3 py-2.5 text-sm shadow-xs outline-none transition focus:ring-2 ${
     hasError
       ? 'border-[var(--color-brand-warm)] focus:border-[var(--color-brand-warm)] focus:ring-[var(--color-brand-warm-soft)]'
       : 'border-black/10 focus:border-[var(--color-brand-contrast)] focus:ring-[var(--color-brand-contrast-muted)]'
@@ -496,7 +496,7 @@ export function ListingForm({
                     setField('price', preset.value);
                     markTouched('price');
                   }}
-                  className="rounded-full border border-black/10 bg-white/80 px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
+                  className="app-chip transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
                 >
                   {preset.label}
                 </button>
@@ -572,7 +572,7 @@ export function ListingForm({
               {values.photoUrls.map((photoUrl, index) => (
                 <div
                   key={photoUrl}
-                  className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm"
+                  className="app-list-row overflow-hidden"
                 >
                   <div
                     className="flex aspect-square items-end bg-[var(--bg-tertiary)] bg-cover bg-center"
@@ -597,7 +597,7 @@ export function ListingForm({
           ) : null}
         </div>
 
-        <label className="flex items-start gap-3 rounded-2xl border border-black/10 bg-[var(--color-brand-primary-soft)] p-3 text-sm">
+        <label className="app-panel-soft flex items-start gap-3 p-3 text-sm">
           <input
             type="checkbox"
             checked={values.negotiable}
@@ -663,7 +663,7 @@ export function ListingForm({
                   setField('locationNeighborhood', area);
                   markTouched('locationNeighborhood');
                 }}
-                className="rounded-full border border-black/10 bg-white/80 px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
+                className="app-chip transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
               >
                 {area}
               </button>
@@ -718,7 +718,7 @@ export function ListingForm({
                   });
                   markTouched('endHour');
                 }}
-                className="rounded-full border border-black/10 bg-white/80 px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)] transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
+                className="app-chip transition hover:border-[var(--color-brand-contrast)] hover:text-[var(--color-brand-contrast)]"
               >
                 {preset.label}{' '}
                 <span className="font-medium text-[var(--text-tertiary)]">
@@ -786,7 +786,7 @@ export function ListingForm({
 
         {error ? (
           <p
-            className="rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+            className="app-alert p-3 text-sm"
             role="alert"
           >
             {error}
