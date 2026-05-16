@@ -19,7 +19,9 @@ type ListingBuyerPreviewProps = {
 
 function formatPreviewPrice(value: string): string {
   const amount = Number.parseFloat(value);
-  return Number.isFinite(amount) && amount >= 0 ? formatPrice(amount) : '$--';
+  return Number.isFinite(amount) && amount >= 0
+    ? formatPrice(amount)
+    : 'Price pending';
 }
 
 function formatPreviewAvailability(values: ListingFormValues): string {
@@ -97,7 +99,7 @@ export function ListingBuyerPreview({
         <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
           {conditionLabel(values.condition)}
         </span>
-        <span className="rounded-full bg-white/75 px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]">
+        <span className="rounded-full bg-[var(--bg-secondary)] px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]">
           {category}
         </span>
         <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">

@@ -597,7 +597,7 @@ export function ListingForm({
           ) : null}
         </div>
 
-        <label className="app-panel-soft flex items-start gap-3 p-3 text-sm">
+        <label className="flex items-start gap-3 border-t border-[var(--border-default)] pt-4 text-sm">
           <input
             type="checkbox"
             checked={values.negotiable}
