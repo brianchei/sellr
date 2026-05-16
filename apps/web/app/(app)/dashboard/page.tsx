@@ -104,10 +104,10 @@ function getHomeAction({
           copy: 'You have inventory started. Publish one listing so buyers can find it.',
         }
       : {
-          eyebrow: 'Start selling',
-          label: 'Create listing',
-          href: '/sell',
-          copy: 'Add one polished listing with photos to make your community marketplace feel active.',
+          eyebrow: 'Start local',
+          label: 'Browse listings',
+          href: '/marketplace',
+          copy: 'See what is active in your community first. Sell an item when you have a good photo and pickup context ready.',
         };
   }
 
@@ -280,6 +280,7 @@ export default function DashboardPage() {
         </div>
 
         <SetupPanel
+          hasCommunity={Boolean(primaryCommunityId)}
           isLoading={
             listingsQuery.isLoading ||
             conversationsQuery.isLoading ||
@@ -444,12 +445,12 @@ function HomeFocusPanel({
         : 'Join a community to unlock marketplace actions.',
     },
     {
-      label: 'Listings live',
+      label: 'Your live listings',
       value: activeListingsCount.toLocaleString(),
       href: '/listings',
       helper:
         activeListingsCount === 0
-          ? 'No items are visible in browse yet.'
+          ? 'Selling is optional. Start when you have an item ready.'
           : 'Visible to buyers in your active community.',
     },
     {
@@ -459,15 +460,20 @@ function HomeFocusPanel({
       helper: unreadCount === 0 ? 'You are caught up.' : 'Review new activity.',
     },
     {
-      label: 'Buyer threads',
+      label: 'Inbox threads',
       value: buyerConversationsCount.toLocaleString(),
       href: '/inbox',
       helper:
         buyerConversationsCount === 0
-          ? 'No buyer conversations yet.'
+          ? 'Messages stay tied to item pages.'
           : 'Keep pickup coordination item-anchored.',
     },
   ];
+  const quickActions = [
+    { href: '/marketplace', label: 'Browse listings' },
+    { href: '/sell', label: 'Sell an item' },
+    { href: '/inbox', label: 'Open inbox' },
+  ].filter((action) => action.href !== homeAction.href);
 
   return (
     <section className="app-panel mt-6 p-5 sm:p-6">
@@ -477,7 +483,7 @@ function HomeFocusPanel({
             {homeAction.eyebrow}
           </p>
           <h2 className="mt-1 text-xl font-semibold text-[var(--text-primary)]">
-            Next best action
+            Your next step
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
             {homeAction.copy}
@@ -488,6 +494,17 @@ function HomeFocusPanel({
           >
             {homeAction.label}
           </Link>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {quickActions.map((action) => (
+              <Link
+                key={action.href}
+                href={action.href}
+                className="app-action-secondary px-3 py-1.5 text-xs"
+              >
+                {action.label}
+              </Link>
+            ))}
+          </div>
         </div>
 
         <div className="divide-y divide-[var(--border-default)] border-t border-[var(--border-default)] lg:border-t-0">
@@ -768,6 +785,7 @@ function RecentInboxPanel({
 /* -------------------------------------------------------------------------- */
 
 function SetupPanel({
+  hasCommunity,
   isLoading,
   isError,
   activeListingsCount,
@@ -777,6 +795,7 @@ function SetupPanel({
   unreadCount,
   buyerConversationCount,
 }: {
+  hasCommunity: boolean;
   isLoading: boolean;
   isError: boolean;
   activeListingsCount: number;
@@ -789,8 +808,10 @@ function SetupPanel({
   const checks = [
     {
       label: 'Community access',
-      detail: 'Verified-community access is active.',
-      complete: true,
+      detail: hasCommunity
+        ? 'Verified-community access is active.'
+        : 'Join a community before browsing, selling, or messaging.',
+      complete: hasCommunity,
     },
     {
       label: 'First listing live',
@@ -831,10 +852,10 @@ function SetupPanel({
       <header className="flex items-start justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            Seller readiness
+            Marketplace readiness
           </h2>
           <p className="text-xs text-[var(--text-secondary)]">
-            Backed signals buyers can rely on.
+            Backed signals and actions that keep local exchange clear.
           </p>
         </div>
         <span
