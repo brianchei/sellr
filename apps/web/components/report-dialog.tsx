@@ -136,7 +136,7 @@ export function ReportDialog({
                     {(['safety', 'quality'] as const).map((option) => (
                       <label
                         key={option}
-                        className={`rounded-2xl border px-3 py-2 text-sm font-semibold ${
+                        className={`app-list-row px-3 py-2 text-sm font-semibold ${
                           severity === option
                             ? 'border-[#111111] bg-[#111111] text-[var(--color-brand-primary)]'
                             : 'border-black/10 bg-white text-[var(--text-secondary)]'
@@ -169,14 +169,14 @@ export function ReportDialog({
                     rows={4}
                     maxLength={500}
                     placeholder="Tell us what happened. Do not include sensitive personal details."
-                    className="mt-2 w-full resize-y rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                    className="mt-2 w-full resize-y rounded-[var(--radius-lg)] border border-black/10 bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                   />
                 </label>
 
                 {formError || reportMutation.isError ? (
                   <p
                     role="alert"
-                    className="mt-3 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)]"
+                    className="app-alert mt-3 p-3 text-sm"
                   >
                     {formError ??
                       (reportMutation.error instanceof Error

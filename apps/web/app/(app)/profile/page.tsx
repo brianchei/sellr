@@ -29,7 +29,7 @@ import { contactVerificationLabel } from '@/lib/trust-signals';
 type MeData = Awaited<ReturnType<typeof fetchMe>>;
 
 function fieldClassName(hasError: boolean): string {
-  return `mt-1.5 w-full rounded-2xl border bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:ring-2 ${
+  return `mt-1.5 w-full rounded-[var(--radius-lg)] border bg-white px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:ring-2 ${
     hasError
       ? 'border-[var(--color-brand-warm)] focus:border-[var(--color-brand-warm)] focus:ring-[var(--color-brand-warm-soft)]'
       : 'border-black/10 focus:border-[var(--color-brand-contrast)] focus:ring-[var(--color-brand-contrast-muted)]'
@@ -67,7 +67,7 @@ export default function ProfilePage() {
   if (meQuery.isError || !meQuery.data) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <section className="app-panel p-5">
+        <section className="app-alert p-5">
           <h1 className="text-lg font-semibold text-[var(--text-primary)]">
             Could not load profile
           </h1>
@@ -115,10 +115,10 @@ function ProfileContent({ me, userId }: { me: MeData; userId: string | null }) {
             </p>
           </div>
           <div className="grid gap-2 text-xs sm:min-w-[220px]">
-            <span className="rounded-2xl border border-[var(--color-brand-primary-muted)] bg-white/80 px-3 py-2 font-semibold text-[var(--text-primary)] shadow-sm">
+            <span className="app-list-row border-[var(--color-brand-primary-muted)] bg-white/80 px-3 py-2 font-semibold text-[var(--text-primary)]">
               Community-visible identity
             </span>
-            <span className="rounded-2xl border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] px-3 py-2 font-semibold text-[var(--color-brand-contrast-strong)]">
+            <span className="app-list-row border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] px-3 py-2 font-semibold text-[var(--color-brand-contrast-strong)]">
               Profile readiness signals
             </span>
           </div>
@@ -164,7 +164,7 @@ function ProfileSummary({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div
           aria-label={`${me.user.displayName} avatar`}
-          className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white bg-[var(--color-brand-primary)] bg-cover bg-center text-2xl font-bold text-[var(--text-primary)] shadow-[var(--shadow-app-card)] ring-4 ring-[var(--color-brand-primary-muted)]"
+          className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white bg-[var(--color-brand-primary)] bg-cover bg-center text-2xl font-bold text-[var(--text-primary)] shadow-sm ring-4 ring-[var(--color-brand-primary-muted)]"
           style={
             me.user.avatarUrl
               ? { backgroundImage: `url("${me.user.avatarUrl}")` }
@@ -244,8 +244,8 @@ function ProfileFact({
 
   return (
     <div
-      className={`rounded-2xl border p-3 ${
-        tone === 'plain' ? 'border-transparent p-0' : toneClass
+      className={`app-list-row p-3 ${
+        tone === 'plain' ? 'border-transparent bg-transparent p-0 shadow-none' : toneClass
       }`}
     >
       <dt className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
@@ -370,7 +370,7 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
         </span>
       </header>
 
-      <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-4 sm:flex-row sm:items-center">
+      <div className="app-list-row mt-4 flex flex-col gap-4 border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-4 sm:flex-row sm:items-center">
         <div
           className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-white bg-[var(--color-brand-primary)] bg-cover bg-center text-base font-bold text-[var(--text-primary)] shadow-sm"
           style={
@@ -408,7 +408,7 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
                 type="button"
                 onClick={() => avatarMutation.mutate(null)}
                 disabled={avatarMutation.isPending}
-                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] transition hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-secondary border-[var(--color-brand-warm)] px-3 py-1.5 text-xs text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Remove
               </button>
@@ -454,7 +454,7 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
 
         {formError || profileMutation.isError ? (
           <p
-            className="rounded-lg border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-3 text-sm text-[var(--color-brand-warm-strong)] md:col-span-2"
+            className="app-alert p-3 text-sm md:col-span-2"
             role="alert"
           >
             {formError ??
@@ -465,7 +465,7 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
         ) : null}
 
         {profileMutation.isSuccess && !dirty ? (
-          <p className="rounded-lg border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm font-medium text-[var(--color-brand-accent-strong)] md:col-span-2">
+          <p className="app-list-row border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-3 text-sm font-medium text-[var(--color-brand-accent-strong)] md:col-span-2">
             Profile updated.
           </p>
         ) : null}
@@ -544,7 +544,7 @@ function ProfileReadinessPanel({
             return (
               <div
                 key={check.issue}
-                className={`rounded-2xl border p-4 ${
+                className={`app-list-row p-4 ${
                   check.complete
                     ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)]'
                     : 'border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)]'
