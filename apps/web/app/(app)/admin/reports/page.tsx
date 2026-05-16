@@ -265,7 +265,7 @@ function ReportCard({
   );
 
   return (
-    <article className="app-panel p-5">
+    <article className="app-list-row p-5">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <input
@@ -310,7 +310,7 @@ function ReportCard({
         {report.target?.detail ?? 'The target may have been removed.'}
       </p>
 
-      <div className="mt-4 rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3">
+      <div className="app-section mt-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
           Report reason
         </p>
@@ -333,7 +333,7 @@ function ReportCard({
       </p>
 
       {memberManagement ? (
-        <div className="mt-4 rounded-2xl border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-3">
+        <div className="app-list-row mt-4 border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-brand-contrast)]">
             Member context
           </p>
@@ -360,7 +360,7 @@ function ReportCard({
       ) : null}
 
       {memberManagement && hasMemberModerationActions ? (
-        <div className="mt-3 rounded-2xl border border-black/10 bg-white/80 p-3">
+        <div className="app-section mt-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
             Report-linked actions
           </p>
@@ -374,7 +374,7 @@ function ReportCard({
                 type="button"
                 disabled={isModeratingMember}
                 onClick={() => onMemberModeration('demote_admin')}
-                className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-secondary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isModeratingMember && pendingMemberAction === 'demote_admin'
                   ? 'Demoting...'
@@ -386,7 +386,7 @@ function ReportCard({
                 type="button"
                 disabled={isModeratingMember}
                 onClick={() => onMemberModeration('suspend_member')}
-                className="rounded-full border border-black/10 bg-white px-3 py-2 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-secondary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isModeratingMember && pendingMemberAction === 'suspend_member'
                   ? 'Suspending...'
@@ -398,7 +398,7 @@ function ReportCard({
                 type="button"
                 disabled={isModeratingMember}
                 onClick={() => onMemberModeration('deactivate_member')}
-                className="rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-xs font-semibold text-[var(--color-brand-warm-strong)] shadow-sm transition hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-secondary border-[var(--color-brand-warm)] px-3 py-2 text-xs text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isModeratingMember &&
                 pendingMemberAction === 'deactivate_member'
@@ -409,7 +409,7 @@ function ReportCard({
           </div>
           {memberModerationError ? (
             <p
-              className="mt-3 rounded-xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-xs leading-5 text-[var(--color-brand-warm-strong)]"
+              className="app-alert mt-3 px-3 py-2 text-xs leading-5"
               role="alert"
             >
               {memberModerationError}
@@ -419,7 +419,7 @@ function ReportCard({
       ) : null}
 
       {report.moderationActions.length > 0 ? (
-        <div className="mt-3 rounded-2xl border border-black/10 bg-[var(--bg-secondary)] p-3">
+        <div className="app-section mt-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
             Moderation history
           </p>
@@ -464,7 +464,7 @@ function ReportCard({
             type="button"
             disabled={isUpdating}
             onClick={() => onStatusChange(action.status)}
-            className="rounded-full border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="app-action-secondary px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isUpdating && pendingStatus === action.status
               ? 'Saving...'
@@ -476,7 +476,7 @@ function ReportCard({
             type="button"
             disabled={isUpdating || isRemoving}
             onClick={onRemoveListing}
-            className="rounded-full border border-[var(--color-brand-warm)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-brand-warm-strong)] shadow-sm transition hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="app-action-secondary border-[var(--color-brand-warm)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isRemoving ? 'Removing...' : 'Remove listing'}
           </button>
@@ -484,7 +484,7 @@ function ReportCard({
         {manageMemberHref ? (
           <Link
             href={manageMemberHref}
-            className="rounded-full border border-[var(--color-brand-contrast-muted)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-brand-contrast)] shadow-sm transition hover:bg-[var(--color-brand-contrast-soft)]"
+            className="app-action-secondary border-[var(--color-brand-contrast-muted)] px-3 py-2 text-sm text-[var(--color-brand-contrast)] hover:bg-[var(--color-brand-contrast-soft)]"
           >
             Manage member
           </Link>
@@ -825,7 +825,7 @@ export default function AdminReportsPage() {
                 type="button"
                 onClick={() => setStatus(item.value)}
                 aria-pressed={active}
-                className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:-translate-y-0.5"
+                className="app-chip transition hover:border-black/20 hover:text-[var(--text-primary)]"
                 style={
                   active
                     ? isOpen
@@ -894,7 +894,7 @@ export default function AdminReportsPage() {
             value={targetType}
             onChange={(next) => setTargetType(next)}
           />
-          <label className="ml-auto inline-flex w-full items-center gap-2 rounded-full border border-[var(--border-default)] bg-white px-3 py-1.5 text-xs sm:w-auto sm:min-w-[260px]">
+          <label className="app-chip ml-auto w-full sm:w-auto sm:min-w-[260px]">
             <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
               Search
             </span>
@@ -920,7 +920,7 @@ export default function AdminReportsPage() {
         </div>
 
         {filteredReports.length > 0 ? (
-          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/90 px-3 py-2 text-xs shadow-sm">
+          <div className="app-list-row flex flex-wrap items-center gap-2 px-3 py-2 text-xs">
             <label className="inline-flex items-center gap-2 text-[var(--text-secondary)]">
               <input
                 type="checkbox"
@@ -948,7 +948,7 @@ export default function AdminReportsPage() {
                 type="button"
                 disabled={selectedCount === 0 || isBulkBusy}
                 onClick={() => void runBulkUpdate('resolved')}
-                className="rounded-full bg-[#111111] px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-primary)] shadow-sm transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-primary px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {bulkPending === 'resolved'
                   ? 'Resolving…'
@@ -958,7 +958,7 @@ export default function AdminReportsPage() {
                 type="button"
                 disabled={selectedCount === 0 || isBulkBusy}
                 onClick={() => void runBulkUpdate('dismissed')}
-                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-secondary px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {bulkPending === 'dismissed'
                   ? 'Dismissing…'
@@ -968,7 +968,7 @@ export default function AdminReportsPage() {
                 type="button"
                 disabled={selectedCount === 0 || isBulkBusy}
                 onClick={() => void runBulkUpdate('in_review')}
-                className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="app-action-secondary px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {bulkPending === 'in_review' ? 'Moving…' : 'Move to review'}
               </button>
@@ -985,7 +985,7 @@ export default function AdminReportsPage() {
         reportsQuery.error.status === 403
       ) ? (
         <section
-          className="mt-4 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-4 p-6"
           role="alert"
         >
           <h2 className="text-base font-semibold">Could not load reports</h2>
@@ -1085,7 +1085,7 @@ function FilterPill<T extends string>({
   onChange: (next: T) => void;
 }) {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/90 p-0.5 shadow-sm">
+    <div className="app-list-row inline-flex items-center gap-2 p-0.5">
       <span className="px-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
         {label}
       </span>
