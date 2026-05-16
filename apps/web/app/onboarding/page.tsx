@@ -179,14 +179,14 @@ export default function OnboardingPage() {
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
             <section className="app-panel p-5 sm:p-7">
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
-                Verify access
+                Community access
               </p>
               <h1 className="mt-2 text-3xl font-semibold leading-tight text-[var(--text-primary)] sm:text-4xl">
-                Join Badger Market
+                Verify Badger Market access
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-                Use your verified UW-Madison email or an invite code to unlock
-                local listings, selling, and item-tied messages.
+                Use the student email you signed in with. Invite codes are for
+                organizer-approved members.
               </p>
 
               {verifiedEmail ? (
@@ -208,18 +208,10 @@ export default function OnboardingPage() {
                 </div>
               ) : null}
 
-              <h2 className="mt-6 text-base font-semibold text-[var(--text-primary)]">
-                Choose access method
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-                Student email is fastest when it matches your sign-in. Invite
-                codes work for trusted early members.
-              </p>
-
               <div
                 role="tablist"
                 aria-label="Choose a verification method"
-                className="mt-5 grid grid-cols-2 gap-2 rounded-full bg-[var(--bg-tertiary)] p-1"
+                className="mt-6 grid grid-cols-2 gap-2 rounded-full bg-[var(--bg-tertiary)] p-1"
               >
                 <button
                   type="button"
@@ -236,7 +228,7 @@ export default function OnboardingPage() {
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
                 >
-                  Student email
+                  Verified email
                 </button>
                 <button
                   type="button"
@@ -311,8 +303,8 @@ export default function OnboardingPage() {
                     id="onboarding-email-help"
                     className="mt-1.5 text-xs text-[var(--text-tertiary)]"
                   >
-                    We&apos;ll match your verified email domain against
-                    allowlisted communities.
+                    We match the verified email already attached to this
+                    account.
                   </p>
                 )}
 
@@ -334,7 +326,7 @@ export default function OnboardingPage() {
                   {loading
                     ? 'Joining...'
                     : mode === 'email'
-                      ? 'Join with verified email'
+                      ? 'Unlock Badger Market'
                       : 'Join with invite code'}
                 </button>
               </form>
@@ -344,10 +336,8 @@ export default function OnboardingPage() {
                   Don&apos;t have an invite or community email?
                 </summary>
                 <p className="mt-2 leading-5">
-                  Sellr is invite-only while we onboard new communities. Ask an
-                  organizer or moderator in your community for an invite code,
-                  or sign out and sign back in with the student email tied to a
-                  supported campus community.
+                  Ask an organizer for a code, or sign out and sign back in
+                  with the supported campus email tied to your community.
                 </p>
               </details>
 
@@ -360,18 +350,21 @@ export default function OnboardingPage() {
             <aside className="space-y-4">
               <section className="app-panel-soft p-5">
                 <h2 className="text-base font-semibold text-[var(--text-primary)]">
-                  After access opens
+                  What opens next
                 </h2>
                 <ul className="mt-3 divide-y divide-[var(--border-default)]">
-                  <TrustPillar
+                  <NextStepItem
+                    number="1"
                     title="Browse Badger Market"
                     body="Listings are scoped to the community you just joined."
                   />
-                  <TrustPillar
-                    title="List when ready"
+                  <NextStepItem
+                    number="2"
+                    title="Sell when ready"
                     body="Your verified profile gives buyers basic seller context."
                   />
-                  <TrustPillar
+                  <NextStepItem
+                    number="3"
                     title="Message from items"
                     body="Conversations stay tied to the listing and community."
                   />
@@ -396,15 +389,23 @@ export default function OnboardingPage() {
   );
 }
 
-function TrustPillar({ title, body }: { title: string; body: string }) {
+function NextStepItem({
+  number,
+  title,
+  body,
+}: {
+  number: string;
+  title: string;
+  body: string;
+}) {
   return (
     <li className="py-3">
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]"
+          className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--text-primary)] text-[11px] font-semibold text-[var(--color-brand-primary)]"
         >
-          <CheckIcon />
+          {number}
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-[var(--text-primary)]">
