@@ -1,6 +1,6 @@
 # Sellr UI/UX Overhaul Guide
 
-Last updated: May 15, 2026.
+Last updated: May 16, 2026.
 
 Use this guide before Phase 6 AI work. Sellr already has a functional web SLC;
 the next job is to make the existing buyer/seller loop feel simpler, more
@@ -891,24 +891,41 @@ Acceptance:
 
 ### Phase B - Design System Foundation
 
-Status: started. The May 15 foundation pass added the attached flow-reference
-notes, lightened global app surface tokens/utilities, and updated shared
-listing/seller trust card patterns without adding dependencies or changing SLC
-behavior.
+Status: complete for the Pre-Phase-6 foundation scope. The May 15-16 passes
+added the attached flow-reference notes, lightened global app surface
+tokens/utilities, updated shared listing/seller trust card patterns, and applied
+the lighter foundation to high-impact reusable marketplace, dashboard, listing
+detail, admin, profile/report, inbox/notifications, listing management, and
+community-home patterns without adding dependencies or changing SLC behavior.
 
 Deliver:
 
-- Audit `apps/web/app/globals.css` tokens/utilities.
-- Reduce gradient/panel dependency in app surfaces.
-- Define updated button, panel, card, badge, form, empty, loading, error, and
+- Audited `apps/web/app/globals.css` tokens/utilities.
+- Reduced gradient/panel dependency in app surfaces.
+- Defined updated button, panel, card, badge, form, empty, loading, error, and
   focus patterns.
-- Confirm no new design library is needed.
+- Confirmed no new design library is needed.
 
 Acceptance:
 
 - Existing routes still render.
 - Reusable utilities support the simpler marketplace direction.
 - Accessibility baseline is documented and testable.
+
+Closeout notes:
+
+- Foundation utilities now include `app-panel`, `app-panel-soft`,
+  `app-panel-dark`, `app-section`, `app-list-row`, `app-empty-state`,
+  `app-alert`, `app-field`, `app-chip`, `app-action-primary`, and
+  `app-action-secondary`.
+- Repeated heavy patterns such as oversized rounded panels, `bg-white/90`
+  form fields, dashed empty states with extra card weight, and nested dashboard
+  cards were reduced across the main signed-in surfaces.
+- Desktop Browser smoke on May 16 covered `/`, `/marketplace`, `/dashboard`,
+  and `/admin/community` with no framework overlay or console warning/error
+  output. Mobile viewport QA remains a Phase F/readiness item because the
+  available in-app Browser surface did not expose viewport resizing and the repo
+  does not currently include Playwright as a local command.
 
 ### Phase C - Onboarding And Navigation
 
@@ -1023,17 +1040,18 @@ Browser verification should cover desktop and mobile widths for:
 Use seeded/demo data where possible. Route smoke tests validate responses, but
 they do not replace visual, responsive, and accessibility review.
 
-## Recommended Next Prompt For Phase B
+## Recommended Next Prompt For Phase C
 
 ```text
-Begin Phase B of the Sellr Pre-Phase-6 UI/UX overhaul. Read AGENTS.md,
+Begin Phase C of the Sellr Pre-Phase-6 UI/UX overhaul. Read AGENTS.md,
 docs/ui-ux-overhaul-guide.md, docs/design-language.md,
 docs/current-state-and-scope.md, docs/web-next-development-guide.md,
-apps/web/README.md, and apps/web/app/globals.css. Audit the existing web design
-tokens and reusable surface/button/card/form patterns, then make a small,
-reviewable token/component-foundation pass that reduces generic dashboard
-styling, nested-card reliance, and excessive gradient/panel weight while
-preserving the current SLC behavior. Do not implement Phase 6 AI or add a new
-design system library. Run focused web lint/typecheck/build checks and summarize
-remaining risks.
+apps/web/README.md, and apps/web/app/globals.css. Build on the completed Phase B
+foundation by simplifying the new-user and first signed-in path: `/`, `/login`,
+`/onboarding`, `/communities/join`, the authenticated app header/navigation,
+and the dashboard-as-home decision. Keep the implementation small and
+reviewable, preserve auth/community/listing/messaging/admin behavior, do not
+implement Phase 6 AI, do not add broad product scope, and do not add a new
+design-system library. Run focused web lint/typecheck/build checks and summarize
+remaining visual or interaction risks.
 ```

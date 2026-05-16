@@ -82,9 +82,13 @@ Before Phase 6 AI listing-assistant work, the next product-development priority
 is the UI/UX overhaul in `docs/ui-ux-overhaul-guide.md`. That guide now contains
 the route/repo audit, current UX diagnosis, onboarding redesign plan,
 screen-by-screen direction, component guidance, microcopy, accessibility bar,
-metrics, and Phase A-F implementation plan. Simplify onboarding, make the app
-feel more personal and local, reduce generic "AI/vibe-coded" patterns, and
-preserve the current SLC behavior while improving the existing flows.
+metrics, and Phase A-F implementation plan. Phase B foundation work is complete
+for the current scope, with lighter reusable app surfaces, rows, fields, alerts,
+chips, empty states, and action utilities applied across high-impact signed-in
+surfaces. Continue with Phase C onboarding/navigation and first signed-in action
+work. Simplify onboarding, make the app feel more personal and local, reduce
+generic "AI/vibe-coded" patterns, and preserve the current SLC behavior while
+improving the existing flows.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -322,14 +326,14 @@ If continuing product development, complete the Pre-Phase 6 UI/UX overhaul
 before starting AI listing assistant work:
 
 ```text
-Continue the Sellr Pre-Phase-6 UI/UX overhaul after the initial Phase B
-foundation pass. Read AGENTS.md, docs/ui-ux-overhaul-guide.md,
+Begin Phase C of the Sellr Pre-Phase-6 UI/UX overhaul after the completed Phase
+B foundation pass. Read AGENTS.md, docs/ui-ux-overhaul-guide.md,
 docs/design-language.md, docs/current-state-and-scope.md,
 docs/web-next-development-guide.md, apps/web/README.md, and
 apps/web/app/globals.css. Build on the lighter token/surface baseline by
-cleaning up the highest-impact route-level patterns first: onboarding/login,
-dashboard-as-home, marketplace filters/cards, listing detail, seller flows, and
-inbox/profile trust surfaces. Preserve current SLC behavior, do not implement
+simplifying the new-user and first signed-in path first: `/`, `/login`,
+`/onboarding`, `/communities/join`, authenticated app header/navigation, and
+the dashboard-as-home decision. Preserve current SLC behavior, do not implement
 Phase 6 AI, do not add broad product scope, and do not add a new design-system
 library.
 ```
