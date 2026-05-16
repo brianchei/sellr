@@ -211,7 +211,7 @@ function Hero() {
             where buyers and sellers share context before they meet.
           </p>
 
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/login"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-black px-6 py-3.5 text-sm font-semibold text-white no-underline shadow-lg shadow-black/10 transition hover:-translate-y-0.5 hover:bg-[var(--color-brand-contrast-strong)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-primary)] sm:text-base"
@@ -219,7 +219,17 @@ function Hero() {
               Join your community
               <ArrowRightIcon />
             </Link>
+            <Link
+              href="#how-it-works"
+              className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/80 px-5 py-3 text-sm font-semibold text-[var(--text-primary)] no-underline transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+            >
+              See how it works
+            </Link>
           </div>
+          <p className="mx-auto mt-3 max-w-md text-xs leading-5 text-[var(--text-tertiary)]">
+            Start with a wisc.edu email. Invite codes remain available for
+            trusted early members.
+          </p>
         </div>
 
         <div className="mt-12 sm:mt-16">

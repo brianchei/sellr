@@ -43,6 +43,8 @@ export default function JoinCommunityPage() {
     mode === 'invite'
       ? inviteValue.length >= 3
       : emailValue.length > 5 && emailValue.includes('@');
+  const helpId = mode === 'invite' ? 'join-invite-help' : 'join-email-help';
+  const describedBy = error ? `${helpId} join-community-error` : helpId;
 
   const selectMode = (nextMode: JoinMode) => {
     setMode(nextMode);
@@ -129,8 +131,9 @@ export default function JoinCommunityPage() {
               Join another community
             </h1>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              Add a verified local group, then Sellr switches your active
-              community so browsing, selling, and messaging stay scoped.
+              Add a verified local group with an invite code or the verified
+              email already on your account. Sellr will switch your active
+              community after you join.
             </p>
           </div>
           <div className="app-list-row border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-4 py-3">
@@ -150,10 +153,18 @@ export default function JoinCommunityPage() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <section className="app-panel p-5 sm:p-6">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+            Choose how to join
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+            Invite codes are best for early access. Verified email works when
+            the community is tied to your email domain.
+          </p>
+
           <div
             role="tablist"
             aria-label="Choose a community join method"
-            className="grid grid-cols-2 gap-2 rounded-full bg-[var(--bg-tertiary)] p-1"
+            className="mt-5 grid grid-cols-2 gap-2 rounded-full bg-[var(--bg-tertiary)] p-1"
           >
             <button
               type="button"
@@ -201,7 +212,7 @@ export default function JoinCommunityPage() {
                   }
                   autoComplete="off"
                   placeholder="INVITE2026"
-                  aria-describedby="join-invite-help"
+                  aria-describedby={describedBy}
                   aria-invalid={Boolean(error)}
                   className={`${fieldClassName(Boolean(error))} font-mono uppercase tracking-wider`}
                 />
@@ -218,7 +229,7 @@ export default function JoinCommunityPage() {
                   type="email"
                   autoComplete="email"
                   placeholder="you@wisc.edu"
-                  aria-describedby="join-email-help"
+                  aria-describedby={describedBy}
                   readOnly={Boolean(verifiedEmail)}
                   aria-invalid={Boolean(error)}
                   className={fieldClassName(Boolean(error))}
@@ -246,6 +257,7 @@ export default function JoinCommunityPage() {
 
             {error ? (
               <p
+                id="join-community-error"
                 className="app-alert mt-4 px-3 py-2 text-sm"
                 role="alert"
               >
@@ -258,7 +270,11 @@ export default function JoinCommunityPage() {
               disabled={loading || !canSubmit || meQuery.isLoading}
               className="app-action-primary mt-5 w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Joining...' : 'Join community'}
+              {loading
+                ? 'Joining...'
+                : mode === 'invite'
+                  ? 'Join with invite code'
+                  : 'Join with verified email'}
             </button>
           </form>
         </section>
@@ -271,7 +287,7 @@ export default function JoinCommunityPage() {
             <div className="mt-4 space-y-3">
               <GuidanceItem text="Your active community switches to the community you just joined." />
               <GuidanceItem text="Browse, sell, listing inventory, and community pages use that active context." />
-              <GuidanceItem text="You can switch between active communities from the app shell." />
+              <GuidanceItem text="You can switch between active communities from the app header." />
             </div>
           </section>
 

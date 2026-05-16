@@ -456,6 +456,7 @@ body {
 }
 
 :where(.app-field) {
+  display: block;
   width: 100%;
   border: 1px solid rgba(24, 24, 27, 0.1);
   border-radius: var(--radius-lg);
