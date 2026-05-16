@@ -14,10 +14,7 @@ import {
 import { useAuth } from '@/components/auth-provider';
 import { PhotoGallery } from '@/components/photo-gallery';
 import { ReportDialog } from '@/components/report-dialog';
-import {
-  SellerProfileCard,
-  profileInitials,
-} from '@/components/seller-profile-card';
+import { profileInitials } from '@/components/seller-profile-card';
 import {
   availabilityWindows,
   formatAvailabilityWindow,
@@ -74,7 +71,7 @@ const QUICK_REPLIES: QuickReply[] = [
   {
     id: 'question',
     label: 'I have a quick question',
-    text: 'Hi, is this still available? I had a quick question before pickup — ',
+    text: 'Hi, is this still available? I had a quick question before pickup: ',
   },
 ];
 
@@ -140,7 +137,7 @@ function sellerDisplayName(listing: ApiListing): string {
   return listing.seller?.displayName?.trim() || 'Community seller';
 }
 
-function SellerInlineSummary({
+function SellerContactSummary({
   listing,
   isOwnListing,
 }: {
@@ -154,58 +151,160 @@ function SellerInlineSummary({
   const communitySignal = communityTrustLabel(listing.seller);
 
   return (
-    <section
-      aria-label="Seller snapshot"
-      className="mt-5 border-y border-[var(--border-default)] py-4"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <div
-            aria-label={`${sellerName} avatar`}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-xs font-bold text-[var(--text-primary)] ring-4 ring-[var(--color-brand-primary-soft)]"
-            style={
-              listing.seller?.avatarUrl
-                ? { backgroundImage: `url("${listing.seller.avatarUrl}")` }
-                : undefined
-            }
-          >
-            {listing.seller?.avatarUrl ? null : profileInitials(sellerName)}
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
-              {isOwnListing ? 'Your seller profile' : 'Seller'}
-            </p>
-            <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
-              {sellerName}
-            </p>
-          </div>
+    <section aria-label="Seller confidence" className="mt-4">
+      <div className="flex items-start gap-3">
+        <div
+          aria-label={`${sellerName} avatar`}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-xs font-bold text-[var(--text-primary)] ring-4 ring-[var(--color-brand-primary-soft)]"
+          style={
+            listing.seller?.avatarUrl
+              ? { backgroundImage: `url("${listing.seller.avatarUrl}")` }
+              : undefined
+          }
+        >
+          {listing.seller?.avatarUrl ? null : profileInitials(sellerName)}
         </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {communitySignal ? (
-            <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
-              {communitySignal}
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+                {isOwnListing ? 'Your seller profile' : 'Seller confidence'}
+              </p>
+              <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                {sellerName}
+              </p>
+            </div>
+            {sellerHref ? (
+              <Link
+                href={sellerHref}
+                className="shrink-0 text-xs font-semibold text-[var(--color-brand-contrast)] no-underline hover:underline"
+              >
+                View storefront
+              </Link>
+            ) : null}
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {communitySignal ? (
+              <span className="rounded-full bg-[var(--color-brand-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-accent-strong)]">
+                {communitySignal}
+              </span>
+            ) : null}
+            {contactSignal ? (
+              <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
+                {contactSignal}
+              </span>
+            ) : null}
+            <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]">
+              {sellerListings}
             </span>
-          ) : null}
-          {contactSignal ? (
-            <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
-              {contactSignal}
-            </span>
-          ) : null}
-          <span className="rounded-full bg-[var(--bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]">
-            {sellerListings}
-          </span>
-          {sellerHref ? (
-            <Link
-              href={sellerHref}
-              className="rounded-full px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-contrast)] no-underline hover:bg-[var(--color-brand-contrast-soft)]"
-            >
-              View storefront
-            </Link>
-          ) : null}
+          </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function PickupContactSummary({
+  listing,
+  windows,
+}: {
+  listing: ApiListing;
+  windows: ReturnType<typeof availabilityWindows>;
+}) {
+  const firstWindow = windows[0];
+
+  return (
+    <section
+      aria-label="Pickup confidence"
+      className="mt-4 divide-y divide-[var(--border-default)] border-y border-[var(--border-default)]"
+    >
+      <div className="flex gap-3 py-3">
+        <svg
+          className="mt-0.5 shrink-0 text-[var(--color-brand-contrast)]"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 21s7-6 7-12a7 7 0 0 0-14 0c0 6 7 12 7 12Z" />
+          <circle cx="12" cy="9" r="2.5" />
+        </svg>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+            Pickup area
+          </p>
+          <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+            {listing.locationNeighborhood}
+          </p>
+          <p className="mt-0.5 text-xs leading-5 text-[var(--text-secondary)]">
+            {formatRadius(listing.locationRadiusM)} radius. Exact spot is
+            shared after both sides agree.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-3 py-3">
+        <svg
+          className="mt-0.5 shrink-0 text-[var(--color-brand-contrast)]"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="3" y="4" width="18" height="17" rx="2" />
+          <path d="M3 10h18" />
+          <path d="M8 2v4" />
+          <path d="M16 2v4" />
+        </svg>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+            Timing
+          </p>
+          <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+            {firstWindow
+              ? formatAvailabilityWindow(firstWindow)
+              : 'Ask in your message'}
+          </p>
+          <p className="mt-0.5 text-xs leading-5 text-[var(--text-secondary)]">
+            {windows.length > 1
+              ? `${windows.length - 1} more ${
+                  windows.length === 2 ? 'window' : 'windows'
+                } listed below.`
+              : 'Confirm pickup timing before heading out.'}
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ListingReportAction({ listingId }: { listingId: string }) {
+  return (
+    <div className="mt-4 border-t border-[var(--border-default)] pt-4">
+      <p className="text-xs leading-5 text-[var(--text-tertiary)]">
+        Something off? Report stays tied to this listing and goes to a
+        moderator.
+      </p>
+      <div className="mt-2">
+        <ReportDialog
+          targetId={listingId}
+          targetType="listing"
+          subjectLabel="this listing"
+          triggerLabel="Report listing"
+          triggerClassName="inline-flex items-center justify-center rounded-full border border-[var(--color-brand-warm)] bg-[var(--bg-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
+        />
+      </div>
+    </div>
   );
 }
 
@@ -343,7 +442,7 @@ export default function ListingDetailPage() {
   );
 
   // Reset per-listing UI state when the user navigates to a different listing.
-  // (React 19 "store info from previous renders" pattern — preferred over an
+  // (React 19 "store info from previous renders" pattern, preferred over an
   //  effect that synchronously calls setState.)
   const [trackedListingId, setTrackedListingId] = useState<string | null>(null);
   if (listing?.id && listing.id !== trackedListingId) {
@@ -548,11 +647,6 @@ export default function ListingDetailPage() {
               ) : null}
             </div>
 
-            <SellerInlineSummary
-              listing={listing}
-              isOwnListing={isOwnListing}
-            />
-
             <ListingAtAGlance
               listing={listing}
               photoCount={photos.length}
@@ -667,26 +761,9 @@ export default function ListingDetailPage() {
         </article>
 
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <SellerProfileCard
-            profile={listing.seller}
-            heading="Seller of this item"
-            contextLabel={
-              publicContactVerificationLabel(listing.seller)
-                ? 'Verified contact with community-scoped listing history.'
-                : 'Community-scoped seller profile.'
-            }
-            profileHref={
-              listing.seller ? `/sellers/${listing.seller.id}` : undefined
-            }
-            profileLabel="View storefront"
-            editableHref={
-              isOwnListing ? `/listings/${listing.id}/edit` : undefined
-            }
-            editableLabel="Edit listing"
-          />
-
           <ContactCard
             listing={listing}
+            windows={windows}
             isOwnListing={isOwnListing}
             isAvailable={isAvailable}
             sent={sent}
@@ -715,7 +792,7 @@ export default function ListingDetailPage() {
             onSubmit={onSubmit}
           />
 
-          <SafePickupCard listingId={listing.id} isOwnListing={isOwnListing} />
+          <SafePickupCard />
         </aside>
       </section>
     </main>
@@ -728,6 +805,7 @@ export default function ListingDetailPage() {
 
 function ContactCard({
   listing,
+  windows,
   isOwnListing,
   isAvailable,
   sent,
@@ -746,6 +824,7 @@ function ContactCard({
   onSubmit,
 }: {
   listing: ApiListing;
+  windows: ReturnType<typeof availabilityWindows>;
   isOwnListing: boolean;
   isAvailable: boolean;
   sent: boolean;
@@ -769,8 +848,18 @@ function ContactCard({
         {isOwnListing ? 'Your listing' : 'Contact seller'}
       </h2>
 
+      {!isOwnListing ? (
+        <>
+          <SellerContactSummary
+            listing={listing}
+            isOwnListing={isOwnListing}
+          />
+          <PickupContactSummary listing={listing} windows={windows} />
+        </>
+      ) : null}
+
       {isOwnListing ? (
-        <div className="app-list-row mt-3 border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+        <div className="mt-4 border-y border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] py-4">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             This is your listing.
           </p>
@@ -807,12 +896,12 @@ function ContactCard({
               href={`/sellers/${listing.seller.id}`}
               className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[var(--color-brand-warm-strong)] no-underline underline-offset-2 hover:underline"
             >
-              View seller storefront →
+              View seller storefront
             </Link>
           ) : null}
         </div>
       ) : profileLoading ? (
-        <div className="app-list-row mt-3 p-4">
+        <div className="mt-4 border-y border-[var(--border-default)] py-4">
           <p className="text-sm font-medium text-[var(--text-primary)]">
             Checking your profile
           </p>
@@ -821,7 +910,7 @@ function ContactCard({
           </p>
         </div>
       ) : profileIssue ? (
-        <div className="app-list-row mt-3 border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] p-4">
+        <div className="mt-4 border-y border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] py-4">
           <p className="text-sm font-semibold text-[var(--text-primary)]">
             {PROFILE_COMPLETION_COPY[profileIssue].title}
           </p>
@@ -840,7 +929,7 @@ function ContactCard({
           </Link>
         </div>
       ) : sent ? (
-        <div className="app-list-row mt-3 border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] p-4">
+        <div className="mt-4 border-y border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] py-4">
           <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-brand-accent-strong)]">
             <svg
               width="14"
@@ -949,6 +1038,8 @@ function ContactCard({
           </p>
         </form>
       )}
+
+      {!isOwnListing ? <ListingReportAction listingId={listing.id} /> : null}
     </section>
   );
 }
@@ -957,13 +1048,7 @@ function ContactCard({
 /* Sellr Safe Pickup card                                                      */
 /* -------------------------------------------------------------------------- */
 
-function SafePickupCard({
-  listingId,
-  isOwnListing,
-}: {
-  listingId: string;
-  isOwnListing: boolean;
-}) {
+function SafePickupCard() {
   const steps = [
     'Meet in a busy local spot you both already know.',
     'Inspect the item before any money changes hands.',
@@ -973,11 +1058,7 @@ function SafePickupCard({
 
   return (
     <section
-      className="app-panel border-[var(--color-brand-accent-muted)] p-5"
-      style={{
-        background:
-          'linear-gradient(180deg, var(--color-brand-accent-soft) 0%, var(--bg-elevated) 70%)',
-      }}
+      className="app-panel-soft p-5"
       aria-labelledby="safe-pickup-heading"
     >
       <div className="flex items-start justify-between gap-3">
@@ -1003,11 +1084,11 @@ function SafePickupCard({
         </h2>
       </div>
 
-      <ul className="mt-3 space-y-2">
+      <ol className="mt-3 space-y-2">
         {steps.map((step, index) => (
           <li key={step} className="flex items-start gap-3">
             <span
-              className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[var(--color-brand-accent-strong)] ring-1 ring-[var(--color-brand-accent-muted)]"
+              className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-[10px] font-bold text-[var(--color-brand-accent-strong)] ring-1 ring-[var(--color-brand-accent-muted)]"
               aria-hidden="true"
             >
               {index + 1}
@@ -1017,25 +1098,7 @@ function SafePickupCard({
             </p>
           </li>
         ))}
-      </ul>
-
-      {!isOwnListing ? (
-        <div className="mt-4 border-t border-[var(--color-brand-accent-muted)] pt-4">
-          <p className="text-xs leading-5 text-[var(--text-secondary)]">
-            See something off? Reports go to a real moderator and stay tied to
-            this specific listing.
-          </p>
-          <div className="mt-2">
-            <ReportDialog
-              targetId={listingId}
-              targetType="listing"
-              subjectLabel="this listing"
-              triggerLabel="Report this listing"
-              triggerClassName="inline-flex items-center gap-1.5 rounded-md border border-[var(--color-brand-warm)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
-            />
-          </div>
-        </div>
-      ) : null}
+      </ol>
     </section>
   );
 }
