@@ -107,19 +107,19 @@ function ProfileContent({ me, userId }: { me: MeData; userId: string | null }) {
               Profile
             </span>
             <h1 className="mt-3 text-2xl font-semibold text-[var(--text-primary)] sm:text-3xl">
-              Manage how members see you
+              How you appear in Sellr
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-              Keep your identity, photo, and readiness signals clear before
-              posting listings or coordinating pickup.
+              Buyers and sellers see these backed signals next to listings,
+              conversations, and pickup coordination.
             </p>
           </div>
           <div className="grid gap-2 text-xs sm:min-w-[220px]">
             <span className="app-list-row border-[var(--color-brand-primary-muted)] bg-white/80 px-3 py-2 font-semibold text-[var(--text-primary)]">
-              Community-visible identity
+              Visible in messages
             </span>
             <span className="app-list-row border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] px-3 py-2 font-semibold text-[var(--color-brand-contrast-strong)]">
-              Profile readiness signals
+              Listing/contact readiness
             </span>
           </div>
         </div>
@@ -175,11 +175,15 @@ function ProfileSummary({
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
-            Profile signal preview
+            Public trust preview
           </p>
           <h2 className="break-words text-xl font-semibold text-[var(--text-primary)]">
             {me.user.displayName}
           </h2>
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+            This is the name, contact status, and community context buyers and
+            sellers see before pickup.
+          </p>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
             {contactVerificationLabel(me.user)} | Member since{' '}
             {formatMemberSince(me.user.memberSince ?? me.user.createdAt)}
@@ -192,7 +196,7 @@ function ProfileSummary({
             </span>
             <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
               {ready
-                ? 'Ready for listing and contact'
+                ? 'Visible with backed trust signals'
                 : `${issues.length} ${issues.length === 1 ? 'step' : 'steps'} left`}
             </span>
           </div>
@@ -362,7 +366,8 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
             Profile details
           </h2>
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-            These details appear in conversations, storefronts, and trust cards.
+            Your display name and photo anchor the trust cues that appear near
+            listings and messages.
           </p>
         </div>
         <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
@@ -385,7 +390,8 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
             Profile photo
           </p>
           <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-            JPG, PNG, or WebP. Keep the image under 3 MB.
+            Use a recognizable image so buyers and sellers know who they are
+            coordinating with. JPG, PNG, or WebP under 3 MB.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <input
@@ -528,8 +534,8 @@ function ProfileReadinessPanel({
                 Profile readiness
               </h2>
               <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-                Backed signals required for posting listings and contacting
-                sellers.
+                Complete these so marketplace actions can show backed identity
+                instead of blank profile context.
               </p>
             </div>
             <span className="rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)] shadow-sm">
@@ -566,7 +572,9 @@ function ProfileReadinessPanel({
                       {check.complete ? check.completeLabel : copy.title}
                     </p>
                     <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
-                      {check.complete ? 'Complete.' : copy.body}
+                      {check.complete
+                        ? 'Shown as a backed profile signal.'
+                        : copy.body}
                     </p>
                     {!check.complete ? (
                       <Link
@@ -603,8 +611,9 @@ function ProfileReadinessPanel({
               Trust tips
             </h2>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              A recognizable name and photo help buyers understand who they are
-              coordinating with before pickup.
+              A recognizable name, verified contact, and active community
+              membership help people decide whether to message, sell, or meet
+              locally.
             </p>
           </div>
         </div>
