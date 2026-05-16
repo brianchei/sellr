@@ -405,6 +405,7 @@ function ContactCard({
           targetId={sellerId}
           targetType="user"
           subjectLabel={sellerName}
+          contextLabel="Seller reports stay tied to this storefront and community."
           triggerLabel="Report seller"
           triggerClassName="inline-flex justify-center rounded-full border border-[var(--color-brand-warm)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-warm-strong)] no-underline shadow-sm hover:bg-[var(--color-brand-warm-soft)]"
         />

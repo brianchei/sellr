@@ -78,6 +78,7 @@ function MessageBubble({
               targetId={message.id}
               targetType="message"
               subjectLabel="this message"
+              contextLabel="Message reports include this message and conversation context."
               triggerLabel="Report message"
               triggerClassName="text-xs font-medium text-[var(--color-brand-warm-strong)] underline-offset-2 hover:underline"
             />
@@ -348,6 +349,7 @@ export function ConversationThread({
                 targetId={peerReportId}
                 targetType="user"
                 subjectLabel={peerName}
+                contextLabel="Member reports stay tied to this conversation and community."
                 triggerLabel="Report member"
                 triggerClassName="inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
               />
