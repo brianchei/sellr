@@ -16,7 +16,7 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
+  { label: 'Home', href: '/dashboard', icon: DashboardIcon },
   { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
   { label: 'Listings', href: '/listings', icon: ListingsIcon },
   { label: 'Inbox', href: '/inbox', icon: InboxIcon },
@@ -378,7 +378,7 @@ export function AppHeader() {
                     onClick={() => setAccountOpen(false)}
                     className="mx-2 block rounded-xl px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
                   >
-                    Account
+                    Home
                   </Link>
                   <Link
                     href="/profile"

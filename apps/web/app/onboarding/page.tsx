@@ -145,7 +145,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="app-shell-bg flex min-h-screen flex-col text-[var(--text-primary)]">
-      <header className="border-b border-black/10 bg-white/80 backdrop-blur">
+      <header className="border-b border-black/10 bg-white">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <Link
             href="/"
@@ -180,27 +180,26 @@ export default function OnboardingPage() {
               </p>
               <div className="space-y-3">
                 <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">
-                  Join your local community to get started.
+                  Join your community.
                 </h1>
                 <p className="max-w-xl text-base leading-7 text-[var(--text-secondary)]">
-                  Sellr only works inside trusted local groups — campuses,
-                  coworking spaces, residences, and invite-only neighborhoods.
-                  Verifying community access is what makes browsing, listing,
-                  and meeting up safer than a generic listings board.
+                  Community access puts you in the right local marketplace
+                  before you browse, sell, or message. It keeps listings scoped
+                  to people with shared context.
                 </p>
               </div>
               <ul className="grid gap-3 sm:grid-cols-1">
                 <TrustPillar
-                  title="Verified communities only"
-                  body="Every listing belongs to a known, gated local group — not the open internet."
+                  title="Verified group"
+                  body="Listings stay inside a known local community, not the open internet."
                 />
                 <TrustPillar
-                  title="Identity-aware messaging"
-                  body="Buyers and sellers know who they're talking to before any pickup is arranged."
+                  title="Member context"
+                  body="Messages carry community and profile context before pickup is arranged."
                 />
                 <TrustPillar
-                  title="Community accountability"
-                  body="Reports, blocks, and member tenure keep flaky and unsafe behavior visible."
+                  title="Scoped safety"
+                  body="Reports and access controls stay tied to the community they affect."
                 />
               </ul>
             </section>
@@ -273,7 +272,8 @@ export default function OnboardingPage() {
                       autoComplete="off"
                       placeholder="INVITE2026"
                       aria-describedby="onboarding-invite-help"
-                      className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 font-mono text-sm uppercase tracking-wider text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                      aria-invalid={Boolean(error)}
+                      className="app-field mt-1.5 px-3 py-2.5 font-mono text-sm uppercase tracking-wider"
                     />
                   </label>
                 ) : (
@@ -290,7 +290,8 @@ export default function OnboardingPage() {
                       placeholder="you@wisc.edu"
                       aria-describedby="onboarding-email-help"
                       readOnly={Boolean(verifiedEmail)}
-                      className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                      aria-invalid={Boolean(error)}
+                      className="app-field mt-1.5 px-3 py-2.5 text-sm"
                     />
                   </label>
                 )}
@@ -315,7 +316,7 @@ export default function OnboardingPage() {
 
                 {error ? (
                   <p
-                    className="mt-4 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+                    className="app-alert mt-4 px-3 py-2 text-sm"
                     role="alert"
                   >
                     {error}
@@ -357,7 +358,7 @@ export default function OnboardingPage() {
 
 function TrustPillar({ title, body }: { title: string; body: string }) {
   return (
-    <li className="rounded-3xl border border-black/10 bg-white/85 p-4 shadow-[var(--shadow-app-card)] backdrop-blur">
+    <li className="app-list-row p-4">
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
