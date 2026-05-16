@@ -9,10 +9,8 @@ import { useAuth } from '@/components/auth-provider';
 type JoinMode = 'invite' | 'email';
 
 function fieldClassName(hasError: boolean): string {
-  return `mt-1.5 w-full rounded-2xl border bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:ring-2 ${
-    hasError
-      ? 'border-[var(--color-brand-warm)] focus:border-[var(--color-brand-warm)] focus:ring-[var(--color-brand-warm-soft)]'
-      : 'border-black/10 focus:border-[var(--color-brand-contrast)] focus:ring-[var(--color-brand-contrast-muted)]'
+  return `app-field mt-1.5 px-3 py-2.5 text-sm ${
+    hasError ? 'border-[var(--color-brand-warm)]' : ''
   }`;
 }
 
@@ -131,12 +129,11 @@ export default function JoinCommunityPage() {
               Join another community
             </h1>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-              Add another verified local group to your Sellr account. After you
-              join, Sellr will switch your active community so browsing,
-              listing, and seller tools stay scoped correctly.
+              Add a verified local group, then Sellr switches your active
+              community so browsing, selling, and messaging stay scoped.
             </p>
           </div>
-          <div className="rounded-3xl border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-4 py-3">
+          <div className="app-list-row border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-accent-strong)]">
               Current access
             </p>
@@ -205,6 +202,7 @@ export default function JoinCommunityPage() {
                   autoComplete="off"
                   placeholder="INVITE2026"
                   aria-describedby="join-invite-help"
+                  aria-invalid={Boolean(error)}
                   className={`${fieldClassName(Boolean(error))} font-mono uppercase tracking-wider`}
                 />
               </label>
@@ -222,6 +220,7 @@ export default function JoinCommunityPage() {
                   placeholder="you@wisc.edu"
                   aria-describedby="join-email-help"
                   readOnly={Boolean(verifiedEmail)}
+                  aria-invalid={Boolean(error)}
                   className={fieldClassName(Boolean(error))}
                 />
               </label>
@@ -247,7 +246,7 @@ export default function JoinCommunityPage() {
 
             {error ? (
               <p
-                className="mt-4 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+                className="app-alert mt-4 px-3 py-2 text-sm"
                 role="alert"
               >
                 {error}
@@ -300,7 +299,7 @@ export default function JoinCommunityPage() {
 
 function GuidanceItem({ text }: { text: string }) {
   return (
-    <div className="flex gap-3 rounded-2xl border border-black/10 bg-white/80 p-3">
+    <div className="app-list-row flex gap-3 p-3">
       <span
         aria-hidden="true"
         className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--color-brand-accent)]"

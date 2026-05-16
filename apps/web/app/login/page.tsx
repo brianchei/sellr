@@ -265,11 +265,11 @@ export default function LoginPage() {
           Sign in
         </p>
         <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
-          Sign in to Sellr
+          Enter your community marketplace
         </h1>
         <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-          UW-Madison students can use a verified wisc.edu email. If you received
-          an invite, phone sign-in is also available.
+          Use your verified student email first. Invite-only members can use
+          phone sign-in when their community shared a code.
         </p>
 
         {step === 'email' ? (
@@ -286,8 +286,9 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="you@wisc.edu"
+                aria-invalid={Boolean(error)}
                 aria-describedby="login-email-help"
-                className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="app-field mt-1.5 px-3 py-2.5 text-sm"
               />
             </label>
             <p
@@ -329,8 +330,9 @@ export default function LoginPage() {
                 autoComplete="tel"
                 placeholder="(555) 123-4567"
                 inputMode="tel"
+                aria-invalid={Boolean(error)}
                 aria-describedby="login-phone-help"
-                className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="app-field mt-1.5 px-3 py-2.5 text-sm"
               />
             </label>
             <p
@@ -377,8 +379,9 @@ export default function LoginPage() {
                 autoComplete="one-time-code"
                 maxLength={OTP_CODE_LENGTH}
                 placeholder="123456"
+                aria-invalid={Boolean(error)}
                 aria-label="6 digit verification code"
-                className="w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-3 text-center font-mono text-xl tracking-[0.4em] text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="app-field px-3 py-3 text-center font-mono text-xl tracking-[0.4em]"
               />
             </label>
             <button
@@ -410,7 +413,7 @@ export default function LoginPage() {
 
         {error ? (
           <p
-            className="mt-4 rounded-2xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-sm text-[var(--color-brand-warm-strong)]"
+            className="app-alert mt-4 px-3 py-2 text-sm"
             role="alert"
           >
             {error}
