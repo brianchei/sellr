@@ -843,11 +843,33 @@ function ContactCard({
   onMessageChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const sellerName = sellerDisplayName(listing);
+  const firstWindow = windows[0];
+  const pickupTimingCopy = firstWindow
+    ? `Start with approximate pickup timing like ${formatAvailabilityWindow(
+        firstWindow,
+      )}.`
+    : 'Start with approximate pickup timing.';
+  const messageHelpId = `listing-message-help-${listing.id}`;
+  const messageErrorId = `listing-message-error-${listing.id}`;
+  const messageDescriptions = [
+    messageHelpId,
+    messageError ? messageErrorId : null,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <section className="app-panel p-5">
       <h2 className="text-base font-semibold text-[var(--text-primary)]">
-        {isOwnListing ? 'Your listing' : 'Contact seller'}
+        {isOwnListing ? 'Your listing' : 'Message seller'}
       </h2>
+      {!isOwnListing ? (
+        <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+          Your message stays attached to {listing.title}. Ask {sellerName} about
+          timing, item details, or a public pickup spot.
+        </p>
+      ) : null}
 
       {!isOwnListing ? (
         <>
@@ -948,9 +970,9 @@ function ContactCard({
             Message sent
           </p>
           <p className="mt-1.5 text-sm leading-6 text-[var(--text-secondary)]">
-            Your conversation is now open with the seller. Continue
-            coordinating pickup from your inbox so the listing context stays
-            attached.
+            Your conversation is open with {sellerName}. Keep pickup details in
+            that thread, and share an exact pickup spot only after both sides
+            agree.
           </p>
           <Link
             href={
@@ -965,6 +987,17 @@ function ContactCard({
         </div>
       ) : (
         <form onSubmit={onSubmit} className="mt-3">
+          <div className="mb-4 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-secondary)] px-3 py-2.5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+              Before you send
+            </p>
+            <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+              {pickupTimingCopy} Meet in a public, familiar place when
+              possible. Do not send deposits, gift cards, or payment codes
+              before seeing the item.
+            </p>
+          </div>
+
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
               Quick start
@@ -1006,12 +1039,25 @@ function ContactCard({
               rows={5}
               maxLength={8000}
               placeholder="Be specific about timing and pickup preferences."
+              aria-describedby={messageDescriptions || undefined}
+              aria-invalid={Boolean(messageError)}
               className="app-field mt-2 resize-y px-3 py-2.5 text-sm leading-6"
             />
           </label>
+          <p
+            id={messageHelpId}
+            className="mt-2 text-xs leading-5 text-[var(--text-tertiary)]"
+          >
+            Keep exact addresses, payment, and handoff details in the Sellr
+            thread until the pickup plan is clear.
+          </p>
 
           {messageError ? (
-            <p className="app-alert mt-2 p-3 text-sm" role="alert">
+            <p
+              id={messageErrorId}
+              className="app-alert mt-2 p-3 text-sm"
+              role="alert"
+            >
               {messageError}
             </p>
           ) : null}
@@ -1030,7 +1076,7 @@ function ContactCard({
             disabled={isPending}
             className="app-action-primary mt-3 w-full px-4 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isPending ? 'Sending...' : 'Send message'}
+            {isPending ? 'Sending...' : 'Message seller'}
           </button>
 
           <p className="mt-3 text-xs leading-5 text-[var(--text-tertiary)]">
