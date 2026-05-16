@@ -271,7 +271,7 @@ export default function MarketplacePage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search title, details, or neighborhood"
-                className="w-full rounded-2xl border border-black/10 bg-white/90 py-2.5 pl-9 pr-3 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+                className="app-field py-2.5 pl-9 pr-3 text-sm"
               />
             </div>
           </label>
@@ -283,7 +283,7 @@ export default function MarketplacePage() {
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             >
               <option value="all">All categories</option>
               {CATEGORIES.map((item) => (
@@ -321,7 +321,7 @@ export default function MarketplacePage() {
               placeholder="No minimum"
               aria-invalid={Boolean(priceFilter.error)}
               aria-describedby="listing-price-filter-error"
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             />
           </label>
 
@@ -336,7 +336,7 @@ export default function MarketplacePage() {
               placeholder="No maximum"
               aria-invalid={Boolean(priceFilter.error)}
               aria-describedby="listing-price-filter-error"
-              className="mt-1.5 w-full rounded-2xl border border-black/10 bg-white/90 px-3 py-2.5 text-sm text-[var(--text-primary)] shadow-xs outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+              className="app-field mt-1.5 px-3 py-2.5 text-sm"
             />
           </label>
         </div>
@@ -363,7 +363,7 @@ export default function MarketplacePage() {
               type="button"
               onClick={() => setVerifiedOnly((current) => !current)}
               aria-pressed={verifiedOnly}
-              className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition"
+              className="app-chip px-3 py-1.5 transition"
               style={{
                 borderColor: verifiedOnly
                   ? 'var(--color-brand-accent)'
@@ -413,7 +413,7 @@ export default function MarketplacePage() {
             type="button"
             onClick={() => setHasPhotosOnly((current) => !current)}
             aria-pressed={hasPhotosOnly}
-            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition"
+            className="app-chip px-3 py-1.5 transition"
             style={{
               borderColor: hasPhotosOnly
                 ? 'var(--color-brand-contrast)'
@@ -515,7 +515,7 @@ export default function MarketplacePage() {
 
       {!priceFilter.error && listingsQuery.isError ? (
         <section
-          className="mt-4 rounded-3xl border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] p-6 text-[var(--color-brand-warm-strong)]"
+          className="app-alert mt-4 p-6"
           role="alert"
         >
           <h2 className="text-base font-semibold">Could not load listings</h2>
@@ -626,7 +626,7 @@ function FilterChipRow<TValue extends string>({
               role="radio"
               aria-checked={active}
               onClick={() => onChange(option.value)}
-              className="rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:-translate-y-0.5"
+              className="app-chip px-3 py-1.5 transition"
               style={{
                 borderColor: active
                   ? 'var(--color-brand-contrast)'
