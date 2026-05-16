@@ -52,13 +52,16 @@ const LISTING: ApiListing = {
 };
 
 describe('<ListingCard />', () => {
-  it('surfaces browse scanability and trust cues', () => {
+  it('surfaces browse scanability and the primary trust cue', () => {
     render(<ListingCard listing={LISTING} />);
 
+    expect(screen.getByText('$45')).toBeTruthy();
+    expect(screen.getByText('Walnut study desk')).toBeTruthy();
+    expect(screen.getByText('Good')).toBeTruthy();
     expect(screen.getByText('0.6 mi')).toBeTruthy();
     expect(screen.getByText('1 photo')).toBeTruthy();
     expect(screen.getByText('Verified contact')).toBeTruthy();
-    expect(screen.getByText('Active community member')).toBeTruthy();
+    expect(screen.queryByText('Active community member')).toBeNull();
     expect(screen.getByText('Maya Chen')).toBeTruthy();
     expect(screen.getByText('3 active listings')).toBeTruthy();
   });

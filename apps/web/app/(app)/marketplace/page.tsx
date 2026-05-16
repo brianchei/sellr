@@ -98,6 +98,7 @@ export default function MarketplacePage() {
     useState<PickupRadiusOption>('all');
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [hasPhotosOnly, setHasPhotosOnly] = useState(false);
+  const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
 
   const trimmedQuery = query.trim();
   const priceFilter = useMemo(
@@ -172,6 +173,13 @@ export default function MarketplacePage() {
     pickupRadius !== 'all' ||
     verifiedOnly ||
     hasPhotosOnly;
+  const advancedFilterCount = [
+    condition !== 'all',
+    Boolean(minPriceValue.trim()) || Boolean(maxPriceValue.trim()),
+    pickupRadius !== 'all',
+  ].filter(Boolean).length;
+  const shouldShowAdvancedFilters =
+    advancedFiltersOpen || Boolean(priceFilter.error);
 
   const clearFilters = () => {
     setQuery('');
@@ -183,6 +191,7 @@ export default function MarketplacePage() {
     setPickupRadius('all');
     setVerifiedOnly(false);
     setHasPhotosOnly(false);
+    setAdvancedFiltersOpen(false);
   };
 
   if (!primaryCommunityId) {
@@ -243,9 +252,9 @@ export default function MarketplacePage() {
 
       <section
         aria-label="Filter listings"
-        className="app-panel-soft mt-6 p-4 sm:p-5"
+        className="app-panel-soft mt-6 p-3 sm:p-4"
       >
-        <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_210px_190px]">
           <label className="block">
             <span className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
               Search
@@ -293,72 +302,62 @@ export default function MarketplacePage() {
               ))}
             </select>
           </label>
-        </div>
-
-        <FilterChipRow
-          label="Sort"
-          value={sort}
-          options={SORT_OPTIONS}
-          onChange={setSort}
-        />
-
-        <FilterChipRow
-          label="Condition"
-          value={condition}
-          options={CONDITION_FILTERS}
-          onChange={setCondition}
-        />
-
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <label className="block">
-            <span className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
-              Min price
-            </span>
-            <input
-              value={minPriceValue}
-              onChange={(event) => setMinPriceValue(event.target.value)}
-              inputMode="decimal"
-              placeholder="No minimum"
-              aria-invalid={Boolean(priceFilter.error)}
-              aria-describedby="listing-price-filter-error"
-              className="app-field mt-1.5 px-3 py-2.5 text-sm"
-            />
-          </label>
 
           <label className="block">
             <span className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
-              Max price
+              Sort
             </span>
-            <input
-              value={maxPriceValue}
-              onChange={(event) => setMaxPriceValue(event.target.value)}
-              inputMode="decimal"
-              placeholder="No maximum"
-              aria-invalid={Boolean(priceFilter.error)}
-              aria-describedby="listing-price-filter-error"
+            <select
+              value={sort}
+              onChange={(event) => setSort(event.target.value as SortOption)}
               className="app-field mt-1.5 px-3 py-2.5 text-sm"
-            />
+            >
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </label>
         </div>
-        {priceFilter.error ? (
-          <p
-            id="listing-price-filter-error"
-            className="mt-2 text-xs font-medium text-[var(--color-brand-warm-strong)]"
-            role="alert"
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setHasPhotosOnly((current) => !current)}
+            aria-pressed={hasPhotosOnly}
+            className="app-chip px-3 py-1.5 transition"
+            style={{
+              borderColor: hasPhotosOnly
+                ? 'var(--color-brand-contrast)'
+                : 'var(--border-default)',
+              background: hasPhotosOnly
+                ? 'var(--color-brand-contrast-soft)'
+                : 'var(--bg-elevated)',
+              color: hasPhotosOnly
+                ? 'var(--color-brand-contrast)'
+                : 'var(--text-secondary)',
+            }}
           >
-            {priceFilter.error}
-          </p>
-        ) : null}
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="6" width="18" height="14" rx="2" />
+              <circle cx="12" cy="13" r="3.5" />
+              <path d="M8 6V4h8v2" />
+            </svg>
+            Has photos
+          </button>
 
-        <FilterChipRow
-          label="Pickup radius"
-          value={pickupRadius}
-          options={PICKUP_RADIUS_FILTERS}
-          onChange={setPickupRadius}
-        />
-
-        {verifiedAvailable || verifiedOnly ? (
-          <div className="mt-4 flex flex-wrap gap-2">
+          {verifiedAvailable || verifiedOnly ? (
             <button
               type="button"
               onClick={() => setVerifiedOnly((current) => !current)}
@@ -405,25 +404,27 @@ export default function MarketplacePage() {
               </svg>
               Verified contact only
             </button>
-          </div>
-        ) : null}
+          ) : null}
 
-        <div className={verifiedAvailable ? 'mt-2' : 'mt-4'}>
           <button
             type="button"
-            onClick={() => setHasPhotosOnly((current) => !current)}
-            aria-pressed={hasPhotosOnly}
+            onClick={() => setAdvancedFiltersOpen((current) => !current)}
+            aria-expanded={shouldShowAdvancedFilters}
+            aria-controls="marketplace-advanced-filters"
             className="app-chip px-3 py-1.5 transition"
             style={{
-              borderColor: hasPhotosOnly
-                ? 'var(--color-brand-contrast)'
-                : 'var(--border-default)',
-              background: hasPhotosOnly
-                ? 'var(--color-brand-contrast-soft)'
-                : 'var(--bg-elevated)',
-              color: hasPhotosOnly
-                ? 'var(--color-brand-contrast)'
-                : 'var(--text-secondary)',
+              borderColor:
+                shouldShowAdvancedFilters || advancedFilterCount > 0
+                  ? 'var(--color-brand-contrast)'
+                  : 'var(--border-default)',
+              background:
+                shouldShowAdvancedFilters || advancedFilterCount > 0
+                  ? 'var(--color-brand-contrast-soft)'
+                  : 'var(--bg-elevated)',
+              color:
+                shouldShowAdvancedFilters || advancedFilterCount > 0
+                  ? 'var(--color-brand-contrast)'
+                  : 'var(--text-secondary)',
             }}
           >
             <svg
@@ -437,13 +438,102 @@ export default function MarketplacePage() {
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              <rect x="3" y="6" width="18" height="14" rx="2" />
-              <circle cx="12" cy="13" r="3.5" />
-              <path d="M8 6V4h8v2" />
+              <path d="M4 6h16" />
+              <path d="M7 12h10" />
+              <path d="M10 18h4" />
             </svg>
-            Has photos
+            {shouldShowAdvancedFilters ? 'Hide filters' : 'More filters'}
+            {advancedFilterCount > 0 ? ` (${advancedFilterCount})` : null}
           </button>
+
+          {hasActiveFilters ? (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold text-[var(--text-primary)] transition hover:bg-[var(--color-brand-primary-soft)]"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+              Clear
+            </button>
+          ) : null}
         </div>
+
+        {shouldShowAdvancedFilters ? (
+          <div
+            id="marketplace-advanced-filters"
+            className="app-section mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.85fr)]"
+          >
+            <FilterChipRow
+              className="mt-0"
+              label="Condition"
+              value={condition}
+              options={CONDITION_FILTERS}
+              onChange={setCondition}
+            />
+
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
+                Price range
+              </p>
+              <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
+                <label className="block">
+                  <span className="sr-only">Minimum price</span>
+                  <input
+                    value={minPriceValue}
+                    onChange={(event) => setMinPriceValue(event.target.value)}
+                    inputMode="decimal"
+                    placeholder="No minimum"
+                    aria-invalid={Boolean(priceFilter.error)}
+                    aria-describedby="listing-price-filter-error"
+                    className="app-field px-3 py-2.5 text-sm"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="sr-only">Maximum price</span>
+                  <input
+                    value={maxPriceValue}
+                    onChange={(event) => setMaxPriceValue(event.target.value)}
+                    inputMode="decimal"
+                    placeholder="No maximum"
+                    aria-invalid={Boolean(priceFilter.error)}
+                    aria-describedby="listing-price-filter-error"
+                    className="app-field px-3 py-2.5 text-sm"
+                  />
+                </label>
+              </div>
+              {priceFilter.error ? (
+                <p
+                  id="listing-price-filter-error"
+                  className="mt-2 text-xs font-medium text-[var(--color-brand-warm-strong)]"
+                  role="alert"
+                >
+                  {priceFilter.error}
+                </p>
+              ) : null}
+            </div>
+
+            <FilterChipRow
+              className="mt-0 lg:col-span-2"
+              label="Pickup radius"
+              value={pickupRadius}
+              options={PICKUP_RADIUS_FILTERS}
+              onChange={setPickupRadius}
+            />
+          </div>
+        ) : null}
       </section>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
@@ -464,28 +554,6 @@ export default function MarketplacePage() {
             </>
           )}
         </p>
-        {hasActiveFilters ? (
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold text-[var(--text-primary)] transition hover:bg-[var(--color-brand-primary-soft)]"
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-            Clear filters
-          </button>
-        ) : null}
       </div>
 
       {!priceFilter.error && listingsQuery.isLoading ? (
@@ -597,18 +665,20 @@ export default function MarketplacePage() {
 /* -------------------------------------------------------------------------- */
 
 function FilterChipRow<TValue extends string>({
+  className = 'mt-4',
   label,
   value,
   options,
   onChange,
 }: {
+  className?: string;
   label: string;
   value: TValue;
   options: ReadonlyArray<{ value: TValue; label: string }>;
   onChange: (value: TValue) => void;
 }) {
   return (
-    <div className="mt-4">
+    <div className={className}>
       <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
         {label}
       </p>
