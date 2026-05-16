@@ -136,7 +136,7 @@ export default function OnboardingPage() {
     return (
       <main className="app-shell-bg flex min-h-screen items-center justify-center px-6 py-16">
         <p className="text-center text-sm text-[var(--text-tertiary)]">
-          Loading...
+          Checking your session...
         </p>
       </main>
     );
@@ -177,16 +177,16 @@ export default function OnboardingPage() {
       <main className="flex-1 px-4 py-8 sm:py-12">
         <div className="mx-auto w-full max-w-5xl">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-            <section className="app-panel-soft p-5 sm:p-7">
+            <section className="app-panel p-5 sm:p-7">
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
-                One step left
+                Verify access
               </p>
               <h1 className="mt-2 text-3xl font-semibold leading-tight text-[var(--text-primary)] sm:text-4xl">
                 Join Badger Market
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
-                Badger Market is for verified UW-Madison members, so listings
-                and messages stay local.
+                Use your verified UW-Madison email or an invite code to unlock
+                local listings, selling, and item-tied messages.
               </p>
 
               {verifiedEmail ? (
@@ -208,13 +208,12 @@ export default function OnboardingPage() {
                 </div>
               ) : null}
 
-              <h2 className="mt-5 text-xl font-semibold text-[var(--text-primary)]">
-                Verify community access
+              <h2 className="mt-6 text-base font-semibold text-[var(--text-primary)]">
+                Choose access method
               </h2>
-              <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                UW-Madison students can join Badger Market with a verified
-                wisc.edu email. If you received an invite, you can also join
-                with an invite code.
+              <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+                Student email is fastest when it matches your sign-in. Invite
+                codes work for trusted early members.
               </p>
 
               <div
@@ -353,39 +352,40 @@ export default function OnboardingPage() {
               </details>
 
               <p className="mt-4 text-center text-xs leading-5 text-[var(--text-tertiary)]">
-                Your verified contact stays private. You can join more
-                communities later from Home.
+                Your exact contact stays private. Community access only scopes
+                where you can browse, sell, and message.
               </p>
             </section>
 
             <aside className="space-y-4">
-              <section className="app-panel p-5">
+              <section className="app-panel-soft p-5">
                 <h2 className="text-base font-semibold text-[var(--text-primary)]">
-                  After you join
+                  After access opens
                 </h2>
-                <ul className="mt-4 grid gap-3">
+                <ul className="mt-3 divide-y divide-[var(--border-default)]">
                   <TrustPillar
-                    title="Browse local listings"
-                    body="Marketplace results use your verified community context."
+                    title="Browse Badger Market"
+                    body="Listings are scoped to the community you just joined."
                   />
                   <TrustPillar
-                    title="Sell when ready"
-                    body="Your profile and verified contact help buyers understand who is posting."
+                    title="List when ready"
+                    body="Your verified profile gives buyers basic seller context."
                   />
                   <TrustPillar
-                    title="Message from an item"
-                    body="Conversations stay tied to the listing and community they affect."
+                    title="Message from items"
+                    body="Conversations stay tied to the listing and community."
                   />
                 </ul>
               </section>
 
-              <section className="app-panel p-5">
+              <section className="app-section">
                 <h2 className="text-base font-semibold text-[var(--text-primary)]">
-                  Invite codes
+                  Need an invite?
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-                  Codes remain available for trusted seed sellers and early
-                  members whose access comes from a community organizer.
+                  Ask a community organizer or moderator for a code. You can
+                  also sign out and use the supported campus email tied to your
+                  community.
                 </p>
               </section>
             </aside>
@@ -398,11 +398,11 @@ export default function OnboardingPage() {
 
 function TrustPillar({ title, body }: { title: string; body: string }) {
   return (
-    <li className="app-list-row p-4">
+    <li className="py-3">
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]"
+          className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]"
         >
           <CheckIcon />
         </span>
