@@ -300,6 +300,7 @@ function ListingReportAction({ listingId }: { listingId: string }) {
           targetId={listingId}
           targetType="listing"
           subjectLabel="this listing"
+          contextLabel="Listing reports stay tied to this item and its community."
           triggerLabel="Report listing"
           triggerClassName="inline-flex items-center justify-center rounded-full border border-[var(--color-brand-warm)] bg-[var(--bg-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
         />

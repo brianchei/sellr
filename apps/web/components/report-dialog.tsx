@@ -11,14 +11,22 @@ type ReportDialogProps = {
   targetId: string;
   targetType: ReportTargetType;
   subjectLabel: string;
+  contextLabel?: string;
   triggerLabel?: string;
   triggerClassName?: string;
+};
+
+const TARGET_LABELS: Record<ReportTargetType, string> = {
+  listing: 'Listing',
+  user: 'Member',
+  message: 'Message',
 };
 
 export function ReportDialog({
   targetId,
   targetType,
   subjectLabel,
+  contextLabel,
   triggerLabel = 'Report',
   triggerClassName = 'text-sm font-medium text-[var(--color-brand-warm-strong)] underline-offset-2 hover:underline',
 }: ReportDialogProps) {
@@ -95,7 +103,9 @@ export function ReportDialog({
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
                   Thanks for helping keep Sellr focused on safe, trustworthy
-                  local exchanges.
+                  local exchanges. This report is tied to the {TARGET_LABELS[
+                    targetType
+                  ].toLowerCase()} context you selected.
                 </p>
                 <button
                   type="button"
@@ -116,7 +126,8 @@ export function ReportDialog({
                       Report {subjectLabel}
                     </h2>
                     <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-                      Reports help Sellr review unsafe or misleading activity.
+                      Tell us what happened. Reports help community admins
+                      review unsafe or misleading activity.
                     </p>
                   </div>
                   <button
@@ -127,6 +138,24 @@ export function ReportDialog({
                     Close
                   </button>
                 </div>
+
+                <div className="mt-4 rounded-[var(--radius-lg)] border border-black/10 bg-[var(--bg-secondary)] p-3">
+                  <p className="text-xs font-semibold uppercase text-[var(--color-brand-contrast)]">
+                    Report target
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
+                    {TARGET_LABELS[targetType]} · {subjectLabel}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">
+                    {contextLabel ??
+                      'This report stays attached to the selected marketplace context.'}
+                  </p>
+                </div>
+
+                <p className="mt-4 rounded-[var(--radius-lg)] border border-[var(--color-brand-warm)] bg-[var(--color-brand-warm-soft)] px-3 py-2 text-xs leading-5 text-[var(--color-brand-warm-strong)]">
+                  If you feel unsafe, stop the pickup and report it. Do not
+                  include sensitive personal details.
+                </p>
 
                 <fieldset className="mt-5">
                   <legend className="text-sm font-medium text-[var(--text-primary)]">
@@ -168,7 +197,7 @@ export function ReportDialog({
                     }}
                     rows={4}
                     maxLength={500}
-                    placeholder="Tell us what happened. Do not include sensitive personal details."
+                    placeholder="Share the specific behavior, listing issue, or message that should be reviewed."
                     className="mt-2 w-full resize-y rounded-[var(--radius-lg)] border border-black/10 bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
                   />
                 </label>
