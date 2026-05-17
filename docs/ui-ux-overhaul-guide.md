@@ -1050,9 +1050,13 @@ Closeout QA notes:
 - May 17 follow-up added `pnpm smoke:inbox` to exercise populated inbox/thread
   API behavior inside `pnpm slc:ready`, plus component coverage for the thread
   reply form's busy and failed-submit states.
-- Remaining Phase F risks: logged-out auth/onboarding visual QA, populated
-  notifications QA, and a seeded incomplete-profile visual Browser smoke if a
-  launch fixture is added.
+- May 17 follow-up added `pnpm smoke:notifications` to create real message
+  notifications, verify unread filtering, mark an individual notification read,
+  and clear remaining unread state through mark-all-read inside
+  `pnpm slc:ready`. Browser smoke also verified the populated `/notifications`
+  list at desktop and mobile widths, including the mark-all-read interaction.
+- Remaining Phase F risks: logged-out auth/onboarding visual QA and a seeded
+  incomplete-profile visual Browser smoke if a launch fixture is added.
 
 ## Process Audit Notes
 

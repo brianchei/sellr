@@ -96,9 +96,9 @@ May 17 Phase F progress: Browser smoke covered the main route list at 1280px
 desktop and 390px mobile, focused web checks passed, and `pnpm slc:ready`
 passed locally outside the sandbox after the authenticated web route smoke was
 made robust for multi-community demo users. Remaining closeout risks are
-logged-out auth/onboarding visual QA, populated notifications QA, populated
-inbox thread rendered visual QA, and a seeded incomplete-profile visual Browser
-smoke if a launch fixture is added.
+logged-out auth/onboarding visual QA, populated inbox thread rendered visual
+QA, and a seeded incomplete-profile visual Browser smoke if a launch fixture is
+added.
 
 May 17 follow-up: report dialog focus, keyboard containment, local validation,
 and success-state focus are now hardened with component tests. Browser smoke
@@ -126,6 +126,13 @@ archived thread to the active inbox. The inbox smoke is wired into
 `pnpm slc:ready`. The thread reply form now exposes a busy submit state, locks
 the composer while pending, and clears failed-submit copy once the sender edits
 the reply.
+
+May 17 follow-up: populated notifications behavior now has API smoke coverage
+through `pnpm smoke:notifications`, which creates real message notifications,
+verifies unread filtering, marks one notification read, and confirms
+mark-all-read clears remaining unread state. The notifications smoke is wired
+into `pnpm slc:ready`. Browser smoke also verified populated `/notifications`
+at desktop and mobile widths, including the mark-all-read interaction.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless

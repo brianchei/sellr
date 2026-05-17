@@ -15,6 +15,7 @@ With Redis, Supabase/Postgres, API, and web running:
 pnpm smoke:seller
 pnpm smoke:buyer
 pnpm smoke:inbox
+pnpm smoke:notifications
 pnpm smoke:reports
 pnpm smoke:web
 ```
@@ -39,6 +40,10 @@ The inbox script signs in as the seeded seller and buyer, sends messages from
 both participants, verifies populated listing and peer context in each inbox,
 checks archived filtering, and confirms a new peer reply restores an archived
 thread to the active inbox.
+
+The notifications script signs in as the seeded seller and buyer, creates real
+message notifications, verifies unread filtering, marks one notification read,
+and confirms mark-all-read clears remaining unread notification state.
 
 The report script signs in as the seeded buyer, seller, and admin, submits a
 real listing report, verifies the created report fields, and confirms the admin
