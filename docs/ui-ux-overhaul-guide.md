@@ -1033,9 +1033,15 @@ Closeout QA notes:
   initial focus, focus containment, Escape close, trigger focus restoration,
   submit-success focus, local validation coverage, and a Browser smoke on a
   buyer-visible listing report action.
+- May 17 follow-up hardened the non-own listing contact path and readiness
+  gates: contact-send now has page-level coverage, send failures clear when the
+  buyer edits the message, failed profile checks block seller contact with a
+  retry action, incomplete profile states hide the contact submit action, and a
+  Browser smoke verified a buyer-visible listing can submit into the `Message
+  sent` state.
 - Remaining Phase F risks: logged-out auth/onboarding visual QA, populated
-  notifications QA, populated inbox thread QA, non-own seller contact-send QA,
-  report submit API smoke, and incomplete-profile blocked-action states.
+  notifications QA, populated inbox thread QA, report submit API smoke, and a
+  seeded incomplete-profile visual Browser smoke if a launch fixture is added.
 
 ## Process Audit Notes
 

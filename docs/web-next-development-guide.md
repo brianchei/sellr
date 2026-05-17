@@ -394,8 +394,8 @@ Remaining Phase F work:
 
 - Complete the remaining manual QA follow-ups from the May 17 route smoke:
   logged-out auth/onboarding visuals, populated notifications, populated inbox
-  thread, non-own seller contact-send, report submit API smoke, and
-  incomplete-profile blocked-action states.
+  thread, report submit API smoke, and a seeded incomplete-profile visual
+  Browser smoke if a launch fixture is added.
 - Audit accessibility and state coverage for dialogs, filters, forms, empty
   states, loading states, errors, disabled controls, focus, and mobile tap
   targets.
@@ -435,6 +435,9 @@ Pre-Phase-6 progress:
 - May 17 follow-up hardened report dialog focus, keyboard containment,
   validation, and success-state focus with component tests and a Browser smoke
   on a buyer-visible listing report action.
+- May 17 follow-up hardened non-own listing contact-send and profile-readiness
+  gates with page-level tests, retryable profile-check failure UI, API-error
+  clearing on message edits, and a Browser smoke through `Message sent`.
 
 Acceptance notes:
 
