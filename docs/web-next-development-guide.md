@@ -393,9 +393,11 @@ Completed route-level work:
 Remaining Phase F work:
 
 - Complete the remaining manual QA follow-ups from the May 17 route smoke:
-  logged-out auth/onboarding visuals, populated notifications, populated inbox
-  thread, and a seeded incomplete-profile visual Browser smoke if a launch
-  fixture is added.
+  logged-out auth/onboarding visuals, populated notifications, and a seeded
+  incomplete-profile visual Browser smoke if a launch fixture is added.
+- Populated inbox thread API coverage now exists through `pnpm smoke:inbox`,
+  which is wired into `pnpm slc:ready`; keep any remaining inbox work focused on
+  rendered desktop/mobile visual QA unless a concrete regression appears.
 - Audit accessibility and state coverage for dialogs, filters, forms, empty
   states, loading states, errors, disabled controls, focus, and mobile tap
   targets.
