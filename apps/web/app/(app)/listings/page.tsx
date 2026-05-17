@@ -19,6 +19,7 @@ import {
   formatCondition,
   formatPostedDate,
   formatPrice,
+  formatRadius,
   photoUrls,
 } from '@/lib/listing-format';
 import {
@@ -49,6 +50,7 @@ type ListingAction =
   | { type: 'unpublish'; listing: ApiListing }
   | { type: 'mark-sold'; listing: ApiListing }
   | { type: 'delete'; listing: ApiListing };
+type StatusFilterValue = (typeof STATUS_FILTERS)[number]['value'];
 
 function statusLabel(status: string): string {
   return STATUS_LABELS[status] ?? status.replaceAll('_', ' ');
@@ -65,6 +67,44 @@ function statusClass(status: string): string {
     return 'bg-[var(--color-brand-contrast-soft)] text-[var(--color-brand-contrast)]';
   }
   return 'bg-[var(--bg-tertiary)] text-[var(--text-secondary)]';
+}
+
+function emptyStatusFilterLabel(value: StatusFilterValue): string {
+  if (value === 'draft') {
+    return 'draft';
+  }
+
+  return value;
+}
+
+function listingPickupSummary(listing: ApiListing): string | null {
+  if (!listing.locationNeighborhood) {
+    return null;
+  }
+
+  return `${listing.locationNeighborhood}, ${formatRadius(
+    listing.locationRadiusM,
+  )} radius`;
+}
+
+function listingLifecycleNote(listing: ApiListing): string {
+  if (listing.status === 'active') {
+    return 'Visible in browse. Mark it sold after handoff, or unpublish if pickup details need work.';
+  }
+
+  if (listing.status === 'draft') {
+    return 'Hidden from buyers. Edit the details, then publish when the item is ready.';
+  }
+
+  if (listing.status === 'sold') {
+    return 'Sold listings stay here for your record and are removed from browse.';
+  }
+
+  if (listing.status === 'expired') {
+    return 'Expired listings are hidden from browse until you republish them.';
+  }
+
+  return 'Review status before making this listing visible to buyers.';
 }
 
 function listingUpdatedAt(listing: ApiListing): number {
@@ -125,7 +165,7 @@ function MyListingsContent() {
   const searchParams = useSearchParams();
   const { primaryCommunityId, userId } = useAuth();
   const [statusFilter, setStatusFilter] =
-    useState<(typeof STATUS_FILTERS)[number]['value']>('all');
+    useState<StatusFilterValue>('all');
   const [notice, setNotice] = useState<string | null>(() =>
     noticeFromSearchParams(searchParams),
   );
@@ -285,7 +325,7 @@ function MyListingsContent() {
           <h1 className="mt-1 text-2xl font-semibold text-[var(--text-primary)]">
             My listings
           </h1>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
+          <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
             {summaryLine}
           </p>
         </div>
@@ -390,7 +430,7 @@ function MyListingsContent() {
         </section>
       ) : null}
 
-      {listings.length > 0 && meQuery.data ? (
+      {filteredListings.length > 0 && meQuery.data ? (
         <div className="mt-6">
           <SellerProfileCard
             profile={meQuery.data.user}
@@ -431,8 +471,8 @@ function MyListingsContent() {
         <section className="app-empty-state mt-6 p-8 text-center">
           <h2 className="text-xl font-semibold">No listings yet</h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Create your first structured listing so buyers have enough context
-            to make a clear local pickup request.
+            You have not listed anything yet. Start with one clear photo and a
+            pickup area.
           </p>
           <Link
             href="/sell"
@@ -448,9 +488,12 @@ function MyListingsContent() {
       listings.length > 0 &&
       filteredListings.length === 0 ? (
         <section className="app-empty-state mt-6 p-8 text-center">
-          <h2 className="text-xl font-semibold">No {statusFilter} listings</h2>
+          <h2 className="text-xl font-semibold">
+            No {emptyStatusFilterLabel(statusFilter)} listings
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Try another status filter or create a new listing.
+            Try another status filter, or create a new listing when you have a
+            photo and pickup area ready.
           </p>
           <button
             type="button"
@@ -500,6 +543,7 @@ function ListingRow({
 }) {
   const photos = photoUrls(listing.photoUrls);
   const primaryPhoto = photos[0];
+  const pickupSummary = listingPickupSummary(listing);
   const status = listing.status;
   const canPublish = status === 'draft' || status === 'expired';
   const canUnpublish = status === 'active';
@@ -525,7 +569,7 @@ function ListingRow({
       : null;
 
   return (
-    <article className="grid gap-4 p-4 transition hover:bg-white sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
+    <article className="grid gap-4 p-4 transition hover:bg-[var(--bg-primary)] sm:grid-cols-[96px_minmax(0,1fr)_minmax(180px,220px)]">
       <Link
         href={`/marketplace/${listing.id}`}
         aria-label={`Open ${listing.title} detail page`}
@@ -567,15 +611,23 @@ function ListingRow({
           <span className="font-semibold text-[var(--text-primary)]">
             {formatPrice(listing.price)}
           </span>
-          <span>· {listing.category}</span>
-          {listing.locationNeighborhood ? (
-            <span>· {listing.locationNeighborhood}</span>
-          ) : null}
-          <span>· Updated {formatPostedDate(listing.updatedAt)}</span>
+          <span>{listing.category}</span>
+          {pickupSummary ? <span>{pickupSummary}</span> : null}
+          <span>Updated {formatPostedDate(listing.updatedAt)}</span>
         </div>
+        <p className="mt-2 text-xs leading-5 text-[var(--text-secondary)]">
+          {listingLifecycleNote(listing)}
+        </p>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div
+        className="flex flex-col gap-2"
+        role="group"
+        aria-label={`Manage ${listing.title}`}
+      >
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+          Next action
+        </p>
         {primaryAction ? (
           <button
             type="button"
@@ -589,7 +641,11 @@ function ListingRow({
               ? primaryAction.pendingLabel
               : primaryAction.label}
           </button>
-        ) : null}
+        ) : (
+          <p className="rounded-[var(--radius-lg)] bg-[var(--bg-secondary)] px-3 py-2 text-center text-xs font-medium text-[var(--text-secondary)]">
+            No marketplace action needed
+          </p>
+        )}
 
         <div className="grid grid-cols-2 gap-2">
           <Link
