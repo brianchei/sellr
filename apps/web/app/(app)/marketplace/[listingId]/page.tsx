@@ -291,9 +291,12 @@ function PickupContactSummary({
 function ListingReportAction({ listingId }: { listingId: string }) {
   return (
     <div className="mt-4 border-t border-[var(--border-default)] pt-4">
-      <p className="text-xs leading-5 text-[var(--text-tertiary)]">
-        Something off? Report stays tied to this listing and goes to a
-        moderator.
+      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+        Report path
+      </p>
+      <p className="mt-1 text-xs leading-5 text-[var(--text-tertiary)]">
+        Use this if the item, seller, or pickup request feels off. Reports stay
+        tied to this listing and community.
       </p>
       <div className="mt-2">
         <ReportDialog
@@ -301,7 +304,7 @@ function ListingReportAction({ listingId }: { listingId: string }) {
           targetType="listing"
           subjectLabel="this listing"
           contextLabel="Listing reports stay tied to this item and its community."
-          triggerLabel="Report listing"
+          triggerLabel="Report this listing"
           triggerClassName="inline-flex items-center justify-center rounded-full border border-[var(--color-brand-warm)] bg-[var(--bg-primary)] px-3 py-1.5 text-xs font-semibold text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
         />
       </div>
@@ -345,7 +348,6 @@ function ListingAtAGlance({
   freshness: ListedFreshness | null;
 }) {
   const status = statusDisplay(listing.status);
-  const sellerName = sellerDisplayName(listing);
 
   return (
     <section aria-labelledby="listing-glance-heading" className="mt-6">
@@ -374,11 +376,9 @@ function ListingAtAGlance({
           }
         />
         <DetailStat
-          label="Seller"
-          value={sellerName}
-          note={`${status.label} listing · ${activeListingCountLabel(
-            listing.seller?.listingCount,
-          )}`}
+          label="Availability"
+          value={status.label}
+          note={listing.negotiable ? 'Open to offers' : 'Firm price'}
         />
       </dl>
     </section>
@@ -862,12 +862,12 @@ function ContactCard({
   return (
     <section className="app-panel p-5">
       <h2 className="text-base font-semibold text-[var(--text-primary)]">
-        {isOwnListing ? 'Your listing' : 'Message seller'}
+        {isOwnListing ? 'Your listing' : 'Contact seller'}
       </h2>
       {!isOwnListing ? (
         <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-          Your message stays attached to {listing.title}. Ask {sellerName} about
-          timing, item details, or a public pickup spot.
+          Send a listing-tied message to {sellerName}. Start with timing, item
+          details, or a public pickup preference.
         </p>
       ) : null}
 
@@ -1000,7 +1000,7 @@ function ContactCard({
 
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
-              Quick start
+              Message intent
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {quickReplies.map((reply) => {
