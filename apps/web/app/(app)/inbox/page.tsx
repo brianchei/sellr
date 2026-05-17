@@ -268,7 +268,7 @@ export default function InboxPage() {
 
               <article className="app-empty-state flex min-h-[320px] items-center justify-center p-8 text-center lg:min-h-[560px]">
                 <div>
-                  <h2 className="text-xl font-semibold">Open a conversation</h2>
+                  <h2 className="text-xl font-semibold">Open an item thread</h2>
                   <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
                     Choose a thread to review the listing context and continue
                     coordinating pickup.
@@ -277,7 +277,7 @@ export default function InboxPage() {
                     href={`/inbox/${filteredConversations[0].id}`}
                     className="app-action-primary mt-5 px-4 py-2 text-sm"
                   >
-                    Open latest
+                    Open latest thread
                   </Link>
                 </div>
               </article>
