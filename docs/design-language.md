@@ -1,6 +1,6 @@
 # Sellr Design Language
 
-Last updated: May 16, 2026.
+Last updated: May 17, 2026.
 
 Sellr is a trust-native local marketplace for high-trust, peer-to-peer commerce. The product should feel structured, local, approachable, and safer than a generic listing board. It should be bright enough to feel memorable, but calm enough that buyers and sellers can scan listings, make decisions, and complete tasks quickly.
 
@@ -18,10 +18,12 @@ The visual language should support confidence: clean hierarchy, obvious actions,
 
 ## Pre-Phase 6 Overhaul Direction
 
-Before Phase 6 AI listing-assistant work, the web app needs a focused UI/UX
-overhaul. The goal is to keep Sellr recognizable, but make the current SLC feel
-simpler, more personal, and less like a generic AI-generated marketplace
-template.
+Before Phase 6 AI listing-assistant work, the web app needs the focused UI/UX
+overhaul to be fully closed out. The route-level implementation passes have
+shipped through onboarding, navigation, home, marketplace, listing, seller,
+inbox, notification, admin, profile, and storefront surfaces. The remaining
+work is release-readiness QA and documentation accuracy, not another broad
+route redesign.
 
 Use [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md) as the handoff guide
 for that pass. It supersedes any earlier Phase 1 tendency toward heavy gradients,
@@ -30,13 +32,12 @@ those patterns make the core buyer/seller flow feel busy.
 
 The expanded overhaul guide is also the source of truth for onboarding,
 screen-by-screen UX direction, microcopy, accessibility requirements, and
-implementation phasing. In particular, the next design pass should treat
-onboarding as contextual activation rather than a tutorial: get users to
-verified community access and then to browse, sell, or reply as quickly as the
-current trust gates allow.
+implementation phasing. Future design work should preserve the shipped
+contextual activation pattern: get users to verified community access and then
+to browse, sell, or reply as quickly as the current trust gates allow.
 
-The redesign should preserve the existing product contracts and trusted
-marketplace scope while prioritizing:
+Any remaining closeout or design fixes should preserve the existing product
+contracts and trusted marketplace scope while prioritizing:
 
 - Fewer containers, panels, chips, and explanatory blocks.
 - Clearer first-run onboarding from landing to login to community access.

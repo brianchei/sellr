@@ -78,21 +78,19 @@ The current web SLC includes:
   consistent backed signals such as verified contact, active community
   membership, profile photo presence, and active listings.
 
-Before Phase 6 AI listing-assistant work, the next product-development priority
-is the UI/UX overhaul in `docs/ui-ux-overhaul-guide.md`. That guide now contains
-the route/repo audit, current UX diagnosis, onboarding redesign plan,
-screen-by-screen direction, component guidance, microcopy, accessibility bar,
-metrics, and Phase A-F implementation plan. Phase B foundation work is complete
-for the current scope, with lighter reusable app surfaces, rows, fields, alerts,
-chips, empty states, and action utilities applied across high-impact signed-in
-surfaces. May 16 Browser DOM smoke covered the public entry, marketplace,
-listing detail, dashboard, sell/listings, inbox, notifications, profile,
-storefront, and admin community/report routes; mobile viewport automation is
-still a launch-readiness risk until a local browser test command is available.
-Continue with Phase C onboarding/navigation and first signed-in action work.
-Simplify onboarding, make the app feel more personal and local, reduce generic
-"AI/vibe-coded" patterns, and preserve the current SLC behavior while improving
-the existing flows.
+Before Phase 6 AI listing-assistant work, finish the UI/UX overhaul closeout in
+`docs/ui-ux-overhaul-guide.md`. The route/repo audit, UX diagnosis, onboarding
+strategy, screen-by-screen direction, component guidance, microcopy,
+accessibility bar, metrics, and Phase A-F plan are documented there. The
+implementation passes through Phase E are now shipped on `main`: Phase B
+foundation utilities and route-level passes for onboarding/auth entry, app
+navigation, signed-in home/dashboard, marketplace filters, listing detail,
+listing form, seller inventory, inbox/thread hierarchy, notifications, admin
+density, and profile/storefront trust hierarchy. The next work is Phase F
+closeout, not another broad route redesign: reconcile docs, run final desktop
+and mobile visual QA, audit accessibility/state coverage, and run
+`pnpm slc:ready` or document blockers. Preserve the current SLC behavior and
+keep Phase 6 AI deferred until that closeout is done.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
@@ -326,18 +324,19 @@ verify admin/community access, run media health checks, watch Railway/Resend
 logs, and record any launch notes. Do not add new product scope.
 ```
 
-If continuing product development, complete the Pre-Phase 6 UI/UX overhaul
-before starting AI listing assistant work:
+If continuing product development, finish the Pre-Phase-6 UI/UX closeout before
+starting AI listing assistant work:
 
 ```text
-Begin Phase C of the Sellr Pre-Phase-6 UI/UX overhaul after the completed Phase
-B foundation pass. Read AGENTS.md, docs/ui-ux-overhaul-guide.md,
-docs/design-language.md, docs/current-state-and-scope.md,
-docs/web-next-development-guide.md, apps/web/README.md, and
-apps/web/app/globals.css. Build on the lighter token/surface baseline by
-simplifying the new-user and first signed-in path first: `/`, `/login`,
-`/onboarding`, `/communities/join`, authenticated app header/navigation, and
-the dashboard-as-home decision. Preserve current SLC behavior, do not implement
-Phase 6 AI, do not add broad product scope, and do not add a new design-system
-library.
+Begin Phase F closeout of the Sellr Pre-Phase-6 UI/UX overhaul. Read AGENTS.md,
+docs/ui-ux-overhaul-guide.md, docs/design-language.md,
+docs/current-state-and-scope.md, docs/web-next-development-guide.md,
+apps/web/README.md, and apps/web/app/globals.css. Do not restart Phase C, D, or
+E route redesigns unless a fresh audit finds a concrete regression. Instead,
+run a final route/state/responsive/accessibility QA sweep across the public
+entry, auth/onboarding, home, marketplace, listing detail, listing form,
+inventory, inbox/thread, notifications, profile/storefront, and admin surfaces.
+Fix only small regressions, update docs with the exact current state, preserve
+current SLC behavior, do not implement Phase 6 AI, do not add broad product
+scope, and do not add a new design-system library.
 ```
