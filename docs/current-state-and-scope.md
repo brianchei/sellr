@@ -162,10 +162,12 @@ follow-up hardened non-own listing contact-send and profile-readiness gates with
 page-level tests, retryable profile-check failure UI, API-error clearing on
 message edits, and a Browser smoke through `Message sent`. A report follow-up
 added `pnpm smoke:reports` to submit a real listing report through the API and
-verify admin review visibility; it now runs inside `pnpm slc:ready`. Remaining
-closeout risks are logged-out auth/onboarding visual QA, populated
-notifications QA, populated inbox thread QA, and a seeded incomplete-profile
-visual Browser smoke if a launch fixture is added.
+verify admin review visibility; it now runs inside `pnpm slc:ready`. An inbox
+follow-up added `pnpm smoke:inbox` for populated buyer/seller thread replies,
+archive filtering, and reply-driven restoration to the active inbox; it also
+runs inside `pnpm slc:ready`. Remaining closeout risks are logged-out
+auth/onboarding visual QA, populated notifications QA, and a seeded
+incomplete-profile visual Browser smoke if a launch fixture is added.
 
 ## Deliberately Deferred
 

@@ -256,9 +256,13 @@ export function ConversationThread({
       onArchiveChange?.(nextArchived);
     },
   });
+  const isSending = replyMutation.isPending;
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSending) {
+      return;
+    }
     setReplyError(null);
 
     const trimmed = reply.trim();
@@ -285,6 +289,7 @@ export function ConversationThread({
   function applyQuickReply(text: string) {
     setReply(text);
     setReplyError(null);
+    replyMutation.reset();
     setTimeout(() => {
       const node = textareaRef.current;
       if (node) {
@@ -478,6 +483,8 @@ export function ConversationThread({
 
       <form
         onSubmit={onSubmit}
+        aria-busy={isSending}
+        aria-label="Conversation reply form"
         className="border-t border-black/10 bg-white p-4"
       >
         {showQuickReplies ? (
@@ -491,7 +498,8 @@ export function ConversationThread({
                   key={reply}
                   type="button"
                   onClick={() => applyQuickReply(reply)}
-                  className="app-chip bg-[var(--bg-secondary)] transition hover:border-black/20 hover:bg-white hover:text-[var(--text-primary)]"
+                  disabled={isSending}
+                  className="app-chip bg-[var(--bg-secondary)] transition hover:border-black/20 hover:bg-white hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {reply}
                 </button>
@@ -521,9 +529,11 @@ export function ConversationThread({
             onChange={(event) => {
               setReply(event.target.value);
               setReplyError(null);
+              replyMutation.reset();
             }}
             rows={3}
             maxLength={8000}
+            disabled={isSending}
             aria-describedby={replyDescriptions}
             aria-invalid={Boolean(replyError)}
             placeholder={
@@ -562,10 +572,10 @@ export function ConversationThread({
           </p>
           <button
             type="submit"
-            disabled={replyMutation.isPending || reply.trim().length === 0}
+            disabled={isSending || reply.trim().length === 0}
             className="app-action-primary w-full px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
-            {replyMutation.isPending ? 'Sending...' : 'Send reply'}
+            {isSending ? 'Sending...' : 'Send reply'}
           </button>
         </div>
       </form>

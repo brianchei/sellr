@@ -18,6 +18,7 @@
     "env:web": "node scripts/ensure-web-env.cjs",
     "smoke:seller": "node scripts/smoke-seller-lifecycle.cjs",
     "smoke:buyer": "node scripts/smoke-buyer-contact.cjs",
+    "smoke:inbox": "node scripts/smoke-inbox-thread.cjs",
     "smoke:reports": "node scripts/smoke-report-submit.cjs",
     "smoke:web": "node scripts/smoke-web-routes.cjs",
     "slc:ready": "node scripts/slc-readiness.cjs"

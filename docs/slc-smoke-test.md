@@ -14,6 +14,8 @@ With Redis, Supabase/Postgres, API, and web running:
 ```bash
 pnpm smoke:seller
 pnpm smoke:buyer
+pnpm smoke:inbox
+pnpm smoke:reports
 pnpm smoke:web
 ```
 
@@ -32,6 +34,15 @@ it, and deletes it.
 The buyer script signs in as the seeded seller and buyer, opens or reuses a
 pre-offer conversation for an active seller listing, sends a buyer message, and
 confirms both inboxes and message threads can see it.
+
+The inbox script signs in as the seeded seller and buyer, sends messages from
+both participants, verifies populated listing and peer context in each inbox,
+checks archived filtering, and confirms a new peer reply restores an archived
+thread to the active inbox.
+
+The report script signs in as the seeded buyer, seller, and admin, submits a
+real listing report, verifies the created report fields, and confirms the admin
+reports API can review the submitted listing report.
 
 The web script signs in through the same web proxy, opens or reuses the seeded
 buyer/seller conversation, and verifies the authenticated HTML routes for

@@ -1015,8 +1015,10 @@ Closeout QA notes:
 - The authenticated local session redirected `/login` and `/onboarding` to
   `/dashboard`, so logged-out auth/onboarding screens still need a focused
   unauthenticated smoke before final launch signoff.
-- The local seed state exposed an empty inbox, so `/inbox/[conversationId]`
-  thread QA still needs seeded buyer/seller conversation data.
+- May 17 follow-up added a populated inbox thread smoke that creates or reuses
+  a buyer/seller listing conversation, sends messages from both participants,
+  verifies listing/peer/latest-message thread context, checks archived inbox
+  filtering, and confirms a new reply restores an archived thread to active.
 - The smoke did not find horizontal overflow, route-blocking render failures,
   or obvious clipped text on the covered desktop/mobile route snapshots.
 - One mobile admin navigation initially returned a local internal-error/login
@@ -1045,9 +1047,12 @@ Closeout QA notes:
   `pnpm slc:ready`. The report dialog also marks the form busy while submitting,
   locks report details during the pending request, and clears submit failures as
   soon as the reporter edits the report.
+- May 17 follow-up added `pnpm smoke:inbox` to exercise populated inbox/thread
+  API behavior inside `pnpm slc:ready`, plus component coverage for the thread
+  reply form's busy and failed-submit states.
 - Remaining Phase F risks: logged-out auth/onboarding visual QA, populated
-  notifications QA, populated inbox thread QA, and a seeded incomplete-profile
-  visual Browser smoke if a launch fixture is added.
+  notifications QA, and a seeded incomplete-profile visual Browser smoke if a
+  launch fixture is added.
 
 ## Process Audit Notes
 
