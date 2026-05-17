@@ -97,8 +97,8 @@ desktop and 390px mobile, focused web checks passed, and `pnpm slc:ready`
 passed locally outside the sandbox after the authenticated web route smoke was
 made robust for multi-community demo users. Remaining closeout risks are
 logged-out auth/onboarding visual QA, populated notifications QA, populated
-inbox thread QA, report submit API smoke, and a seeded incomplete-profile visual
-Browser smoke if a launch fixture is added.
+inbox thread QA, and a seeded incomplete-profile visual Browser smoke if a
+launch fixture is added.
 
 May 17 follow-up: report dialog focus, keyboard containment, local validation,
 and success-state focus are now hardened with component tests. Browser smoke
@@ -111,6 +111,12 @@ have page-level tests. Failed profile checks block seller contact with a retry
 action, incomplete profile states hide the contact submit action, send failures
 clear once the buyer edits the message, and Browser smoke verified a
 buyer-visible listing reaches `Message sent`.
+
+May 17 follow-up: report submit now has API smoke coverage through
+`pnpm smoke:reports`, which creates a real listing report and verifies admin
+review visibility. The report smoke is wired into `pnpm slc:ready`. The report
+dialog also exposes a busy submit state, locks details while pending, and clears
+failed-submit copy once the reporter edits the report.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless

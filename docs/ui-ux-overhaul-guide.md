@@ -1039,9 +1039,15 @@ Closeout QA notes:
   retry action, incomplete profile states hide the contact submit action, and a
   Browser smoke verified a buyer-visible listing can submit into the `Message
   sent` state.
+- May 17 follow-up added `pnpm smoke:reports` to submit a real listing report
+  through the API, verify the created report fields, and confirm an admin in the
+  reported listing community can review it. The smoke now runs inside
+  `pnpm slc:ready`. The report dialog also marks the form busy while submitting,
+  locks report details during the pending request, and clears submit failures as
+  soon as the reporter edits the report.
 - Remaining Phase F risks: logged-out auth/onboarding visual QA, populated
-  notifications QA, populated inbox thread QA, report submit API smoke, and a
-  seeded incomplete-profile visual Browser smoke if a launch fixture is added.
+  notifications QA, populated inbox thread QA, and a seeded incomplete-profile
+  visual Browser smoke if a launch fixture is added.
 
 ## Process Audit Notes
 

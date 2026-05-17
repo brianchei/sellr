@@ -144,4 +144,58 @@ describe('<ReportDialog />', () => {
       'Add a little more detail so Sellr can review it.',
     );
   });
+
+  it('clears a submit failure once the reporter edits the details', async () => {
+    createReportMock.mockRejectedValueOnce(new Error('Report failed'));
+    const user = userEvent.setup();
+    renderReportDialog();
+
+    await user.click(screen.getByRole('button', { name: 'Report listing' }));
+    await user.type(
+      screen.getByRole('textbox', { name: 'Details' }),
+      'The seller requested a payment code before pickup.',
+    );
+    await user.click(screen.getByRole('button', { name: 'Submit report' }));
+
+    expect((await screen.findByRole('alert')).textContent).toContain(
+      'Report failed',
+    );
+
+    await user.type(screen.getByRole('textbox', { name: 'Details' }), ' More');
+
+    await waitFor(() => {
+      expect(screen.queryByText('Report failed')).toBeNull();
+    });
+  });
+
+  it('marks the form busy and locks report details while submitting', async () => {
+    createReportMock.mockImplementation(
+      () => new Promise(() => undefined),
+    );
+    const user = userEvent.setup();
+    renderReportDialog();
+
+    await user.click(screen.getByRole('button', { name: 'Report listing' }));
+    await user.type(
+      screen.getByRole('textbox', { name: 'Details' }),
+      'The seller requested a payment code before pickup.',
+    );
+    await user.click(screen.getByRole('button', { name: 'Submit report' }));
+
+    await waitFor(() => {
+      expect(
+        screen
+          .getByRole('form', { name: 'Report form' })
+          .getAttribute('aria-busy'),
+      ).toBe('true');
+    });
+    expect(
+      (screen.getByRole('textbox', { name: 'Details' }) as HTMLTextAreaElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole('button', { name: 'Submitting...' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+  });
 });

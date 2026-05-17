@@ -74,6 +74,7 @@ export function ReportDialog({
       setFormError(null);
     },
   });
+  const isSubmitting = reportMutation.isPending;
 
   useEffect(() => {
     if (!open) return;
@@ -116,6 +117,8 @@ export function ReportDialog({
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
+
     const trimmed = reason.trim();
 
     if (trimmed.length < 10) {
@@ -129,6 +132,13 @@ export function ReportDialog({
 
     setFormError(null);
     reportMutation.mutate();
+  };
+
+  const clearSubmitFeedback = () => {
+    setFormError(null);
+    if (reportMutation.isError) {
+      reportMutation.reset();
+    }
   };
 
   const onDialogKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -224,7 +234,11 @@ export function ReportDialog({
                 </button>
               </div>
             ) : (
-              <form onSubmit={onSubmit}>
+              <form
+                onSubmit={onSubmit}
+                aria-busy={isSubmitting}
+                aria-label="Report form"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2
@@ -287,7 +301,11 @@ export function ReportDialog({
                           name={`report-severity-${targetType}-${targetId}`}
                           value={option}
                           checked={severity === option}
-                          onChange={() => setSeverity(option)}
+                          onChange={() => {
+                            setSeverity(option);
+                            clearSubmitFeedback();
+                          }}
+                          disabled={isSubmitting}
                           className="sr-only"
                         />
                         {option === 'safety'
@@ -305,8 +323,9 @@ export function ReportDialog({
                     value={reason}
                     onChange={(event) => {
                       setReason(event.target.value);
-                      setFormError(null);
+                      clearSubmitFeedback();
                     }}
+                    disabled={isSubmitting}
                     rows={4}
                     maxLength={500}
                     aria-describedby={
@@ -350,12 +369,10 @@ export function ReportDialog({
                   </button>
                   <button
                     type="submit"
-                    disabled={reportMutation.isPending}
+                    disabled={isSubmitting}
                     className="app-action-primary px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {reportMutation.isPending
-                      ? 'Submitting...'
-                      : 'Submit report'}
+                    {isSubmitting ? 'Submitting...' : 'Submit report'}
                   </button>
                 </div>
               </form>
