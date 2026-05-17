@@ -89,6 +89,14 @@ export default function LoginPage() {
           title: 'Use your wisc.edu email',
           body: 'Get a 6-digit code, verify Badger Market access, then browse or sell in your community.',
         };
+  const loginErrorId = 'login-error';
+  const emailDescriptionIds = error
+    ? `login-email-help ${loginErrorId}`
+    : 'login-email-help';
+  const phoneDescriptionIds = error
+    ? `login-phone-help ${loginErrorId}`
+    : 'login-phone-help';
+  const codeDescriptionIds = error ? loginErrorId : undefined;
 
   useEffect(() => {
     if (hydrated && isAuthenticated && communityIds !== null) {
@@ -304,7 +312,7 @@ export default function LoginPage() {
                 autoComplete="email"
                 placeholder="you@wisc.edu"
                 aria-invalid={Boolean(error)}
-                aria-describedby="login-email-help"
+                aria-describedby={emailDescriptionIds}
                 className="app-field mt-1.5 px-3 py-2.5 text-sm"
               />
             </label>
@@ -356,7 +364,7 @@ export default function LoginPage() {
                 placeholder="(555) 123-4567"
                 inputMode="tel"
                 aria-invalid={Boolean(error)}
-                aria-describedby="login-phone-help"
+                aria-describedby={phoneDescriptionIds}
                 className="app-field mt-1.5 px-3 py-2.5 text-sm"
               />
             </label>
@@ -405,6 +413,7 @@ export default function LoginPage() {
                 placeholder="123456"
                 aria-invalid={Boolean(error)}
                 aria-label="6 digit verification code"
+                aria-describedby={codeDescriptionIds}
                 className="app-field px-3 py-3 text-center font-mono text-xl tracking-[0.4em]"
               />
             </label>
@@ -437,6 +446,7 @@ export default function LoginPage() {
 
         {error ? (
           <p
+            id={loginErrorId}
             className="app-alert mt-4 px-3 py-2 text-sm"
             role="alert"
           >

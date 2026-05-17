@@ -415,10 +415,14 @@ Remaining Phase F work:
   covered the logged-out `/login` screen, but the local Browser virtual
   clipboard blocked typed form entry before capturing a no-community
   onboarding screenshot.
-- Audit accessibility and state coverage for dialogs, filters, forms, empty
-  states, loading states, errors, disabled controls, focus, and mobile tap
-  targets.
-- Rerun `pnpm slc:ready` before final handoff if additional code changes land.
+- Accessibility/state coverage has been audited across dialogs, filters, forms,
+  empty/loading/error/success states, disabled controls, focus, and mobile
+  tap/overflow checks. The audit fixed `/login` field-error associations and
+  added focused tests for invalid email and OTP error states. `pnpm slc:ready`
+  passed after a transient authenticated route-smoke failure cleared on isolated
+  rerun.
+- Rerun `pnpm slc:ready` before final handoff only if additional code changes
+  land.
 - Keep docs current so future sessions do not restart completed Phase C, D, or
   E slices.
 
