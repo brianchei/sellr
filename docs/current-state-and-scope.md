@@ -169,9 +169,14 @@ runs inside `pnpm slc:ready`. A notifications follow-up added
 `pnpm smoke:notifications` for real message notifications, unread filtering,
 individual mark-read, and mark-all-read; it also runs inside
 `pnpm slc:ready`, and Browser smoke covered populated `/notifications` at
-desktop and mobile widths. Remaining closeout risks are logged-out
-auth/onboarding visual QA and a seeded incomplete-profile visual Browser smoke
-if a launch fixture is added.
+desktop and mobile widths. An auth/onboarding follow-up added
+`pnpm smoke:auth-onboarding` for logged-out auth state, email OTP sign-in,
+email-domain onboarding, and dashboard reachability; it also runs inside
+`pnpm slc:ready`, and Browser smoke covered the logged-out `/login` entry
+screen. Remaining closeout risks are populated inbox thread rendered visual QA,
+authenticated no-community onboarding visual QA if final signoff requires a
+fresh screenshot, and a seeded incomplete-profile visual Browser smoke if a
+launch fixture is added.
 
 ## Deliberately Deferred
 

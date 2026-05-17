@@ -1012,9 +1012,13 @@ Closeout QA notes:
   `/marketplace`, one listing detail, `/sell`, `/listings`, `/inbox`,
   `/notifications`, `/profile`, one seller storefront, `/admin/community`, and
   `/admin/reports`.
-- The authenticated local session redirected `/login` and `/onboarding` to
-  `/dashboard`, so logged-out auth/onboarding screens still need a focused
-  unauthenticated smoke before final launch signoff.
+- May 17 follow-up added `pnpm smoke:auth-onboarding` to cover logged-out
+  auth state, `/login` and `/onboarding` HTML responses, local email OTP
+  verification, email-domain community join, and `/dashboard` reachability. The
+  smoke now runs inside `pnpm slc:ready`. Browser smoke also covered the
+  logged-out `/login` screen; Browser text entry was blocked by the local
+  virtual clipboard before a no-community onboarding screenshot could be
+  captured.
 - May 17 follow-up added a populated inbox thread smoke that creates or reuses
   a buyer/seller listing conversation, sends messages from both participants,
   verifies listing/peer/latest-message thread context, checks archived inbox
@@ -1055,8 +1059,10 @@ Closeout QA notes:
   and clear remaining unread state through mark-all-read inside
   `pnpm slc:ready`. Browser smoke also verified the populated `/notifications`
   list at desktop and mobile widths, including the mark-all-read interaction.
-- Remaining Phase F risks: logged-out auth/onboarding visual QA and a seeded
-  incomplete-profile visual Browser smoke if a launch fixture is added.
+- Remaining Phase F risks: populated inbox thread rendered visual QA,
+  authenticated no-community onboarding visual QA if final signoff requires a
+  screenshot, and a seeded incomplete-profile visual Browser smoke if a launch
+  fixture is added.
 
 ## Process Audit Notes
 
