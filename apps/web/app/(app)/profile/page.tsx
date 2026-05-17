@@ -94,31 +94,25 @@ function ProfileContent({ me, userId }: { me: MeData; userId: string | null }) {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 pb-10 sm:py-8">
-      <header
-        className="app-panel-soft mb-6 overflow-hidden p-5 sm:p-7"
-        style={{
-          background:
-            'radial-gradient(circle at 12% 20%, rgba(255, 227, 71, 0.55), transparent 30%), linear-gradient(135deg, var(--color-brand-primary-soft) 0%, var(--bg-elevated) 46%, var(--color-brand-contrast-soft) 100%)',
-        }}
-      >
+      <header className="mb-6 border-b border-[var(--border-default)] pb-5 sm:pb-6">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <span className="inline-flex rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)] shadow-sm">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-brand-contrast)]">
               Profile
             </span>
             <h1 className="mt-3 text-2xl font-semibold text-[var(--text-primary)] sm:text-3xl">
-              How you appear in Sellr
+              How you appear to buyers and sellers
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
               Buyers and sellers see these backed signals next to listings,
               conversations, and pickup coordination.
             </p>
           </div>
-          <div className="grid gap-2 text-xs sm:min-w-[220px]">
-            <span className="app-list-row border-[var(--color-brand-primary-muted)] bg-white/80 px-3 py-2 font-semibold text-[var(--text-primary)]">
+          <div className="grid gap-2 text-xs sm:min-w-[230px]">
+            <span className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2 font-semibold text-[var(--text-primary)]">
               Visible in messages
             </span>
-            <span className="app-list-row border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] px-3 py-2 font-semibold text-[var(--color-brand-contrast-strong)]">
+            <span className="rounded-[var(--radius-lg)] border border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] px-3 py-2 font-semibold text-[var(--color-brand-contrast-strong)]">
               Listing/contact readiness
             </span>
           </div>
@@ -154,17 +148,11 @@ function ProfileSummary({
   issues: ProfileCompletionIssue[];
 }) {
   return (
-    <section
-      className="app-panel overflow-hidden p-5"
-      style={{
-        background:
-          'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,249,215,0.82) 100%)',
-      }}
-    >
+    <section className="app-panel p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div
           aria-label={`${me.user.displayName} avatar`}
-          className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-4 border-white bg-[var(--color-brand-primary)] bg-cover bg-center text-2xl font-bold text-[var(--text-primary)] shadow-sm ring-4 ring-[var(--color-brand-primary-muted)]"
+          className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-2xl font-bold text-[var(--text-primary)] shadow-sm"
           style={
             me.user.avatarUrl
               ? { backgroundImage: `url("${me.user.avatarUrl}")` }
@@ -239,23 +227,19 @@ function ProfileFact({
 }) {
   const toneClass =
     tone === 'primary'
-      ? 'border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)]'
+      ? 'text-[var(--color-brand-primary-strong)]'
       : tone === 'contrast'
-        ? 'border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)]'
+        ? 'text-[var(--color-brand-contrast)]'
         : tone === 'accent'
-          ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)]'
-          : '';
+          ? 'text-[var(--color-brand-accent-strong)]'
+          : 'text-[var(--text-primary)]';
 
   return (
-    <div
-      className={`app-list-row p-3 ${
-        tone === 'plain' ? 'border-transparent bg-transparent p-0 shadow-none' : toneClass
-      }`}
-    >
+    <div className="min-w-0">
       <dt className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
         {label}
       </dt>
-      <dd className="mt-1 break-words font-medium text-[var(--text-primary)]">
+      <dd className={`mt-1 break-words font-medium ${toneClass}`}>
         {value}
       </dd>
     </div>
@@ -375,9 +359,9 @@ function ProfileEditor({ me, userId }: { me: MeData; userId: string | null }) {
         </span>
       </header>
 
-      <div className="app-list-row mt-4 flex flex-col gap-4 border-[var(--color-brand-contrast-muted)] bg-[var(--color-brand-contrast-soft)] p-4 sm:flex-row sm:items-center">
+      <div className="mt-4 flex flex-col gap-4 border-t border-[var(--border-default)] pt-4 sm:flex-row sm:items-center">
         <div
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-white bg-[var(--color-brand-primary)] bg-cover bg-center text-base font-bold text-[var(--text-primary)] shadow-sm"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-base font-bold text-[var(--text-primary)] shadow-sm"
           style={
             avatarUrl ? { backgroundImage: `url("${avatarUrl}")` } : undefined
           }
@@ -526,46 +510,67 @@ function ProfileReadinessPanel({
 
   return (
     <aside className="space-y-5">
-      <section className="app-panel overflow-hidden p-0">
-        <div className="bg-[var(--color-brand-primary-soft)] p-5">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-base font-semibold text-[var(--text-primary)]">
-                Profile readiness
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
-                Complete these so marketplace actions can show backed identity
-                instead of blank profile context.
-              </p>
-            </div>
-            <span className="rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)] shadow-sm">
-              {ready ? 'Ready' : `${issues.length} left`}
-            </span>
+      <section className="app-panel p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-base font-semibold text-[var(--text-primary)]">
+              Profile readiness
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
+              Complete these so marketplace actions can show backed identity
+              instead of blank profile context.
+            </p>
           </div>
+          <span className="rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary-strong)]">
+            {ready ? 'Ready' : `${issues.length} left`}
+          </span>
         </div>
 
-        <div className="space-y-3 p-5">
+        <div className="mt-5 divide-y divide-[var(--border-default)] border-y border-[var(--border-default)]">
           {checks.map((check) => {
             const copy = PROFILE_COMPLETION_COPY[check.issue];
             return (
               <div
                 key={check.issue}
-                className={`app-list-row p-4 ${
-                  check.complete
-                    ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)]'
-                    : 'border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)]'
-                }`}
+                className="py-4"
               >
                 <div className="flex items-start gap-3">
                   <span
-                    className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                    className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
                       check.complete
-                        ? 'bg-white text-[var(--color-brand-accent-strong)]'
-                        : 'bg-white text-[var(--color-brand-primary-strong)]'
+                        ? 'border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]'
+                        : 'border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] text-[var(--color-brand-primary-strong)]'
                     }`}
                     aria-hidden="true"
                   >
-                    {check.complete ? 'OK' : '!'}
+                    {check.complete ? (
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m5 12 5 5L20 7" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M12 7v6" />
+                        <path d="M12 17h.01" />
+                      </svg>
+                    )}
                   </span>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-[var(--text-primary)]">
@@ -592,19 +597,26 @@ function ProfileReadinessPanel({
         </div>
       </section>
 
-      <section
-        className="app-panel p-5"
-        style={{
-          background:
-            'linear-gradient(135deg, var(--color-brand-contrast-soft), rgba(255,255,255,0.95))',
-        }}
-      >
+      <section className="app-panel-soft p-5">
         <div className="flex items-start gap-3">
           <span
             aria-hidden="true"
             className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-contrast)] text-xs font-bold text-white"
           >
-            i
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11v5" />
+              <path d="M12 8h.01" />
+            </svg>
           </span>
           <div>
             <h2 className="text-base font-semibold text-[var(--text-primary)]">

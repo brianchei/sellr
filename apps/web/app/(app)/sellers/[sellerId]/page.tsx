@@ -192,11 +192,11 @@ export default function SellerStorefrontPage() {
       </Link>
 
       <section className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <article className="app-panel-soft p-5 sm:p-6">
+        <article className="app-panel p-5 sm:p-6">
           <div className="flex flex-wrap items-start gap-4">
             <div
               aria-label={`${seller.displayName} avatar`}
-              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-lg font-bold text-[var(--text-primary)] shadow-md ring-4 ring-white/70"
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary)] bg-cover bg-center text-lg font-bold text-[var(--text-primary)] shadow-sm"
               style={
                 seller.avatarUrl
                   ? { backgroundImage: `url("${seller.avatarUrl}")` }
@@ -267,7 +267,7 @@ export default function SellerStorefrontPage() {
           {mostRecentListing && recencyLabel ? (
             <Link
               href={`/marketplace/${mostRecentListing.id}`}
-              className="app-list-row mt-5 flex items-center justify-between gap-3 p-3 text-sm no-underline transition hover:border-black/20 hover:bg-white"
+              className="mt-5 flex items-center justify-between gap-3 border-t border-[var(--border-default)] pt-4 text-sm no-underline transition hover:text-[var(--color-brand-contrast)]"
             >
               <div className="min-w-0">
                 <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-tertiary)]">
@@ -412,7 +412,7 @@ function ContactCard({
           subjectLabel={sellerName}
           contextLabel="Seller reports stay tied to this storefront and community."
           triggerLabel="Report seller"
-          triggerClassName="inline-flex justify-center rounded-full border border-[var(--color-brand-warm)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-brand-warm-strong)] no-underline shadow-sm hover:bg-[var(--color-brand-warm-soft)]"
+          triggerClassName="app-action-secondary justify-center border-[var(--color-brand-warm)] px-4 py-2 text-sm text-[var(--color-brand-warm-strong)] hover:bg-[var(--color-brand-warm-soft)]"
         />
       </div>
     </div>

@@ -123,9 +123,26 @@ export function SellerProfileCard({
       </div>
 
       {signalSummary ? (
-        <p className="mt-3 border-l-2 border-[var(--color-brand-accent-muted)] pl-3 text-xs leading-5 text-[var(--text-secondary)]">
-          {signalSummary}
-        </p>
+        <div className="mt-3 flex items-start gap-2 text-xs leading-5 text-[var(--text-secondary)]">
+          <span
+            aria-hidden="true"
+            className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[var(--color-brand-accent-muted)] bg-[var(--color-brand-accent-soft)] text-[var(--color-brand-accent-strong)]"
+          >
+            <svg
+              width="9"
+              height="9"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m5 12 5 5L20 7" />
+            </svg>
+          </span>
+          <p>{signalSummary}</p>
+        </div>
       ) : null}
 
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-black/10 pt-4 text-sm">
