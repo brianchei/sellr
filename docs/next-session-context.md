@@ -86,11 +86,12 @@ implementation passes through Phase E are now shipped on `main`: Phase B
 foundation utilities and route-level passes for onboarding/auth entry, app
 navigation, signed-in home/dashboard, marketplace filters, listing detail,
 listing form, seller inventory, inbox/thread hierarchy, notifications, admin
-density, and profile/storefront trust hierarchy. The next work is Phase F
-closeout, not another broad route redesign: reconcile docs, run final desktop
-and mobile visual QA, audit accessibility/state coverage, and run
-`pnpm slc:ready` or document blockers. Preserve the current SLC behavior and
-keep Phase 6 AI deferred until that closeout is done.
+density, and profile/storefront trust hierarchy. Phase F closeout is also
+complete for the current web SLC: docs have been reconciled, desktop/mobile
+route smoke has run, accessibility/state coverage was audited, and
+`pnpm slc:ready` passed. Preserve the current SLC behavior, keep Phase 6 AI
+deferred unless explicitly requested, and avoid another broad route redesign
+unless a fresh audit finds a concrete regression.
 
 May 17 Phase F progress: Browser smoke covered the main route list at 1280px
 desktop and 390px mobile, focused web checks passed, and `pnpm slc:ready`
@@ -98,10 +99,10 @@ passed locally outside the sandbox after the authenticated web route smoke was
 made robust for multi-community demo users. Populated inbox/thread desktop
 rendered QA also passed through Arc/Computer Use after `pnpm smoke:inbox`
 seeded the buyer/seller thread, and authenticated mobile inbox/thread QA passed
-in the in-app Browser at 390px with the same buyer fixture. Remaining closeout
-risks are authenticated no-community onboarding visual QA if final signoff
-requires a screenshot, and a seeded incomplete-profile visual Browser smoke if a
-launch fixture is added.
+in the in-app Browser at 390px with the same buyer fixture. Optional
+launch-evidence risks are authenticated no-community onboarding visual QA if
+final signoff requires a screenshot, and a seeded incomplete-profile visual
+Browser smoke if a launch fixture is added.
 
 May 17 follow-up: final accessibility/state audit covered dialogs, filters,
 forms, empty/loading/error/success states, disabled controls, focus behavior,
@@ -391,19 +392,18 @@ verify admin/community access, run media health checks, watch Railway/Resend
 logs, and record any launch notes. Do not add new product scope.
 ```
 
-If continuing product development, finish the Pre-Phase-6 UI/UX closeout before
-starting AI listing assistant work:
+If continuing product development, use this prompt only for regression-driven
+follow-up or optional launch evidence. Do not restart completed Phase C, D, E,
+or F work:
 
 ```text
-Begin Phase F closeout of the Sellr Pre-Phase-6 UI/UX overhaul. Read AGENTS.md,
+Continue Sellr Pre-Phase-6 UI/UX follow-up only if a new regression, optional
+launch-evidence need, or asset-dependent follow-up is identified. Read AGENTS.md,
 docs/ui-ux-overhaul-guide.md, docs/design-language.md,
 docs/current-state-and-scope.md, docs/web-next-development-guide.md,
-apps/web/README.md, and apps/web/app/globals.css. Do not restart Phase C, D, or
-E route redesigns unless a fresh audit finds a concrete regression. Instead,
-run a final route/state/responsive/accessibility QA sweep across the public
-entry, auth/onboarding, home, marketplace, listing detail, listing form,
-inventory, inbox/thread, notifications, profile/storefront, and admin surfaces.
-Fix only small regressions, update docs with the exact current state, preserve
-current SLC behavior, do not implement Phase 6 AI, do not add broad product
-scope, and do not add a new design-system library.
+apps/web/README.md, and apps/web/app/globals.css. Do not restart Phase C, D, E,
+or F route redesigns unless a fresh audit finds a concrete regression. Fix only
+small regressions, update docs with the exact current state, preserve current SLC
+behavior, do not implement Phase 6 AI, do not add broad product scope, and do
+not add a new design-system library.
 ```

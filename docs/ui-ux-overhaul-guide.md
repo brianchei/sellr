@@ -394,22 +394,22 @@ or meetup scheduler. Direction:
 | Landing page `/` | Public entry has shorter activation, community-first copy, and app preview. | Still needs real launch proof and approved imagery. | Keep first viewport action-oriented; add proof only when real assets exist. | P0 | Shipped pass; proof follow-up |
 | Sign up/login `/login` | Email OTP primary with phone fallback, Wisc email validation, concise code step, loading/error states. | Keep fallback secondary and avoid auth copy drift. | Maintain email-first path with phone fallback and focused repair copy. | P0 | Shipped pass |
 | Community verification `/onboarding` | Email/invite verification is action-first with lighter trust explanation. | Keep community access from feeling like homework. | Continue to make the verification action the main event. | P0 | Shipped pass |
-| First-time onboarding | Signed-in home/dashboard now emphasizes browse, sell, reply, or readiness. | Need final route/state QA for blocked or incomplete profiles. | Keep profile requirements contextual and action-linked. | P0 | Shipped pass; Phase F QA |
+| First-time onboarding | Signed-in home/dashboard now emphasizes browse, sell, reply, or readiness. | Optional no-community or incomplete-profile visual proof only if final signoff asks for it. | Keep profile requirements contextual and action-linked. | P0 | Shipped pass; closeout complete |
 | Dashboard `/dashboard` | Reframed toward home/next actions with active community, listing/message context, and readiness. | Route is still named `/dashboard`, which is acceptable for SLC but conceptually `Home`. | Do not rebuild again unless launch users struggle to choose a next action. | P0 | Shipped pass |
-| Browse/search `/marketplace` | Server-backed filters, search, category/condition/price/radius/photo/sort, quick filters, listing grid. | Final QA should confirm filters stay compact on mobile and empty states remain useful. | Inventory-first browsing with filters as supporting controls. | P0 | Shipped pass; Phase F QA |
+| Browse/search `/marketplace` | Server-backed filters, search, category/condition/price/radius/photo/sort, quick filters, listing grid. | Watch for mobile filter regressions only after new changes. | Inventory-first browsing with filters as supporting controls. | P0 | Shipped pass; closeout complete |
 | Listing cards | Cards prioritize image, price, title, condition, neighborhood, radius, freshness, and seller trust. | Some photo/category overlays intentionally remain because they support scanability. | Avoid adding low-value metadata back to cards. | P0 | Shipped pass |
-| Listing detail | Item-first layout with seller/pickup confidence near contact and clearer report/message hierarchy. | Final QA should cover own listing, sold/unavailable, incomplete profile, and message-success states. | Preserve item-anchored contact and privacy-preserving pickup context. | P0 | Shipped pass; Phase F QA |
+| Listing detail | Item-first layout with seller/pickup confidence near contact and clearer report/message hierarchy. | Contact, readiness, report, and message-success gates have focused coverage; avoid another pass without a concrete regression. | Preserve item-anchored contact and privacy-preserving pickup context. | P0 | Shipped pass; closeout complete |
 | Offer flow | Web SLC remains listing-tied contact/message intent, not formal offers. API modules still exist. | Avoid implying a full offer handoff in UI. | Keep documented as structured inquiry until formal offer UI is intentionally scoped. | P1 | Deferred by scope |
 | Meetup coordination | No dedicated scheduler; pickup windows and safety guidance live in listings/messages. | Avoid introducing a half-built meetup state. | Future meetup UI should live inside conversations after launch feedback. | P1 | Deferred by scope |
-| Inbox/messages | Conversation list/thread are item-anchored with archive/restore, reply, safety/report affordances. | Final QA should confirm mobile list/detail behavior and empty/archived states. | Keep item, participant, reply, and safety context together. | P0 | Shipped pass; Phase F QA |
-| Notifications | Notifications read as activity rows with unread state, target links, mark-read actions, and empty states. | Final QA should cover populated admin/message/listing notifications. | Keep every notification tied to one useful target/action. | P1 | Shipped pass; Phase F QA |
-| Profile `/profile` | Page is framed as how the member appears to buyers/sellers, with readiness and editable identity. | Final QA should cover missing display name/photo/contact/community states. | Keep trust cues backed and linked to high-intent actions. | P1 | Shipped pass; Phase F QA |
-| Seller storefront `/sellers/[sellerId]` | Storefront answers who, verified contact, community, active listings, and how to contact through an item. | Need non-own-seller report/contact visual smoke with seeded data. | Keep contact item-anchored and storefront language local/trust-specific. | P1 | Shipped pass; Phase F QA |
-| Safety/reporting/blocking | Report dialog, admin reports, archive/hide, and moderation actions are preserved and clearer. | Final QA should cover dialog focus, report success/error, and destructive confirmations. | Keep safety entry points near the affected listing, seller, or conversation. | P0 | Shipped pass; Phase F QA |
-| Admin/moderation | Admin community/reports are denser, utilitarian, and audit-focused. | Admin is desktop-priority but must remain usable on mobile without broken layout. | Continue avoiding decorative dashboard patterns. | P1 | Shipped pass; Phase F QA |
-| Empty states | Foundation `app-empty-state` and route-specific next actions are used across core routes. | Need final audit for any stale generic empty copy. | What happened, why it matters, one next action. | P0 | Mostly shipped; Phase F QA |
-| Error states | Errors remain route/form-specific, with app alert styling and repair copy. | Need final audit for field-level `aria-describedby` coverage. | Tie errors to fields and avoid color-only signals. | P0 | Partially shipped; Phase F QA |
-| Loading states | Skeletons/structured loading states exist on many routes. | Some generic loading copy may remain and should be fixed only where visible. | Preserve layout dimensions and action context while loading. | P1 | Partially shipped; Phase F QA |
+| Inbox/messages | Conversation list/thread are item-anchored with archive/restore, reply, safety/report affordances. | Populated desktop/mobile thread QA and smoke coverage are in place; revisit only for regressions. | Keep item, participant, reply, and safety context together. | P0 | Shipped pass; closeout complete |
+| Notifications | Notifications read as activity rows with unread state, target links, mark-read actions, and empty states. | Populated notification smoke and rendered QA are in place; revisit only for regressions. | Keep every notification tied to one useful target/action. | P1 | Shipped pass; closeout complete |
+| Profile `/profile` | Page is framed as how the member appears to buyers/sellers, with readiness and editable identity. | Optional incomplete-profile visual proof remains asset/fixture-dependent. | Keep trust cues backed and linked to high-intent actions. | P1 | Shipped pass; closeout complete |
+| Seller storefront `/sellers/[sellerId]` | Storefront answers who, verified contact, community, active listings, and how to contact through an item. | Non-own contact/report behavior has focused coverage; revisit only for regressions. | Keep contact item-anchored and storefront language local/trust-specific. | P1 | Shipped pass; closeout complete |
+| Safety/reporting/blocking | Report dialog, admin reports, archive/hide, and moderation actions are preserved and clearer. | Dialog focus, validation, submit, and success states have focused coverage. | Keep safety entry points near the affected listing, seller, or conversation. | P0 | Shipped pass; closeout complete |
+| Admin/moderation | Admin community/reports are denser, utilitarian, and audit-focused. | Admin remains desktop-priority; mobile route smoke did not find current layout blockers. | Continue avoiding decorative dashboard patterns. | P1 | Shipped pass; closeout complete |
+| Empty states | Foundation `app-empty-state` and route-specific next actions are used across core routes. | Reopen only if a fresh route audit finds stale generic copy. | What happened, why it matters, one next action. | P0 | Shipped pass; closeout complete |
+| Error states | Errors remain route/form-specific, with app alert styling and repair copy. | Final field-error audit fixed the concrete `/login` association gap. | Tie errors to fields and avoid color-only signals. | P0 | Shipped pass; closeout complete |
+| Loading states | Skeletons/structured loading states exist on many routes. | Reopen only if visible generic loading copy regresses a current flow. | Preserve layout dimensions and action context while loading. | P1 | Shipped pass; closeout complete |
 
 ## Screen-By-Screen Direction
 
@@ -928,9 +928,9 @@ Closeout notes:
   covered filtered seller-inventory empty state, empty inbox, empty
   notifications, and disabled `Mark all read`.
 - Later route slices used the in-app Browser viewport capability for
-  representative 390px mobile smoke. Phase F still needs one full, documented
-  mobile QA sweep across the route list because those checks happened slice by
-  slice rather than as a single release-readiness pass.
+  representative 390px mobile smoke. Phase F closeout then recorded a broader
+  desktop/mobile route sweep plus focused populated inbox, notifications,
+  report, and accessibility/state follow-ups.
 
 ### Phase C - Onboarding And Navigation
 
@@ -989,14 +989,17 @@ Acceptance:
 
 ### Phase F - Polish And Launch Readiness
 
-Status: in progress. This remains the next best work before Phase 6 AI.
+Status: complete for the current web SLC. Reopen only for concrete regressions,
+optional launch-evidence requests, or asset-dependent proof work.
 
-Deliver:
+Closeout bar:
 
-- Standardize empty/loading/error/success states.
-- Add analytics events for UX metrics if missing.
-- Run responsive, accessibility, performance, and SLC readiness QA.
+- Keep empty/loading/error/success states standardized.
+- Keep responsive, accessibility, performance, and SLC readiness QA current
+  when code changes land.
 - Use real seed inventory and approved imagery where available.
+- Defer new analytics events unless production instrumentation is separately
+  scoped.
 
 Acceptance:
 
@@ -1078,9 +1081,9 @@ Closeout QA notes:
   visible error alert with `aria-describedby`, and focused tests cover the
   repair. `pnpm slc:ready` passed after a transient authenticated web-route
   smoke failure cleared on isolated rerun.
-- Remaining Phase F risks: authenticated no-community onboarding visual QA if
-  final signoff requires a screenshot, and a seeded incomplete-profile visual
-  Browser smoke if a launch fixture is added.
+- Optional launch-evidence risks: authenticated no-community onboarding visual
+  QA if final signoff requires a screenshot, and a seeded incomplete-profile
+  visual Browser smoke if a launch fixture is added.
 
 ## Process Audit Notes
 
@@ -1119,8 +1122,8 @@ Redundancy analysis:
   was useful for safety, but future sessions should avoid rerunning the same
   broad build/browser smoke unless files changed or Phase F closeout is the
   explicit goal.
-- The next implementation prompt should be Phase F closeout, not another Phase
-  C/D/E route rewrite.
+- The next implementation prompt should be regression-driven or launch-evidence
+  work, not another Phase C/D/E/F route rewrite.
 
 ## Acceptance Criteria For The Overhaul
 
@@ -1175,20 +1178,18 @@ Browser verification should cover desktop and mobile widths for:
 Use seeded/demo data where possible. Route smoke tests validate responses, but
 they do not replace visual, responsive, and accessibility review.
 
-## Recommended Next Prompt For Phase F Closeout
+## Recommended Next Prompt For Regression Follow-Up
 
 ```text
-Begin Phase F closeout of the Sellr Pre-Phase-6 UI/UX overhaul. Read AGENTS.md,
+Continue the Sellr Pre-Phase-6 UI/UX overhaul only if a concrete regression,
+optional launch-evidence request, or asset-dependent follow-up has been
+identified. Read AGENTS.md,
 docs/ui-ux-overhaul-guide.md, docs/design-language.md,
 docs/current-state-and-scope.md, docs/web-next-development-guide.md,
-apps/web/README.md, and apps/web/app/globals.css. Do not restart Phase C, D, or
-E route redesigns unless a fresh audit finds a concrete regression. Run a final
-route/state/responsive/accessibility QA sweep across `/`, `/login`,
-`/onboarding`, `/dashboard`, `/marketplace`, one listing detail, `/sell`,
-`/listings`, `/inbox`, one thread, `/notifications`, `/profile`, one seller
-storefront, `/admin/community`, and `/admin/reports`. Fix only small,
-reviewable regressions, preserve current SLC behavior, do not implement Phase 6
-AI, do not add broad product scope, and do not add a new design-system library.
-Run `pnpm slc:ready` plus focused web lint/typecheck/test/build checks, or
-document blockers.
+apps/web/README.md, and apps/web/app/globals.css. Do not restart Phase C, D, E,
+or F work without a fresh audit finding. Fix only small, reviewable regressions,
+preserve current SLC behavior, do not implement Phase 6 AI, do not add broad
+product scope, and do not add a new design-system library. Run only the focused
+checks that match changed files, plus `pnpm slc:ready` if code changes touch a
+core SLC flow.
 ```
