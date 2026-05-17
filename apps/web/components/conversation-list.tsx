@@ -44,33 +44,23 @@ export function ConversationList({
             userId != null &&
             conversation.latestMessage != null &&
             conversation.latestMessage.senderId !== userId;
-          const titleClass = selected
-            ? needsReply
-              ? 'truncate text-sm font-bold text-white'
-              : 'truncate text-sm font-semibold text-white'
-            : needsReply
-              ? 'truncate text-sm font-bold text-[var(--text-primary)]'
-              : 'truncate text-sm font-semibold text-[var(--text-primary)]';
-          const previewClass = selected
-            ? needsReply
-              ? 'mt-1 truncate text-sm font-medium text-white/85'
-              : 'mt-1 truncate text-sm text-white/72'
-            : needsReply
-              ? 'mt-1 truncate text-sm font-medium text-[var(--text-primary)]'
-              : 'mt-1 truncate text-sm text-[var(--text-secondary)]';
+          const titleClass = needsReply
+            ? 'truncate text-sm font-bold text-[var(--text-primary)]'
+            : 'truncate text-sm font-semibold text-[var(--text-primary)]';
+          const previewClass = needsReply
+            ? 'mt-1 truncate text-sm font-medium text-[var(--text-primary)]'
+            : 'mt-1 truncate text-sm text-[var(--text-secondary)]';
 
           return (
             <Link
               key={conversation.id}
               href={`/inbox/${conversation.id}`}
               aria-current={selected ? 'page' : undefined}
-              className="grid w-full grid-cols-[56px_minmax(0,1fr)] gap-3 px-4 py-3 text-left no-underline transition hover:bg-[var(--bg-secondary)]"
-              style={{
-                background: selected
-                  ? 'linear-gradient(135deg, var(--text-primary) 0%, #2e2a24 100%)'
-                  : undefined,
-                color: selected ? 'white' : undefined,
-              }}
+              className={`grid w-full grid-cols-[56px_minmax(0,1fr)] gap-3 px-4 py-3 text-left no-underline transition ${
+                selected
+                  ? 'bg-[var(--color-brand-primary-soft)]'
+                  : 'hover:bg-[var(--bg-secondary)]'
+              }`}
             >
               <div
                 className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--bg-tertiary)] bg-cover bg-center text-xs font-semibold text-[var(--text-tertiary)]"
@@ -94,7 +84,6 @@ export function ConversationList({
                           ? 'font-semibold text-[var(--color-brand-contrast)]'
                           : 'text-[var(--text-tertiary)]'
                       }`}
-                      style={selected ? { color: 'rgba(255,255,255,0.68)' } : undefined}
                     >
                       {formatMessageTime(conversation.latestMessage.createdAt)}
                     </span>
@@ -103,9 +92,9 @@ export function ConversationList({
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                   <span
                     className={`font-medium ${
-                      selected
-                        ? 'text-[var(--color-brand-primary)]'
-                        : 'text-[var(--color-brand-contrast)]'
+                      selected || needsReply
+                        ? 'text-[var(--color-brand-contrast)]'
+                        : 'text-[var(--text-secondary)]'
                     }`}
                   >
                     {conversationPeer(conversation)}
@@ -113,14 +102,6 @@ export function ConversationList({
                   {needsReply ? (
                     <span
                       className="inline-flex items-center rounded-full bg-[var(--color-brand-primary-soft)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-brand-primary-strong)]"
-                      style={
-                        selected
-                          ? {
-                              background: 'rgba(246,232,76,0.18)',
-                              color: 'var(--color-brand-primary)',
-                            }
-                          : undefined
-                      }
                     >
                       Needs reply
                     </span>
@@ -128,41 +109,21 @@ export function ConversationList({
                   {userId != null ? (
                     <span
                       className="inline-flex items-center rounded-full bg-[var(--bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-secondary)]"
-                      style={
-                        selected
-                          ? {
-                              background: 'rgba(255,255,255,0.12)',
-                              color: 'rgba(255,255,255,0.76)',
-                            }
-                          : undefined
-                      }
                       title={`You are the ${role} in this conversation`}
                     >
-                      You · {role}
+                      You are {role}
                     </span>
                   ) : null}
                   {conversation.archivedAt ? (
                     <span
                       className="inline-flex items-center rounded-full bg-[var(--bg-tertiary)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[var(--text-secondary)]"
-                      style={
-                        selected
-                          ? {
-                              background: 'rgba(255,255,255,0.12)',
-                              color: 'rgba(255,255,255,0.76)',
-                            }
-                          : undefined
-                      }
                     >
                       Archived
                     </span>
                   ) : null}
                   {conversation.listing ? (
-                    <span
-                      className={
-                        selected ? 'text-white/60' : 'text-[var(--text-tertiary)]'
-                      }
-                    >
-                      · {formatPrice(conversation.listing.price)}
+                    <span className="text-[var(--text-tertiary)]">
+                      {formatPrice(conversation.listing.price)}
                     </span>
                   ) : null}
                 </div>

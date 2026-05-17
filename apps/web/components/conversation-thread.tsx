@@ -144,6 +144,7 @@ function ListingContextHeader({
   return (
     <Link
       href={`/marketplace/${listing.id}`}
+      aria-label={`Open listing context for ${listing.title}`}
       className="app-list-row grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3 p-3 no-underline transition hover:border-black/20 hover:bg-white"
     >
       <div
@@ -156,6 +157,9 @@ function ListingContextHeader({
         aria-hidden="true"
       />
       <div className="min-w-0">
+        <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+          Item in this thread
+        </p>
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
           <p className="min-w-0 truncate text-sm font-semibold text-[var(--text-primary)]">
             {listing.title}
@@ -217,6 +221,11 @@ export function ConversationThread({
   const archived = Boolean(conversation.archivedAt);
   const peerSignals = profileSignalSummary(conversation.peer);
   const peerReportId = conversation.peer?.id;
+  const replyHelpId = `conversation-reply-help-${conversation.id}`;
+  const replyErrorId = `conversation-reply-error-${conversation.id}`;
+  const replyDescriptions = [replyHelpId, replyError ? replyErrorId : null]
+    .filter(Boolean)
+    .join(' ');
 
   const messagesQuery = useQuery({
     queryKey: ['conversation-messages', conversation.id],
@@ -472,24 +481,32 @@ export function ConversationThread({
         className="border-t border-black/10 bg-white p-4"
       >
         {showQuickReplies ? (
-          <div
-            className="mb-3 flex flex-wrap gap-1.5"
-            aria-label="Quick replies"
-          >
-            {quickReplies.map((reply) => (
-              <button
-                key={reply}
-                type="button"
-                onClick={() => applyQuickReply(reply)}
-                className="app-chip bg-[var(--bg-secondary)] transition hover:border-black/20 hover:bg-white hover:text-[var(--text-primary)]"
-              >
-                {reply}
-              </button>
-            ))}
+          <div className="mb-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+              Quick replies for pickup
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Quick replies">
+              {quickReplies.map((reply) => (
+                <button
+                  key={reply}
+                  type="button"
+                  onClick={() => applyQuickReply(reply)}
+                  className="app-chip bg-[var(--bg-secondary)] transition hover:border-black/20 hover:bg-white hover:text-[var(--text-primary)]"
+                >
+                  {reply}
+                </button>
+              ))}
+            </div>
           </div>
         ) : null}
 
-        <div className="mb-3 rounded-[var(--radius-lg)] border border-black/10 bg-[var(--bg-secondary)] px-3 py-2.5 text-xs leading-5 text-[var(--text-secondary)]">
+        <div
+          id={replyHelpId}
+          className="mb-3 rounded-[var(--radius-lg)] border border-black/10 bg-[var(--bg-secondary)] px-3 py-2.5 text-xs leading-5 text-[var(--text-secondary)]"
+        >
+          <p className="mb-1 font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+            Pickup safety
+          </p>
           <p>
             Meet in a public, familiar place when possible. Do not send
             deposits, gift cards, or payment codes before seeing the item.
@@ -497,7 +514,7 @@ export function ConversationThread({
         </div>
 
         <label className="block text-sm font-medium text-[var(--text-primary)]">
-          <span className="sr-only">Reply</span>
+          Reply to {peerName}
           <textarea
             ref={textareaRef}
             value={reply}
@@ -507,17 +524,20 @@ export function ConversationThread({
             }}
             rows={3}
             maxLength={8000}
+            aria-describedby={replyDescriptions}
+            aria-invalid={Boolean(replyError)}
             placeholder={
               role === 'buyer'
                 ? 'Ask about timing, pickup location, or item details.'
                 : 'Suggest a pickup window or confirm availability.'
             }
-            className="w-full resize-y rounded-2xl border border-black/10 bg-white px-3 py-2.5 text-sm leading-6 text-[var(--text-primary)] outline-none focus:border-[var(--color-brand-contrast)] focus:ring-2 focus:ring-[var(--color-brand-contrast-muted)]"
+            className="app-field mt-2 resize-y px-3 py-2.5 text-sm leading-6"
           />
         </label>
 
         {replyError ? (
           <p
+            id={replyErrorId}
             className="app-alert mt-3 p-3 text-sm"
             role="alert"
           >
