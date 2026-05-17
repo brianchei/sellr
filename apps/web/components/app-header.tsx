@@ -16,11 +16,18 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Home', href: '/dashboard', icon: DashboardIcon },
   { label: 'Browse', href: '/marketplace', icon: BrowseIcon },
-  { label: 'Listings', href: '/listings', icon: ListingsIcon },
   { label: 'Inbox', href: '/inbox', icon: InboxIcon },
   { label: 'Profile', href: '/profile', icon: ProfileIcon },
+];
+
+const MOBILE_NAV_ITEMS: NavItem[] = [
+  { label: 'Home', href: '/dashboard', icon: DashboardIcon },
+  ...NAV_ITEMS,
+];
+
+const SELLER_TOOL_ITEMS: NavItem[] = [
+  { label: 'My listings', href: '/listings', icon: ListingsIcon },
 ];
 
 function isActive(pathname: string, href: string): boolean {
@@ -93,17 +100,12 @@ export function AppHeader() {
 
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b border-black/10"
-      style={{
-        background:
-          'linear-gradient(135deg, rgba(255,249,215,0.92) 0%, rgba(255,255,255,0.92) 48%, rgba(241,240,251,0.86) 100%)',
-        backdropFilter: 'blur(16px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
-      }}
+      className="sticky top-0 z-50 w-full border-b border-[var(--border-default)] bg-[var(--bg-primary)]"
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
         <Link
           href="/dashboard"
+          aria-label="Home"
           className="flex shrink-0 items-center gap-2 no-underline"
         >
           <Image
@@ -142,7 +144,7 @@ export function AppHeader() {
                   : 'Open current community'
               }
               aria-expanded={canSwitchCommunity ? communityOpen : undefined}
-              className="inline-flex max-w-[190px] items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+              className="inline-flex max-w-[190px] items-center gap-2 rounded-full border border-[var(--border-default)] bg-[var(--bg-secondary)] px-3 py-2 text-sm font-semibold text-[var(--text-primary)] transition hover:border-[var(--border-strong)] hover:bg-[var(--bg-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             >
               <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-brand-accent)]" />
               <span className="truncate">{primaryCommunity.name}</span>
@@ -164,7 +166,7 @@ export function AppHeader() {
                   aria-hidden="true"
                 />
                 <div
-                  className="absolute left-0 z-50 mt-2 min-w-[240px] overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-2 shadow-xl backdrop-blur"
+                  className="absolute left-0 z-50 mt-2 min-w-[240px] overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--bg-primary)] p-2 shadow-[var(--shadow-app-card)]"
                   role="menu"
                 >
                   <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
@@ -250,7 +252,7 @@ export function AppHeader() {
         <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/sell"
-            className="hidden items-center justify-center gap-2 rounded-full bg-[#111111] px-4 py-2 text-sm font-bold text-[var(--color-brand-primary)] no-underline shadow-[0_18px_30px_-18px_rgba(17,17,17,0.8)] transition hover:-translate-y-px hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)] md:inline-flex"
+            className="app-action-primary hidden px-4 py-2 text-sm md:inline-flex"
           >
             <SellIcon />
             Sell
@@ -264,7 +266,7 @@ export function AppHeader() {
                 : 'Notifications'
             }
             aria-current={notificationsActive ? 'page' : undefined}
-            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 text-[var(--text-primary)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] transition hover:border-[var(--border-strong)] hover:bg-[var(--bg-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             style={{
               background: notificationsActive
                 ? 'var(--text-primary)'
@@ -288,7 +290,7 @@ export function AppHeader() {
             aria-label={drawerOpen ? 'Close navigation' : 'Open navigation'}
             aria-expanded={drawerOpen}
             aria-controls="app-mobile-drawer"
-            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/85 text-[var(--text-primary)] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)] md:hidden"
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-primary)] text-[var(--text-primary)] transition hover:border-[var(--border-strong)] hover:bg-[var(--bg-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)] md:hidden"
           >
             {drawerOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
@@ -327,7 +329,7 @@ export function AppHeader() {
                   aria-hidden="true"
                 />
                 <div
-                  className="absolute right-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-2xl border border-black/10 bg-white/95 py-2 shadow-xl backdrop-blur"
+                  className="absolute right-0 z-50 mt-2 min-w-[220px] overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--bg-primary)] py-2 shadow-[var(--shadow-app-card)]"
                   role="menu"
                 >
                   {primaryCommunity && canSwitchCommunity ? (
@@ -395,6 +397,17 @@ export function AppHeader() {
                   >
                     Home
                   </Link>
+                  {SELLER_TOOL_ITEMS.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      role="menuitem"
+                      onClick={() => setAccountOpen(false)}
+                      className="mx-2 block rounded-xl px-3 py-2 text-sm font-medium text-[var(--text-secondary)] no-underline hover:bg-[var(--color-brand-primary-soft)] hover:text-[var(--text-primary)]"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
                   <Link
                     href="/profile"
                     role="menuitem"
@@ -441,7 +454,7 @@ export function AppHeader() {
           />
           <nav
             id="app-mobile-drawer"
-            className="absolute left-3 right-3 top-16 z-50 overflow-hidden rounded-b-3xl border border-black/10 bg-white/95 shadow-2xl backdrop-blur md:hidden"
+            className="absolute left-3 right-3 top-16 z-50 overflow-hidden rounded-b-3xl border border-[var(--border-default)] bg-[var(--bg-primary)] shadow-[var(--shadow-app-card-hover)] md:hidden"
             aria-label="Primary"
           >
             <div className="mx-auto max-w-6xl px-4 py-3">
@@ -525,7 +538,7 @@ export function AppHeader() {
                 ) : null}
               </Link>
               <ul className="space-y-1">
-                {NAV_ITEMS.map((item) => {
+                {MOBILE_NAV_ITEMS.map((item) => {
                   const active = isActive(pathname, item.href);
                   return (
                     <li key={item.href}>
@@ -552,6 +565,39 @@ export function AppHeader() {
                   );
                 })}
               </ul>
+              <div className="mt-3 border-t border-[var(--border-default)] pt-3">
+                <p className="px-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+                  Seller tools
+                </p>
+                <ul className="mt-1 space-y-1">
+                  {SELLER_TOOL_ITEMS.map((item) => {
+                    const active = isActive(pathname, item.href);
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setDrawerOpen(false)}
+                          aria-current={active ? 'page' : undefined}
+                          className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold no-underline transition"
+                          style={{
+                            color: active
+                              ? 'var(--color-brand-primary)'
+                              : 'var(--text-secondary)',
+                            background: active
+                              ? 'var(--text-primary)'
+                              : 'transparent',
+                          }}
+                        >
+                          <span className="inline-flex items-center gap-2">
+                            <item.icon />
+                            {item.label}
+                          </span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </div>
           </nav>
         </>
