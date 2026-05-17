@@ -35,7 +35,41 @@ const FILTERS: Array<{ value: FilterValue; label: string }> = [
 
 function categoryLabel(category: NotificationCategory): string {
   if (category === 'time-sensitive') return 'Pickup';
+  if (category === 'messages') return 'Message';
+  if (category === 'listings') return 'Listing';
   return category[0].toUpperCase() + category.slice(1);
+}
+
+function notificationIntentLabel(category: NotificationCategory): string {
+  if (category === 'messages') {
+    return 'Message thread';
+  }
+
+  if (category === 'listings') {
+    return 'Listing update';
+  }
+
+  if (category === 'marketplace') {
+    return 'Marketplace listing';
+  }
+
+  if (category === 'time-sensitive') {
+    return 'Pickup change';
+  }
+
+  return 'Activity update';
+}
+
+function targetCopy(targetLabel: string): string {
+  if (targetLabel === 'Conversation') {
+    return 'Message thread';
+  }
+
+  if (targetLabel === 'Notification center') {
+    return 'Activity center';
+  }
+
+  return targetLabel;
 }
 
 function categoryClass(category: NotificationCategory): string {
@@ -113,13 +147,11 @@ function NotificationCard({
 
   return (
     <article
-      className="group transition hover:bg-white"
+      className="group bg-[var(--bg-primary)] transition hover:bg-[var(--bg-secondary)]"
       style={
         isPickup
           ? { background: 'var(--color-brand-warm-soft)' }
-          : isUnread
-            ? { background: 'var(--color-brand-contrast-soft)' }
-            : undefined
+          : undefined
       }
     >
       <div className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
@@ -176,15 +208,19 @@ function NotificationCard({
               {notification.body}
             </p>
             <p className="mt-2 text-xs font-medium text-[var(--text-tertiary)]">
-              Target: {notification.targetLabel}
+              About: {notificationIntentLabel(notification.category)} ·{' '}
+              {targetCopy(notification.targetLabel)}
             </p>
           </Link>
         </div>
-        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex flex-wrap items-center gap-2 sm:max-w-[220px] sm:justify-end">
+          <p className="w-full text-xs font-semibold uppercase tracking-wide text-[var(--text-tertiary)] sm:text-right">
+            Next action
+          </p>
           <Link
             href={notification.href}
             onClick={handleOpenClick}
-            className="app-action-secondary px-3 py-1.5 text-xs"
+            className="app-action-secondary px-3 py-1.5 text-xs sm:w-full"
           >
             {notification.actionLabel}
             <svg
