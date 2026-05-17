@@ -51,6 +51,7 @@ const phases = [
     steps: [
       { label: 'Seller lifecycle smoke', command: pnpm, args: ['smoke:seller'] },
       { label: 'Buyer contact smoke', command: pnpm, args: ['smoke:buyer'] },
+      { label: 'Report submit smoke', command: pnpm, args: ['smoke:reports'] },
       {
         label: 'Authenticated web route smoke',
         command: pnpm,

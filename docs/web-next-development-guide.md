@@ -394,8 +394,8 @@ Remaining Phase F work:
 
 - Complete the remaining manual QA follow-ups from the May 17 route smoke:
   logged-out auth/onboarding visuals, populated notifications, populated inbox
-  thread, report submit API smoke, and a seeded incomplete-profile visual
-  Browser smoke if a launch fixture is added.
+  thread, and a seeded incomplete-profile visual Browser smoke if a launch
+  fixture is added.
 - Audit accessibility and state coverage for dialogs, filters, forms, empty
   states, loading states, errors, disabled controls, focus, and mobile tap
   targets.
@@ -438,6 +438,10 @@ Pre-Phase-6 progress:
 - May 17 follow-up hardened non-own listing contact-send and profile-readiness
   gates with page-level tests, retryable profile-check failure UI, API-error
   clearing on message edits, and a Browser smoke through `Message sent`.
+- May 17 follow-up added `pnpm smoke:reports` and wired it into
+  `pnpm slc:ready`; the smoke submits a real listing report through the API and
+  verifies admin review visibility. The report dialog now exposes a busy form
+  state, locks details while submitting, and clears failed-submit copy on edit.
 
 Acceptance notes:
 
