@@ -92,6 +92,14 @@ and mobile visual QA, audit accessibility/state coverage, and run
 `pnpm slc:ready` or document blockers. Preserve the current SLC behavior and
 keep Phase 6 AI deferred until that closeout is done.
 
+May 17 Phase F progress: Browser smoke covered the main route list at 1280px
+desktop and 390px mobile, focused web checks passed, and `pnpm slc:ready`
+passed locally outside the sandbox after the authenticated web route smoke was
+made robust for multi-community demo users. Remaining closeout risks are
+logged-out auth/onboarding visual QA, report-dialog interaction/focus QA,
+populated notifications QA, non-own seller contact/report QA, and
+incomplete-profile blocked-action states.
+
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
 explicitly requested.

@@ -152,6 +152,14 @@ a concrete regression. The remaining work is Phase F:
 - Add real launch proof, testimonials, statistics, and approved imagery only
   after those assets exist and are approved.
 
+May 17 Phase F progress: a desktop/mobile Browser route smoke covered the main
+public, buyer/seller, profile/storefront, and admin routes; focused web checks
+passed; and `pnpm slc:ready` passed locally outside the sandbox after fixing the
+authenticated web smoke to support multi-community demo users. Remaining
+closeout risks are logged-out auth/onboarding visual QA, report-dialog
+interaction/focus QA, populated notifications QA, non-own seller contact/report
+QA, and incomplete-profile blocked-action states.
+
 ## Deliberately Deferred
 
 Do not add these before launch unless explicitly requested:

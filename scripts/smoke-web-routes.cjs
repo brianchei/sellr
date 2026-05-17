@@ -94,21 +94,29 @@ async function main() {
   console.log(`API base URL: ${buyerClient.apiBaseUrl}`);
   console.log(`Web base URL: ${webBaseUrl}`);
 
-  const { communityId: sellerCommunityId, me: sellerMe } =
+  const { me: sellerMe } =
     await signInWithLocalOtp(sellerClient, {
       phoneE164: sellerPhoneE164,
       code: otpCode,
       deviceFingerprint: 'sellr-smoke-web-routes-seller',
     });
 
-  const sellerListings = await sellerClient.api(
-    `/listings/mine?communityId=${sellerCommunityId}&limit=50`,
-  );
-  const activeListing = findActiveListing(
-    sellerListings.listings,
-    sellerMe.user.id,
-  );
-  const editableListing = findEditableListing(sellerListings.listings);
+  let activeListing = null;
+  let editableListing = null;
+  for (const communityId of sellerMe.communityIds ?? []) {
+    const candidateListings = await sellerClient.api(
+      `/listings/mine?communityId=${communityId}&limit=50`,
+    );
+    const candidateActiveListing = findActiveListing(
+      candidateListings.listings,
+      sellerMe.user.id,
+    );
+    if (candidateActiveListing) {
+      activeListing = candidateActiveListing;
+      editableListing = findEditableListing(candidateListings.listings);
+      break;
+    }
+  }
   assert(
     activeListing,
     'No active seller listing found. Run `pnpm --filter @sellr/api exec prisma db seed` first.',
@@ -118,14 +126,14 @@ async function main() {
     'No seller listing found for edit route smoke. Run the seed first.',
   );
 
-  const { communityId: buyerCommunityId, me: buyerMe } =
+  const { me: buyerMe } =
     await signInWithLocalOtp(buyerClient, {
       phoneE164: buyerPhoneE164,
       code: otpCode,
       deviceFingerprint: 'sellr-smoke-web-routes-buyer',
     });
   assert(
-    buyerCommunityId === activeListing.communityId,
+    buyerMe.communityIds?.includes(activeListing.communityId),
     'Buyer and seller smoke accounts are not in the same community.',
   );
   assert(
@@ -164,16 +172,13 @@ async function main() {
     `/listings/${editableListing.id}/edit`,
   );
 
-  const { communityId: adminCommunityId } = await signInWithLocalOtp(
-    adminClient,
-    {
-      phoneE164: adminPhoneE164,
-      code: otpCode,
-      deviceFingerprint: 'sellr-smoke-web-routes-admin',
-    },
-  );
+  const { me: adminMe } = await signInWithLocalOtp(adminClient, {
+    phoneE164: adminPhoneE164,
+    code: otpCode,
+    deviceFingerprint: 'sellr-smoke-web-routes-admin',
+  });
   assert(
-    adminCommunityId === activeListing.communityId,
+    adminMe.communityIds?.includes(activeListing.communityId),
     'Admin smoke account is not in the listing community.',
   );
   const reports = await adminClient.api('/reports?status=all&limit=10');

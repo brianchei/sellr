@@ -392,14 +392,14 @@ Completed route-level work:
 
 Remaining Phase F work:
 
-- Run a final desktop and mobile route smoke across the public entry,
-  auth/onboarding, home, marketplace, listing detail, listing form, inventory,
-  inbox/thread, notifications, profile/storefront, and admin surfaces.
+- Complete the remaining manual QA follow-ups from the May 17 route smoke:
+  logged-out auth/onboarding visuals, report-dialog focus/submit behavior,
+  populated notifications, non-own seller contact/report, and incomplete-profile
+  blocked-action states.
 - Audit accessibility and state coverage for dialogs, filters, forms, empty
   states, loading states, errors, disabled controls, focus, and mobile tap
   targets.
-- Run `pnpm slc:ready` and focused package checks, or document environment
-  blockers.
+- Rerun `pnpm slc:ready` before final handoff if additional code changes land.
 - Keep docs current so future sessions do not restart completed Phase C, D, or
   E slices.
 
@@ -428,6 +428,10 @@ Pre-Phase-6 progress:
 - Browser smoke has covered representative desktop and 390px mobile views for
   several changed surfaces, but a single final Phase F QA sweep is still needed
   before calling the overhaul complete.
+- May 17 Phase F work added a broader Browser route smoke at 1280px and 390px,
+  documented remaining manual QA risks in `docs/ui-ux-overhaul-guide.md`, fixed
+  the authenticated web smoke for multi-community demo users, and got
+  `pnpm slc:ready` passing locally outside the sandbox.
 
 Acceptance notes:
 
