@@ -165,9 +165,13 @@ added `pnpm smoke:reports` to submit a real listing report through the API and
 verify admin review visibility; it now runs inside `pnpm slc:ready`. An inbox
 follow-up added `pnpm smoke:inbox` for populated buyer/seller thread replies,
 archive filtering, and reply-driven restoration to the active inbox; it also
-runs inside `pnpm slc:ready`. Remaining closeout risks are logged-out
-auth/onboarding visual QA, populated notifications QA, and a seeded
-incomplete-profile visual Browser smoke if a launch fixture is added.
+runs inside `pnpm slc:ready`. A notifications follow-up added
+`pnpm smoke:notifications` for real message notifications, unread filtering,
+individual mark-read, and mark-all-read; it also runs inside
+`pnpm slc:ready`, and Browser smoke covered populated `/notifications` at
+desktop and mobile widths. Remaining closeout risks are logged-out
+auth/onboarding visual QA and a seeded incomplete-profile visual Browser smoke
+if a launch fixture is added.
 
 ## Deliberately Deferred
 

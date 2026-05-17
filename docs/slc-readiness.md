@@ -69,6 +69,7 @@ pnpm --filter @sellr/api exec prisma db seed
 pnpm smoke:seller
 pnpm smoke:buyer
 pnpm smoke:inbox
+pnpm smoke:notifications
 pnpm smoke:reports
 pnpm smoke:web
 pnpm --filter @sellr/shared typecheck
