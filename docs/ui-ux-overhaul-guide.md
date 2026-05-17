@@ -1054,15 +1054,21 @@ Closeout QA notes:
 - May 17 follow-up added `pnpm smoke:inbox` to exercise populated inbox/thread
   API behavior inside `pnpm slc:ready`, plus component coverage for the thread
   reply form's busy and failed-submit states.
+- May 17 follow-up used that populated inbox fixture for desktop rendered QA in
+  Arc/Computer Use. The buyer login path reached `/inbox`, opened the seeded
+  Walnut study desk thread, and verified the populated conversation row, item
+  context, seller trust summary, report/archive actions, message history, pickup
+  safety copy, quick replies, and empty-reply disabled state without obvious
+  clipping or horizontal overflow.
 - May 17 follow-up added `pnpm smoke:notifications` to create real message
   notifications, verify unread filtering, mark an individual notification read,
   and clear remaining unread state through mark-all-read inside
   `pnpm slc:ready`. Browser smoke also verified the populated `/notifications`
   list at desktop and mobile widths, including the mark-all-read interaction.
-- Remaining Phase F risks: populated inbox thread rendered visual QA,
-  authenticated no-community onboarding visual QA if final signoff requires a
-  screenshot, and a seeded incomplete-profile visual Browser smoke if a launch
-  fixture is added.
+- Remaining Phase F risks: authenticated mobile populated inbox/thread visual
+  QA, authenticated no-community onboarding visual QA if final signoff requires
+  a screenshot, and a seeded incomplete-profile visual Browser smoke if a
+  launch fixture is added.
 
 ## Process Audit Notes
 

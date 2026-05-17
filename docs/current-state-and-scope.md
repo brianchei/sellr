@@ -173,7 +173,13 @@ desktop and mobile widths. An auth/onboarding follow-up added
 `pnpm smoke:auth-onboarding` for logged-out auth state, email OTP sign-in,
 email-domain onboarding, and dashboard reachability; it also runs inside
 `pnpm slc:ready`, and Browser smoke covered the logged-out `/login` entry
-screen. Remaining closeout risks are populated inbox thread rendered visual QA,
+screen. A populated inbox/thread desktop rendered smoke used the local
+`pnpm smoke:inbox` fixture, signed in as the buyer through the phone fallback,
+and verified `/inbox` plus the latest thread in Arc/Computer Use: the populated
+conversation row, item context, seller trust summary, report/archive actions,
+message history, pickup safety copy, quick replies, and empty-reply disabled
+state rendered without obvious clipping or horizontal overflow. Remaining
+closeout risks are authenticated mobile populated inbox/thread visual QA,
 authenticated no-community onboarding visual QA if final signoff requires a
 fresh screenshot, and a seeded incomplete-profile visual Browser smoke if a
 launch fixture is added.
