@@ -50,6 +50,16 @@ const PICKUP_RADIUS_FILTERS: Array<{
   { value: '2500', label: '1.6 mi or tighter' },
 ];
 
+const QUICK_CATEGORY_FILTERS = [
+  { value: 'all', label: 'All' },
+  { value: 'Furniture', label: 'Furniture' },
+  { value: 'Dorm', label: 'Dorm' },
+  { value: 'Books', label: 'Books' },
+  { value: 'Electronics', label: 'Electronics' },
+  { value: 'Transportation', label: 'Bikes' },
+  { value: 'Free', label: 'Free' },
+] as const;
+
 function parseOptionalPriceFilter(value: string): number | undefined | null {
   const cleanValue = value.trim();
   if (!cleanValue) {
@@ -180,6 +190,36 @@ export default function MarketplacePage() {
   ].filter(Boolean).length;
   const shouldShowAdvancedFilters =
     advancedFiltersOpen || Boolean(priceFilter.error);
+  const priceFilterLabel =
+    priceFilter.minPrice !== undefined && priceFilter.maxPrice !== undefined
+      ? `$${priceFilter.minPrice}-$${priceFilter.maxPrice}`
+      : priceFilter.minPrice !== undefined
+        ? `From $${priceFilter.minPrice}`
+        : priceFilter.maxPrice !== undefined
+          ? `Up to $${priceFilter.maxPrice}`
+          : null;
+  const pickupRadiusLabel =
+    pickupRadius === 'all'
+      ? null
+      : PICKUP_RADIUS_FILTERS.find((option) => option.value === pickupRadius)
+          ?.label;
+  const selectedCategoryLabel =
+    category === 'all'
+      ? null
+      : QUICK_CATEGORY_FILTERS.find((option) => option.value === category)
+          ?.label ?? category;
+  const activeFilterLabels = [
+    trimmedQuery ? `Search: ${trimmedQuery}` : null,
+    selectedCategoryLabel,
+    condition !== 'all' ? CONDITION_LABELS_MAP[condition] : null,
+    priceFilterLabel,
+    pickupRadiusLabel,
+    hasPhotosOnly ? 'Has photos' : null,
+    verifiedOnly ? 'Verified contact' : null,
+    sort !== 'recent'
+      ? SORT_OPTIONS.find((option) => option.value === sort)?.label
+      : null,
+  ].filter((label): label is string => Boolean(label));
 
   const clearFilters = () => {
     setQuery('');
@@ -251,8 +291,8 @@ export default function MarketplacePage() {
       </header>
 
       <section
-        aria-label="Filter listings"
-        className="app-panel-soft mt-6 p-3 sm:p-4"
+        aria-label="Search and filter listings"
+        className="mt-6 border-y border-[var(--border-default)] bg-[var(--bg-primary)] py-4"
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_210px_190px]">
           <label className="block">
@@ -321,7 +361,15 @@ export default function MarketplacePage() {
           </label>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <FilterChipRow
+          className="mt-3"
+          label="Quick categories"
+          value={category}
+          options={QUICK_CATEGORY_FILTERS}
+          onChange={setCategory}
+        />
+
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[var(--border-default)] pt-3">
           <button
             type="button"
             onClick={() => setHasPhotosOnly((current) => !current)}
@@ -445,29 +493,6 @@ export default function MarketplacePage() {
             {shouldShowAdvancedFilters ? 'Hide filters' : 'More filters'}
             {advancedFilterCount > 0 ? ` (${advancedFilterCount})` : null}
           </button>
-
-          {hasActiveFilters ? (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-semibold text-[var(--text-primary)] transition hover:bg-[var(--color-brand-primary-soft)]"
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M18 6 6 18M6 6l12 12" />
-              </svg>
-              Clear
-            </button>
-          ) : null}
         </div>
 
         {shouldShowAdvancedFilters ? (
@@ -554,6 +579,41 @@ export default function MarketplacePage() {
             </>
           )}
         </p>
+        {hasActiveFilters ? (
+          <div
+            className="flex flex-wrap items-center gap-2"
+            aria-label="Active filters"
+          >
+            {activeFilterLabels.map((label) => (
+              <span
+                key={label}
+                className="rounded-full border border-[var(--border-default)] bg-[var(--bg-primary)] px-2.5 py-1 text-xs font-semibold text-[var(--text-secondary)]"
+              >
+                {label}
+              </span>
+            ))}
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-[var(--text-primary)] transition hover:bg-[var(--color-brand-primary-soft)]"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+              Clear
+            </button>
+          </div>
+        ) : null}
       </div>
 
       {!priceFilter.error && listingsQuery.isLoading ? (
@@ -661,7 +721,7 @@ export default function MarketplacePage() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Filter chip row (used for sort + condition)                                 */
+/* Filter chip row                                                             */
 /* -------------------------------------------------------------------------- */
 
 function FilterChipRow<TValue extends string>({
