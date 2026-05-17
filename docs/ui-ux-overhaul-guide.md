@@ -1060,15 +1060,20 @@ Closeout QA notes:
   context, seller trust summary, report/archive actions, message history, pickup
   safety copy, quick replies, and empty-reply disabled state without obvious
   clipping or horizontal overflow.
+- May 17 follow-up also completed authenticated mobile populated inbox/thread QA
+  in the in-app Browser at 390px. Phone fallback sign-in reached Jordan's
+  populated `/inbox`, the latest Walnut study desk thread opened correctly,
+  item/seller trust context and message history rendered without horizontal
+  overflow, and tapping a pickup quick reply filled the composer and enabled
+  `Send reply` without sending a message.
 - May 17 follow-up added `pnpm smoke:notifications` to create real message
   notifications, verify unread filtering, mark an individual notification read,
   and clear remaining unread state through mark-all-read inside
   `pnpm slc:ready`. Browser smoke also verified the populated `/notifications`
   list at desktop and mobile widths, including the mark-all-read interaction.
-- Remaining Phase F risks: authenticated mobile populated inbox/thread visual
-  QA, authenticated no-community onboarding visual QA if final signoff requires
-  a screenshot, and a seeded incomplete-profile visual Browser smoke if a
-  launch fixture is added.
+- Remaining Phase F risks: authenticated no-community onboarding visual QA if
+  final signoff requires a screenshot, and a seeded incomplete-profile visual
+  Browser smoke if a launch fixture is added.
 
 ## Process Audit Notes
 

@@ -178,11 +178,15 @@ screen. A populated inbox/thread desktop rendered smoke used the local
 and verified `/inbox` plus the latest thread in Arc/Computer Use: the populated
 conversation row, item context, seller trust summary, report/archive actions,
 message history, pickup safety copy, quick replies, and empty-reply disabled
-state rendered without obvious clipping or horizontal overflow. Remaining
-closeout risks are authenticated mobile populated inbox/thread visual QA,
-authenticated no-community onboarding visual QA if final signoff requires a
-fresh screenshot, and a seeded incomplete-profile visual Browser smoke if a
-launch fixture is added.
+state rendered without obvious clipping or horizontal overflow. The mobile
+rendered pass then used the in-app Browser at 390px, signed in as the same buyer,
+verified populated `/inbox`, opened the latest Walnut study desk thread, checked
+item/seller trust context, message history, pickup safety, quick replies,
+empty-reply disabled state, and confirmed a quick reply fills the composer and
+enables send without horizontal overflow or console warnings. Remaining closeout
+risks are authenticated no-community onboarding visual QA if final signoff
+requires a fresh screenshot and a seeded incomplete-profile visual Browser smoke
+if a launch fixture is added.
 
 ## Deliberately Deferred
 
