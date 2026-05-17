@@ -1,6 +1,6 @@
 # Sellr UI/UX Overhaul Guide
 
-Last updated: May 16, 2026.
+Last updated: May 17, 2026.
 
 Use this guide before Phase 6 AI work. Sellr already has a functional web SLC;
 the next job is to make the existing buyer/seller loop feel simpler, more
@@ -389,27 +389,27 @@ or meetup scheduler. Direction:
 
 ## Current Product Audit
 
-| Area | Current state | Main UX problem | Recommended direction | Priority | Type |
+| Area | Current state | Main UX problem | Recommended direction | Priority | Status |
 | --- | --- | --- | --- | --- | --- |
-| Landing page `/` | Strong trust-native thesis, long multi-section page, app preview, proof, pain, benefits, FAQ. | Too much explanation before activation; reads like a polished template. | One sharp first viewport, shorter proof, real listing/campus imagery when approved, CTA to login and a preview of inventory path. | P0 | Future implementation |
-| Sign up/login `/login` | Email OTP primary with phone fallback, Wisc email validation, code step, loading/error states. | Panel is functional but can feel standalone and generic; fallback may compete with primary path. | Make email-first path feel campus-specific and calm; phone fallback secondary; OTP copy shorter and more helpful. | P0 | Future implementation |
-| Community verification `/onboarding` | Email/invite tabs, trust pillars, clear form validation. | Too much explanatory copy before the action; trust pillars feel like a landing section. | Reduce to "verify access" action plus one-sentence why; move trust explanation into small inline cues. | P0 | Future implementation |
-| First-time onboarding | Login routes to onboarding then dashboard. Profile requirements appear contextually. | First signed-in destination can feel like account setup rather than marketplace activation. | Route to a home surface with one obvious choice: browse, sell, or complete profile if blocked. | P0 | Future implementation |
-| Dashboard `/dashboard` | Greeting, KPIs, recent listings/inbox, setup panel, profile section. | KPI/dashboard framing competes with local marketplace intent. | Rework into `Home`: next best action, active community, recent listing/message context, small readiness checklist. | P0 | Future implementation |
-| Browse/search `/marketplace` | Server-backed filters, search, category/condition/price/radius/photo/sort, listing grid. | Filter panel is heavy; chips and fields can bury inventory. | Inventory first; collapsible/segmented filters; campus categories and quick chips for move-out essentials. | P0 | Future implementation |
-| Listing cards | Image, category, status, photo count, title, price, neighborhood, radius, freshness, description, chips, seller. | Too many badges/metadata points for fast scanning. | Prioritize image, price, title, condition, neighborhood, seller trust. Move low-value details to detail page. | P0 | Future implementation |
-| Listing detail | Photo gallery, at-a-glance stats, seller snapshot/card, quick replies, report. | Useful but dense; seller/trust appears in multiple blocks. | Item-first layout with sticky contact action, integrated seller/pickup confidence, clear report path. | P0 | Future implementation |
-| Offer flow | No full formal offer UI in web SLC; quick message/offer intent exists. API modules for offers exist. | User may expect an offer/handoff state but only sees a message. | Document as structured inquiry for SLC; future offer UI should live after message intent, not before contact. | P1 | Future implementation |
-| Meetup coordination | No dedicated web meetup scheduler in current screens; pickup windows exist in listings/messages. API modules exist. | Safety/coordination guidance is present but not a coherent meetup state. | Add future conversation-anchored meetup cards with approximate area, public-place guidance, and status. | P1 | Future implementation |
-| Inbox/messages | Listing-tied conversations, archive/restore, unread activity, thread UI. | Needs stronger item/person anchoring and mobile scan polish. | Show item card, seller/buyer identity, next reply action, and safety/report affordance without extra panels. | P0 | Future implementation |
-| Notifications | Notification list and unread badges. | Risk of feeling like a log rather than actionable activity. | Group by message/listing/community/admin; every item should link to one next action. | P1 | Future implementation |
-| Profile `/profile` | Display name, photo upload, verified contact, storefront, readiness. | Can feel like account settings instead of trust setup. | Frame as "How you appear to buyers/sellers"; contextualize missing fields by blocked actions. | P1 | Future implementation |
-| Seller storefront `/sellers/[sellerId]` | Seller trust signals and active listings. | Needs more local trust clarity and less generic profile-card language. | Storefront should answer: who, community, verified contact, active listings, how to contact through item. | P1 | Future implementation |
-| Safety/reporting/blocking | Report dialog, admin reports, conversation archive/hide, moderation actions. | Safety affordances exist but copy/state should be consistent across flows. | Preserve all safety entry points; standardize warning copy, suspicious-payment guidance, report outcomes, and admin clarity. | P0 | Future implementation |
-| Admin/moderation | Admin community and reports dashboards are functional and explicit. | Admin surfaces inherit visual noise from app panels and need density discipline. | Keep utilitarian; align tokens, spacing, action hierarchy, audit history, and empty/error states. | P1 | Future implementation |
-| Empty states | Present across pages but inconsistent in tone/detail. | Some empty states explain the system instead of offering the next action. | Standardize: what happened, why it matters, one next step, optional secondary action. | P0 | Future implementation |
-| Error states | Forms and queries show errors; API validation exists. | Error copy can be technical or visually disconnected. | Tie field errors with `aria-describedby`; use friendly repair copy and no color-only signals. | P0 | Future implementation |
-| Loading states | Basic loading text/skeletons across some flows. | Generic `Loading...` breaks polish and can cause layout shifts. | Use stable skeletons/disabled states that preserve page structure and action context. | P1 | Future implementation |
+| Landing page `/` | Public entry has shorter activation, community-first copy, and app preview. | Still needs real launch proof and approved imagery. | Keep first viewport action-oriented; add proof only when real assets exist. | P0 | Shipped pass; proof follow-up |
+| Sign up/login `/login` | Email OTP primary with phone fallback, Wisc email validation, concise code step, loading/error states. | Keep fallback secondary and avoid auth copy drift. | Maintain email-first path with phone fallback and focused repair copy. | P0 | Shipped pass |
+| Community verification `/onboarding` | Email/invite verification is action-first with lighter trust explanation. | Keep community access from feeling like homework. | Continue to make the verification action the main event. | P0 | Shipped pass |
+| First-time onboarding | Signed-in home/dashboard now emphasizes browse, sell, reply, or readiness. | Need final route/state QA for blocked or incomplete profiles. | Keep profile requirements contextual and action-linked. | P0 | Shipped pass; Phase F QA |
+| Dashboard `/dashboard` | Reframed toward home/next actions with active community, listing/message context, and readiness. | Route is still named `/dashboard`, which is acceptable for SLC but conceptually `Home`. | Do not rebuild again unless launch users struggle to choose a next action. | P0 | Shipped pass |
+| Browse/search `/marketplace` | Server-backed filters, search, category/condition/price/radius/photo/sort, quick filters, listing grid. | Final QA should confirm filters stay compact on mobile and empty states remain useful. | Inventory-first browsing with filters as supporting controls. | P0 | Shipped pass; Phase F QA |
+| Listing cards | Cards prioritize image, price, title, condition, neighborhood, radius, freshness, and seller trust. | Some photo/category overlays intentionally remain because they support scanability. | Avoid adding low-value metadata back to cards. | P0 | Shipped pass |
+| Listing detail | Item-first layout with seller/pickup confidence near contact and clearer report/message hierarchy. | Final QA should cover own listing, sold/unavailable, incomplete profile, and message-success states. | Preserve item-anchored contact and privacy-preserving pickup context. | P0 | Shipped pass; Phase F QA |
+| Offer flow | Web SLC remains listing-tied contact/message intent, not formal offers. API modules still exist. | Avoid implying a full offer handoff in UI. | Keep documented as structured inquiry until formal offer UI is intentionally scoped. | P1 | Deferred by scope |
+| Meetup coordination | No dedicated scheduler; pickup windows and safety guidance live in listings/messages. | Avoid introducing a half-built meetup state. | Future meetup UI should live inside conversations after launch feedback. | P1 | Deferred by scope |
+| Inbox/messages | Conversation list/thread are item-anchored with archive/restore, reply, safety/report affordances. | Final QA should confirm mobile list/detail behavior and empty/archived states. | Keep item, participant, reply, and safety context together. | P0 | Shipped pass; Phase F QA |
+| Notifications | Notifications read as activity rows with unread state, target links, mark-read actions, and empty states. | Final QA should cover populated admin/message/listing notifications. | Keep every notification tied to one useful target/action. | P1 | Shipped pass; Phase F QA |
+| Profile `/profile` | Page is framed as how the member appears to buyers/sellers, with readiness and editable identity. | Final QA should cover missing display name/photo/contact/community states. | Keep trust cues backed and linked to high-intent actions. | P1 | Shipped pass; Phase F QA |
+| Seller storefront `/sellers/[sellerId]` | Storefront answers who, verified contact, community, active listings, and how to contact through an item. | Need non-own-seller report/contact visual smoke with seeded data. | Keep contact item-anchored and storefront language local/trust-specific. | P1 | Shipped pass; Phase F QA |
+| Safety/reporting/blocking | Report dialog, admin reports, archive/hide, and moderation actions are preserved and clearer. | Final QA should cover dialog focus, report success/error, and destructive confirmations. | Keep safety entry points near the affected listing, seller, or conversation. | P0 | Shipped pass; Phase F QA |
+| Admin/moderation | Admin community/reports are denser, utilitarian, and audit-focused. | Admin is desktop-priority but must remain usable on mobile without broken layout. | Continue avoiding decorative dashboard patterns. | P1 | Shipped pass; Phase F QA |
+| Empty states | Foundation `app-empty-state` and route-specific next actions are used across core routes. | Need final audit for any stale generic empty copy. | What happened, why it matters, one next action. | P0 | Mostly shipped; Phase F QA |
+| Error states | Errors remain route/form-specific, with app alert styling and repair copy. | Need final audit for field-level `aria-describedby` coverage. | Tie errors to fields and avoid color-only signals. | P0 | Partially shipped; Phase F QA |
+| Loading states | Skeletons/structured loading states exist on many routes. | Some generic loading copy may remain and should be fixed only where visible. | Preserve layout dimensions and action context while loading. | P1 | Partially shipped; Phase F QA |
 
 ## Screen-By-Screen Direction
 
@@ -927,12 +927,15 @@ Closeout notes:
   route-blocking render failures or captured console errors. State smoke also
   covered filtered seller-inventory empty state, empty inbox, empty
   notifications, and disabled `Mark all read`.
-- Mobile viewport automation remains a Phase F/readiness risk because the
-  available in-app Browser surface does not expose viewport resizing and
-  `pnpm exec playwright` is not currently available as a local command without
-  adding tooling.
+- Later route slices used the in-app Browser viewport capability for
+  representative 390px mobile smoke. Phase F still needs one full, documented
+  mobile QA sweep across the route list because those checks happened slice by
+  slice rather than as a single release-readiness pass.
 
 ### Phase C - Onboarding And Navigation
+
+Status: shipped on `main`. PRs #70-#73 covered signed-in home next actions,
+onboarding entry, app navigation priority, and public landing activation.
 
 Deliver:
 
@@ -947,6 +950,10 @@ Acceptance:
 - Email-first auth remains primary with phone fallback.
 
 ### Phase D - Marketplace Core Screens
+
+Status: shipped on `main`. PRs #74-#77 and #80 covered marketplace filters,
+listing detail contact hierarchy, listing form workflow hierarchy, seller
+inventory lifecycle hierarchy, and profile/storefront trust hierarchy.
 
 Deliver:
 
@@ -963,6 +970,10 @@ Acceptance:
 
 ### Phase E - Trust And Coordination Flows
 
+Status: shipped on `main`. PRs #78-#79 plus prior admin/report passes covered
+inbox item/thread hierarchy, notification activity rows, report/admin context,
+and item-anchored trust/coordination language.
+
 Deliver:
 
 - Align inbox/thread, buyer contact intent, safety warnings, report dialog,
@@ -978,6 +989,8 @@ Acceptance:
 
 ### Phase F - Polish And Launch Readiness
 
+Status: remaining. This is the next best work before Phase 6 AI.
+
 Deliver:
 
 - Standardize empty/loading/error/success states.
@@ -991,6 +1004,46 @@ Acceptance:
 - Focus states and field errors meet launch quality.
 - `pnpm --filter @sellr/web lint`, `typecheck`, `build`, and `pnpm slc:ready`
   pass or documented blockers are resolved.
+
+## Process Audit Notes
+
+The May 2026 implementation loop produced useful route-level changes, but the
+docs were not updated after each merged slice. That made future prompts keep
+asking for "the next slice" even after Phase C, D, and E route passes were
+already on `main`.
+
+What actually shipped on `main`:
+
+- #70 signed-in home next actions.
+- #71 onboarding entry path.
+- #72 app navigation action priority.
+- #73 public landing activation.
+- #74 marketplace filters.
+- #75 listing detail contact hierarchy.
+- #76 listing form workflow hierarchy.
+- #77 seller inventory lifecycle hierarchy.
+- #78 inbox item/thread hierarchy.
+- #79 notification activity rows.
+- #80 profile/storefront trust hierarchy.
+
+Redundancy analysis:
+
+- The redundancy was mostly process-level: repeated "what is next" and
+  "implement the next slice" prompts caused similar recommendations to be
+  restated after the underlying code had already merged.
+- Some areas received multiple intentional passes. For example,
+  profile/storefront had an early Phase B trust-context pass and a later Phase D
+  trust-hierarchy pass. That is acceptable refinement, but future work should
+  name the distinction clearly.
+- Listing detail also had multiple contact-hierarchy passes across the broader
+  overhaul. Before changing it again, inspect the current route and identify a
+  concrete regression or launch-user problem.
+- Verification was repeated often because each slice ran focused checks. That
+  was useful for safety, but future sessions should avoid rerunning the same
+  broad build/browser smoke unless files changed or Phase F closeout is the
+  explicit goal.
+- The next implementation prompt should be Phase F closeout, not another Phase
+  C/D/E route rewrite.
 
 ## Acceptance Criteria For The Overhaul
 
@@ -1045,18 +1098,20 @@ Browser verification should cover desktop and mobile widths for:
 Use seeded/demo data where possible. Route smoke tests validate responses, but
 they do not replace visual, responsive, and accessibility review.
 
-## Recommended Next Prompt For Phase C
+## Recommended Next Prompt For Phase F Closeout
 
 ```text
-Begin Phase C of the Sellr Pre-Phase-6 UI/UX overhaul. Read AGENTS.md,
+Begin Phase F closeout of the Sellr Pre-Phase-6 UI/UX overhaul. Read AGENTS.md,
 docs/ui-ux-overhaul-guide.md, docs/design-language.md,
 docs/current-state-and-scope.md, docs/web-next-development-guide.md,
-apps/web/README.md, and apps/web/app/globals.css. Build on the completed Phase B
-foundation by simplifying the new-user and first signed-in path: `/`, `/login`,
-`/onboarding`, `/communities/join`, the authenticated app header/navigation,
-and the dashboard-as-home decision. Keep the implementation small and
-reviewable, preserve auth/community/listing/messaging/admin behavior, do not
-implement Phase 6 AI, do not add broad product scope, and do not add a new
-design-system library. Run focused web lint/typecheck/build checks and summarize
-remaining visual or interaction risks.
+apps/web/README.md, and apps/web/app/globals.css. Do not restart Phase C, D, or
+E route redesigns unless a fresh audit finds a concrete regression. Run a final
+route/state/responsive/accessibility QA sweep across `/`, `/login`,
+`/onboarding`, `/dashboard`, `/marketplace`, one listing detail, `/sell`,
+`/listings`, `/inbox`, one thread, `/notifications`, `/profile`, one seller
+storefront, `/admin/community`, and `/admin/reports`. Fix only small,
+reviewable regressions, preserve current SLC behavior, do not implement Phase 6
+AI, do not add broad product scope, and do not add a new design-system library.
+Run `pnpm slc:ready` plus focused web lint/typecheck/test/build checks, or
+document blockers.
 ```

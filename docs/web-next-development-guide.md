@@ -1,6 +1,6 @@
 # Sellr Web Next Development Guide
 
-Last updated: May 15, 2026.
+Last updated: May 17, 2026.
 
 Use this as the living guide for the next wave of Sellr web work after the
 current SLC/MVP. Update it as implementation progresses, decisions change, or
@@ -26,12 +26,12 @@ remaining Phase 1 work is not new product functionality: it is adding real
 launch proof, testimonials, statistics, and approved imagery once those assets
 exist.
 
-Before beginning Phase 6 AI listing-assistant work, prioritize the UI/UX
-overhaul documented in [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md).
-The current SLC is functionally complete enough that the next product risk is
-experience quality: onboarding should be simpler, the app should feel more
-personal and local, and generic "AI/vibe-coded" visual patterns should be
-removed from the core buyer/seller flow.
+Before beginning Phase 6 AI listing-assistant work, finish the UI/UX overhaul
+closeout documented in [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md).
+The core route-level passes have shipped, so the next product risk is not
+another redesign slice. It is launch-readiness QA: confirming responsive
+layouts, accessibility, state coverage, documentation accuracy, and final SLC
+readiness after the app has been simplified.
 
 ## Product Theme
 
@@ -354,9 +354,8 @@ Goal: simplify the current web SLC and make the product feel personal,
 trustworthy, attractive, and purpose-built for local community resale before
 adding AI.
 
-Status: in progress and should be completed before Phase 6 begins. Phase B is
-complete for the foundation scope; Phase C onboarding/navigation is the next
-best implementation slice.
+Status: implementation passes through Phase E are shipped on `main`; Phase F
+closeout remains before Phase 6 begins.
 
 Source guide:
 
@@ -364,37 +363,47 @@ Source guide:
 
 Implementation phases:
 
-- Phase A: direction and documentation. Complete as a docs-only pass before
-  broad UI code changes.
-- Phase B: design system foundation. Clean up tokens, surfaces, component
-  primitives, and accessibility baselines.
-- Phase C: onboarding and navigation. Simplify landing, login, verification,
-  community join, and first signed-in action.
-- Phase D: marketplace core screens. Redesign browse, search/filter, listing
-  cards, listing detail, listing creation/edit, inventory, profile, and
+- Phase A: direction and documentation. Complete.
+- Phase B: design system foundation. Complete for the Pre-Phase-6 scope.
+- Phase C: onboarding and navigation. Shipped across the public entry,
+  email-first auth, community verification, app navigation, and signed-in home.
+- Phase D: marketplace core screens. Shipped across marketplace browse/filter,
+  listing cards/detail, listing form/edit, seller inventory, profile, and
   storefront.
-- Phase E: trust and coordination flows. Align buyer contact, inbox,
-  notifications, safety/reporting, and admin moderation while keeping
-  coordination item-anchored.
-- Phase F: polish and launch readiness. Standardize states, analytics,
-  responsive QA, accessibility QA, performance, and SLC readiness.
+- Phase E: trust and coordination flows. Shipped across buyer contact,
+  inbox/thread hierarchy, notifications, safety/reporting context, and admin
+  density.
+- Phase F: polish and launch readiness. Remaining.
 
-Work items:
+Completed route-level work:
 
-- Audit the existing desktop and mobile experience for generic dashboard
-  patterns, nested cards, excess chips, vague copy, and unclear next actions.
-- Simplify the landing, login, onboarding, and join-another-community path so
+- Simplified the landing, login, onboarding, and join-another-community path so
   new users understand Sellr and reach community-scoped inventory faster.
-- Redesign the authenticated shell and `/dashboard` into a calmer home or
-  next-action surface.
-- Make marketplace browse and listing detail more item-first, with seller trust
-  and pickup context integrated naturally instead of scattered across panels.
-- Simplify listing creation/edit and seller inventory while preserving listing
+- Reprioritized authenticated shell navigation around browse, sell, inbox, and
+  profile.
+- Reframed `/dashboard` as a calmer signed-in home with next actions, active
+  community context, recent listing/message context, and readiness guidance.
+- Made marketplace browse, filters, listing cards, and listing detail more
+  item-first, with seller trust and pickup context closer to contact decisions.
+- Simplified listing creation/edit and seller inventory while preserving listing
   quality guidance, media upload feedback, validation, and publish safeguards.
-- Align inbox, profile, storefront, notifications, and admin surfaces with the
-  new tokens and interaction patterns.
+- Aligned inbox, thread, notifications, profile, storefront, report, admin, and
+  community-home surfaces with the lighter token and interaction patterns.
 
-Phase B progress:
+Remaining Phase F work:
+
+- Run a final desktop and mobile route smoke across the public entry,
+  auth/onboarding, home, marketplace, listing detail, listing form, inventory,
+  inbox/thread, notifications, profile/storefront, and admin surfaces.
+- Audit accessibility and state coverage for dialogs, filters, forms, empty
+  states, loading states, errors, disabled controls, focus, and mobile tap
+  targets.
+- Run `pnpm slc:ready` and focused package checks, or document environment
+  blockers.
+- Keep docs current so future sessions do not restart completed Phase C, D, or
+  E slices.
+
+Pre-Phase-6 progress:
 
 - Reviewed the attached visual flow-reference PDF from Airbnb, Craft,
   ElevenLabs, and Fey and captured the applicable heuristics in
@@ -410,11 +419,15 @@ Phase B progress:
   dashboard, listing detail, listing management, inbox/notification,
   profile/report, admin, and community-home patterns while preserving current
   SLC behavior.
-- May 16 closeout smoke covered `/`, `/marketplace`, `/dashboard`, and
-  `/admin/community` on the local desktop Browser session with no framework
-  overlay or console warning/error output. Full mobile viewport visual QA
-  remains a Phase F/readiness item because Playwright is not available as a
-  repo command and the in-app Browser surface did not expose viewport resizing.
+- Subsequent route passes shipped as PRs #70 through #80, covering signed-in
+  home next actions, onboarding entry, app navigation, public landing
+  activation, marketplace filters, listing detail contact hierarchy, listing
+  form workflow hierarchy, seller inventory lifecycle, inbox item/thread
+  hierarchy, notification activity rows, and profile/storefront trust
+  hierarchy.
+- Browser smoke has covered representative desktop and 390px mobile views for
+  several changed surfaces, but a single final Phase F QA sweep is still needed
+  before calling the overhaul complete.
 
 Acceptance notes:
 
@@ -462,14 +475,13 @@ Acceptance notes:
 
 Planned before Phase 6:
 
-- Complete the UI/UX overhaul in `docs/ui-ux-overhaul-guide.md`.
-- Simplify onboarding and first-run flow from public entry to community access.
-- Reduce generic dashboard patterns, nested cards, excess chips, and decorative
-  AI-style visuals.
-- Make the signed-in home, marketplace, listing detail, seller flows, inbox,
-  profile, and storefront feel more personal, local, and task-focused.
-- Preserve all current SLC behavior while improving visual hierarchy, content
-  voice, mobile usability, and state coverage.
+- Complete Phase F closeout for the UI/UX overhaul in
+  `docs/ui-ux-overhaul-guide.md`.
+- Run final desktop/mobile route QA, accessibility/state review, and
+  `pnpm slc:ready`.
+- Fix only concrete visual, interaction, or state regressions found during that
+  closeout.
+- Preserve all current SLC behavior while improving launch readiness.
 
 Completed in Phase 1:
 

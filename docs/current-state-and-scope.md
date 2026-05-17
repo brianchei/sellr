@@ -1,6 +1,6 @@
 # Sellr Current State And Scope
 
-Last updated: May 15, 2026.
+Last updated: May 17, 2026.
 
 ## Product Scope
 
@@ -14,20 +14,21 @@ Sellr itself remains a general community marketplace. UW-specific behavior is
 scoped to the launch community gate and contextual onboarding guidance.
 
 The Phase 1 web polish pass has shipped. The public landing page and
-authenticated app now share the same refreshed Sellr design language: production
-brand assets, metadata/icons, community-first landing copy, interactive product
-preview, warm gradient shells, rounded elevated app panels, high-contrast
-actions, and refreshed marketplace, listing, messaging, seller, admin, login,
-and onboarding surfaces.
+authenticated app share the refreshed Sellr design language: production brand
+assets, metadata/icons, community-first landing copy, interactive product
+preview, high-contrast actions, and refreshed marketplace, listing, messaging,
+seller, admin, login, and onboarding surfaces.
 
-Before Phase 6 AI work, the next product-development priority is the UI/UX
-overhaul in [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md). The guide
-now records the repository/route audit, current experience diagnosis,
-activation-oriented onboarding strategy, screen-by-screen direction, component
-system guidance, microcopy system, accessibility bar, UX metrics, and Phase A-F
-implementation plan. The goal is to simplify onboarding and the current
-buyer/seller loop, make the app feel more personal and local, and remove generic
-"AI/vibe-coded" UI patterns without adding new product scope.
+The Pre-Phase-6 UI/UX overhaul has progressed beyond the initial foundation
+pass. The shipped route-level passes now cover onboarding/auth entry, app
+navigation, signed-in home/dashboard, marketplace browse/filter density,
+listing detail contact hierarchy, listing creation/edit hierarchy, seller
+inventory lifecycle, inbox item/thread hierarchy, notifications, admin density,
+and profile/storefront trust hierarchy. Before Phase 6 AI work, the remaining
+product-development priority is Phase F closeout: documentation alignment,
+responsive/accessibility QA, state coverage review, and final launch-readiness
+verification. Use [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md) as the
+source of truth for what is complete versus deferred.
 
 ## Production State
 
@@ -134,19 +135,22 @@ Included:
 
 ## Next Product Priority
 
-Complete the Pre-Phase 6 UI/UX overhaul before adding the AI listing assistant.
-Use `docs/ui-ux-overhaul-guide.md` as the implementation handoff. The redesign
-should preserve current auth, community, listing, media, messaging, reporting,
-and admin behavior while simplifying the experience across landing, onboarding,
-home, marketplace, listing detail, seller flows, inbox, profile, storefront, and
-notifications. Phase B foundation work is complete for the current scope:
-lighter app surfaces, rows, fields, chips, alerts, empty states, listing cards,
-seller trust cards, buttons, and authenticated shell patterns are in place while
-preserving existing behavior. May 16 Browser DOM smoke covered the public entry,
-core buyer/seller routes, seller storefront, notifications, and admin community
-and reports routes; mobile viewport automation still needs a dedicated tool
-before launch readiness. Continue with Phase C onboarding/navigation and first
-signed-in action work before beginning Phase 6 AI.
+Finish the Pre-Phase-6 UI/UX overhaul closeout before adding the AI listing
+assistant. The core route implementation passes through Phase E are now shipped
+on `main`; avoid starting another broad "next slice" unless a fresh audit finds
+a concrete regression. The remaining work is Phase F:
+
+- Reconcile docs after the shipped route passes so future sessions do not repeat
+  completed Phase C, D, or E work.
+- Run a final desktop and mobile visual smoke pass across the public entry,
+  auth/onboarding, home, marketplace, listing detail, listing form, inventory,
+  inbox/thread, notifications, profile/storefront, and admin routes.
+- Audit accessibility and state coverage for loading, empty, error, validation,
+  success, focus, dialog, and disabled states.
+- Run `pnpm slc:ready` plus focused web lint/typecheck/test/build checks, or
+  document any environment blockers.
+- Add real launch proof, testimonials, statistics, and approved imagery only
+  after those assets exist and are approved.
 
 ## Deliberately Deferred
 
