@@ -42,7 +42,7 @@ function formatPreviewPickup(values: ListingFormValues): string {
     return neighborhood;
   }
 
-  return `${neighborhood} - ${formatRadius(radius)} radius`;
+  return `${neighborhood}, ${formatRadius(radius)} radius`;
 }
 
 export function ListingBuyerPreview({
@@ -62,10 +62,10 @@ export function ListingBuyerPreview({
   const category = values.subcategory.trim() || values.category;
 
   return (
-    <section className="app-panel-soft p-5">
+    <section className="app-panel-soft p-5" aria-label="Buyer preview">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold">Buyer preview</h2>
-        <span className="rounded-full bg-[#111111] px-2.5 py-1 text-xs font-semibold text-[var(--color-brand-primary)]">
+        <span className="app-chip bg-[var(--bg-primary)] text-[var(--text-secondary)]">
           Draft
         </span>
       </div>
@@ -84,7 +84,7 @@ export function ListingBuyerPreview({
       </div>
 
       <div className="mt-4">
-        <p className="inline-flex rounded-full bg-[var(--color-brand-primary)] px-3 py-1 text-xl font-bold text-[var(--text-primary)]">
+        <p className="text-xl font-semibold leading-none text-[var(--text-primary)]">
           {formatPreviewPrice(values.price)}
         </p>
         <h3 className="mt-1 line-clamp-2 break-words text-base font-semibold text-[var(--text-primary)]">
