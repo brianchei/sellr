@@ -1029,9 +1029,13 @@ Closeout QA notes:
   seller listing from any seller community and checks buyer/admin membership by
   inclusion rather than assuming the first community returned by `/auth/me` is
   the listing community.
-- Remaining Phase F risks: logged-out auth/onboarding visual QA,
-  report-dialog interaction/focus QA, populated notifications QA, non-own
-  seller contact/report QA, and incomplete-profile blocked-action states.
+- May 17 follow-up hardened the reusable report dialog interaction path with
+  initial focus, focus containment, Escape close, trigger focus restoration,
+  submit-success focus, local validation coverage, and a Browser smoke on a
+  buyer-visible listing report action.
+- Remaining Phase F risks: logged-out auth/onboarding visual QA, populated
+  notifications QA, populated inbox thread QA, non-own seller contact-send QA,
+  report submit API smoke, and incomplete-profile blocked-action states.
 
 ## Process Audit Notes
 

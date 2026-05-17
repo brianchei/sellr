@@ -96,9 +96,15 @@ May 17 Phase F progress: Browser smoke covered the main route list at 1280px
 desktop and 390px mobile, focused web checks passed, and `pnpm slc:ready`
 passed locally outside the sandbox after the authenticated web route smoke was
 made robust for multi-community demo users. Remaining closeout risks are
-logged-out auth/onboarding visual QA, report-dialog interaction/focus QA,
-populated notifications QA, non-own seller contact/report QA, and
+logged-out auth/onboarding visual QA, populated notifications QA, populated
+inbox thread QA, non-own seller contact-send QA, report submit API smoke, and
 incomplete-profile blocked-action states.
+
+May 17 follow-up: report dialog focus, keyboard containment, local validation,
+and success-state focus are now hardened with component tests. Browser smoke
+verified the report action on a buyer-visible listing opens correctly, focuses
+the details field, wraps keyboard focus, announces local validation, and returns
+focus to the trigger on Escape.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless
