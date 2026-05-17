@@ -12,6 +12,7 @@ For the higher-level handoff checklist, see
 With Redis, Supabase/Postgres, API, and web running:
 
 ```bash
+pnpm smoke:auth-onboarding
 pnpm smoke:seller
 pnpm smoke:buyer
 pnpm smoke:inbox
@@ -26,6 +27,11 @@ typecheck, test, and build checks, run:
 ```bash
 pnpm slc:ready
 ```
+
+The auth/onboarding script confirms the logged-out auth state, checks `/login`
+and `/onboarding` HTML responses, signs in with a local `@wisc.edu` email OTP,
+resets the smoke user's community membership, joins by verified email domain,
+and confirms the joined session reaches `/dashboard`.
 
 The seller script signs in through the web `/api/v1` proxy, confirms
 `/auth/me`, uploads a temporary listing image, creates a temporary listing,
@@ -62,6 +68,10 @@ the API directly instead of the web proxy.
 Override the web route target with
 `SELLR_SMOKE_WEB_BASE_URL=http://localhost:3000` if the web app is served from a
 different local origin.
+
+Override the reusable onboarding email with
+`SELLR_SMOKE_ONBOARDING_EMAIL=your-smoke-user@wisc.edu` when you need to avoid
+local provider rate limits for repeated auth/onboarding runs.
 
 ## Browser Visual Pass
 

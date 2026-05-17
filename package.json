@@ -16,6 +16,7 @@
     "db:deploy": "pnpm --filter @sellr/api db:deploy",
     "db:studio": "pnpm --filter @sellr/api db:studio",
     "env:web": "node scripts/ensure-web-env.cjs",
+    "smoke:auth-onboarding": "node scripts/smoke-auth-onboarding.cjs",
     "smoke:seller": "node scripts/smoke-seller-lifecycle.cjs",
     "smoke:buyer": "node scripts/smoke-buyer-contact.cjs",
     "smoke:inbox": "node scripts/smoke-inbox-thread.cjs",

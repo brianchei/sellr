@@ -96,9 +96,9 @@ May 17 Phase F progress: Browser smoke covered the main route list at 1280px
 desktop and 390px mobile, focused web checks passed, and `pnpm slc:ready`
 passed locally outside the sandbox after the authenticated web route smoke was
 made robust for multi-community demo users. Remaining closeout risks are
-logged-out auth/onboarding visual QA, populated inbox thread rendered visual
-QA, and a seeded incomplete-profile visual Browser smoke if a launch fixture is
-added.
+populated inbox thread rendered visual QA, authenticated no-community
+onboarding visual QA if final signoff requires a screenshot, and a seeded
+incomplete-profile visual Browser smoke if a launch fixture is added.
 
 May 17 follow-up: report dialog focus, keyboard containment, local validation,
 and success-state focus are now hardened with component tests. Browser smoke
@@ -133,6 +133,16 @@ verifies unread filtering, marks one notification read, and confirms
 mark-all-read clears remaining unread state. The notifications smoke is wired
 into `pnpm slc:ready`. Browser smoke also verified populated `/notifications`
 at desktop and mobile widths, including the mark-all-read interaction.
+
+May 17 follow-up: logged-out auth and email-first onboarding now have API/HTML
+smoke coverage through `pnpm smoke:auth-onboarding`, which checks logged-out
+`/auth/me`, `/login` and `/onboarding` HTML responses, verifies a reusable
+`@wisc.edu` smoke email, resets that smoke user's community membership, joins
+by verified email domain, and confirms `/dashboard` reachability. The smoke is
+wired into `pnpm slc:ready`. Browser smoke also verified the logged-out
+`/login` screen; Browser text entry was blocked by the local virtual clipboard,
+so authenticated no-community `/onboarding` visual QA remains a possible final
+signoff follow-up if a screenshot is required.
 
 Defer payments, escrow, advanced KYC, ratings/reputation, complex moderation,
 delivery/logistics, advanced AI/recommendations, and native mobile polish unless

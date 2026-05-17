@@ -66,6 +66,7 @@ If you need to run the same checks manually, use:
 
 ```bash
 pnpm --filter @sellr/api exec prisma db seed
+pnpm smoke:auth-onboarding
 pnpm smoke:seller
 pnpm smoke:buyer
 pnpm smoke:inbox
@@ -188,6 +189,11 @@ onboarding; use the seeded phone users below for the repeatable smoke fixtures.
 The seller smoke test uploads a temporary listing image and deletes its
 temporary listing at the end. The buyer smoke test appends a `[smoke]` message
 to the seeded conversation.
+The auth/onboarding smoke reuses `sellr-smoke-onboarding@wisc.edu` by default,
+removes that smoke user's existing community memberships, then rejoins by
+verified email domain. Override it with `SELLR_SMOKE_ONBOARDING_EMAIL` when
+running many local auth checks against provider rate limits.
+
 Rerun the seed when you want to reset demo content; it clears local `Dev Campus`
 demo listings, conversations, reports, and notifications before recreating the
 fixtures.

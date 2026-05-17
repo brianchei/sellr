@@ -27,6 +27,7 @@ Requirements:
 Environment overrides:
   SELLR_SMOKE_API_BASE_URL   Defaults to http://localhost:3000/api/v1
   SELLR_SMOKE_WEB_BASE_URL   Defaults to http://localhost:3000
+  SELLR_SMOKE_ONBOARDING_EMAIL Defaults to sellr-smoke-onboarding@wisc.edu
   SELLR_SMOKE_OTP            Defaults to 000000
 `);
   process.exit(0);
@@ -49,6 +50,11 @@ const phases = [
   {
     name: 'SLC smoke tests',
     steps: [
+      {
+        label: 'Auth onboarding smoke',
+        command: pnpm,
+        args: ['smoke:auth-onboarding'],
+      },
       { label: 'Seller lifecycle smoke', command: pnpm, args: ['smoke:seller'] },
       { label: 'Buyer contact smoke', command: pnpm, args: ['smoke:buyer'] },
       { label: 'Inbox thread smoke', command: pnpm, args: ['smoke:inbox'] },
