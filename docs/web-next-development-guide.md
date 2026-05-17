@@ -355,7 +355,7 @@ trustworthy, attractive, and purpose-built for local community resale before
 adding AI.
 
 Status: implementation passes through Phase E are shipped on `main`; Phase F
-closeout remains before Phase 6 begins.
+closeout checks for the current web SLC have also passed.
 
 Source guide:
 
@@ -373,7 +373,8 @@ Implementation phases:
 - Phase E: trust and coordination flows. Shipped across buyer contact,
   inbox/thread hierarchy, notifications, safety/reporting context, and admin
   density.
-- Phase F: polish and launch readiness. Remaining.
+- Phase F: polish and launch readiness. Complete for the current web SLC;
+  remaining follow-ups are optional or asset-dependent.
 
 Completed route-level work:
 
@@ -390,11 +391,14 @@ Completed route-level work:
 - Aligned inbox, thread, notifications, profile, storefront, report, admin, and
   community-home surfaces with the lighter token and interaction patterns.
 
-Remaining Phase F work:
+Phase F closeout state:
 
-- Complete the remaining manual QA follow-ups from the May 17 route smoke:
-  authenticated no-community onboarding visual QA if final signoff requires a
-  screenshot, and a seeded incomplete-profile visual Browser smoke if a launch
+- Core route, state, responsive, accessibility, and readiness checks have run.
+  Do not start another broad route pass unless a fresh audit finds a concrete
+  regression.
+- Optional manual QA follow-ups remain only if specifically needed for final
+  signoff: authenticated no-community onboarding visual QA if a screenshot is
+  required, and a seeded incomplete-profile visual Browser smoke if a launch
   fixture is added.
 - Populated inbox thread API coverage now exists through `pnpm smoke:inbox`,
   which is wired into `pnpm slc:ready`; desktop rendered QA also passed through
@@ -421,10 +425,10 @@ Remaining Phase F work:
   added focused tests for invalid email and OTP error states. `pnpm slc:ready`
   passed after a transient authenticated route-smoke failure cleared on isolated
   rerun.
-- Rerun `pnpm slc:ready` before final handoff only if additional code changes
-  land.
+- Rerun `pnpm slc:ready` before handoff only if additional code changes land.
 - Keep docs current so future sessions do not restart completed Phase C, D, or
-  E slices.
+  E slices, and do not reopen Phase F without a concrete regression or optional
+  launch-evidence request.
 
 Pre-Phase-6 progress:
 
@@ -449,8 +453,8 @@ Pre-Phase-6 progress:
   hierarchy, notification activity rows, and profile/storefront trust
   hierarchy.
 - Browser smoke has covered representative desktop and 390px mobile views for
-  several changed surfaces, but a single final Phase F QA sweep is still needed
-  before calling the overhaul complete.
+  the main public, buyer/seller, messaging, notification, profile/storefront,
+  and admin surfaces, and Phase F closeout is documented for the current SLC.
 - May 17 Phase F work added a broader Browser route smoke at 1280px and 390px,
   documented remaining manual QA risks in `docs/ui-ux-overhaul-guide.md`, fixed
   the authenticated web smoke for multi-community demo users, and got
@@ -512,12 +516,13 @@ Acceptance notes:
 
 Planned before Phase 6:
 
-- Complete Phase F closeout for the UI/UX overhaul in
+- Preserve the completed Phase F closeout recorded in
   `docs/ui-ux-overhaul-guide.md`.
-- Run final desktop/mobile route QA, accessibility/state review, and
-  `pnpm slc:ready`.
+- Rerun desktop/mobile route QA, accessibility/state review, and
+  `pnpm slc:ready` only after additional code changes or a concrete regression
+  report.
 - Fix only concrete visual, interaction, or state regressions found during that
-  closeout.
+  follow-up.
 - Preserve all current SLC behavior while improving launch readiness.
 
 Completed in Phase 1:

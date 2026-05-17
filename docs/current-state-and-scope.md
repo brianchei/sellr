@@ -24,11 +24,11 @@ pass. The shipped route-level passes now cover onboarding/auth entry, app
 navigation, signed-in home/dashboard, marketplace browse/filter density,
 listing detail contact hierarchy, listing creation/edit hierarchy, seller
 inventory lifecycle, inbox item/thread hierarchy, notifications, admin density,
-and profile/storefront trust hierarchy. Before Phase 6 AI work, the remaining
-product-development priority is Phase F closeout: documentation alignment,
-responsive/accessibility QA, state coverage review, and final launch-readiness
-verification. Use [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md) as the
-source of truth for what is complete versus deferred.
+and profile/storefront trust hierarchy. Phase F closeout for the current web
+SLC is now effectively complete: documentation alignment, responsive route
+smoke, accessibility/state review, and SLC readiness verification have all been
+run. Use [`ui-ux-overhaul-guide.md`](./ui-ux-overhaul-guide.md) as the source
+of truth for what is complete versus deferred.
 
 ## Production State
 
@@ -135,10 +135,11 @@ Included:
 
 ## Next Product Priority
 
-Finish the Pre-Phase-6 UI/UX overhaul closeout before adding the AI listing
-assistant. The core route implementation passes through Phase E are now shipped
-on `main`; avoid starting another broad "next slice" unless a fresh audit finds
-a concrete regression. The remaining Phase F work is narrow:
+The Pre-Phase-6 UI/UX overhaul is closed for the current web SLC. The core route
+implementation passes through Phase E are shipped on `main`, and Phase F
+closeout checks have run. Avoid starting another broad "next slice" unless a
+fresh audit finds a concrete regression. Remaining work is optional or
+asset-dependent:
 
 - Capture authenticated no-community onboarding visual QA only if final signoff
   requires a fresh screenshot.
@@ -185,10 +186,10 @@ accessibility/state audit found and fixed one concrete login gap: invalid
 email/code states now connect the visible error alert to the active input with
 `aria-describedby`, with focused web tests covering the repair. The same pass
 reran `pnpm slc:ready` successfully after a transient authenticated-route smoke
-failure cleared on isolated rerun. Remaining closeout risks are authenticated
-no-community onboarding visual QA if final signoff requires a fresh screenshot
-and a seeded incomplete-profile visual Browser smoke if a launch fixture is
-added.
+failure cleared on isolated rerun. Optional launch-evidence risks are
+authenticated no-community onboarding visual QA if final signoff requires a
+fresh screenshot and a seeded incomplete-profile visual Browser smoke if a
+launch fixture is added.
 
 ## Deliberately Deferred
 
