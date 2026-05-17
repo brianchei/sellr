@@ -5,128 +5,49 @@ import { LandingAppPreview } from '@/components/landing-app-preview';
 
 const proofItems = [
   {
-    value: 'Badger Market',
-    label: 'launch community',
-    detail: 'A UW-Madison focused first community instead of a generic board.',
+    value: 'wisc.edu',
+    label: 'verified access',
+    detail: 'Join Badger Market with student email before browsing or selling.',
     icon: 'community',
   },
   {
-    value: 'wisc.edu',
-    label: 'verified access',
-    detail: 'Students can join with school email before browsing or selling.',
+    value: 'Listings first',
+    label: 'marketplace scan',
+    detail: 'See photos, price, condition, pickup area, and seller context fast.',
     icon: 'verified',
   },
   {
-    value: 'Photo-first',
-    label: 'better listing context',
-    detail: 'Buyers can judge condition, pickup fit, and seller intent faster.',
+    value: 'Item inbox',
+    label: 'anchored messages',
+    detail: 'Conversations stay tied to the listing and the verified community.',
     icon: 'photos',
   },
   {
-    value: 'Inbox + reports',
-    label: 'trust loop live',
-    detail: 'Contact, replies, notifications, and reporting are already wired.',
+    value: 'Safer pickup',
+    label: 'privacy-minded',
+    detail: 'Start with approximate area and share exact details only in conversation.',
     icon: 'messages',
-  },
-] as const;
-
-const painItems = [
-  {
-    title: 'Anonymous profiles make pickup feel risky',
-    copy: 'Most resale apps ask buyers and sellers to trust a thin profile, a fuzzy location, and a rushed message thread.',
-  },
-  {
-    title: 'The listing is easy, the handoff is not',
-    copy: 'The real work is schedule, pickup area, expectations, and deciding whether the person on the other side will show up.',
-  },
-  {
-    title: 'Conversations lose item context fast',
-    copy: 'Once price, timing, and seller identity drift apart, a simple local sale starts to feel like a mystery DM.',
   },
 ] as const;
 
 const flowSteps = [
   {
     n: '01',
-    title: 'Verify the community',
-    copy: 'Join Badger Market with a verified UW email or trusted invite code.',
+    title: 'Verify access',
+    copy: 'Use your UW email or a trusted invite code to open Badger Market.',
     visual: 'wisc.edu verified',
   },
   {
     n: '02',
-    title: 'Post or browse structured listings',
-    copy: 'Price, condition, photos, pickup area, and availability show up before the first message.',
+    title: 'Browse or list',
+    copy: 'Compare useful campus items, or post your own with photos and pickup context.',
     visual: '$140 desk / Lakeshore',
   },
   {
     n: '03',
     title: 'Message from the item',
-    copy: 'Every buyer thread starts from a listing, so the seller and item context stay attached.',
+    copy: 'Start the conversation from the listing so seller, item, and community stay attached.',
     visual: 'Maya -> walnut desk',
-  },
-  {
-    n: '04',
-    title: 'Coordinate local pickup',
-    copy: 'Start with approximate area and timing, then share exact details only when both sides are ready.',
-    visual: 'Sat 10-2 / campus',
-  },
-] as const;
-
-const benefits = [
-  {
-    title: 'Buy with shared local context',
-    copy: 'See community membership, seller identity, pickup area, and listing details in one place.',
-  },
-  {
-    title: 'Sell with fewer back-and-forths',
-    copy: 'Structured listing fields help buyers understand price, condition, timing, and pickup fit before they ask.',
-  },
-  {
-    title: 'Keep coordination item-anchored',
-    copy: 'Messages stay tied to the item and seller, making the next step easier to scan.',
-  },
-  {
-    title: 'Moderate the first trust loop',
-    copy: 'Reports, admin review, and explicit listing removal give communities practical control.',
-  },
-] as const;
-
-const commitments = [
-  {
-    title: 'Built for verified communities',
-    copy: 'Community access, seller identity, and listing context appear before high-intent actions.',
-  },
-  {
-    title: 'Focused on safer handoffs',
-    copy: 'Approximate pickup areas and item-anchored messages keep coordination clear without exposing exact addresses too early.',
-  },
-  {
-    title: 'Ready for real student stories',
-    copy: 'The page is structured to feature launch testimonials and community stats as soon as they are available.',
-  },
-] as const;
-
-const accessPlans = [
-  {
-    title: 'Browse',
-    price: 'Free',
-    label: 'for verified members',
-    featured: false,
-    items: ['Community-scoped listings', 'Seller trust cards', 'Saved item context'],
-  },
-  {
-    title: 'Sell',
-    price: 'Free',
-    label: 'highlighted for launch',
-    featured: true,
-    items: ['Photo-backed listings', 'Buyer contact inbox', 'Sold lifecycle tools'],
-  },
-  {
-    title: 'Admin',
-    price: 'Invite only',
-    label: 'for community operators',
-    featured: false,
-    items: ['Invite-code setup', 'Member management', 'Report review'],
   },
 ] as const;
 
@@ -160,15 +81,11 @@ const faqs = [
 
 export default function Home() {
   return (
-    <main className="bg-[linear-gradient(180deg,#fff9d7_0%,#f7f4ea_22%,#ffffff_48%,#f1f0fb_72%,#111111_100%)] text-[var(--text-primary)]">
+    <main className="bg-[linear-gradient(180deg,#fff9d7_0%,#ffffff_34%,#f7f4ea_76%,#111111_100%)] text-[var(--text-primary)]">
       <Header />
       <Hero />
       <CommunityProof />
-      <ProblemPain />
       <HowItWorks />
-      <Benefits />
-      <TrustCommitments />
-      <LaunchAccess />
       <Faq />
       <FinalCta />
       <Footer />
@@ -206,9 +123,8 @@ function Hero() {
             Badger Market
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
-            Sellr&apos;s verified UW-Madison marketplace for local listings,
-            item-tied messages, and pickup coordination that starts with
-            community context.
+            Sellr&apos;s verified UW-Madison marketplace for buying, selling, and
+            messaging around local items before pickup details get personal.
           </p>
 
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -220,21 +136,21 @@ function Hero() {
               <ArrowRightIcon />
             </Link>
             <Link
-              href="#preview"
+              href="#how-it-works"
               className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/80 px-5 py-3 text-sm font-semibold text-[var(--text-primary)] no-underline transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-contrast-muted)]"
             >
-              Preview listings
+              See how it works
             </Link>
           </div>
           <div className="mx-auto mt-4 flex max-w-2xl flex-wrap items-center justify-center gap-2 text-xs font-semibold text-[var(--text-secondary)]">
             <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1">
-              wisc.edu access
+              wisc.edu verified
             </span>
             <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1">
-              Approximate pickup areas
+              Community-scoped listings
             </span>
             <span className="rounded-full border border-black/10 bg-white/70 px-3 py-1">
-              Item-linked inbox
+              Item-linked messages
             </span>
           </div>
         </div>
@@ -264,12 +180,12 @@ function CommunityProof() {
               id="proof-heading"
               className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl"
             >
-              The marketplace opens around the item, seller, and pickup.
+              Join once, then get straight to the marketplace.
             </h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-            Join with verified access, then browse listings with photos,
-            seller context, and messages that stay attached to the item.
+            Badger Market keeps access, listings, seller context, and messages
+            inside the same verified community.
           </p>
         </div>
 
@@ -299,58 +215,6 @@ function CommunityProof() {
   );
 }
 
-function ProblemPain() {
-  return (
-    <section
-      id="why"
-      aria-labelledby="pain-heading"
-      className="bg-[radial-gradient(circle_at_25%_0%,#34295f_0%,#111111_38%,#050505_100%)] text-white"
-    >
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-          <div>
-            <p className="text-xs font-semibold uppercase text-[#f6e84c]">
-              The pain
-            </p>
-            <h2
-              id="pain-heading"
-              className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl"
-            >
-              Local resale breaks after the listing.
-            </h2>
-            <p className="mt-5 max-w-md text-base leading-7 text-white/70">
-              The hard part is not posting a desk or finding a lamp. It is
-              knowing who you are meeting, what community they belong to, and
-              whether the pickup will actually happen.
-            </p>
-          </div>
-
-          <div className="grid gap-4">
-            {painItems.map((item, index) => (
-              <article
-                key={item.title}
-                className="grid gap-4 rounded-3xl border border-white/10 bg-white/[0.06] p-5 sm:grid-cols-[5rem_1fr] sm:p-6"
-              >
-                <span className="text-5xl font-semibold leading-none text-[#f6e84c]">
-                  0{index + 1}
-                </span>
-                <div>
-                  <h3 className="text-xl font-semibold leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-white/70">
-                    {item.copy}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function HowItWorks() {
   return (
     <section
@@ -367,255 +231,73 @@ function HowItWorks() {
             id="how-heading"
             className="mt-3 text-4xl font-semibold leading-tight sm:text-5xl"
           >
-            See the buyer/seller path in four moves.
+            Three moves from access to pickup intent.
           </h2>
         </div>
 
-        <div className="mt-10 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded-[2rem] border border-black/10 bg-white p-4 shadow-xl shadow-black/5">
-            <div className="rounded-[1.5rem] bg-[#111111] p-4 text-white">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <span className="text-sm font-semibold">Sellr flow demo</span>
-                <span className="rounded-full bg-[#f6e84c] px-3 py-1 text-xs font-semibold text-black">
-                  30 sec path
-                </span>
-              </div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {flowSteps.map((step) => (
-                  <div
-                    key={step.n}
-                    className="rounded-2xl border border-white/10 bg-white/[0.06] p-4"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-sm font-semibold text-[#f6e84c]">
-                        {step.n}
-                      </span>
-                      <span className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/75">
+        <div className="mt-10 grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="rounded-2xl border border-black/10 bg-white p-5">
+            <ol className="divide-y divide-black/10">
+              {flowSteps.map((step) => (
+                <li
+                  key={step.n}
+                  className="grid gap-3 py-4 first:pt-0 last:pb-0 sm:grid-cols-[3.5rem_1fr]"
+                >
+                  <span className="text-sm font-semibold text-[var(--color-brand-contrast)]">
+                    {step.n}
+                  </span>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-lg font-semibold">{step.title}</h3>
+                      <span className="rounded-full bg-[var(--color-brand-primary-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-brand-primary-strong)]">
                         {step.visual}
                       </span>
                     </div>
-                    <h3 className="mt-6 text-lg font-semibold">
-                      {step.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-white/70">
+                    <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
                       {step.copy}
                     </p>
                   </div>
-                ))}
-              </div>
-            </div>
+                </li>
+              ))}
+            </ol>
           </div>
 
-          <div className="rounded-[2rem] border border-black/10 bg-white p-6">
+          <div className="rounded-2xl border border-black/10 bg-white p-5">
             <p className="text-xs font-semibold uppercase text-[var(--color-brand-contrast)]">
               App preview
             </p>
-            <h3 className="mt-4 text-3xl font-semibold leading-tight">
+            <h3 className="mt-3 text-2xl font-semibold leading-tight">
               The flow stays tied to the item.
             </h3>
-            <p className="mt-4 text-sm leading-6 text-[var(--text-secondary)]">
+            <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
               Listing details, seller context, and messages stay connected from
               browse to pickup, so buyers and sellers do not have to rebuild
               trust in a separate thread.
             </p>
-            <div className="mt-8 overflow-hidden rounded-3xl border border-black/10 bg-[#f7f4ea]">
+            <div className="mt-6 overflow-hidden rounded-2xl border border-black/10 bg-[#f7f4ea]">
               <div className="grid grid-cols-3 border-b border-black/10 text-xs font-semibold">
                 <span className="bg-[#f6e84c] px-3 py-2">Verify</span>
                 <span className="px-3 py-2">List</span>
                 <span className="px-3 py-2">Meet</span>
               </div>
               <div className="p-4">
-                <div className="rounded-2xl bg-white p-4">
+                <div className="rounded-xl bg-white p-4">
                   <p className="text-sm font-semibold">Walnut writing desk</p>
                   <p className="mt-1 text-xs text-[var(--text-secondary)]">
                     $140 / Lakeshore / Maya R.
                   </p>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-3 text-xs font-semibold">
-                  <div className="rounded-2xl bg-white p-3">
+                  <div className="rounded-xl bg-white p-3">
                     Verified community
                   </div>
-                  <div className="rounded-2xl bg-white p-3">
+                  <div className="rounded-xl bg-white p-3">
                     Item-linked inbox
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Benefits() {
-  return (
-    <section
-      id="benefits"
-      aria-labelledby="benefits-heading"
-      className="bg-[linear-gradient(180deg,#ffffff_0%,#f7f4ea_100%)]"
-    >
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase text-[var(--color-brand-contrast)]">
-            Features as benefits
-          </p>
-          <h2
-            id="benefits-heading"
-            className="mt-3 text-4xl font-semibold leading-tight sm:text-5xl"
-          >
-            Outcomes buyers and sellers can feel.
-          </h2>
-        </div>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {benefits.map((benefit) => (
-            <article
-              key={benefit.title}
-              className="rounded-3xl border border-black/10 bg-[#f7f4ea] p-5"
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f6e84c] text-black">
-                <CheckIcon />
-              </span>
-              <h3 className="mt-6 text-xl font-semibold leading-snug">
-                {benefit.title}
-              </h3>
-              <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
-                {benefit.copy}
-              </p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TrustCommitments() {
-  return (
-    <section
-      aria-labelledby="commitments-heading"
-      className="border-y border-black/10 bg-[linear-gradient(135deg,#fff9d7_0%,#f7f4ea_46%,#f1f0fb_100%)]"
-    >
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase text-[var(--color-brand-contrast)]">
-              Trust commitments
-            </p>
-            <h2
-              id="commitments-heading"
-              className="mt-3 text-4xl font-semibold leading-tight sm:text-5xl"
-            >
-              Trust starts before the meetup.
-            </h2>
-            <p className="mt-4 max-w-xl text-base leading-7 text-[var(--text-secondary)]">
-              The first launch page should make the buyer and seller feel
-              understood, even before community stories and usage stats are
-              ready to publish.
-            </p>
-          </div>
-
-          <div className="grid gap-3">
-            {commitments.map((item) => (
-              <article
-                key={item.title}
-                className="rounded-3xl border border-black/10 bg-white p-5"
-              >
-                <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-                  {item.copy}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function LaunchAccess() {
-  return (
-    <section
-      id="access"
-      aria-labelledby="access-heading"
-      className="bg-[linear-gradient(180deg,#ffffff_0%,#fffdf0_100%)]"
-    >
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-semibold uppercase text-[var(--color-brand-contrast)]">
-            Launch access
-          </p>
-          <h2
-            id="access-heading"
-            className="mt-3 text-4xl font-semibold leading-tight sm:text-5xl"
-          >
-            Simple launch access.
-          </h2>
-          <p className="mt-4 text-base leading-7 text-[var(--text-secondary)]">
-            Browsing and selling are free for the initial community launch.
-            Community admin tools stay limited to trusted operators.
-          </p>
-        </div>
-
-        <div className="mt-10 grid gap-4 lg:grid-cols-3">
-          {accessPlans.map((plan) => (
-            <article
-              key={plan.title}
-              className={
-                plan.featured
-                  ? 'rounded-3xl border border-black bg-[#111111] p-6 text-white shadow-xl shadow-black/10'
-                  : 'rounded-3xl border border-black/10 bg-[#f7f4ea] p-6'
-              }
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-2xl font-semibold">{plan.title}</h3>
-                  <p
-                    className={
-                      plan.featured
-                        ? 'mt-1 text-sm text-white/65'
-                        : 'mt-1 text-sm text-[var(--text-secondary)]'
-                    }
-                  >
-                    {plan.label}
-                  </p>
-                </div>
-                {plan.featured ? (
-                  <span className="rounded-full bg-[#f6e84c] px-3 py-1 text-xs font-semibold text-black">
-                    Launch focus
-                  </span>
-                ) : null}
-              </div>
-
-              <p className="mt-8 text-4xl font-semibold">{plan.price}</p>
-              <ul className="mt-8 space-y-3 text-sm">
-                {plan.items.map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <span
-                      className={
-                        plan.featured
-                          ? 'flex h-5 w-5 items-center justify-center rounded-full bg-[#f6e84c] text-black'
-                          : 'flex h-5 w-5 items-center justify-center rounded-full bg-black text-white'
-                      }
-                    >
-                      <CheckIcon size={12} />
-                    </span>
-                    <span
-                      className={
-                        plan.featured
-                          ? 'text-white/80'
-                          : 'text-[var(--text-secondary)]'
-                      }
-                    >
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
         </div>
       </div>
     </section>
@@ -718,8 +400,14 @@ function Footer() {
           </p>
         </div>
 
-        <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm" aria-label="Footer">
-          <Link href="#preview" className="text-white/65 no-underline hover:text-white">
+        <nav
+          className="flex flex-wrap gap-x-6 gap-y-2 text-sm"
+          aria-label="Footer"
+        >
+          <Link
+            href="#preview"
+            className="text-white/65 no-underline hover:text-white"
+          >
             Preview
           </Link>
           <Link
@@ -729,12 +417,9 @@ function Footer() {
             How it works
           </Link>
           <Link
-            href="#benefits"
+            href="#faq"
             className="text-white/65 no-underline hover:text-white"
           >
-            Benefits
-          </Link>
-          <Link href="#faq" className="text-white/65 no-underline hover:text-white">
             FAQ
           </Link>
           <Link
@@ -855,24 +540,6 @@ function ArrowRightIcon() {
     >
       <path d="M5 12h14" />
       <path d="m12 5 7 7-7 7" />
-    </svg>
-  );
-}
-
-function CheckIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="m5 12 5 5L20 7" />
     </svg>
   );
 }
