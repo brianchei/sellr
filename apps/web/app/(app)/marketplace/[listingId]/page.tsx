@@ -436,6 +436,8 @@ export default function ListingDetailPage() {
   const isAvailable = listing?.status === 'active';
   const profileIssues = profileCompletionIssues(meQuery.data);
   const blockingProfileIssue = isOwnListing ? undefined : profileIssues[0];
+  const profileCheckBlocked =
+    !isOwnListing && (!userId || meQuery.isError || !meQuery.data);
   const status = listing ? statusDisplay(listing.status) : null;
   const freshness = useMemo(
     () => (listing ? formatRelativeListedDate(listing.createdAt) : null),
@@ -465,6 +467,10 @@ export default function ListingDetailPage() {
       setMessageError('Complete your profile before contacting a seller.');
       return;
     }
+    if (profileCheckBlocked) {
+      setMessageError('Refresh your profile check before contacting a seller.');
+      return;
+    }
     if (trimmed.length < 10) {
       setMessageError('Write a little more so the seller knows what you need.');
       return;
@@ -481,6 +487,7 @@ export default function ListingDetailPage() {
     setActiveQuickReply(reply.id);
     setMessage(reply.text);
     setMessageError(null);
+    contactMutation.reset();
   };
 
   if (listingQuery.isLoading) {
@@ -771,6 +778,7 @@ export default function ListingDetailPage() {
             sentConversationId={sentConversationId}
             profileIssue={blockingProfileIssue}
             profileLoading={!isOwnListing && meQuery.isLoading}
+            profileError={!isOwnListing && (meQuery.isError || !userId)}
             message={message}
             messageError={messageError}
             activeQuickReply={activeQuickReply}
@@ -789,7 +797,9 @@ export default function ListingDetailPage() {
               setMessage(value);
               setMessageError(null);
               setActiveQuickReply('');
+              contactMutation.reset();
             }}
+            onRetryProfile={() => void meQuery.refetch()}
             onSubmit={onSubmit}
           />
 
@@ -813,6 +823,7 @@ function ContactCard({
   sentConversationId,
   profileIssue,
   profileLoading,
+  profileError,
   message,
   messageError,
   activeQuickReply,
@@ -822,6 +833,7 @@ function ContactCard({
   errorMessage,
   onApplyQuickReply,
   onMessageChange,
+  onRetryProfile,
   onSubmit,
 }: {
   listing: ApiListing;
@@ -832,6 +844,7 @@ function ContactCard({
   sentConversationId: string | null;
   profileIssue: ProfileCompletionIssue | undefined;
   profileLoading: boolean;
+  profileError: boolean;
   message: string;
   messageError: string | null;
   activeQuickReply: string;
@@ -841,6 +854,7 @@ function ContactCard({
   errorMessage: string | null;
   onApplyQuickReply: (reply: QuickReply) => void;
   onMessageChange: (value: string) => void;
+  onRetryProfile: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   const sellerName = sellerDisplayName(listing);
@@ -931,6 +945,23 @@ function ContactCard({
           <p className="mt-1 text-sm leading-6 text-[var(--text-secondary)]">
             Sellr verifies your profile before opening seller contact.
           </p>
+        </div>
+      ) : profileError ? (
+        <div className="app-alert mt-4 p-4" role="alert">
+          <p className="text-sm font-semibold text-[var(--color-brand-warm-strong)]">
+            Could not verify your profile.
+          </p>
+          <p className="mt-1 text-sm leading-6 text-[var(--color-brand-warm-strong)] opacity-90">
+            Refresh the profile check before contacting this seller. Sellr keeps
+            messages tied to a verified profile and community.
+          </p>
+          <button
+            type="button"
+            onClick={onRetryProfile}
+            className="mt-3 inline-flex rounded-lg bg-[var(--color-brand-warm)] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[var(--color-brand-warm-strong)]"
+          >
+            Retry profile check
+          </button>
         </div>
       ) : profileIssue ? (
         <div className="mt-4 border-y border-[var(--color-brand-primary-muted)] bg-[var(--color-brand-primary-soft)] py-4">
