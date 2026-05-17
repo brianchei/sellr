@@ -989,7 +989,7 @@ Acceptance:
 
 ### Phase F - Polish And Launch Readiness
 
-Status: remaining. This is the next best work before Phase 6 AI.
+Status: in progress. This remains the next best work before Phase 6 AI.
 
 Deliver:
 
@@ -1004,6 +1004,34 @@ Acceptance:
 - Focus states and field errors meet launch quality.
 - `pnpm --filter @sellr/web lint`, `typecheck`, `build`, and `pnpm slc:ready`
   pass or documented blockers are resolved.
+
+Closeout QA notes:
+
+- May 17 Browser smoke covered the route list at 1280px desktop and 390px
+  mobile viewports: `/`, `/login`, `/onboarding`, `/dashboard`,
+  `/marketplace`, one listing detail, `/sell`, `/listings`, `/inbox`,
+  `/notifications`, `/profile`, one seller storefront, `/admin/community`, and
+  `/admin/reports`.
+- The authenticated local session redirected `/login` and `/onboarding` to
+  `/dashboard`, so logged-out auth/onboarding screens still need a focused
+  unauthenticated smoke before final launch signoff.
+- The local seed state exposed an empty inbox, so `/inbox/[conversationId]`
+  thread QA still needs seeded buyer/seller conversation data.
+- The smoke did not find horizontal overflow, route-blocking render failures,
+  or obvious clipped text on the covered desktop/mobile route snapshots.
+- One mobile admin navigation initially returned a local internal-error/login
+  state during the automated sweep, but immediate rechecks of
+  `/admin/community` and `/admin/reports` at 390px loaded correctly with no
+  console errors or horizontal overflow. Treat this as a local smoke anomaly
+  unless it reproduces.
+- `pnpm slc:ready` passed on May 17 after fixing the authenticated web route
+  smoke to support multi-community demo users. The smoke now chooses an active
+  seller listing from any seller community and checks buyer/admin membership by
+  inclusion rather than assuming the first community returned by `/auth/me` is
+  the listing community.
+- Remaining Phase F risks: logged-out auth/onboarding visual QA,
+  report-dialog interaction/focus QA, populated notifications QA, non-own
+  seller contact/report QA, and incomplete-profile blocked-action states.
 
 ## Process Audit Notes
 
