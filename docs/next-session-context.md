@@ -95,10 +95,12 @@ keep Phase 6 AI deferred until that closeout is done.
 May 17 Phase F progress: Browser smoke covered the main route list at 1280px
 desktop and 390px mobile, focused web checks passed, and `pnpm slc:ready`
 passed locally outside the sandbox after the authenticated web route smoke was
-made robust for multi-community demo users. Remaining closeout risks are
-populated inbox thread rendered visual QA, authenticated no-community
-onboarding visual QA if final signoff requires a screenshot, and a seeded
-incomplete-profile visual Browser smoke if a launch fixture is added.
+made robust for multi-community demo users. Populated inbox/thread desktop
+rendered QA also passed through Arc/Computer Use after `pnpm smoke:inbox`
+seeded the buyer/seller thread. Remaining closeout risks are authenticated
+mobile populated inbox/thread visual QA, authenticated no-community onboarding
+visual QA if final signoff requires a screenshot, and a seeded incomplete-profile
+visual Browser smoke if a launch fixture is added.
 
 May 17 follow-up: report dialog focus, keyboard containment, local validation,
 and success-state focus are now hardened with component tests. Browser smoke
@@ -125,7 +127,10 @@ thread context, checks archived filtering, and confirms a new reply restores an
 archived thread to the active inbox. The inbox smoke is wired into
 `pnpm slc:ready`. The thread reply form now exposes a busy submit state, locks
 the composer while pending, and clears failed-submit copy once the sender edits
-the reply.
+the reply. Desktop rendered QA verified the buyer `/inbox` list and latest
+Walnut study desk thread with populated conversation context, seller trust,
+report/archive actions, pickup safety copy, quick replies, and the disabled
+empty-reply state.
 
 May 17 follow-up: populated notifications behavior now has API smoke coverage
 through `pnpm smoke:notifications`, which creates real message notifications,

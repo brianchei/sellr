@@ -393,12 +393,14 @@ Completed route-level work:
 Remaining Phase F work:
 
 - Complete the remaining manual QA follow-ups from the May 17 route smoke:
-  populated inbox thread rendered visual QA, authenticated no-community
-  onboarding visual QA if final signoff requires a screenshot, and a seeded
-  incomplete-profile visual Browser smoke if a launch fixture is added.
+  authenticated mobile populated inbox/thread visual QA, authenticated
+  no-community onboarding visual QA if final signoff requires a screenshot, and
+  a seeded incomplete-profile visual Browser smoke if a launch fixture is added.
 - Populated inbox thread API coverage now exists through `pnpm smoke:inbox`,
-  which is wired into `pnpm slc:ready`; keep any remaining inbox work focused on
-  rendered desktop/mobile visual QA unless a concrete regression appears.
+  which is wired into `pnpm slc:ready`; desktop rendered QA also passed through
+  Arc/Computer Use by signing in as the smoke buyer, opening `/inbox`, and
+  checking the latest Walnut study desk thread. Keep any remaining inbox work
+  focused on authenticated mobile visual QA unless a concrete regression appears.
 - Populated notification API coverage now exists through
   `pnpm smoke:notifications`, which is wired into `pnpm slc:ready`; keep any
   remaining notification work focused on concrete regressions. The populated
