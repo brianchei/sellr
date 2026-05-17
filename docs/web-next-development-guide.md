@@ -393,9 +393,9 @@ Completed route-level work:
 Remaining Phase F work:
 
 - Complete the remaining manual QA follow-ups from the May 17 route smoke:
-  logged-out auth/onboarding visuals, report-dialog focus/submit behavior,
-  populated notifications, non-own seller contact/report, and incomplete-profile
-  blocked-action states.
+  logged-out auth/onboarding visuals, populated notifications, populated inbox
+  thread, non-own seller contact-send, report submit API smoke, and
+  incomplete-profile blocked-action states.
 - Audit accessibility and state coverage for dialogs, filters, forms, empty
   states, loading states, errors, disabled controls, focus, and mobile tap
   targets.
@@ -432,6 +432,9 @@ Pre-Phase-6 progress:
   documented remaining manual QA risks in `docs/ui-ux-overhaul-guide.md`, fixed
   the authenticated web smoke for multi-community demo users, and got
   `pnpm slc:ready` passing locally outside the sandbox.
+- May 17 follow-up hardened report dialog focus, keyboard containment,
+  validation, and success-state focus with component tests and a Browser smoke
+  on a buyer-visible listing report action.
 
 Acceptance notes:
 

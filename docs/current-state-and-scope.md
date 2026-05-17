@@ -155,10 +155,12 @@ a concrete regression. The remaining work is Phase F:
 May 17 Phase F progress: a desktop/mobile Browser route smoke covered the main
 public, buyer/seller, profile/storefront, and admin routes; focused web checks
 passed; and `pnpm slc:ready` passed locally outside the sandbox after fixing the
-authenticated web smoke to support multi-community demo users. Remaining
-closeout risks are logged-out auth/onboarding visual QA, report-dialog
-interaction/focus QA, populated notifications QA, non-own seller contact/report
-QA, and incomplete-profile blocked-action states.
+authenticated web smoke to support multi-community demo users. A follow-up
+hardened report dialog focus, keyboard containment, validation, and success
+focus with component tests and a buyer-visible listing Browser smoke. Remaining
+closeout risks are logged-out auth/onboarding visual QA, populated
+notifications QA, populated inbox thread QA, non-own seller contact-send QA,
+report submit API smoke, and incomplete-profile blocked-action states.
 
 ## Deliberately Deferred
 
