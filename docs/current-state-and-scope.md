@@ -138,17 +138,14 @@ Included:
 Finish the Pre-Phase-6 UI/UX overhaul closeout before adding the AI listing
 assistant. The core route implementation passes through Phase E are now shipped
 on `main`; avoid starting another broad "next slice" unless a fresh audit finds
-a concrete regression. The remaining work is Phase F:
+a concrete regression. The remaining Phase F work is narrow:
 
-- Reconcile docs after the shipped route passes so future sessions do not repeat
-  completed Phase C, D, or E work.
-- Run a final desktop and mobile visual smoke pass across the public entry,
-  auth/onboarding, home, marketplace, listing detail, listing form, inventory,
-  inbox/thread, notifications, profile/storefront, and admin routes.
-- Audit accessibility and state coverage for loading, empty, error, validation,
-  success, focus, dialog, and disabled states.
-- Run `pnpm slc:ready` plus focused web lint/typecheck/test/build checks, or
-  document any environment blockers.
+- Capture authenticated no-community onboarding visual QA only if final signoff
+  requires a fresh screenshot.
+- Add a seeded incomplete-profile visual Browser smoke only if a launch fixture
+  is added.
+- Rerun `pnpm slc:ready` plus focused web lint/typecheck/test/build checks only
+  after additional code changes, or document any environment blockers.
 - Add real launch proof, testimonials, statistics, and approved imagery only
   after those assets exist and are approved.
 
@@ -183,10 +180,15 @@ rendered pass then used the in-app Browser at 390px, signed in as the same buyer
 verified populated `/inbox`, opened the latest Walnut study desk thread, checked
 item/seller trust context, message history, pickup safety, quick replies,
 empty-reply disabled state, and confirmed a quick reply fills the composer and
-enables send without horizontal overflow or console warnings. Remaining closeout
-risks are authenticated no-community onboarding visual QA if final signoff
-requires a fresh screenshot and a seeded incomplete-profile visual Browser smoke
-if a launch fixture is added.
+enables send without horizontal overflow or console warnings. The final
+accessibility/state audit found and fixed one concrete login gap: invalid
+email/code states now connect the visible error alert to the active input with
+`aria-describedby`, with focused web tests covering the repair. The same pass
+reran `pnpm slc:ready` successfully after a transient authenticated-route smoke
+failure cleared on isolated rerun. Remaining closeout risks are authenticated
+no-community onboarding visual QA if final signoff requires a fresh screenshot
+and a seeded incomplete-profile visual Browser smoke if a launch fixture is
+added.
 
 ## Deliberately Deferred
 

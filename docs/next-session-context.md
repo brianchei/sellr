@@ -103,6 +103,14 @@ risks are authenticated no-community onboarding visual QA if final signoff
 requires a screenshot, and a seeded incomplete-profile visual Browser smoke if a
 launch fixture is added.
 
+May 17 follow-up: final accessibility/state audit covered dialogs, filters,
+forms, empty/loading/error/success states, disabled controls, focus behavior,
+and mobile tap/overflow risk. The audit found and fixed a concrete `/login`
+field-error association gap: invalid email/code states now reference the visible
+`login-error` alert from `aria-describedby`, with focused web tests added.
+`pnpm slc:ready` passed after a transient authenticated web-route smoke failure
+cleared on isolated rerun.
+
 May 17 follow-up: report dialog focus, keyboard containment, local validation,
 and success-state focus are now hardened with component tests. Browser smoke
 verified the report action on a buyer-visible listing opens correctly, focuses

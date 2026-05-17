@@ -1071,6 +1071,13 @@ Closeout QA notes:
   and clear remaining unread state through mark-all-read inside
   `pnpm slc:ready`. Browser smoke also verified the populated `/notifications`
   list at desktop and mobile widths, including the mark-all-read interaction.
+- May 17 follow-up completed the final accessibility/state audit across the
+  documented high-risk groups: dialogs, filters, forms, empty/loading/error/
+  success states, disabled controls, focus, and mobile tap/overflow checks. One
+  concrete gap was fixed: `/login` now ties invalid email/code states to the
+  visible error alert with `aria-describedby`, and focused tests cover the
+  repair. `pnpm slc:ready` passed after a transient authenticated web-route
+  smoke failure cleared on isolated rerun.
 - Remaining Phase F risks: authenticated no-community onboarding visual QA if
   final signoff requires a screenshot, and a seeded incomplete-profile visual
   Browser smoke if a launch fixture is added.
