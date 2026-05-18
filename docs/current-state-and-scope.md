@@ -206,6 +206,8 @@ Do not add these before launch unless explicitly requested:
 ## Immediate Launch Priorities
 
 - Seed 25-40 high-quality active listings for the initial campus launch.
+- Run `pnpm --filter @sellr/api inventory:readiness -- --community="Badger Market"`
+  after seed inventory updates.
 - Confirm launch admin can access `/admin/community` and `/admin/reports`.
 - Watch Railway logs and Resend logs during the first real-user wave.
 - Run `pnpm --filter @sellr/api media:health` after early listing activity.

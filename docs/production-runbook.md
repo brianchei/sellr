@@ -39,6 +39,27 @@ OTP, `Badger Market` join, `BADGER2026`, `cdn.sellr-ai.com` listing media,
 buyer contact, inbox, notifications, and seller listing lifecycle were verified
 on May 11, 2026.
 
+## Launch Inventory Readiness
+
+Run from the repository root with production API database environment variables
+available:
+
+```bash
+pnpm --filter @sellr/api inventory:readiness -- --community="Badger Market"
+```
+
+Use strict mode when this should fail until blocking launch inventory issues are
+fixed:
+
+```bash
+pnpm --filter @sellr/api inventory:readiness -- --community="Badger Market" --strict
+```
+
+The command reports active listing count, seller/category diversity, photo/CDN
+coverage, attached media rows, and listing/seller quality issues. See
+[`launch-inventory-readiness.md`](./launch-inventory-readiness.md) for the full
+checklist and remediation guide.
+
 ## Media Cleanup Health
 
 Run from the repository root with production API environment variables available
