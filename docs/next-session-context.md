@@ -373,8 +373,11 @@ suites are skipped by the repo safety guard.
 - Production alerting thresholds/destinations for the structured failures and
   media health signals are useful post-launch hardening, but are not a release
   blocker for the SLC.
-- Watch Railway, Resend, and media health during the first real-user wave.
-- Seed enough high-quality active listings for the initial UW-Madison launch.
+- Watch Railway, Resend, inventory readiness, and media health during the first
+  real-user wave.
+- Seed enough high-quality active listings for the initial UW-Madison launch;
+  use `pnpm --filter @sellr/api inventory:readiness -- --community="Badger Market"`
+  as the operational checklist.
 - Add real landing-page proof, testimonials, statistics, and approved
   campus/member/listing imagery only after those assets are available and
   approved.

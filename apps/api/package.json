@@ -10,6 +10,7 @@
     "test": "vitest run --passWithNoTests",
     "lint": "eslint src tests",
     "algolia:configure": "tsx src/scripts/configureAlgolia.ts",
+    "inventory:readiness": "tsx src/scripts/launchInventoryReadiness.ts",
     "media:health": "tsx src/scripts/mediaHealth.ts",
     "media:cleanup-expired": "tsx src/scripts/queueExpiredMediaCleanup.ts",
     "media:retry-failed": "tsx src/scripts/retryFailedMediaCleanup.ts",
