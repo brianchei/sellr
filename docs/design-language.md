@@ -4,6 +4,13 @@ Last updated: May 17, 2026.
 
 Sellr is a trust-native local marketplace for high-trust, peer-to-peer commerce. The product should feel structured, local, approachable, and safer than a generic listing board. It should be bright enough to feel memorable, but calm enough that buyers and sellers can scan listings, make decisions, and complete tasks quickly.
 
+Root design context now lives in `PRODUCT.md` and `DESIGN.md`. `PRODUCT.md`
+captures the strategic product register, audience, purpose, anti-references,
+principles, and accessibility expectations for design tools such as Impeccable.
+`DESIGN.md` captures the machine-readable visual tokens and design rationale in
+the Google DESIGN.md format. Use this file for expanded Sellr-specific guidance
+and implementation notes.
+
 ## Product Feel
 
 Sellr should feel:
@@ -122,25 +129,25 @@ over recreating the mark in CSS or inline SVG.
 
 ### Core Palette
 
-| Token | Hex | Role |
-| --- | --- | --- |
-| `--color-brand-primary` | `#FFE347` | Mustard. Primary brand color, primary CTA background, logo color, key highlights. |
-| `--color-brand-contrast` | `#6457A6` | Dusty grape. Contrast color, navigation active states, links, secondary CTAs, focus support. |
-| `--color-brand-secondary` | `#7D7ABC` | Soft periwinkle. Secondary surfaces, quiet badges, category accents. |
-| `--color-brand-accent` | `#23F0C7` | Tropical mint. Verified/local trust cues, success states, pickup-friendly signals. |
-| `--color-brand-warm` | `#EF767A` | Light coral. Human warmth, warnings, destructive actions, seller prompts. |
+| Token                     | Hex       | Role                                                                                         |
+| ------------------------- | --------- | -------------------------------------------------------------------------------------------- |
+| `--color-brand-primary`   | `#FFE347` | Mustard. Primary brand color, primary CTA background, logo color, key highlights.            |
+| `--color-brand-contrast`  | `#6457A6` | Dusty grape. Contrast color, navigation active states, links, secondary CTAs, focus support. |
+| `--color-brand-secondary` | `#7D7ABC` | Soft periwinkle. Secondary surfaces, quiet badges, category accents.                         |
+| `--color-brand-accent`    | `#23F0C7` | Tropical mint. Verified/local trust cues, success states, pickup-friendly signals.           |
+| `--color-brand-warm`      | `#EF767A` | Light coral. Human warmth, warnings, destructive actions, seller prompts.                    |
 
 ### Recommended Neutral Tokens
 
-| Token | Value | Role |
-| --- | --- | --- |
-| `--color-ink` | `#18181B` | Primary text and text on mustard. |
-| `--color-muted` | `#52525B` | Secondary text. |
-| `--color-subtle` | `#71717A` | Tertiary text and metadata. |
-| `--color-border` | `#E4E4E7` | Default borders and dividers. |
-| `--color-surface` | `#FFFFFF` | Cards, forms, and elevated surfaces. |
-| `--color-canvas` | `#FAFAF7` | App background. Warm off-white. |
-| `--color-canvas-tint` | `#FFF9D7` | Soft mustard-tinted callouts. |
+| Token                 | Value     | Role                                 |
+| --------------------- | --------- | ------------------------------------ |
+| `--color-ink`         | `#18181B` | Primary text and text on mustard.    |
+| `--color-muted`       | `#52525B` | Secondary text.                      |
+| `--color-subtle`      | `#71717A` | Tertiary text and metadata.          |
+| `--color-border`      | `#E4E4E7` | Default borders and dividers.        |
+| `--color-surface`     | `#FFFFFF` | Cards, forms, and elevated surfaces. |
+| `--color-canvas`      | `#FAFAF7` | App background. Warm off-white.      |
+| `--color-canvas-tint` | `#FFF9D7` | Soft mustard-tinted callouts.        |
 
 ### Usage Rules
 
@@ -358,6 +365,10 @@ Avoid:
 
 ## Implementation Notes
 
+- Start inspiration-led UI upgrade sessions from
+  `docs/ui-upgrade-reference-workflow.md`. Build a reference-intake brief before
+  code changes, then choose one small slice with explicit behavior-preservation
+  and verification notes.
 - Update the existing web CSS tokens to reflect this language before broad UI
   polish; prefer token changes that let current routes inherit a calmer app
   foundation before rewriting screens.

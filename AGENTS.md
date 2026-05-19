@@ -1,6 +1,7 @@
 # Sellr Agent Instructions
 
 ## Product Direction
+
 Sellr is a trust-native local marketplace for verified, high-trust communities.
 It is optimized for local peer-to-peer resale where identity, proximity,
 availability, and pickup coordination matter.
@@ -12,21 +13,31 @@ Before Phase 6 AI work, prioritize the documented UI/UX overhaul in
 `docs/ui-ux-overhaul-guide.md`: simplify onboarding and core flows, make the app
 feel more personal and local, and remove generic "AI/vibe-coded" UI patterns.
 
+For future inspiration-led UI upgrades, read `PRODUCT.md`, `DESIGN.md`, and
+`docs/ui-upgrade-reference-workflow.md` before proposing or implementing visual
+changes. Translate reference sources into Sellr-specific hierarchy, density,
+trust, motion, and responsive decisions rather than copying a visual skin.
+
 ## Scope Discipline
+
 Prioritize complete core flows over broad feature coverage. Defer payments,
 advanced AI, native mobile polish, complex moderation, ratings, delivery and
 logistics, advanced admin features, and marketplace growth loops unless
 explicitly requested.
 
 ## SLC Definition
+
 Included features must be Simple, Lovable, and Complete:
+
 - Simple: minimal scope and clear UX.
 - Lovable: polished enough to feel better than a generic listing board.
 - Complete: working happy path, validation, loading/empty/error states,
   responsive design, and no dead-end UI.
 
 ## Core MVP Bias
+
 Prefer work that improves:
+
 - Listing creation and listing quality
 - Browse/search/filter discovery
 - Listing detail clarity
@@ -35,6 +46,7 @@ Prefer work that improves:
 - Responsive web usability
 
 ## Current Web SLC Surface
+
 The current web SLC includes Resend email OTP login with Twilio phone fallback,
 community onboarding, marketplace browse/search/filter, listing detail, durable
 R2-backed listing photo upload, seller inventory management, sold lifecycle,
@@ -45,6 +57,7 @@ seller readiness panel on `/dashboard`. Before adding breadth, keep these flows
 polished and covered by the readiness gate.
 
 ## Current Deployment Context
+
 - GitHub Actions CI and production migration checks are passing.
 - GitHub `main` is protected; use pull requests for changes to `main`.
 - Supabase is the production Postgres/PostGIS database.
@@ -76,9 +89,12 @@ polished and covered by the readiness gate.
   `docs/custom-domain-cutover.md`, `docs/email-first-auth.md`, and
   `docs/next-session-context.md` before continuing deployment or
   production-hardening work. See `docs/ui-ux-overhaul-guide.md` before
-  continuing product UI work.
+  continuing product UI work. See `PRODUCT.md`, `DESIGN.md`, and
+  `docs/ui-upgrade-reference-workflow.md` before an inspiration-led UI upgrade
+  pass.
 
 ## Repository Map
+
 - `apps/web`: Next.js 16 App Router web SLC and seller/admin surfaces.
 - `apps/api`: Fastify API, Prisma 7 schema/client, BullMQ workers, Socket.IO.
 - `apps/mobile`: Expo React Native app. Keep compatible with Expo SDK 55.
@@ -88,6 +104,7 @@ polished and covered by the readiness gate.
   baseline reference for platform decisions.
 
 ## Architecture Rules
+
 - Keep shared domain contracts in `packages/shared`; do not duplicate enums or
   validation schemas in app code.
 - When API request/response behavior changes, update the API route, shared
@@ -103,6 +120,7 @@ polished and covered by the readiness gate.
   PostGIS proximity over exposing exact pickup addresses before acceptance.
 
 ## Web Development Rules
+
 - The web app uses Next.js 16, React 19, Tailwind CSS 4, and App Router. Do not
   assume older Next.js conventions; read relevant docs under
   `node_modules/next/dist/docs/` before changing framework-sensitive code.
@@ -115,6 +133,7 @@ polished and covered by the readiness gate.
   server data access in client components.
 
 ## API And Data Rules
+
 - Fastify routes should validate input with Zod schemas from `@sellr/shared`
   whenever the schema is reusable by clients.
 - Return consistent `ok(...)` response shapes from API modules unless an
@@ -127,6 +146,7 @@ polished and covered by the readiness gate.
   push behavior remains centralized.
 
 ## Local Development
+
 - Install dependencies with `pnpm install`.
 - Use `pnpm env:web` to create/update `apps/web/.env.local` from root env
   values.
@@ -136,6 +156,7 @@ polished and covered by the readiness gate.
 - Run migrations with `pnpm db:migrate`.
 
 ## Verification
+
 - Prefer targeted checks while iterating, then broader checks before handoff
   when practical.
 - Root commands:
@@ -153,6 +174,7 @@ polished and covered by the readiness gate.
   - `pnpm --filter @sellr/api-client typecheck`
 
 ## Engineering Rules
+
 - Follow existing architecture and package conventions.
 - Prefer completing existing scaffolding over replacing it.
 - Do not add production dependencies without justification.
@@ -164,6 +186,7 @@ polished and covered by the readiness gate.
 - Summarize verification results and remaining risks.
 
 ## Handoff Checklist
+
 - Explain what changed and why.
 - Call out touched packages/apps.
 - Include verification commands and results.
