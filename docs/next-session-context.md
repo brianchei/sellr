@@ -363,6 +363,8 @@ suites are skipped by the repo safety guard.
 - Media cleanup health tooling is now implemented through API scripts:
   `media:health`, `media:cleanup-expired`, and `media:retry-failed`.
 - Production runbook coverage lives in `docs/production-runbook.md`.
+- Canonical release-day sequencing lives in
+  `docs/launch-release-checklist.md`.
 - Email-first auth setup and launch community gating lives in
   `docs/email-first-auth.md`.
 - Domain cutover setup for Cloudflare, Vercel, Railway, Resend, and R2 lives in
@@ -375,6 +377,9 @@ suites are skipped by the repo safety guard.
   blocker for the SLC.
 - Watch Railway, Resend, inventory readiness, and media health during the first
   real-user wave.
+- Use `docs/launch-release-checklist.md` as the first stop for release-day
+  ordering before jumping into the deeper smoke, monitoring, inventory, and
+  media runbooks.
 - Safe production public smoke is available through
   `pnpm smoke:production-public`; the full authenticated launch sequence lives
   in `docs/launch-smoke-checklist.md`.
@@ -397,8 +402,9 @@ If staying in launch mode, ask the next session to help with launch operations:
 ```text
 Read AGENTS.md, docs/current-state-and-scope.md, and docs/next-session-context.md.
 Help operate the initial Sellr campus launch: seed or review launch listings,
-verify admin/community access, run media health checks, watch Railway/Resend
-logs, and record any launch notes. Do not add new product scope.
+verify admin/community access, follow docs/launch-release-checklist.md, run
+media health checks, watch Railway/Resend logs, and record any launch notes. Do
+not add new product scope.
 ```
 
 If continuing product development, use this prompt only for regression-driven

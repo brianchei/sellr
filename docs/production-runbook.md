@@ -51,6 +51,13 @@ Use [`launch-smoke-checklist.md`](./launch-smoke-checklist.md) for the full
 operator checklist covering email OTP, onboarding, inventory readiness, listing
 upload/CDN, messaging, notifications, reports/admin, and media health.
 
+## Launch Release Checklist
+
+Use [`launch-release-checklist.md`](./launch-release-checklist.md) as the
+canonical release-day sequence. It orders scope confirmation, CI, provider
+preflight, seed inventory, public smoke, authenticated smoke, media health,
+active monitoring, go/hold/rollback decisions, and evidence capture.
+
 ## Launch Monitoring
 
 Use [`launch-monitoring.md`](./launch-monitoring.md) during the first real-user

@@ -4,6 +4,10 @@ Use this during the initial campus launch and after production changes that
 touch auth, onboarding, marketplace browse, listing media, messaging,
 notifications, reports/admin, or environment variables.
 
+For release-day ordering, start with
+[`launch-release-checklist.md`](./launch-release-checklist.md), then use this
+file for watch windows, thresholds, provider surfaces, and incident response.
+
 This is a lightweight operator runbook, not a new monitoring platform. Prefer
 existing provider dashboards, structured logs, and the production smoke commands
 until launch traffic proves a need for more automation.

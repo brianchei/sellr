@@ -344,14 +344,16 @@ The full production smoke path has passed on `sellr-ai.com`. Repeat it after
 domain/env changes, migrations, or deploys that touch auth, communities,
 listings, uploads, messaging, notifications, or reports:
 
-1. Run `pnpm smoke:production-public`.
-2. Run the authenticated and mutable steps in
+1. Use [`launch-release-checklist.md`](./launch-release-checklist.md) as the
+   canonical ordered path.
+2. Run `pnpm smoke:production-public`.
+3. Run the authenticated and mutable steps in
    [`launch-smoke-checklist.md`](./launch-smoke-checklist.md).
-3. Record inventory readiness, media health, email OTP, listing CDN URL,
+4. Record inventory readiness, media health, email OTP, listing CDN URL,
    messaging, notification, and admin/report evidence.
-4. Confirm a newly uploaded listing image still loads after a Railway API
+5. Confirm a newly uploaded listing image still loads after a Railway API
    redeploy.
-5. Use [`launch-monitoring.md`](./launch-monitoring.md) for the active watch
+6. Use [`launch-monitoring.md`](./launch-monitoring.md) for the active watch
    window, alert thresholds, provider dashboards, and rollback signals.
 
 For local release verification, keep using:

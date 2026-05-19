@@ -205,6 +205,8 @@ Do not add these before launch unless explicitly requested:
 
 ## Immediate Launch Priorities
 
+- Use `docs/launch-release-checklist.md` as the canonical ordered release-day
+  checklist.
 - Seed 25-40 high-quality active listings for the initial campus launch.
 - Run `pnpm --filter @sellr/api inventory:readiness -- --community="Badger Market"`
   after seed inventory updates.
