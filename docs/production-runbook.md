@@ -51,6 +51,14 @@ Use [`launch-smoke-checklist.md`](./launch-smoke-checklist.md) for the full
 operator checklist covering email OTP, onboarding, inventory readiness, listing
 upload/CDN, messaging, notifications, reports/admin, and media health.
 
+## Launch Monitoring
+
+Use [`launch-monitoring.md`](./launch-monitoring.md) during the first real-user
+wave and after deploys that touch auth, marketplace, listing media, messaging,
+notifications, reports/admin, provider configuration, or database migrations.
+It defines watch windows, provider surfaces, alert thresholds, response
+playbooks, evidence rules, and rollback signals.
+
 ## Launch Inventory Readiness
 
 Run from the repository root with production API database environment variables

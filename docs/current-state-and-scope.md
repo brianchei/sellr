@@ -211,6 +211,8 @@ Do not add these before launch unless explicitly requested:
 - Confirm launch admin can access `/admin/community` and `/admin/reports`.
 - Run `pnpm smoke:production-public` after deploys that touch custom domains,
   auth rewrites, or public routes.
+- Use `docs/launch-monitoring.md` for first-wave watch windows, alert
+  thresholds, evidence rules, and rollback signals.
 - Watch Railway logs and Resend logs during the first real-user wave.
 - Run `pnpm --filter @sellr/api media:health` after early listing activity.
 - Keep `sellr-web.vercel.app` and the Railway backing API URL available for
