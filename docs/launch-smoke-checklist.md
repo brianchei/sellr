@@ -4,6 +4,10 @@ Use this after production deploys that touch auth, onboarding, marketplace,
 listing lifecycle, media upload, messaging, reports/admin, notifications,
 environment variables, custom domains, or database migrations.
 
+For release-day ordering, start with
+[`launch-release-checklist.md`](./launch-release-checklist.md), then use this
+file for the detailed authenticated and mutable smoke steps.
+
 The checklist has two layers:
 
 - Safe public checks that can run any time.
