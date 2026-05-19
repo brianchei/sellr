@@ -375,6 +375,9 @@ suites are skipped by the repo safety guard.
   blocker for the SLC.
 - Watch Railway, Resend, inventory readiness, and media health during the first
   real-user wave.
+- Safe production public smoke is available through
+  `pnpm smoke:production-public`; the full authenticated launch sequence lives
+  in `docs/launch-smoke-checklist.md`.
 - Seed enough high-quality active listings for the initial UW-Madison launch;
   use `pnpm --filter @sellr/api inventory:readiness -- --community="Badger Market"`
   as the operational checklist.

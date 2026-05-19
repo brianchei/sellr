@@ -209,6 +209,8 @@ Do not add these before launch unless explicitly requested:
 - Run `pnpm --filter @sellr/api inventory:readiness -- --community="Badger Market"`
   after seed inventory updates.
 - Confirm launch admin can access `/admin/community` and `/admin/reports`.
+- Run `pnpm smoke:production-public` after deploys that touch custom domains,
+  auth rewrites, or public routes.
 - Watch Railway logs and Resend logs during the first real-user wave.
 - Run `pnpm --filter @sellr/api media:health` after early listing activity.
 - Keep `sellr-web.vercel.app` and the Railway backing API URL available for
