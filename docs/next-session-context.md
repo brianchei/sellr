@@ -378,6 +378,9 @@ suites are skipped by the repo safety guard.
 - Safe production public smoke is available through
   `pnpm smoke:production-public`; the full authenticated launch sequence lives
   in `docs/launch-smoke-checklist.md`.
+- Launch monitoring coverage lives in `docs/launch-monitoring.md`, including
+  provider watch surfaces, P0/P1/P2 thresholds, response playbooks, evidence
+  rules, and rollback signals.
 - Seed enough high-quality active listings for the initial UW-Madison launch;
   use `pnpm --filter @sellr/api inventory:readiness -- --community="Badger Market"`
   as the operational checklist.

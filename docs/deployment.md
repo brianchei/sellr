@@ -351,6 +351,8 @@ listings, uploads, messaging, notifications, or reports:
    messaging, notification, and admin/report evidence.
 4. Confirm a newly uploaded listing image still loads after a Railway API
    redeploy.
+5. Use [`launch-monitoring.md`](./launch-monitoring.md) for the active watch
+   window, alert thresholds, provider dashboards, and rollback signals.
 
 For local release verification, keep using:
 
