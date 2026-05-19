@@ -346,7 +346,10 @@ suites are skipped by the repo safety guard.
 ## Files To Read First
 
 - `AGENTS.md`
+- `PRODUCT.md`
+- `DESIGN.md`
 - `README.md`
+- `docs/ui-upgrade-reference-workflow.md`
 - `docs/current-state-and-scope.md`
 - `docs/deployment.md`
 - `docs/custom-domain-cutover.md`
@@ -360,6 +363,9 @@ suites are skipped by the repo safety guard.
 
 ## Follow-Up Engineering Risks
 
+- Inspiration-led UI upgrade prep now lives in `PRODUCT.md`, `DESIGN.md`, and
+  `docs/ui-upgrade-reference-workflow.md`. Use those before translating
+  hand-picked references into implementation slices.
 - Media cleanup health tooling is now implemented through API scripts:
   `media:health`, `media:cleanup-expired`, and `media:retry-failed`.
 - Production runbook coverage lives in `docs/production-runbook.md`.
@@ -421,4 +427,20 @@ or F route redesigns unless a fresh audit finds a concrete regression. Fix only
 small regressions, update docs with the exact current state, preserve current SLC
 behavior, do not implement Phase 6 AI, do not add broad product scope, and do
 not add a new design-system library.
+```
+
+If starting the planned inspiration-led UI upgrade, ask the next session to
+begin with reference intake rather than immediate code changes:
+
+```text
+Read AGENTS.md, PRODUCT.md, DESIGN.md, docs/ui-upgrade-reference-workflow.md,
+docs/current-state-and-scope.md, docs/design-language.md,
+docs/ui-ux-overhaul-guide.md, docs/web-next-development-guide.md,
+apps/web/README.md, and apps/web/app/globals.css.
+
+I will provide hand-picked UI references and inspirations. First create a
+reference-intake brief that identifies what each source contributes, what Sellr
+should avoid copying, and the smallest safe implementation slices. Do not
+implement Phase 6 AI, do not add broad product scope, do not add a new
+design-system library, and preserve current SLC behavior.
 ```

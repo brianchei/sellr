@@ -47,8 +47,11 @@ current production state and launch scope,
 [`docs/custom-domain-cutover.md`](docs/custom-domain-cutover.md) for the
 Cloudflare/Vercel/Railway domain cutover guide,
 [`docs/email-first-auth.md`](docs/email-first-auth.md) for the Resend email OTP
-flow, [`docs/ui-ux-overhaul-guide.md`](docs/ui-ux-overhaul-guide.md) for the
-Pre-Phase 6 redesign handoff, including onboarding, route-by-route UX
+flow, [`PRODUCT.md`](PRODUCT.md) and [`DESIGN.md`](DESIGN.md) for strategic and
+machine-readable design context,
+[`docs/ui-upgrade-reference-workflow.md`](docs/ui-upgrade-reference-workflow.md)
+for inspiration-led UI upgrade intake, [`docs/ui-ux-overhaul-guide.md`](docs/ui-ux-overhaul-guide.md)
+for the Pre-Phase 6 redesign handoff, including onboarding, route-by-route UX
 direction, accessibility, metrics, and Phase A-F implementation sequencing, and
 [`docs/next-session-context.md`](docs/next-session-context.md) for a short
 handoff brief for continuing work in a new agent session.
