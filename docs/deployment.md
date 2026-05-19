@@ -344,21 +344,13 @@ The full production smoke path has passed on `sellr-ai.com`. Repeat it after
 domain/env changes, migrations, or deploys that touch auth, communities,
 listings, uploads, messaging, notifications, or reports:
 
-1. Open `/health` on the public API origin, `https://api.sellr-ai.com`.
-2. Open the public web origin, `https://sellr-ai.com`.
-3. Log in with a real `@wisc.edu` email OTP.
-4. Join or confirm access to `Badger Market`.
-5. Browse marketplace listings.
-6. Create a listing with a local image upload.
-7. Open the listing detail page.
-8. Send a buyer contact message.
-9. Confirm inbox and notifications update.
-10. Confirm `/admin/community` invite/member management as an admin.
-11. Sign in as an admin and open `/admin/reports`.
-12. For a listing report, use **Remove listing** and confirm the listing is
-    removed and associated media cleanup is queued/deleted.
-13. Confirm a newly uploaded listing image still loads after a Railway API
-    redeploy.
+1. Run `pnpm smoke:production-public`.
+2. Run the authenticated and mutable steps in
+   [`launch-smoke-checklist.md`](./launch-smoke-checklist.md).
+3. Record inventory readiness, media health, email OTP, listing CDN URL,
+   messaging, notification, and admin/report evidence.
+4. Confirm a newly uploaded listing image still loads after a Railway API
+   redeploy.
 
 For local release verification, keep using:
 

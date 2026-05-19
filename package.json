@@ -21,6 +21,7 @@
     "smoke:buyer": "node scripts/smoke-buyer-contact.cjs",
     "smoke:inbox": "node scripts/smoke-inbox-thread.cjs",
     "smoke:notifications": "node scripts/smoke-notifications.cjs",
+    "smoke:production-public": "node scripts/smoke-production-public.cjs",
     "smoke:reports": "node scripts/smoke-report-submit.cjs",
     "smoke:web": "node scripts/smoke-web-routes.cjs",
     "slc:ready": "node scripts/slc-readiness.cjs"

@@ -39,6 +39,18 @@ OTP, `Badger Market` join, `BADGER2026`, `cdn.sellr-ai.com` listing media,
 buyer contact, inbox, notifications, and seller listing lifecycle were verified
 on May 11, 2026.
 
+## Production Smoke
+
+Run the safe, non-mutating public smoke after production deploys:
+
+```bash
+pnpm smoke:production-public
+```
+
+Use [`launch-smoke-checklist.md`](./launch-smoke-checklist.md) for the full
+operator checklist covering email OTP, onboarding, inventory readiness, listing
+upload/CDN, messaging, notifications, reports/admin, and media health.
+
 ## Launch Inventory Readiness
 
 Run from the repository root with production API database environment variables
